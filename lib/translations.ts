@@ -1,5 +1,3 @@
-import { FREE_SHIPPING_THRESHOLD_EUROS } from "@/lib/shipping"
-
 export type Locale = "it" | "en" | "es" | "de" | "fr"
 
 export const localeNames: Record<Locale, string> = {
@@ -96,7 +94,7 @@ export const translations = {
       home: "Home",
       collections: "Collezioni",
       freeShipping: "Spedizione Gratuita",
-      freeShippingDesc: `Da ${FREE_SHIPPING_THRESHOLD_EUROS}\u00A0€`,
+      freeShippingDesc: "Sempre, senza importo minimo",
       freeReturn: "Reso Gratuito",
       freeReturnDesc: "Entro 30 giorni",
       securePayment: "Pagamento Sicuro",
@@ -108,7 +106,7 @@ export const translations = {
       exclusiveDesign: "Design esclusivo MIRΛI",
       regularFit: "Vestibilità regolare",
       availableSizes: "Taglie disponibili",
-      shippingInfo: `Spedizione standard gratuita per ordini da ${FREE_SHIPPING_THRESHOLD_EUROS}\u00A0€. Consegna in 3-5 giorni lavorativi.`,
+      shippingInfo: "Spedizione standard sempre gratuita. Consegna in 3-5 giorni lavorativi.",
       returnInfo: "Reso gratuito entro 30 giorni dalla ricezione. Il prodotto deve essere nelle condizioni originali con tutti i cartellini.",
       youMayAlsoLike: "Potrebbe Piacerti Anche",
       reduceQuantity: "Riduci quantità",
@@ -117,7 +115,7 @@ export const translations = {
     // Features
     features: {
       globalShipping: "Spedizione Globale",
-      globalShippingDesc: `Consegna standard gratuita in tutta Europa per ordini da ${FREE_SHIPPING_THRESHOLD_EUROS}\u00A0€.`,
+      globalShippingDesc: "Consegna standard gratuita in tutta Europa.",
       securePayment: "Pagamento Sicuro",
       securePaymentDesc: "Transazioni protette con crittografia di livello bancario.",
       easyReturns: "Resi Facili",
@@ -266,7 +264,7 @@ export const translations = {
       home: "Home",
       collections: "Collections",
       freeShipping: "Free Shipping",
-      freeShippingDesc: `From €${FREE_SHIPPING_THRESHOLD_EUROS}`,
+      freeShippingDesc: "Always, with no minimum order",
       freeReturn: "Free Returns",
       freeReturnDesc: "Within 30 days",
       securePayment: "Secure Payment",
@@ -278,7 +276,7 @@ export const translations = {
       exclusiveDesign: "Exclusive MIRΛI design",
       regularFit: "Regular fit",
       availableSizes: "Available sizes",
-      shippingInfo: `Free standard shipping for orders of €${FREE_SHIPPING_THRESHOLD_EUROS} or more. Delivery in 3-5 business days.`,
+      shippingInfo: "Standard shipping is always free. Delivery in 3-5 business days.",
       returnInfo: "Free returns within 30 days of receipt. The product must be in original condition with all tags.",
       youMayAlsoLike: "You May Also Like",
       reduceQuantity: "Reduce quantity",
@@ -287,7 +285,7 @@ export const translations = {
     // Features
     features: {
       globalShipping: "Global Shipping",
-      globalShippingDesc: `Free standard delivery across Europe for orders of €${FREE_SHIPPING_THRESHOLD_EUROS} or more.`,
+      globalShippingDesc: "Free standard delivery across Europe.",
       securePayment: "Secure Payment",
       securePaymentDesc: "Transactions protected with bank-level encryption.",
       easyReturns: "Easy Returns",
@@ -436,7 +434,7 @@ export const translations = {
       home: "Inicio",
       collections: "Colecciones",
       freeShipping: "Envío Gratuito",
-      freeShippingDesc: `A partir de ${FREE_SHIPPING_THRESHOLD_EUROS}\u00A0€`,
+      freeShippingDesc: "Siempre, sin pedido mínimo",
       freeReturn: "Devolución Gratuita",
       freeReturnDesc: "Dentro de 30 días",
       securePayment: "Pago Seguro",
@@ -448,7 +446,7 @@ export const translations = {
       exclusiveDesign: "Diseño exclusivo MIRΛI",
       regularFit: "Ajuste regular",
       availableSizes: "Tallas disponibles",
-      shippingInfo: `Envío estándar gratuito para pedidos desde ${FREE_SHIPPING_THRESHOLD_EUROS}\u00A0€. Entrega en 3-5 días laborables.`,
+      shippingInfo: "El envío estándar es siempre gratuito. Entrega en 3-5 días laborables.",
       returnInfo: "Devolución gratuita dentro de los 30 días de la recepción. El producto debe estar en condiciones originales con todas las etiquetas.",
       youMayAlsoLike: "También Te Puede Gustar",
       reduceQuantity: "Reducir cantidad",
@@ -457,7 +455,7 @@ export const translations = {
     // Features
     features: {
       globalShipping: "Envío Global",
-      globalShippingDesc: `Entrega estándar gratuita en toda Europa para pedidos desde ${FREE_SHIPPING_THRESHOLD_EUROS}\u00A0€.`,
+      globalShippingDesc: "Entrega estándar gratuita en toda Europa.",
       securePayment: "Pago Seguro",
       securePaymentDesc: "Transacciones protegidas con encriptación de nivel bancario.",
       easyReturns: "Devoluciones Fáciles",
@@ -606,7 +604,7 @@ export const translations = {
       home: "Startseite",
       collections: "Kollektionen",
       freeShipping: "Kostenloser Versand",
-      freeShippingDesc: `Ab ${FREE_SHIPPING_THRESHOLD_EUROS}\u00A0€`,
+      freeShippingDesc: "Immer, ohne Mindestbestellwert",
       freeReturn: "Kostenlose Rücksendung",
       freeReturnDesc: "Innerhalb von 30 Tagen",
       securePayment: "Sichere Zahlung",
@@ -618,7 +616,7 @@ export const translations = {
       exclusiveDesign: "Exklusives MIRΛI Design",
       regularFit: "Normale Passform",
       availableSizes: "Verfügbare Größen",
-      shippingInfo: `Kostenloser Standardversand ab ${FREE_SHIPPING_THRESHOLD_EUROS}\u00A0€. Lieferung in 3-5 Werktagen.`,
+      shippingInfo: "Der Standardversand ist immer kostenlos. Lieferung in 3-5 Werktagen.",
       returnInfo: "Kostenlose Rücksendung innerhalb von 30 Tagen nach Erhalt. Das Produkt muss sich im Originalzustand mit allen Etiketten befinden.",
       youMayAlsoLike: "Das Könnte Dir Auch Gefallen",
       reduceQuantity: "Menge reduzieren",
@@ -627,7 +625,7 @@ export const translations = {
     // Features
     features: {
       globalShipping: "Weltweiter Versand",
-      globalShippingDesc: `Kostenlose Standardlieferung in ganz Europa ab ${FREE_SHIPPING_THRESHOLD_EUROS}\u00A0€.`,
+      globalShippingDesc: "Kostenlose Standardlieferung in ganz Europa.",
       securePayment: "Sichere Zahlung",
       securePaymentDesc: "Transaktionen mit Verschlüsselung auf Bankniveau geschützt.",
       easyReturns: "Einfache Rücksendung",
@@ -776,7 +774,7 @@ export const translations = {
       home: "Accueil",
       collections: "Collections",
       freeShipping: "Livraison Gratuite",
-      freeShippingDesc: `À partir de ${FREE_SHIPPING_THRESHOLD_EUROS}\u00A0€`,
+      freeShippingDesc: "Toujours, sans minimum de commande",
       freeReturn: "Retour Gratuit",
       freeReturnDesc: "Sous 30 jours",
       securePayment: "Paiement Sécurisé",
@@ -788,7 +786,7 @@ export const translations = {
       exclusiveDesign: "Design exclusif MIRΛI",
       regularFit: "Coupe régulière",
       availableSizes: "Tailles disponibles",
-      shippingInfo: `Livraison standard gratuite à partir de ${FREE_SHIPPING_THRESHOLD_EUROS}\u00A0€. Livraison en 3-5 jours ouvrables.`,
+      shippingInfo: "La livraison standard est toujours gratuite. Livraison en 3-5 jours ouvrables.",
       returnInfo: "Retour gratuit dans les 30 jours suivant la réception. Le produit doit être dans son état d'origine avec toutes les étiquettes.",
       youMayAlsoLike: "Vous Aimerez Aussi",
       reduceQuantity: "Réduire la quantité",
@@ -797,7 +795,7 @@ export const translations = {
     // Features
     features: {
       globalShipping: "Livraison Mondiale",
-      globalShippingDesc: `Livraison standard gratuite dans toute l'Europe à partir de ${FREE_SHIPPING_THRESHOLD_EUROS}\u00A0€.`,
+      globalShippingDesc: "Livraison standard gratuite dans toute l'Europe.",
       securePayment: "Paiement Sécurisé",
       securePaymentDesc: "Transactions protégées par un cryptage de niveau bancaire.",
       easyReturns: "Retours Faciles",

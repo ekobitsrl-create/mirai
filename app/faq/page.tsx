@@ -3,7 +3,7 @@ import Link from "next/link"
 import { ArrowLeft } from "lucide-react"
 import { Navbar } from "@/components/navbar"
 import { Footer } from "@/components/footer"
-import { FREE_SHIPPING_THRESHOLD_EUROS, formatShippingPrice, SHIPPING_CONFIG } from "@/lib/shipping"
+import { formatShippingPrice, SHIPPING_CONFIG } from "@/lib/shipping"
 
 export const metadata: Metadata = {
   title: "FAQ - MIRAI",
@@ -33,7 +33,7 @@ const faqs = [
     questions: [
       {
         q: "Quanto costa la spedizione?",
-        a: `La spedizione standard è gratuita per ordini da ${FREE_SHIPPING_THRESHOLD_EUROS}\u00A0€. Per ordini inferiori costa ${formatShippingPrice(SHIPPING_CONFIG.standardPriceCents)}. La spedizione express costa ${formatShippingPrice(SHIPPING_CONFIG.expressPriceCents)}.`,
+        a: `La spedizione standard è sempre gratuita, senza importo minimo. La spedizione express costa ${formatShippingPrice(SHIPPING_CONFIG.expressPriceCents)}.`,
       },
       {
         q: "In quanto tempo ricevero il mio ordine?",

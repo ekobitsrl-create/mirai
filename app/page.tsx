@@ -9,13 +9,12 @@ import { Newsletter } from "@/components/newsletter"
 import { Footer } from "@/components/footer"
 import { createClient } from "@/lib/supabase/server"
 import { withDemoProducts } from "@/lib/products"
-import { FREE_SHIPPING_THRESHOLD_EUROS } from "@/lib/shipping"
 
 export const dynamic = "force-dynamic"
 
 export const metadata: Metadata = {
   title: "MIRAI - Streetwear & Cappelli Custom | Moda Urbana Made in Italy",
-  description: `Scopri la collezione MIRAI: streetwear esclusivo, cappelli custom New Era con cristalli e borchie, pezzi unici fatti a mano. Spedizione gratuita da ${FREE_SHIPPING_THRESHOLD_EUROS}\u00A0€.`,
+  description: "Scopri la collezione MIRAI: streetwear esclusivo, cappelli custom New Era con cristalli e borchie, pezzi unici fatti a mano. Spedizione gratuita.",
   openGraph: {
     title: "MIRAI - Streetwear & Cappelli Custom",
     description: "Streetwear esclusivo e cappelli custom New Era. Pezzi unici fatti a mano. Made in Italy.",

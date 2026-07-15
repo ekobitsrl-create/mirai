@@ -1,6 +1,4 @@
 export const SHIPPING_CONFIG = {
-  freeThresholdCents: 15_000,
-  standardPriceCents: 590,
   expressPriceCents: 990,
   standardDeliveryDays: { minimum: 3, maximum: 5 },
   expressDeliveryDays: { minimum: 1, maximum: 2 },
@@ -11,8 +9,6 @@ export const SHIPPING_CONFIG = {
   ],
 } as const
 
-export const FREE_SHIPPING_THRESHOLD_EUROS = SHIPPING_CONFIG.freeThresholdCents / 100
-
 export function formatShippingPrice(cents: number) {
   return new Intl.NumberFormat("it-IT", {
     style: "currency",
@@ -21,22 +17,16 @@ export function formatShippingPrice(cents: number) {
   }).format(cents / 100)
 }
 
-export function getStripeShippingOptions(subtotalCents: number) {
-  const standardAmount = subtotalCents >= SHIPPING_CONFIG.freeThresholdCents
-    ? 0
-    : SHIPPING_CONFIG.standardPriceCents
-
+export function getStripeShippingOptions(_subtotalCents: number) {
   return [
     {
       shipping_rate_data: {
         type: "fixed_amount" as const,
         fixed_amount: {
-          amount: standardAmount,
+          amount: 0,
           currency: "eur",
         },
-        display_name: standardAmount === 0
-          ? "Spedizione Standard Gratuita"
-          : "Spedizione Standard",
+        display_name: "Spedizione Standard Gratuita",
         delivery_estimate: {
           minimum: {
             unit: "business_day" as const,

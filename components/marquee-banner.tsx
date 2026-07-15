@@ -2,7 +2,6 @@
 
 import { useState } from "react"
 import { X } from "lucide-react"
-import { FREE_SHIPPING_THRESHOLD_EUROS } from "@/lib/shipping"
 
 function InfiniteMarquee({ children, speed = "normal", className = "" }: { children: React.ReactNode; speed?: "normal" | "fast"; className?: string }) {
   const animClass = speed === "fast" ? "animate-marquee-fast" : "animate-marquee"
@@ -26,7 +25,7 @@ export function MarqueeBanner() {
     <div className="relative z-50">
       {/* Top info bar - subtle */}
       <InfiniteMarquee speed="normal" className="bg-secondary border-b border-border py-2">
-        {[`Spedizione Gratuita da ${FREE_SHIPPING_THRESHOLD_EUROS}\u00A0€`, "Resi Gratuiti entro 30 Giorni", "Pagamento Sicuro e Protetto", "Spedizione Express Disponibile"].map((msg, i) => (
+        {["Spedizione Gratuita", "Resi Gratuiti entro 30 Giorni", "Pagamento Sicuro e Protetto", "Spedizione Express Disponibile"].map((msg, i) => (
           <span key={i} className="mx-8 text-[11px] tracking-[0.2em] uppercase text-muted-foreground">
             {msg}
           </span>

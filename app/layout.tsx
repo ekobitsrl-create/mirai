@@ -8,7 +8,6 @@ import { WhatsAppButton } from '@/components/whatsapp-button'
 import { BackgroundMusic } from '@/components/background-music'
 import { SiteIntro } from '@/components/site-intro'
 import { MiraGuide } from '@/components/mira-guide'
-import { FREE_SHIPPING_THRESHOLD_EUROS } from '@/lib/shipping'
 import './globals.css'
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
@@ -22,7 +21,7 @@ export const metadata: Metadata = {
     default: "MIRAI - Streetwear & Cappelli Custom | Moda Urbana Made in Italy",
     template: "%s | MIRAI",
   },
-  description: `Scopri MIRAI: streetwear esclusivo e cappelli custom New Era con cristalli e borchie. Pezzi unici fatti a mano. Spedizione gratuita da ${FREE_SHIPPING_THRESHOLD_EUROS}\u00A0€. Made in Italy.`,
+  description: "Scopri MIRAI: streetwear esclusivo e cappelli custom New Era con cristalli e borchie. Pezzi unici fatti a mano. Spedizione gratuita. Made in Italy.",
   keywords: [
     "streetwear", "cappelli custom", "New Era custom", "moda urbana",
     "abbigliamento streetwear", "cappelli personalizzati", "borchie",

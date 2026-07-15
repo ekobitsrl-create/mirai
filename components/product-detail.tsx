@@ -23,7 +23,6 @@ import {
 } from "lucide-react"
 import { useCart } from "@/lib/cart-context"
 import type { StoreProduct } from "@/lib/products"
-import { FREE_SHIPPING_THRESHOLD_EUROS } from "@/lib/shipping"
 
 function formatCategory(slug: string) {
   return slug.replace(/-/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase())
@@ -319,7 +318,7 @@ export function ProductDetail({
           </div>
 
           <div className="mt-8 grid grid-cols-3 border-y border-white/15 bg-white/[0.025] py-5">
-            <TrustItem icon={Truck} title="Free shipping" detail={`Da €${FREE_SHIPPING_THRESHOLD_EUROS}`} />
+            <TrustItem icon={Truck} title="Spedizione gratuita" detail="Sempre" />
             <TrustItem icon={RotateCcw} title="Reso facile" detail="Entro 14 giorni" bordered />
             <TrustItem icon={ShieldCheck} title="Pagamento" detail="100% sicuro" />
           </div>

@@ -3,7 +3,7 @@ import Link from "next/link"
 import { ArrowLeft, Truck, Clock, Globe, Package } from "lucide-react"
 import { Navbar } from "@/components/navbar"
 import { Footer } from "@/components/footer"
-import { FREE_SHIPPING_THRESHOLD_EUROS, formatShippingPrice, SHIPPING_CONFIG } from "@/lib/shipping"
+import { formatShippingPrice, SHIPPING_CONFIG } from "@/lib/shipping"
 
 export const metadata: Metadata = {
   title: "Spedizioni - MIRAI",
@@ -29,7 +29,7 @@ export default function SpedizioniPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-16">
             {[
-              { icon: Truck, title: "Spedizione Standard", value: "3-5 giorni lavorativi", desc: `Gratuita per ordini da ${FREE_SHIPPING_THRESHOLD_EUROS}\u00A0€, altrimenti ${formatShippingPrice(SHIPPING_CONFIG.standardPriceCents)}` },
+              { icon: Truck, title: "Spedizione Standard", value: "3-5 giorni lavorativi", desc: "Sempre gratuita, senza importo minimo" },
               { icon: Clock, title: "Spedizione Express", value: "1-2 giorni lavorativi", desc: `Costo di ${formatShippingPrice(SHIPPING_CONFIG.expressPriceCents)}` },
               { icon: Globe, title: "Destinazioni Europee", value: "UE, Regno Unito e Svizzera", desc: "Stesse tariffe e tempistiche indicate sopra" },
               { icon: Package, title: "Ritiro in MIRAI LAB STORE", value: "Disponibile a breve", desc: "Ritira gratuitamente nel nostro MIRAI LAB STORE di Catania" },
