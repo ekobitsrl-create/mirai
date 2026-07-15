@@ -7,6 +7,7 @@ import { CookieBanner } from '@/components/cookie-banner'
 import { WhatsAppButton } from '@/components/whatsapp-button'
 import { BackgroundMusic } from '@/components/background-music'
 import { SiteIntro } from '@/components/site-intro'
+import { MiraGuide } from '@/components/mira-guide'
 import { FREE_SHIPPING_THRESHOLD_EUROS } from '@/lib/shipping'
 import './globals.css'
 
@@ -126,6 +127,7 @@ export default function RootLayout({
         <LanguageProvider>
           <CartProvider>
             {children}
+            <MiraGuide />
             <BackgroundMusic />
             <WhatsAppButton />
             <CookieBanner />

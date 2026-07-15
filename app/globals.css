@@ -174,3 +174,145 @@
 .delay-400 { animation-delay: 0.4s; }
 .delay-500 { animation-delay: 0.5s; }
 .delay-600 { animation-delay: 0.6s; }
+
+@keyframes mira-enter {
+  from {
+    opacity: 0;
+    transform: translate3d(70px, 22px, 0) scale(0.82);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+@keyframes mira-float {
+  0%, 100% {
+    transform: translate3d(0, 0, 0) rotate(-0.7deg);
+  }
+  48% {
+    transform: translate3d(0, -7px, 0) rotate(0.8deg);
+  }
+}
+
+@keyframes mira-type {
+  0%, 100% {
+    transform: translate3d(0, 0, 0) rotate(-1deg);
+  }
+  50% {
+    transform: translate3d(0, -3px, 0) rotate(1.2deg) scale(1.012);
+  }
+}
+
+@keyframes mira-happy {
+  0%, 100% {
+    transform: translateY(0) scale(1);
+  }
+  45% {
+    transform: translateY(-10px) scale(1.025);
+  }
+}
+
+@keyframes mira-glow {
+  0%, 100% {
+    opacity: 0.45;
+    transform: scale(0.86);
+  }
+  50% {
+    opacity: 0.9;
+    transform: scale(1.06);
+  }
+}
+
+@keyframes mira-panel-in {
+  from {
+    opacity: 0;
+    transform: translate3d(20px, 18px, 0) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+@keyframes mira-nudge-in {
+  from {
+    opacity: 0;
+    transform: translate3d(12px, 8px, 0) scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+@keyframes mira-dot {
+  0%, 65%, 100% {
+    opacity: 0.3;
+    transform: translateY(0);
+  }
+  32% {
+    opacity: 1;
+    transform: translateY(-3px);
+  }
+}
+
+.mira-enter {
+  animation: mira-enter 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.mira-idle {
+  animation: mira-float 4.2s ease-in-out infinite;
+  transform-origin: 50% 88%;
+}
+
+.mira-typing {
+  animation: mira-type 0.68s ease-in-out infinite;
+  transform-origin: 50% 82%;
+}
+
+.mira-happy {
+  animation: mira-happy 0.8s ease-in-out 2;
+  transform-origin: 50% 88%;
+}
+
+.mira-glow {
+  animation: mira-glow 3.2s ease-in-out infinite;
+}
+
+.mira-character-crop {
+  mix-blend-mode: screen;
+  -webkit-mask-image:
+    linear-gradient(to bottom, transparent 0%, black 10%, black 88%, transparent 100%),
+    linear-gradient(to right, transparent 0%, black 22%, black 78%, transparent 100%);
+  -webkit-mask-composite: source-in;
+  mask-image:
+    linear-gradient(to bottom, transparent 0%, black 10%, black 88%, transparent 100%),
+    linear-gradient(to right, transparent 0%, black 22%, black 78%, transparent 100%);
+  mask-composite: intersect;
+}
+
+.mira-panel {
+  animation: mira-panel-in 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.mira-nudge {
+  animation: mira-nudge-in 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.mira-typing-dot {
+  animation: mira-dot 0.9s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mira-enter,
+  .mira-idle,
+  .mira-typing,
+  .mira-happy,
+  .mira-glow,
+  .mira-panel,
+  .mira-nudge,
+  .mira-typing-dot {
+    animation: none !important;
+  }
+}
