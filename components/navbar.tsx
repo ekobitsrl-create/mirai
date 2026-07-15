@@ -159,6 +159,12 @@ export function Navbar() {
 
             <div className="hidden lg:flex items-center gap-8">
               <Link
+                href="/collezioni"
+                className="inline-flex items-center rounded-sm bg-primary px-4 py-2 text-[11px] font-bold uppercase tracking-[0.2em] text-primary-foreground transition-all hover:-translate-y-0.5 hover:bg-primary/90 hover:shadow-[0_10px_30px_rgba(168,85,247,0.25)]"
+              >
+                {t.nav.shop}
+              </Link>
+              <Link
                 href="/#prodotti"
                 className="text-sm tracking-widest uppercase text-white/55 hover:text-white transition-colors"
               >
@@ -270,6 +276,13 @@ export function Navbar() {
       {mobileOpen && (
         <div className="border-t border-white/10 bg-[#111113] lg:hidden">
           <div className="flex flex-col px-6 py-6 gap-4">
+            <Link
+              href="/collezioni"
+              className="flex items-center justify-center rounded-sm bg-primary px-4 py-3 text-xs font-bold uppercase tracking-[0.2em] text-primary-foreground"
+              onClick={() => setMobileOpen(false)}
+            >
+              {t.nav.shop}
+            </Link>
             <Link
               href="/#prodotti"
               className="text-sm tracking-widest uppercase text-white/55 hover:text-white transition-colors"

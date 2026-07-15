@@ -24,6 +24,7 @@ export const translations = {
   it: {
     // Navbar
     nav: {
+      shop: "Shop",
       newArrivals: "Nuovi Arrivi",
       collections: "Collezioni",
       aboutUs: "Chi Siamo",
@@ -193,6 +194,7 @@ export const translations = {
   en: {
     // Navbar
     nav: {
+      shop: "Shop",
       newArrivals: "New Arrivals",
       collections: "Collections",
       aboutUs: "About Us",
@@ -362,6 +364,7 @@ export const translations = {
   es: {
     // Navbar
     nav: {
+      shop: "Tienda",
       newArrivals: "Novedades",
       collections: "Colecciones",
       aboutUs: "Sobre Nosotros",
@@ -531,6 +534,7 @@ export const translations = {
   de: {
     // Navbar
     nav: {
+      shop: "Shop",
       newArrivals: "Neuheiten",
       collections: "Kollektionen",
       aboutUs: "Über Uns",
@@ -700,6 +704,7 @@ export const translations = {
   fr: {
     // Navbar
     nav: {
+      shop: "Boutique",
       newArrivals: "Nouveautés",
       collections: "Collections",
       aboutUs: "À Propos",

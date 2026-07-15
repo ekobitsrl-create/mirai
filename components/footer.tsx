@@ -2,6 +2,7 @@
 
 import Link from "next/link"
 import { useLanguage } from "@/lib/language-context"
+import { PaymentBadges } from "@/components/payment-badges"
 
 export function Footer() {
   const { t } = useLanguage()
@@ -81,15 +82,15 @@ export function Footer() {
           ))}
         </div>
 
-        <div className="mt-16 pt-8 border-t border-border flex flex-col md:flex-row items-center justify-between gap-4">
+        <div className="mt-16 flex flex-col items-center justify-between gap-6 border-t border-border pt-8 md:flex-row">
           <p className="text-xs text-muted-foreground">
             &copy; 2026 MIRAI. {t.footer.allRightsReserved}
           </p>
-          <div className="flex items-center gap-6">
-            <span className="text-xs text-muted-foreground">Visa</span>
-            <span className="text-xs text-muted-foreground">Mastercard</span>
-            <span className="text-xs text-muted-foreground">PayPal</span>
-            <span className="text-xs text-muted-foreground">Apple Pay</span>
+          <div className="flex flex-col items-center gap-2 md:items-end">
+            <span className="text-[9px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">
+              Pagamenti accettati
+            </span>
+            <PaymentBadges />
           </div>
         </div>
       </div>

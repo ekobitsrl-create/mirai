@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import type Stripe from 'stripe'
 import { assertStripeConfigured, stripe } from '@/lib/stripe'
 import { createClient } from '@/lib/supabase/server'
 import { getDemoProduct, isBlackIslandProduct, type StoreProduct } from '@/lib/products'
@@ -16,10 +17,31 @@ export async function POST(request: NextRequest) {
   try {
     assertStripeConfigured()
     const body = await request.json()
-    const { items, priceId } = body
+    const { items, priceId, paymentMethod, cancelPath } = body
+
+    const quickPaymentMethod =
+      paymentMethod === 'paypal' || paymentMethod === 'klarna'
+        ? paymentMethod
+        : null
+
+    if (paymentMethod && !quickPaymentMethod) {
+      return NextResponse.json(
+        { error: 'Metodo di pagamento non supportato' },
+        { status: 400 }
+      )
+    }
+
+    const paymentMethodParams: Pick<Stripe.Checkout.SessionCreateParams, 'payment_method_types'> | Record<string, never> = quickPaymentMethod
+      ? { payment_method_types: [quickPaymentMethod] }
+      : {}
 
     // Base URL per i redirect
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+    const configuredBaseUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_SITE_URL
+    const baseUrl = (configuredBaseUrl || request.nextUrl.origin).replace(/\/$/, '')
+    const safeCancelPath =
+      typeof cancelPath === 'string' && cancelPath.startsWith('/') && !cancelPath.startsWith('//')
+        ? cancelPath
+        : '/cancel'
 
     // Se viene passato un priceId diretto (prodotto Stripe)
     if (priceId) {
@@ -30,7 +52,7 @@ export async function POST(request: NextRequest) {
 
       const session = await stripe.checkout.sessions.create({
         mode: 'payment',
-        payment_method_types: ['card'],
+        ...paymentMethodParams,
         line_items: [
           {
             price: priceId,
@@ -42,7 +64,7 @@ export async function POST(request: NextRequest) {
         },
         shipping_options: getStripeShippingOptions(price.unit_amount),
         success_url: `${baseUrl}/success?session_id={CHECKOUT_SESSION_ID}`,
-        cancel_url: `${baseUrl}/cancel`,
+        cancel_url: `${baseUrl}${safeCancelPath}`,
       })
 
       return NextResponse.json({ url: session.url })
@@ -113,7 +135,7 @@ export async function POST(request: NextRequest) {
     // Crea la sessione Stripe Checkout
     const session = await stripe.checkout.sessions.create({
       mode: 'payment',
-      payment_method_types: ['card'],
+      ...paymentMethodParams,
       line_items: lineItems,
       // Raccolta indirizzo di spedizione
       shipping_address_collection: {
@@ -122,10 +144,11 @@ export async function POST(request: NextRequest) {
       shipping_options: getStripeShippingOptions(subtotalCents),
       // URL di redirect
       success_url: `${baseUrl}/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${baseUrl}/cancel`,
+      cancel_url: `${baseUrl}${safeCancelPath}`,
       // Metadata per tracciamento ordine
       metadata: {
         order_items: JSON.stringify(items),
+        ...(quickPaymentMethod ? { requested_payment_method: quickPaymentMethod } : {}),
       },
     })
 

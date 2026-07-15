@@ -8,6 +8,7 @@ import {
   ChevronDown,
   ChevronRight,
   Heart,
+  Loader2,
   Minus,
   PackageCheck,
   Plus,
@@ -50,6 +51,8 @@ export function ProductDetail({
   const [wished, setWished] = useState(false)
   const [zoomOpen, setZoomOpen] = useState(false)
   const [sizeGuideOpen, setSizeGuideOpen] = useState(false)
+  const [quickPaymentLoading, setQuickPaymentLoading] = useState<"paypal" | "klarna" | null>(null)
+  const [paymentError, setPaymentError] = useState<string | null>(null)
 
   const sizes = product.sizes || []
 
@@ -101,6 +104,48 @@ export function ProductDetail({
     })
     setAdded(true)
     window.setTimeout(() => setAdded(false), 2200)
+  }
+
+  async function handleQuickPayment(paymentMethod: "paypal" | "klarna") {
+    if (sizes.length > 0 && !selectedSize) {
+      setSizeError(true)
+      return
+    }
+
+    setPaymentError(null)
+    setQuickPaymentLoading(paymentMethod)
+
+    try {
+      const response = await fetch("/api/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          items: [
+            {
+              productId: product.id,
+              quantity,
+              size: selectedSize || "OS",
+            },
+          ],
+          paymentMethod,
+          cancelPath: `/prodotto/${product.id}`,
+        }),
+      })
+      const result = await response.json()
+
+      if (!response.ok || !result.url) {
+        throw new Error(result.error || "Pagamento momentaneamente non disponibile")
+      }
+
+      window.location.assign(result.url)
+    } catch (error) {
+      setPaymentError(
+        error instanceof Error
+          ? error.message
+          : "Pagamento momentaneamente non disponibile"
+      )
+      setQuickPaymentLoading(null)
+    }
   }
 
   async function shareProduct() {
@@ -227,6 +272,46 @@ export function ProductDetail({
               {added ? <><Check className="h-4 w-4" /> Aggiunto</> : product.in_stock ? <><ShoppingBag className="h-4 w-4" /> Aggiungi al carrello</> : "Esaurito"}
             </button>
           </div>
+
+          {product.in_stock && (
+            <div className="mt-5 border-t border-white/10 pt-5">
+              <div className="mb-3 flex items-center gap-3">
+                <span className="h-px flex-1 bg-white/10" />
+                <span className="text-[9px] font-semibold uppercase tracking-[0.2em] text-white/35">
+                  oppure paga subito
+                </span>
+                <span className="h-px flex-1 bg-white/10" />
+              </div>
+              <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                <button
+                  type="button"
+                  onClick={() => handleQuickPayment("paypal")}
+                  disabled={quickPaymentLoading !== null}
+                  className="flex h-12 items-center justify-center gap-2 rounded-md bg-[#ffc439] px-4 text-sm font-black italic tracking-[-0.03em] text-[#003087] transition-all hover:-translate-y-0.5 hover:brightness-105 disabled:cursor-wait disabled:opacity-60"
+                >
+                  {quickPaymentLoading === "paypal" && <Loader2 className="h-4 w-4 animate-spin" />}
+                  <span>Pay<span className="text-[#009cde]">Pal</span></span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleQuickPayment("klarna")}
+                  disabled={quickPaymentLoading !== null}
+                  className="flex h-12 items-center justify-center gap-2 rounded-md bg-[#ffb3c7] px-4 text-sm font-black tracking-[-0.03em] text-[#17120f] transition-all hover:-translate-y-0.5 hover:brightness-105 disabled:cursor-wait disabled:opacity-60"
+                >
+                  {quickPaymentLoading === "klarna" && <Loader2 className="h-4 w-4 animate-spin" />}
+                  Klarna.
+                </button>
+              </div>
+              <p className="mt-2 text-center text-[9px] leading-4 text-white/30">
+                Checkout sicuro gestito da Stripe. Spedizione e indirizzo vengono scelti nel passaggio successivo.
+              </p>
+              {paymentError && (
+                <p className="mt-2 text-center text-[10px] text-[#ff9b9b]" role="alert">
+                  {paymentError}
+                </p>
+              )}
+            </div>
+          )}
 
           <div className="mt-4 flex items-center gap-2 text-[10px] text-white/40">
             <PackageCheck className="h-4 w-4 text-emerald-400" />

@@ -211,17 +211,18 @@ export function ShopGrid({
   }
 
   return (
-    <div className="min-h-screen bg-[#0c0c0d] text-[#f4f4f1] pt-28 md:pt-32 pb-24">
+    <div className="min-h-screen bg-background pb-24 pt-28 text-foreground md:pt-32">
       <section className="relative overflow-hidden border-b border-white/10">
-        <div className="absolute -right-28 -top-32 h-[420px] w-[420px] rounded-full bg-violet-600/10 blur-[100px]" />
-        <div className="mx-auto max-w-[1500px] px-5 py-14 md:px-8 md:py-20">
+        <div className="absolute -right-28 -top-32 h-[420px] w-[420px] rounded-full bg-primary/20 blur-[110px]" />
+        <div className="absolute -left-32 bottom-0 h-72 w-72 rounded-full bg-primary/10 blur-[100px]" />
+        <div className="mx-auto max-w-[1500px] px-5 py-12 md:px-8 md:py-16">
           <div className="flex flex-col gap-10 lg:flex-row lg:items-end lg:justify-between">
             <div className="max-w-3xl">
-              <div className="mb-5 flex items-center gap-3 text-[10px] font-semibold uppercase tracking-[0.34em] text-[#9f86ff]">
+              <div className="mb-4 flex items-center gap-3 text-[10px] font-semibold uppercase tracking-[0.34em] text-primary">
                 <Sparkles className="h-3.5 w-3.5" />
                 Drop 01 / Shop all
               </div>
-              <h1 className="text-[clamp(3.5rem,11vw,9rem)] font-semibold uppercase leading-[0.78] tracking-[-0.075em]">
+              <h1 className="text-[clamp(2.75rem,8vw,6rem)] font-semibold uppercase leading-[0.88] tracking-[-0.06em] text-foreground">
                 The shop
               </h1>
               <p className="mt-8 max-w-xl text-sm leading-6 text-white/50 md:text-base">
@@ -246,7 +247,7 @@ export function ShopGrid({
         </div>
       </section>
 
-      <section className="sticky top-[95px] z-30 border-b border-white/10 bg-[#0c0c0d]/95 backdrop-blur-xl">
+      <section className="sticky top-[95px] z-30 border-b border-white/10 bg-background/95 backdrop-blur-xl">
         <div className="mx-auto flex max-w-[1500px] items-center gap-3 px-5 py-3 md:px-8">
           <div className="relative min-w-0 flex-1 md:max-w-md">
             <Search className="absolute left-0 top-1/2 h-4 w-4 -translate-y-1/2 text-white/40" />
@@ -258,7 +259,7 @@ export function ShopGrid({
               value={query}
               onChange={(event) => setQuery(event.target.value)}
               placeholder="Cerca nel drop"
-              className="h-11 w-full border-0 border-b border-white/15 bg-transparent pl-7 pr-8 text-sm text-white outline-none transition-colors placeholder:text-white/30 focus:border-[#9f86ff]"
+              className="h-11 w-full border-0 border-b border-white/15 bg-transparent pl-7 pr-8 text-sm text-white outline-none transition-colors placeholder:text-white/30 focus:border-primary"
             />
             {query && (
               <button
@@ -281,7 +282,7 @@ export function ShopGrid({
             <SlidersHorizontal className="h-4 w-4" />
             <span className="hidden sm:inline">Filtri</span>
             {activeFilterCount > 0 && (
-              <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-[#9f86ff] px-1 text-[9px] text-black">
+              <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1 text-[9px] text-primary-foreground">
                 {activeFilterCount}
               </span>
             )}
@@ -300,7 +301,7 @@ export function ShopGrid({
               <ChevronDown className={`h-3.5 w-3.5 transition-transform ${sortOpen ? "rotate-180" : ""}`} />
             </button>
             {sortOpen && (
-              <div className="absolute right-0 top-[calc(100%+8px)] z-40 min-w-56 border border-white/10 bg-[#171719] p-1.5 shadow-2xl">
+              <div className="absolute right-0 top-[calc(100%+8px)] z-40 min-w-56 border border-white/10 bg-card p-1.5 shadow-2xl">
                 {(Object.keys(sortLabels) as SortKey[]).map((key) => (
                   <button
                     key={key}
@@ -353,7 +354,7 @@ export function ShopGrid({
               {selectedSizes.map((size) => (
                 <FilterChip key={size} label={`Taglia ${size}`} onRemove={() => toggleFilter(size, selectedSizes, setSelectedSizes)} />
               ))}
-              <button type="button" onClick={clearFilters} className="px-2 py-1 text-[10px] uppercase tracking-[0.2em] text-[#9f86ff] hover:text-white">
+              <button type="button" onClick={clearFilters} className="px-2 py-1 text-[10px] uppercase tracking-[0.2em] text-primary hover:text-white">
                 Azzera tutto
               </button>
             </div>
@@ -381,7 +382,7 @@ export function ShopGrid({
             <p className="mt-2 max-w-md text-sm leading-6 text-white/45">
               Prova un’altra ricerca o rimuovi uno dei filtri attivi.
             </p>
-            <button type="button" onClick={clearFilters} className="mt-7 border-b border-[#9f86ff] pb-1 text-[10px] font-semibold uppercase tracking-[0.25em] text-[#9f86ff]">
+            <button type="button" onClick={clearFilters} className="mt-7 border-b border-primary pb-1 text-[10px] font-semibold uppercase tracking-[0.25em] text-primary">
               Mostra tutto
             </button>
           </div>
@@ -445,7 +446,7 @@ function ProductCard({
 }) {
   return (
     <article className="group min-w-0" style={{ animationDelay: `${Math.min(index, 8) * 45}ms` }}>
-      <div className="relative mb-4 aspect-[4/5] overflow-hidden bg-[#171719]">
+      <div className="relative mb-4 aspect-[4/5] overflow-hidden bg-card">
         <Link href={`/prodotto/${product.id}`} className="absolute inset-0">
           {product.image_url ? (
             <Image
@@ -461,7 +462,7 @@ function ProductCard({
         </Link>
         <div className="pointer-events-none absolute inset-x-0 top-0 flex items-start justify-between p-3 md:p-4">
           <div className="flex flex-col items-start gap-1.5">
-            {product.is_new && <span className="bg-[#9f86ff] px-2 py-1 text-[8px] font-bold uppercase tracking-[0.2em] text-black">New drop</span>}
+            {product.is_new && <span className="bg-primary px-2 py-1 text-[8px] font-bold uppercase tracking-[0.2em] text-primary-foreground">New drop</span>}
             {!product.in_stock && <span className="bg-white px-2 py-1 text-[8px] font-bold uppercase tracking-[0.2em] text-black">Sold out</span>}
           </div>
           <button
@@ -478,7 +479,7 @@ function ProductCard({
             <button
               type="button"
               onClick={onQuickAdd}
-              className="flex w-full items-center justify-center gap-2 bg-white px-3 py-3 text-[9px] font-bold uppercase tracking-[0.22em] text-black transition-colors hover:bg-[#9f86ff] md:py-3.5 md:text-[10px]"
+              className="flex w-full items-center justify-center gap-2 bg-white px-3 py-3 text-[9px] font-bold uppercase tracking-[0.22em] text-black transition-colors hover:bg-primary hover:text-primary-foreground md:py-3.5 md:text-[10px]"
             >
               <ShoppingBag className="h-3.5 w-3.5" />
               Quick add
@@ -489,8 +490,8 @@ function ProductCard({
       <Link href={`/prodotto/${product.id}`} className="block">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
-            <p className="mb-1 text-[8px] font-semibold uppercase tracking-[0.25em] text-[#9f86ff] md:text-[9px]">{categoryName}</p>
-            <h2 className="truncate text-xs font-medium text-white transition-colors group-hover:text-[#b8a6ff] md:text-sm">{product.name}</h2>
+            <p className="mb-1 text-[8px] font-semibold uppercase tracking-[0.25em] text-primary md:text-[9px]">{categoryName}</p>
+            <h2 className="truncate text-xs font-medium text-white transition-colors group-hover:text-primary md:text-sm">{product.name}</h2>
           </div>
           <p className="shrink-0 text-xs font-medium text-white md:text-sm">{formatPrice(product.price)}</p>
         </div>
@@ -542,10 +543,10 @@ function FilterDrawer({
   return (
     <div className="fixed inset-0 z-[60]">
       <button type="button" className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} aria-label="Chiudi filtri" />
-      <aside className="absolute right-0 top-0 flex h-full w-full max-w-md flex-col border-l border-white/10 bg-[#111113] text-white shadow-2xl animate-in slide-in-from-right duration-300">
+      <aside className="absolute right-0 top-0 flex h-full w-full max-w-md flex-col border-l border-white/10 bg-card text-white shadow-2xl animate-in slide-in-from-right duration-300">
         <div className="flex items-center justify-between border-b border-white/10 px-6 py-5">
           <div>
-            <p className="text-[9px] uppercase tracking-[0.28em] text-[#9f86ff]">Refine your selection</p>
+            <p className="text-[9px] uppercase tracking-[0.28em] text-primary">Refine your selection</p>
             <h2 className="mt-1 text-xl font-medium">Filtri</h2>
           </div>
           <button type="button" onClick={onClose} className="p-2 text-white/50 hover:text-white" aria-label="Chiudi filtri"><X className="h-5 w-5" /></button>
@@ -560,7 +561,7 @@ function FilterDrawer({
                       type="checkbox"
                       checked={selectedCategories.includes(category.slug)}
                       onChange={() => onCategory(category.slug)}
-                      className="h-4 w-4 accent-[#9f86ff]"
+                      className="h-4 w-4 accent-primary"
                     />
                     {category.name}
                   </span>
@@ -606,14 +607,14 @@ function FilterDrawer({
               step="5"
               value={maxPrice}
               onChange={(event) => onMaxPrice(Number(event.target.value))}
-              className="mt-5 w-full accent-[#9f86ff]"
+              className="mt-5 w-full accent-primary"
               aria-label="Prezzo massimo"
             />
           </FilterSection>
         </div>
         <div className="grid grid-cols-[auto_1fr] gap-3 border-t border-white/10 p-5">
           <button type="button" onClick={onReset} className="px-4 text-[9px] font-semibold uppercase tracking-[0.18em] text-white/45 hover:text-white">Azzera</button>
-          <button type="button" onClick={onClose} className="bg-white px-5 py-4 text-[10px] font-bold uppercase tracking-[0.2em] text-black hover:bg-[#9f86ff]">Mostra {resultCount} prodotti</button>
+          <button type="button" onClick={onClose} className="bg-white px-5 py-4 text-[10px] font-bold uppercase tracking-[0.2em] text-black hover:bg-primary hover:text-primary-foreground">Mostra {resultCount} prodotti</button>
         </div>
       </aside>
     </div>
@@ -645,7 +646,7 @@ function QuickAdd({
   return (
     <div className="fixed inset-0 z-[65] flex items-end justify-center md:items-center">
       <button type="button" className="absolute inset-0 bg-black/75 backdrop-blur-sm" onClick={onClose} aria-label="Chiudi quick add" />
-      <div className="relative w-full max-w-xl border border-white/10 bg-[#141416] p-5 text-white shadow-2xl animate-in slide-in-from-bottom-5 duration-300 md:p-7">
+      <div className="relative w-full max-w-xl border border-white/10 bg-card p-5 text-white shadow-2xl animate-in slide-in-from-bottom-5 duration-300 md:p-7">
         <div className="flex gap-4">
           <div className="relative h-28 w-24 shrink-0 overflow-hidden bg-white/5">
             {product.image_url && <Image src={product.image_url} alt={product.name} fill className="object-cover" sizes="96px" />}
@@ -653,7 +654,7 @@ function QuickAdd({
           <div className="min-w-0 flex-1">
             <div className="flex items-start justify-between gap-4">
               <div>
-                <p className="text-[9px] uppercase tracking-[0.24em] text-[#9f86ff]">Quick add</p>
+                <p className="text-[9px] uppercase tracking-[0.24em] text-primary">Quick add</p>
                 <h2 className="mt-1 text-lg font-medium">{product.name}</h2>
                 <p className="mt-1 text-sm text-white/55">{formatPrice(product.price)}</p>
               </div>
@@ -681,7 +682,7 @@ function QuickAdd({
           type="button"
           disabled={!selectedSize}
           onClick={onAdd}
-          className="mt-5 flex w-full items-center justify-center gap-2 bg-[#9f86ff] px-5 py-4 text-[10px] font-bold uppercase tracking-[0.22em] text-black transition-colors hover:bg-white disabled:cursor-not-allowed disabled:bg-white/10 disabled:text-white/25"
+          className="mt-5 flex w-full items-center justify-center gap-2 bg-primary px-5 py-4 text-[10px] font-bold uppercase tracking-[0.22em] text-primary-foreground transition-colors hover:bg-white hover:text-black disabled:cursor-not-allowed disabled:bg-white/10 disabled:text-white/25"
         >
           <ShoppingBag className="h-4 w-4" />
           Aggiungi al carrello
