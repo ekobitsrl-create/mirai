@@ -3,7 +3,7 @@ import { createClient } from "@/lib/supabase/server"
 import { Navbar } from "@/components/navbar"
 import { Footer } from "@/components/footer"
 import { ShopGrid } from "@/components/shop-grid"
-import { withoutBlackIslandProducts } from "@/lib/products"
+import { withDemoProducts } from "@/lib/products"
 
 export const dynamic = "force-dynamic"
 
@@ -25,7 +25,7 @@ export default async function CollezioniPage() {
   ])
 
   const categories = categoriesRes.data || []
-  const products = withoutBlackIslandProducts(productsRes.data || [])
+  const products = withDemoProducts(productsRes.data || [])
 
   // Separate parents and subcategories
   const parentCategories = categories.filter((c) => !c.parent_id)

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { stripe } from '@/lib/stripe'
+import { assertStripeConfigured, stripe } from '@/lib/stripe'
 import { createClient } from '@/lib/supabase/server'
-import { isBlackIslandProduct } from '@/lib/products'
+import { getDemoProduct, isBlackIslandProduct, type StoreProduct } from '@/lib/products'
 import { getStripeShippingOptions, SHIPPING_CONFIG } from '@/lib/shipping'
 
 /**
@@ -14,6 +14,7 @@ import { getStripeShippingOptions, SHIPPING_CONFIG } from '@/lib/shipping'
  */
 export async function POST(request: NextRequest) {
   try {
+    assertStripeConfigured()
     const body = await request.json()
     const { items, priceId } = body
 
@@ -64,14 +65,19 @@ export async function POST(request: NextRequest) {
       .select('id, name, description, price, image_url')
       .in('id', productIds)
 
-    if (error || !products) {
+    const demoProducts = productIds
+      .map(getDemoProduct)
+      .filter((product): product is StoreProduct => product !== null)
+    const checkoutProducts = [...(products || []), ...demoProducts]
+
+    if (error && checkoutProducts.length === 0) {
       return NextResponse.json(
         { error: 'Errore nel recupero dei prodotti' },
         { status: 500 }
       )
     }
 
-    if (products.some(isBlackIslandProduct)) {
+    if (checkoutProducts.some(isBlackIslandProduct)) {
       return NextResponse.json(
         { error: 'Uno dei prodotti selezionati non è più disponibile' },
         { status: 400 }
@@ -80,7 +86,7 @@ export async function POST(request: NextRequest) {
 
     // Costruisci i line items per Stripe
     const lineItems = items.map((cartItem: { productId: string; quantity: number; size?: string }) => {
-      const product = products.find((p) => p.id === cartItem.productId)
+      const product = checkoutProducts.find((p) => p?.id === cartItem.productId)
       if (!product) {
         throw new Error(`Prodotto ${cartItem.productId} non trovato`)
       }
@@ -91,7 +97,7 @@ export async function POST(request: NextRequest) {
           product_data: {
             name: product.name + (cartItem.size ? ` - Taglia ${cartItem.size}` : ''),
             description: product.description || undefined,
-            images: product.image_url ? [product.image_url] : undefined,
+            images: product.image_url?.startsWith('http') ? [product.image_url] : undefined,
           },
           unit_amount: Math.round(Number(product.price) * 100), // Stripe usa i centesimi
         },

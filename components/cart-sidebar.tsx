@@ -16,7 +16,7 @@ export function CartSidebar() {
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
-        <button aria-label={t.cart.title} className="relative text-[#6b5f7d] hover:text-[#1a1025] transition-colors">
+        <button aria-label={t.cart.title} className="relative text-white/55 hover:text-white transition-colors">
           <ShoppingBag className="h-5 w-5" />
           {itemCount > 0 && (
             <span className="absolute -top-1.5 -right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground">

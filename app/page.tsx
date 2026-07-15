@@ -8,7 +8,7 @@ import { Features } from "@/components/features"
 import { Newsletter } from "@/components/newsletter"
 import { Footer } from "@/components/footer"
 import { createClient } from "@/lib/supabase/server"
-import { withoutBlackIslandProducts } from "@/lib/products"
+import { withDemoProducts } from "@/lib/products"
 import { FREE_SHIPPING_THRESHOLD_EUROS } from "@/lib/shipping"
 
 export const dynamic = "force-dynamic"
@@ -31,11 +31,13 @@ export default async function Home() {
       supabase.from("products").select("*").order("created_at", { ascending: false }).limit(32),
       supabase.from("categories").select("*").is("parent_id", null).order("name", { ascending: true }),
     ])
-    products = withoutBlackIslandProducts(prodRes.data || []).slice(0, 8)
+    products = withDemoProducts(prodRes.data || []).slice(0, 8)
     categories = catRes.data || []
   } catch (e) {
     console.error("[v0] Failed to fetch data:", e)
   }
+
+  products = withDemoProducts(products).slice(0, 8)
 
   return (
     <main className="min-h-screen bg-background">

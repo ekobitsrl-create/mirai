@@ -1,6 +1,6 @@
 "use client"
 
-import { createContext, useContext, useState, useCallback, type ReactNode } from "react"
+import { createContext, useContext, useState, useCallback, useEffect, type ReactNode } from "react"
 
 export type CartItem = {
   productId: string
@@ -25,6 +25,30 @@ const CartContext = createContext<CartContextType | undefined>(undefined)
 
 export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([])
+  const [hydrated, setHydrated] = useState(false)
+
+  useEffect(() => {
+    try {
+      const savedCart = window.localStorage.getItem("mirai-cart")
+      if (savedCart) {
+        const parsed = JSON.parse(savedCart)
+        if (Array.isArray(parsed)) setItems(parsed)
+      }
+    } catch {
+      // The cart still works for the current session if storage is unavailable.
+    } finally {
+      setHydrated(true)
+    }
+  }, [])
+
+  useEffect(() => {
+    if (!hydrated) return
+    try {
+      window.localStorage.setItem("mirai-cart", JSON.stringify(items))
+    } catch {
+      // Ignore blocked storage and keep the in-memory cart active.
+    }
+  }, [hydrated, items])
 
   const addItem = useCallback(
     (item: Omit<CartItem, "quantity"> & { quantity?: number }) => {
@@ -35,7 +59,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
         if (existing) {
           return prev.map((i) =>
             i.productId === item.productId && i.size === item.size
-              ? { ...i, quantity: i.quantity + (item.quantity || 1) }
+              ? { ...i, quantity: Math.min(10, i.quantity + (item.quantity || 1)) }
               : i
           )
         }
@@ -60,7 +84,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
       setItems((prev) =>
         prev.map((i) =>
           i.productId === productId && i.size === size
-            ? { ...i, quantity }
+          ? { ...i, quantity: Math.min(10, quantity) }
             : i
         )
       )

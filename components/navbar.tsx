@@ -19,7 +19,7 @@ type CategoryNode = {
 
 function DiscountMarquee({ onClose, discountText, codeText, closeLabel }: { onClose: () => void; discountText: string; codeText: string; closeLabel: string }) {
   return (
-    <div className="bg-[#1a1025] relative border-b border-[#2a1f3d]">
+    <div className="relative border-b border-white/10 bg-[#17121f]">
       <div className="overflow-hidden py-2">
         <div className="animate-marquee-fast flex whitespace-nowrap">
           {[0, 1, 2].map((copy) => (
@@ -56,7 +56,7 @@ const CartSidebar = dynamic(
   {
     ssr: false,
     loading: () => (
-      <button aria-label="Carrello" className="relative text-[#6b5f7d]">
+      <button aria-label="Carrello" className="relative text-white/55">
         <ShoppingBag className="h-5 w-5" />
       </button>
     ),
@@ -145,12 +145,12 @@ export function Navbar() {
           closeLabel={t.nav.closeBanner}
         />
       )}
-      <nav className="bg-white/90 backdrop-blur-md border-b border-[#e4e0ec]">
+      <nav className="border-b border-white/10 bg-[#0c0c0d]/90 backdrop-blur-xl">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
           <div className="flex items-center gap-8">
             <Link href="/" className="flex items-center shrink-0">
               <span
-                className="text-xl font-bold tracking-[0.25em] uppercase text-[#1a1025]"
+                className="text-xl font-bold tracking-[0.25em] uppercase text-white"
                 style={{ fontFamily: "var(--font-space-grotesk)" }}
               >
                 {"MIR\u039BI"}
@@ -160,7 +160,7 @@ export function Navbar() {
             <div className="hidden lg:flex items-center gap-8">
               <Link
                 href="/#prodotti"
-                className="text-sm tracking-widest uppercase text-[#6b5f7d] hover:text-[#1a1025] transition-colors"
+                className="text-sm tracking-widest uppercase text-white/55 hover:text-white transition-colors"
               >
                 {t.nav.newArrivals}
               </Link>
@@ -173,7 +173,7 @@ export function Navbar() {
               >
                 <Link
                   href="/collezioni"
-                  className="flex items-center gap-1 text-sm tracking-widest uppercase text-[#6b5f7d] hover:text-[#1a1025] transition-colors"
+                  className="flex items-center gap-1 text-sm tracking-widest uppercase text-white/55 hover:text-white transition-colors"
                 >
                   {t.nav.collections}
                   <ChevronDown
@@ -183,13 +183,13 @@ export function Navbar() {
 
                 {dropdownOpen && categories.length > 0 && (
                   <div className="absolute top-full left-1/2 -translate-x-1/2 pt-3">
-                    <div className="bg-white border border-[#e4e0ec] rounded-lg shadow-xl min-w-[480px] p-5">
+                    <div className="min-w-[480px] rounded-lg border border-white/10 bg-[#151517] p-5 shadow-2xl">
                       <div className="grid grid-cols-2 gap-6">
                         {categories.map((parent) => (
                           <div key={parent.id}>
                             <Link
                               href={`/collezione/${parent.slug}`}
-                              className="text-xs font-bold tracking-[0.2em] uppercase text-[#1a1025] hover:text-primary transition-colors mb-2.5 block"
+                              className="mb-2.5 block text-xs font-bold uppercase tracking-[0.2em] text-white hover:text-primary transition-colors"
                               onClick={() => setDropdownOpen(false)}
                             >
                               {parent.name}
@@ -200,7 +200,7 @@ export function Navbar() {
                                   <Link
                                     key={sub.id}
                                     href={`/collezione/${parent.slug}?sub=${sub.slug}`}
-                                    className="text-sm text-[#6b5f7d] hover:text-[#1a1025] hover:pl-1 transition-all duration-200"
+                                    className="text-sm text-white/45 hover:pl-1 hover:text-white transition-all duration-200"
                                     onClick={() => setDropdownOpen(false)}
                                   >
                                     {sub.name}
@@ -211,10 +211,10 @@ export function Navbar() {
                           </div>
                         ))}
                       </div>
-                      <div className="mt-4 pt-3 border-t border-[#e4e0ec]">
+                      <div className="mt-4 border-t border-white/10 pt-3">
                         <Link
                           href="/collezioni"
-                          className="text-xs tracking-widest uppercase text-primary hover:text-[#1a1025] transition-colors"
+                          className="text-xs tracking-widest uppercase text-primary hover:text-white transition-colors"
                           onClick={() => setDropdownOpen(false)}
                         >
                           {t.nav.viewAllCollections}
@@ -227,7 +227,7 @@ export function Navbar() {
 
               <Link
                 href="/chi-siamo"
-                className="text-sm tracking-widest uppercase text-[#6b5f7d] hover:text-[#1a1025] transition-colors"
+                className="text-sm tracking-widest uppercase text-white/55 hover:text-white transition-colors"
               >
                 {t.nav.aboutUs}
               </Link>
@@ -235,23 +235,24 @@ export function Navbar() {
           </div>
 
           <div className="flex items-center gap-5">
-            <button
+            <Link
+              href="/collezioni#shop-search"
               aria-label={t.nav.search}
-              className="text-[#6b5f7d] hover:text-[#1a1025] transition-colors"
+              className="text-white/55 hover:text-white transition-colors"
             >
               <Search className="h-5 w-5" />
-            </button>
+            </Link>
             <Link
               href={accountHref}
               aria-label={t.nav.account}
-              className="text-[#6b5f7d] hover:text-[#1a1025] transition-colors"
+              className="text-white/55 hover:text-white transition-colors"
             >
               <User className="h-5 w-5" />
             </Link>
             <LanguageSwitcher />
             <CartSidebar />
             <button
-              className="lg:hidden text-[#1a1025]"
+              className="text-white lg:hidden"
               onClick={() => setMobileOpen(!mobileOpen)}
               aria-label={mobileOpen ? t.nav.closeMenu : t.nav.openMenu}
             >
@@ -267,11 +268,11 @@ export function Navbar() {
 
       {/* Mobile menu */}
       {mobileOpen && (
-        <div className="lg:hidden bg-white border-t border-[#e4e0ec]">
+        <div className="border-t border-white/10 bg-[#111113] lg:hidden">
           <div className="flex flex-col px-6 py-6 gap-4">
             <Link
               href="/#prodotti"
-              className="text-sm tracking-widest uppercase text-[#6b5f7d] hover:text-[#1a1025] transition-colors"
+              className="text-sm tracking-widest uppercase text-white/55 hover:text-white transition-colors"
               onClick={() => setMobileOpen(false)}
             >
               {t.nav.newArrivals}
@@ -280,7 +281,7 @@ export function Navbar() {
             {/* Mobile Collezioni accordion */}
             <div>
               <button
-                className="flex items-center justify-between w-full text-sm tracking-widest uppercase text-[#6b5f7d] hover:text-[#1a1025] transition-colors"
+                className="flex w-full items-center justify-between text-sm uppercase tracking-widest text-white/55 hover:text-white transition-colors"
                 onClick={() => setMobileCollezioni(!mobileCollezioni)}
               >
                 {t.nav.collections}
@@ -294,7 +295,7 @@ export function Navbar() {
                     <div key={parent.id}>
                       <Link
                         href={`/collezione/${parent.slug}`}
-                        className="text-xs font-bold tracking-[0.15em] uppercase text-[#1a1025] mb-1.5 block"
+                        className="mb-1.5 block text-xs font-bold uppercase tracking-[0.15em] text-white"
                         onClick={() => setMobileOpen(false)}
                       >
                         {parent.name}
@@ -305,7 +306,7 @@ export function Navbar() {
                             <Link
                               key={sub.id}
                               href={`/collezione/${parent.slug}?sub=${sub.slug}`}
-                              className="text-sm text-[#6b5f7d] hover:text-[#1a1025] transition-colors"
+                              className="text-sm text-white/45 hover:text-white transition-colors"
                               onClick={() => setMobileOpen(false)}
                             >
                               {sub.name}
@@ -321,14 +322,14 @@ export function Navbar() {
 
             <Link
               href="/chi-siamo"
-              className="text-sm tracking-widest uppercase text-[#6b5f7d] hover:text-[#1a1025] transition-colors"
+              className="text-sm tracking-widest uppercase text-white/55 hover:text-white transition-colors"
               onClick={() => setMobileOpen(false)}
             >
               {t.nav.aboutUs}
             </Link>
             <Link
               href={accountHref}
-              className="text-sm tracking-widest uppercase text-[#6b5f7d] hover:text-[#1a1025] transition-colors"
+              className="text-sm tracking-widest uppercase text-white/55 hover:text-white transition-colors"
               onClick={() => setMobileOpen(false)}
             >
               {t.nav.account}

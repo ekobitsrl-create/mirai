@@ -20,6 +20,7 @@ export default function CheckoutPage() {
     const cartLineItems = items.map((item) => ({
       productId: item.productId,
       quantity: item.quantity,
+      size: item.size,
     }))
     const clientSecret = await createCheckoutSession(cartLineItems)
     if (!clientSecret) {

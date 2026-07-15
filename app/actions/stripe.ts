@@ -1,16 +1,18 @@
 'use server'
 
-import { stripe } from '@/lib/stripe'
+import { assertStripeConfigured, stripe } from '@/lib/stripe'
 import { createClient } from '@/lib/supabase/server'
-import { isBlackIslandProduct } from '@/lib/products'
+import { getDemoProduct, isBlackIslandProduct, type StoreProduct } from '@/lib/products'
 import { getStripeShippingOptions, SHIPPING_CONFIG } from '@/lib/shipping'
 
 type CartLineItem = {
   productId: string
   quantity: number
+  size?: string
 }
 
 export async function createCheckoutSession(cartItems: CartLineItem[]) {
+  assertStripeConfigured()
   if (!cartItems.length) {
     throw new Error('Il carrello è vuoto')
   }
@@ -23,16 +25,19 @@ export async function createCheckoutSession(cartItems: CartLineItem[]) {
     .select('id, name, description, price')
     .in('id', productIds)
 
-  if (error || !products) {
-    throw new Error('Errore nel recupero dei prodotti')
-  }
+  const demoProducts = productIds
+    .map(getDemoProduct)
+    .filter((product): product is StoreProduct => product !== null)
+  const checkoutProducts = [...(products || []), ...demoProducts]
 
-  if (products.some(isBlackIslandProduct)) {
+  if (error && checkoutProducts.length === 0) throw new Error('Errore nel recupero dei prodotti')
+
+  if (checkoutProducts.some(isBlackIslandProduct)) {
     throw new Error('Uno dei prodotti selezionati non è più disponibile')
   }
 
   const lineItems = cartItems.map((cartItem) => {
-    const product = products.find((p) => p.id === cartItem.productId)
+    const product = checkoutProducts.find((p) => p?.id === cartItem.productId)
     if (!product) {
       throw new Error(`Prodotto ${cartItem.productId} non trovato`)
     }
@@ -41,7 +46,7 @@ export async function createCheckoutSession(cartItems: CartLineItem[]) {
       price_data: {
         currency: 'eur',
         product_data: {
-          name: product.name,
+          name: product.name + (cartItem.size ? ` - Taglia ${cartItem.size}` : ''),
           description: product.description || undefined,
         },
         unit_amount: Math.round(Number(product.price) * 100),

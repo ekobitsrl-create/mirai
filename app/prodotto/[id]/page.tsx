@@ -3,14 +3,19 @@ import { notFound } from "next/navigation"
 import { Navbar } from "@/components/navbar"
 import { Footer } from "@/components/footer"
 import { ProductDetail } from "@/components/product-detail"
-import { isBlackIslandProduct, withoutBlackIslandProducts } from "@/lib/products"
+import { getDemoProduct, isBlackIslandProduct, withoutBlackIslandProducts } from "@/lib/products"
 
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://mirai-clothing.vercel.app"
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<import("next").Metadata> {
   const { id } = await params
-  const supabase = await createClient()
-  const { data: product } = await supabase.from("products").select("name, description, price, image_url").eq("id", id).single()
+  const demoProduct = getDemoProduct(id)
+  let product: any = demoProduct
+  if (!product) {
+    const supabase = await createClient()
+    const { data } = await supabase.from("products").select("name, description, price, image_url").eq("id", id).single()
+    product = data
+  }
 
   if (!product || isBlackIslandProduct(product)) return { title: "Prodotto non trovato" }
 
@@ -39,11 +44,15 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
   const { id } = await params
   const supabase = await createClient()
 
-  const { data: product } = await supabase
-    .from("products")
-    .select("*")
-    .eq("id", id)
-    .single()
+  let product: any = getDemoProduct(id)
+  if (!product) {
+    const { data } = await supabase
+      .from("products")
+      .select("*")
+      .eq("id", id)
+      .single()
+    product = data
+  }
 
   if (!product || isBlackIslandProduct(product)) notFound()
 
@@ -133,7 +142,7 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
   }
 
   return (
-    <main className="min-h-screen bg-[#f8f6fb]">
+    <main className="min-h-screen bg-[#0c0c0d]">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
@@ -143,7 +152,7 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
       <Navbar />
-      <div className="pt-32 pb-20">
+      <div className="pt-36 pb-24">
         <ProductDetail product={product} relatedProducts={withoutBlackIslandProducts(related || [])} />
       </div>
       <Footer />
