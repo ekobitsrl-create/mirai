@@ -16,6 +16,12 @@ import {
 type MiraVariant = "male" | "female"
 type MiraPose = "idle" | "listening" | "speaking"
 
+const MIRA_POSE_ASSET: Record<MiraPose, MiraPose> = {
+  idle: "speaking",
+  listening: "listening",
+  speaking: "idle",
+}
+
 type MiraPosition = {
   x: number
   y: number
@@ -178,10 +184,10 @@ function MiraModel({
       <div className="mira-model-glow absolute inset-x-[7%] bottom-[1%] h-[24%] rounded-full bg-primary/45 blur-2xl" />
       <div
         key={`${variant}-${pose}-${faceRight}`}
-        className={`mira-model-sprite mira-model-${pose} absolute inset-0 ${faceRight && pose !== "idle" ? "mira-model-flipped" : ""}`}
+        className={`mira-model-sprite mira-model-${pose} absolute inset-0 ${faceRight ? "mira-model-flipped" : ""}`}
       >
         <Image
-          src={`/mascot/mira-${variant}-${pose}.webp`}
+          src={`/mascot/mira-${variant}-${MIRA_POSE_ASSET[pose]}.webp`}
           alt=""
           fill
           sizes="(min-width: 768px) 144px, 96px"

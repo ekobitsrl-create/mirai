@@ -188,10 +188,16 @@
 
 @keyframes mira-model-idle {
   0%, 100% {
-    transform: translate3d(0, 0, 0) scaleX(var(--mira-flip));
+    transform: translate3d(0, 0, 0) rotate(0.35deg) scaleX(var(--mira-flip));
   }
-  50% {
-    transform: translate3d(0, -6px, 0) scaleX(var(--mira-flip));
+  28% {
+    transform: translate3d(-1px, -4px, 0) rotate(-0.55deg) scaleX(var(--mira-flip));
+  }
+  54% {
+    transform: translate3d(1px, -7px, 0) rotate(0.6deg) scaleX(var(--mira-flip));
+  }
+  78% {
+    transform: translate3d(-1px, -2px, 0) rotate(-0.25deg) scaleX(var(--mira-flip));
   }
 }
 
