@@ -142,7 +142,7 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
   }
 
   return (
-    <main className="min-h-screen bg-[#0c0c0d]">
+    <main className="relative min-h-screen overflow-hidden bg-[#15101d]">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
@@ -152,10 +152,17 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
       <Navbar />
-      <div className="pt-36 pb-24">
+      <div className="pointer-events-none absolute inset-x-0 top-20 h-[950px] overflow-hidden" aria-hidden="true">
+        <div className="absolute -left-40 top-40 h-[520px] w-[520px] rounded-full bg-primary/20 blur-[135px]" />
+        <div className="absolute -right-44 top-0 h-[620px] w-[620px] rounded-full bg-fuchsia-500/10 blur-[160px]" />
+        <div className="absolute left-1/2 top-[520px] h-64 w-[70%] -translate-x-1/2 rounded-full bg-primary/10 blur-[130px]" />
+      </div>
+      <div className="relative pb-24 pt-36">
         <ProductDetail product={product} relatedProducts={withoutBlackIslandProducts(related || [])} />
       </div>
-      <Footer />
+      <div className="relative">
+        <Footer />
+      </div>
     </main>
   )
 }

@@ -215,17 +215,17 @@ export function ShopGrid({
       <section className="relative overflow-hidden border-b border-white/10">
         <div className="absolute -right-28 -top-32 h-[420px] w-[420px] rounded-full bg-primary/20 blur-[110px]" />
         <div className="absolute -left-32 bottom-0 h-72 w-72 rounded-full bg-primary/10 blur-[100px]" />
-        <div className="mx-auto max-w-[1500px] px-5 py-12 md:px-8 md:py-16">
+        <div className="mx-auto max-w-[1500px] px-5 py-10 md:px-8 md:py-12">
           <div className="flex flex-col gap-10 lg:flex-row lg:items-end lg:justify-between">
             <div className="max-w-3xl">
               <div className="mb-4 flex items-center gap-3 text-[10px] font-semibold uppercase tracking-[0.34em] text-primary">
                 <Sparkles className="h-3.5 w-3.5" />
                 Drop 01 / Shop all
               </div>
-              <h1 className="text-[clamp(2.75rem,8vw,6rem)] font-semibold uppercase leading-[0.88] tracking-[-0.06em] text-foreground">
+              <h1 className="text-[clamp(2rem,4vw,3.5rem)] font-semibold uppercase leading-[0.95] tracking-[-0.04em] text-foreground">
                 The shop
               </h1>
-              <p className="mt-8 max-w-xl text-sm leading-6 text-white/50 md:text-base">
+              <p className="mt-6 max-w-xl text-sm leading-6 text-white/55 md:text-base">
                 Silhouette oversize, grafiche decise e dettagli custom. Ogni capo MIRAI nasce per vivere la strada, non per seguire una stagione.
               </p>
             </div>

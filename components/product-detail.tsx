@@ -157,29 +157,29 @@ export function ProductDetail({
   }
 
   return (
-    <div className="mx-auto max-w-[1500px] px-5 text-[#f4f4f1] md:px-8">
-      <nav className="mb-7 flex items-center gap-1.5 overflow-hidden text-[9px] font-medium uppercase tracking-[0.2em] text-white/35" aria-label="Breadcrumb">
+    <div className="mx-auto max-w-[1500px] px-5 text-[#faf8ff] md:px-8">
+      <nav className="mb-7 flex items-center gap-1.5 overflow-hidden text-[9px] font-medium uppercase tracking-[0.2em] text-white/50" aria-label="Breadcrumb">
         <Link href="/" className="shrink-0 hover:text-white">Home</Link>
         <ChevronRight className="h-3 w-3 shrink-0" />
         <Link href="/collezioni" className="shrink-0 hover:text-white">Shop</Link>
         <ChevronRight className="h-3 w-3 shrink-0" />
         <Link href={`/collezione/${product.category}`} className="shrink-0 hover:text-white">{formatCategory(product.category)}</Link>
         <ChevronRight className="h-3 w-3 shrink-0" />
-        <span className="truncate text-white/70">{product.name}</span>
+        <span className="truncate text-white/85">{product.name}</span>
       </nav>
 
       <div className="grid grid-cols-1 gap-10 lg:grid-cols-[minmax(0,1.25fr)_minmax(400px,.75fr)] lg:gap-12 xl:gap-20">
         <section className="grid gap-3 md:grid-cols-[72px_minmax(0,1fr)]">
           <div className="order-2 flex gap-2 md:order-1 md:flex-col">
-            <button type="button" className="relative aspect-square w-16 overflow-hidden border border-white bg-[#d9d4ca] md:w-[72px]" aria-label="Vista frontale">
+            <button type="button" className="relative aspect-square w-16 overflow-hidden border border-primary/70 bg-[#d9d4ca] shadow-[0_0_20px_rgba(159,134,255,0.2)] md:w-[72px]" aria-label="Vista frontale">
               {product.image_url && <Image src={product.image_url} alt="" fill className="object-cover" sizes="72px" />}
             </button>
-            <div className="hidden aspect-square w-[72px] items-center justify-center border border-white/10 bg-white/[0.03] text-[8px] uppercase tracking-[0.16em] text-white/25 md:flex">01 / 01</div>
+            <div className="hidden aspect-square w-[72px] items-center justify-center border border-white/15 bg-white/[0.06] text-[8px] uppercase tracking-[0.16em] text-white/45 md:flex">01 / 01</div>
           </div>
           <button
             type="button"
             onClick={() => setZoomOpen(true)}
-            className="group relative order-1 aspect-square min-w-0 overflow-hidden bg-[#d8d2c7] md:order-2"
+            className="group relative order-1 aspect-square min-w-0 overflow-hidden rounded-sm border border-primary/25 bg-[#d8d2c7] shadow-[0_0_55px_rgba(159,134,255,0.18)] md:order-2"
             aria-label="Ingrandisci immagine prodotto"
           >
             {product.image_url ? (
@@ -194,7 +194,7 @@ export function ProductDetail({
             ) : (
               <span className="absolute inset-0 flex items-center justify-center"><ShoppingBag className="h-16 w-16 text-black/15" /></span>
             )}
-            <span className="absolute bottom-4 right-4 flex h-11 w-11 items-center justify-center rounded-full bg-black/70 text-white backdrop-blur-md transition-transform group-hover:scale-105">
+            <span className="absolute bottom-4 right-4 flex h-11 w-11 items-center justify-center rounded-full border border-primary/40 bg-[#17101f]/85 text-white shadow-[0_0_22px_rgba(159,134,255,0.28)] backdrop-blur-md transition-transform group-hover:scale-105">
               <ZoomIn className="h-4 w-4" />
             </span>
             {product.is_new && (
@@ -203,28 +203,28 @@ export function ProductDetail({
           </button>
         </section>
 
-        <section className="lg:sticky lg:top-32 lg:self-start">
+        <section className="relative overflow-hidden rounded-2xl border border-primary/35 bg-[#2a2034]/92 p-5 shadow-[0_0_70px_rgba(126,87,194,0.24)] backdrop-blur-xl before:pointer-events-none before:absolute before:inset-x-12 before:top-0 before:h-px before:bg-gradient-to-r before:from-transparent before:via-primary before:to-transparent before:shadow-[0_0_18px_rgba(159,134,255,0.9)] sm:p-7 lg:sticky lg:top-32 lg:self-start lg:p-8">
           <div className="flex items-start justify-between gap-6">
             <div>
               <p className="text-[9px] font-semibold uppercase tracking-[0.3em] text-[#9f86ff]">MIRAI / {formatCategory(product.category)}</p>
-              <h1 className="mt-3 max-w-xl text-4xl font-medium leading-[0.95] tracking-[-0.045em] md:text-5xl">{product.name}</h1>
+              <h1 className="mt-3 max-w-xl text-4xl font-medium leading-[0.95] tracking-[-0.045em] text-white md:text-5xl">{product.name}</h1>
               <p className="mt-5 text-lg font-medium">{formatPrice(product.price)}</p>
-              <p className="mt-1 text-[10px] text-white/35">IVA inclusa</p>
+              <p className="mt-1 text-[10px] text-white/55">IVA inclusa</p>
             </div>
             <div className="flex shrink-0 items-center gap-1">
               <button type="button" onClick={shareProduct} className="flex h-10 w-10 items-center justify-center text-white/35 hover:text-white" aria-label="Condividi prodotto"><Share2 className="h-4 w-4" /></button>
-              <button type="button" onClick={toggleWishlist} className={`flex h-10 w-10 items-center justify-center border transition-colors ${wished ? "border-[#9f86ff] bg-[#9f86ff] text-black" : "border-white/15 text-white/65 hover:border-white"}`} aria-label={wished ? "Rimuovi dai preferiti" : "Aggiungi ai preferiti"}>
+              <button type="button" onClick={toggleWishlist} className={`flex h-10 w-10 items-center justify-center border transition-all ${wished ? "border-[#9f86ff] bg-[#9f86ff] text-black shadow-[0_0_24px_rgba(159,134,255,0.45)]" : "border-white/20 bg-white/[0.04] text-white/75 hover:border-primary/70 hover:text-white"}`} aria-label={wished ? "Rimuovi dai preferiti" : "Aggiungi ai preferiti"}>
                 <Heart className={`h-4 w-4 ${wished ? "fill-current" : ""}`} />
               </button>
             </div>
           </div>
 
-          {product.description && <p className="mt-7 max-w-xl text-sm leading-6 text-white/50">{product.description}</p>}
+          {product.description && <p className="mt-7 max-w-xl text-sm leading-6 text-white/70">{product.description}</p>}
 
-          <div className="mt-8 border-t border-white/10 pt-7">
+          <div className="mt-8 border-t border-white/15 pt-7">
             <div className="flex items-center justify-between">
               <p className="text-[10px] font-semibold uppercase tracking-[0.22em]">Colore</p>
-              <span className="text-xs text-white/45">White / Multi</span>
+              <span className="text-xs text-white/65">White / Multi</span>
             </div>
             <button type="button" className="mt-3 flex items-center gap-2 border border-white bg-white px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.15em] text-black">
               <span className="h-3 w-3 rounded-full border border-black/15 bg-white" /> Bianco
@@ -235,7 +235,7 @@ export function ProductDetail({
             <div className="mt-7">
               <div className="flex items-center justify-between">
                 <p className="text-[10px] font-semibold uppercase tracking-[0.22em]">Taglia</p>
-                <button type="button" onClick={() => setSizeGuideOpen(true)} className="flex items-center gap-1.5 text-[10px] text-white/45 underline decoration-white/20 underline-offset-4 hover:text-white">
+                <button type="button" onClick={() => setSizeGuideOpen(true)} className="flex items-center gap-1.5 text-[10px] text-white/60 underline decoration-primary/40 underline-offset-4 hover:text-white">
                   <Ruler className="h-3.5 w-3.5" /> Guida alle taglie
                 </button>
               </div>
@@ -245,20 +245,20 @@ export function ProductDetail({
                     key={size}
                     type="button"
                     onClick={() => { setSelectedSize(size); setSizeError(false) }}
-                    className={`border py-3 text-xs font-medium transition-all ${selectedSize === size ? "border-[#9f86ff] bg-[#9f86ff] text-black" : "border-white/15 text-white/60 hover:border-white/60 hover:text-white"}`}
+                    className={`border py-3 text-xs font-medium transition-all ${selectedSize === size ? "border-[#9f86ff] bg-[#9f86ff] text-black shadow-[0_0_20px_rgba(159,134,255,0.35)]" : "border-white/20 bg-white/[0.035] text-white/75 hover:border-primary/70 hover:text-white"}`}
                   >
                     {size}
                   </button>
                 ))}
               </div>
-              <p className={`mt-2 min-h-4 text-[10px] transition-colors ${sizeError ? "text-[#ff8f8f]" : "text-white/30"}`}>
+              <p className={`mt-2 min-h-4 text-[10px] transition-colors ${sizeError ? "text-[#ff9b9b]" : "text-white/50"}`}>
                 {sizeError ? "Seleziona una taglia prima di continuare." : "Vestibilità oversize — scegli la tua taglia abituale."}
               </p>
             </div>
           )}
 
           <div className="mt-6 flex gap-2">
-            <div className="flex h-14 shrink-0 items-center border border-white/15">
+            <div className="flex h-14 shrink-0 items-center border border-white/20 bg-black/10">
               <button type="button" onClick={() => setQuantity((value) => Math.max(1, value - 1))} className="flex h-full w-10 items-center justify-center text-white/45 hover:text-white" aria-label="Riduci quantità"><Minus className="h-3.5 w-3.5" /></button>
               <span className="w-8 text-center text-xs font-medium">{quantity}</span>
               <button type="button" onClick={() => setQuantity((value) => Math.min(10, value + 1))} className="flex h-full w-10 items-center justify-center text-white/45 hover:text-white" aria-label="Aumenta quantità"><Plus className="h-3.5 w-3.5" /></button>
@@ -267,17 +267,17 @@ export function ProductDetail({
               type="button"
               onClick={handleAddToCart}
               disabled={!product.in_stock}
-              className={`flex h-14 flex-1 items-center justify-center gap-2 px-4 text-[10px] font-bold uppercase tracking-[0.22em] transition-all ${added ? "bg-emerald-400 text-black" : product.in_stock ? "bg-white text-black hover:bg-[#9f86ff]" : "cursor-not-allowed bg-white/10 text-white/30"}`}
+              className={`flex h-14 flex-1 items-center justify-center gap-2 px-4 text-[10px] font-bold uppercase tracking-[0.22em] transition-all ${added ? "bg-emerald-400 text-black" : product.in_stock ? "bg-primary text-primary-foreground shadow-[0_0_30px_rgba(159,134,255,0.38)] hover:-translate-y-0.5 hover:brightness-110 hover:shadow-[0_0_42px_rgba(159,134,255,0.55)]" : "cursor-not-allowed bg-white/10 text-white/30"}`}
             >
               {added ? <><Check className="h-4 w-4" /> Aggiunto</> : product.in_stock ? <><ShoppingBag className="h-4 w-4" /> Aggiungi al carrello</> : "Esaurito"}
             </button>
           </div>
 
           {product.in_stock && (
-            <div className="mt-5 border-t border-white/10 pt-5">
+            <div className="mt-5 rounded-xl border border-white/10 bg-black/10 p-4">
               <div className="mb-3 flex items-center gap-3">
                 <span className="h-px flex-1 bg-white/10" />
-                <span className="text-[9px] font-semibold uppercase tracking-[0.2em] text-white/35">
+                <span className="text-[9px] font-semibold uppercase tracking-[0.2em] text-white/55">
                   oppure paga subito
                 </span>
                 <span className="h-px flex-1 bg-white/10" />
@@ -302,7 +302,7 @@ export function ProductDetail({
                   Klarna.
                 </button>
               </div>
-              <p className="mt-2 text-center text-[9px] leading-4 text-white/30">
+              <p className="mt-2 text-center text-[9px] leading-4 text-white/50">
                 Checkout sicuro gestito da Stripe. Spedizione e indirizzo vengono scelti nel passaggio successivo.
               </p>
               {paymentError && (
@@ -313,12 +313,12 @@ export function ProductDetail({
             </div>
           )}
 
-          <div className="mt-4 flex items-center gap-2 text-[10px] text-white/40">
+          <div className="mt-4 flex items-center gap-2 text-[10px] text-white/60">
             <PackageCheck className="h-4 w-4 text-emerald-400" />
             {product.in_stock ? "Disponibile — spedizione in 1–2 giorni lavorativi" : "Momentaneamente non disponibile"}
           </div>
 
-          <div className="mt-8 grid grid-cols-3 border-y border-white/10 py-5">
+          <div className="mt-8 grid grid-cols-3 border-y border-white/15 bg-white/[0.025] py-5">
             <TrustItem icon={Truck} title="Free shipping" detail={`Da €${FREE_SHIPPING_THRESHOLD_EUROS}`} />
             <TrustItem icon={RotateCcw} title="Reso facile" detail="Entro 14 giorni" bordered />
             <TrustItem icon={ShieldCheck} title="Pagamento" detail="100% sicuro" />
@@ -344,7 +344,7 @@ export function ProductDetail({
       </div>
 
       {relatedProducts.length > 0 && (
-        <section className="mt-24 border-t border-white/10 pt-12 md:mt-32 md:pt-16">
+        <section className="mt-24 border-t border-primary/25 pt-12 md:mt-32 md:pt-16">
           <div className="mb-8 flex items-end justify-between">
             <div>
               <p className="text-[9px] font-semibold uppercase tracking-[0.28em] text-[#9f86ff]">Complete the look</p>
@@ -355,7 +355,7 @@ export function ProductDetail({
           <div className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-5">
             {relatedProducts.map((item) => (
               <Link key={item.id} href={`/prodotto/${item.id}`} className="group min-w-0">
-                <div className="relative mb-3 aspect-[4/5] overflow-hidden bg-white/5">
+                <div className="relative mb-3 aspect-[4/5] overflow-hidden border border-white/10 bg-white/5 shadow-[0_0_30px_rgba(159,134,255,0.08)] transition-all group-hover:border-primary/40 group-hover:shadow-[0_0_35px_rgba(159,134,255,0.18)]">
                   {item.image_url && <Image src={item.image_url} alt={item.name} fill className="object-cover transition-transform duration-700 group-hover:scale-[1.035]" sizes="(max-width: 768px) 50vw, 25vw" />}
                 </div>
                 <h3 className="truncate text-xs font-medium group-hover:text-[#9f86ff]">{item.name}</h3>
@@ -387,7 +387,7 @@ function TrustItem({ icon: Icon, title, detail, bordered = false }: { icon: type
     <div className={`flex flex-col items-center px-2 text-center ${bordered ? "border-x border-white/10" : ""}`}>
       <Icon className="mb-2 h-4 w-4 text-[#9f86ff]" />
       <p className="text-[9px] font-semibold uppercase tracking-[0.13em]">{title}</p>
-      <p className="mt-1 text-[9px] text-white/35">{detail}</p>
+      <p className="mt-1 text-[9px] text-white/55">{detail}</p>
     </div>
   )
 }
@@ -399,7 +399,7 @@ function Details({ title, children, open = false }: { title: string; children: R
         {title}
         <ChevronDown className="h-4 w-4 text-white/35 transition-transform group-open:rotate-180" />
       </summary>
-      <div className="max-w-xl pb-5 text-xs leading-6 text-white/45">{children}</div>
+      <div className="max-w-xl pb-5 text-xs leading-6 text-white/65">{children}</div>
     </details>
   )
 }
