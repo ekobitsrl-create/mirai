@@ -6,6 +6,7 @@ import { LanguageProvider } from '@/lib/language-context'
 import { CookieBanner } from '@/components/cookie-banner'
 import { WhatsAppButton } from '@/components/whatsapp-button'
 import { BackgroundMusic } from '@/components/background-music'
+import { SiteIntro } from '@/components/site-intro'
 import { FREE_SHIPPING_THRESHOLD_EUROS } from '@/lib/shipping'
 import './globals.css'
 
@@ -121,6 +122,7 @@ export default function RootLayout({
             }),
           }}
         />
+        <SiteIntro />
         <LanguageProvider>
           <CartProvider>
             {children}
