@@ -2,7 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState } from "react"
 
-const FADE_DURATION_MS = 1000
+const FADE_DURATION_MS = 1800
+const FADE_LEAD_SECONDS = FADE_DURATION_MS / 1000
 const SAFETY_TIMEOUT_MS = 12000
 
 export function SiteIntro() {
@@ -21,6 +22,15 @@ export function SiteIntro() {
       setIsVisible(false)
     }, FADE_DURATION_MS)
   }, [])
+
+  const handleTimeUpdate = useCallback(() => {
+    const video = videoRef.current
+    if (!video || !Number.isFinite(video.duration)) return
+
+    if (video.duration - video.currentTime <= FADE_LEAD_SECONDS) {
+      finishIntro()
+    }
+  }, [finishIntro])
 
   useEffect(() => {
     if (!isVisible) return
@@ -53,18 +63,19 @@ export function SiteIntro() {
 
   return (
     <div
-      className={`fixed inset-0 z-[10000] flex items-center justify-center overflow-hidden bg-black transition-opacity duration-1000 ease-in-out ${
+      className={`fixed inset-0 z-[10000] flex items-center justify-center overflow-hidden bg-black transition-opacity duration-[1800ms] ease-[cubic-bezier(0.22,1,0.36,1)] ${
         isLeaving ? "pointer-events-none opacity-0" : "opacity-100"
       }`}
       aria-label="Introduzione MIRAI"
     >
       <video
         ref={videoRef}
-        className="h-full w-full object-cover"
+        className="h-full w-full object-cover [filter:contrast(1.06)_saturate(1.05)_brightness(1.01)]"
         autoPlay
         muted
         playsInline
         preload="auto"
+        onTimeUpdate={handleTimeUpdate}
         onEnded={finishIntro}
         onError={finishIntro}
         aria-hidden="true"
