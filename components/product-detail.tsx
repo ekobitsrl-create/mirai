@@ -50,7 +50,8 @@ export function ProductDetail({
   const [wished, setWished] = useState(false)
   const [zoomOpen, setZoomOpen] = useState(false)
   const [sizeGuideOpen, setSizeGuideOpen] = useState(false)
-  const [quickPaymentLoading, setQuickPaymentLoading] = useState<"paypal" | "klarna" | null>(null)
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0)
+  const [quickPaymentLoading, setQuickPaymentLoading] = useState<"paypal" | "klarna" | "scalapay" | null>(null)
   const [paymentError, setPaymentError] = useState<string | null>(null)
 
   const sizes = product.sizes || []
@@ -59,6 +60,12 @@ export function ProductDetail({
   const colorName = product.color_name || "Multicolor"
   const fitNote = product.fit_note || "Consulta la guida alle taglie prima di scegliere."
   const detailItems = product.detail_items || []
+  const gallery = product.image_gallery?.length
+    ? product.image_gallery
+    : product.image_url
+      ? [{ src: product.image_url, alt: product.name, fit: "contain" as const }]
+      : []
+  const selectedImage = gallery[selectedImageIndex] || gallery[0]
 
   useEffect(() => {
     try {
@@ -67,6 +74,10 @@ export function ProductDetail({
     } catch {
       // Wishlist persistence is optional.
     }
+  }, [product.id])
+
+  useEffect(() => {
+    setSelectedImageIndex(0)
   }, [product.id])
 
   useEffect(() => {
@@ -111,7 +122,7 @@ export function ProductDetail({
     window.setTimeout(() => setAdded(false), 2200)
   }
 
-  async function handleQuickPayment(paymentMethod: "paypal" | "klarna") {
+  async function handleQuickPayment(paymentMethod: "paypal" | "klarna" | "scalapay") {
     if (sizes.length > 0 && !selectedSize) {
       setSizeError(true)
       return
@@ -175,24 +186,46 @@ export function ProductDetail({
 
       <div className="grid grid-cols-1 gap-10 lg:grid-cols-[minmax(0,1.25fr)_minmax(400px,.75fr)] lg:gap-12 xl:gap-20">
         <section className="grid gap-3 md:grid-cols-[72px_minmax(0,1fr)]">
-          <div className="order-2 flex gap-2 md:order-1 md:flex-col">
-            <button type="button" className="relative aspect-square w-16 overflow-hidden border border-primary/70 bg-[#d9d4ca] shadow-[0_0_20px_rgba(159,134,255,0.2)] md:w-[72px]" aria-label="Vista frontale">
-              {product.image_url && <Image src={product.image_url} alt="" fill className="object-contain" sizes="72px" />}
-            </button>
-            <div className="hidden aspect-square w-[72px] items-center justify-center border border-white/15 bg-white/[0.06] text-[8px] uppercase tracking-[0.16em] text-white/45 md:flex">01 / 01</div>
+          <div className="order-2 flex gap-2 overflow-x-auto pb-1 md:order-1 md:flex-col md:overflow-visible md:pb-0">
+            {gallery.map((image, index) => (
+              <button
+                key={`${image.src}-${index}`}
+                type="button"
+                onClick={() => setSelectedImageIndex(index)}
+                aria-label={`Mostra immagine ${index + 1} di ${gallery.length}`}
+                aria-current={selectedImageIndex === index ? "true" : undefined}
+                className={`relative aspect-square w-16 shrink-0 overflow-hidden bg-[#d9d4ca] transition-all md:w-[72px] ${selectedImageIndex === index ? "border border-primary/80 shadow-[0_0_20px_rgba(159,134,255,0.3)]" : "border border-white/15 opacity-65 hover:opacity-100"}`}
+              >
+                <Image
+                  src={image.src}
+                  alt=""
+                  fill
+                  className={image.fit === "cover" ? "object-cover" : "object-contain"}
+                  style={{ objectPosition: image.position || "center" }}
+                  sizes="72px"
+                />
+              </button>
+            ))}
+            {gallery.length > 0 && (
+              <div className="hidden aspect-square w-[72px] items-center justify-center border border-white/15 bg-white/[0.06] text-[8px] uppercase tracking-[0.16em] text-white/45 md:flex">
+                {String(selectedImageIndex + 1).padStart(2, "0")} / {String(gallery.length).padStart(2, "0")}
+              </div>
+            )}
           </div>
           <button
             type="button"
             onClick={() => setZoomOpen(true)}
+            disabled={!selectedImage}
             className="group relative order-1 aspect-square min-w-0 overflow-hidden rounded-sm border border-primary/25 bg-[#d8d2c7] shadow-[0_0_55px_rgba(159,134,255,0.18)] md:order-2"
             aria-label="Ingrandisci immagine prodotto"
           >
-            {product.image_url ? (
+            {selectedImage ? (
               <Image
-                src={product.image_url}
-                alt={product.name}
+                src={selectedImage.src}
+                alt={selectedImage.alt}
                 fill
-                className="object-contain object-center transition-transform duration-700 group-hover:scale-[1.025]"
+                className={`${selectedImage.fit === "cover" ? "object-cover" : "object-contain"} transition-transform duration-700 group-hover:scale-[1.025]`}
+                style={{ objectPosition: selectedImage.position || "center" }}
                 sizes="(max-width: 1024px) 100vw, 60vw"
                 priority
               />
@@ -203,7 +236,7 @@ export function ProductDetail({
               <ZoomIn className="h-4 w-4" />
             </span>
             {product.is_new && (
-              <span className="absolute left-4 top-4 bg-[#9f86ff] px-3 py-1.5 text-[9px] font-bold uppercase tracking-[0.2em] text-black">New drop</span>
+              <span className="absolute left-4 top-4 bg-[#9f86ff] px-3 py-1.5 text-[9px] font-bold uppercase tracking-[0.2em] text-black">Novità</span>
             )}
           </button>
         </section>
@@ -297,7 +330,7 @@ export function ProductDetail({
                 </span>
                 <span className="h-px flex-1 bg-white/10" />
               </div>
-              <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+              <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
                 <button
                   type="button"
                   onClick={() => handleQuickPayment("paypal")}
@@ -315,6 +348,15 @@ export function ProductDetail({
                 >
                   {quickPaymentLoading === "klarna" && <Loader2 className="h-4 w-4 animate-spin" />}
                   Klarna.
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleQuickPayment("scalapay")}
+                  disabled={quickPaymentLoading !== null}
+                  className="flex h-12 items-center justify-center gap-2 rounded-md bg-[#f1c4df] px-4 text-sm font-black tracking-[-0.03em] text-[#17120f] transition-all hover:-translate-y-0.5 hover:brightness-105 disabled:cursor-wait disabled:opacity-60"
+                >
+                  {quickPaymentLoading === "scalapay" && <Loader2 className="h-4 w-4 animate-spin" />}
+                  scalapay
                 </button>
               </div>
               <p className="mt-2 text-center text-[9px] leading-4 text-white/50">
@@ -383,11 +425,19 @@ export function ProductDetail({
         </section>
       )}
 
-      {zoomOpen && product.image_url && (
+      {zoomOpen && selectedImage && (
         <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/95 p-4 md:p-10">
           <button type="button" onClick={() => setZoomOpen(false)} className="absolute right-5 top-5 z-10 flex h-11 w-11 items-center justify-center rounded-full bg-white text-black" aria-label="Chiudi immagine"><X className="h-5 w-5" /></button>
-          <div className="relative h-full w-full max-w-6xl">
-            <Image src={product.image_url} alt={product.name} fill className="object-contain" sizes="100vw" priority />
+          <div className={`relative h-full w-full overflow-hidden ${selectedImage.fit === "cover" ? "max-w-3xl" : "max-w-6xl"}`}>
+            <Image
+              src={selectedImage.src}
+              alt={selectedImage.alt}
+              fill
+              className={selectedImage.fit === "cover" ? "object-cover" : "object-contain"}
+              style={{ objectPosition: selectedImage.position || "center" }}
+              sizes="100vw"
+              priority
+            />
           </div>
         </div>
       )}

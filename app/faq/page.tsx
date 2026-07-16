@@ -16,7 +16,7 @@ const faqs = [
     questions: [
       {
         q: "Quali metodi di pagamento accettate?",
-        a: "Accettiamo Visa, Mastercard, PayPal, Apple Pay e Google Pay. Tutti i pagamenti sono processati in modo sicuro tramite Stripe.",
+        a: "Accettiamo Visa, Mastercard, Postepay, PayPal, Apple Pay e Google Pay. Klarna e Scalapay sono disponibili quando l'ordine e il cliente rispettano i requisiti mostrati da Stripe. Tutti i pagamenti sono processati in modo sicuro tramite Stripe.",
       },
       {
         q: "Posso modificare o annullare un ordine?",

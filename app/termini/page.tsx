@@ -37,7 +37,7 @@ export default function TerminiPage() {
 
             <div className="flex flex-col gap-3">
               <h2 className="font-[family-name:var(--font-space-grotesk)] text-xl font-bold text-foreground">3. Ordini e Pagamenti</h2>
-              <p>L{"'"}ordine costituisce una proposta di acquisto da parte dell{"'"}utente. MIRAI si riserva il diritto di accettare o rifiutare qualsiasi ordine. I pagamenti vengono elaborati in modo sicuro tramite Stripe. Accettiamo: Visa, Mastercard, PayPal, Apple Pay, Google Pay. I prezzi sono indicati in Euro e includono l{"'"}IVA.</p>
+              <p>L{"'"}ordine costituisce una proposta di acquisto da parte dell{"'"}utente. MIRAI si riserva il diritto di accettare o rifiutare qualsiasi ordine. I pagamenti vengono elaborati in modo sicuro tramite Stripe. Accettiamo Visa, Mastercard, Postepay, PayPal, Apple Pay e Google Pay; Klarna e Scalapay sono disponibili quando previsti per l{"'"}ordine e il cliente. I prezzi sono indicati in Euro e includono l{"'"}IVA.</p>
             </div>
 
             <div className="flex flex-col gap-3">

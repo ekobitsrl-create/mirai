@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
     const { items, priceId, paymentMethod, cancelPath } = body
 
     const quickPaymentMethod =
-      paymentMethod === 'paypal' || paymentMethod === 'klarna'
+      paymentMethod === 'paypal' || paymentMethod === 'klarna' || paymentMethod === 'scalapay'
         ? paymentMethod
         : null
 

@@ -216,7 +216,7 @@ export function getMiraLocalReply(rawMessage: string, context: MiraKnowledgeCont
 
   const asksShipping = hasAny(message, ["spedizione", "spedire", "consegna", "corriere", "express", "estero"])
   const asksReturns = hasAny(message, ["reso", "restituire", "restituzione", "rimandare indietro", "rimborso"])
-  const asksPayments = hasAny(message, ["pagamento", "pagare", "paypal", "klarna", "visa", "mastercard", "carta", "apple pay", "google pay", "stripe"])
+  const asksPayments = hasAny(message, ["pagamento", "pagare", "paypal", "klarna", "scalapay", "visa", "mastercard", "postepay", "carta", "apple pay", "google pay", "stripe"])
 
   if (asksShipping && asksReturns) {
     return answer(
@@ -230,7 +230,7 @@ export function getMiraLocalReply(rawMessage: string, context: MiraKnowledgeCont
   if (asksShipping && asksPayments) {
     return answer(
       "shipping",
-      "La spedizione standard è gratuita. Il pagamento passa da Stripe e puoi usare carta, PayPal, Apple Pay, Google Pay e Klarna quando disponibili al checkout.",
+      "La spedizione standard è gratuita. Il pagamento passa da Stripe e puoi usare carta, PayPal, Apple Pay, Google Pay, Klarna e Scalapay quando disponibili al checkout.",
       "/faq",
       "FAQ acquisto",
     )
@@ -319,7 +319,10 @@ export function getMiraLocalReply(rawMessage: string, context: MiraKnowledgeCont
     if (hasAny(message, ["klarna", "rate", "a rate", "paga dopo"])) {
       return answer("payments", "Klarna può comparire tra i pagamenti rapidi quando è abilitato e disponibile per quell’acquisto. La conferma definitiva è sempre quella mostrata al checkout.", "/faq", "FAQ pagamenti")
     }
-    return answer("payments", "Il checkout è gestito tramite Stripe. Sono previsti Visa, Mastercard, PayPal, Apple Pay e Google Pay; Klarna compare quando disponibile e abilitato.", "/faq", "Metodi di pagamento")
+    if (hasAny(message, ["scalapay"])) {
+      return answer("payments", "Scalapay può comparire tra i pagamenti rapidi per ordini in euro idonei, quando è attivo sul tuo account Stripe. La disponibilità definitiva viene verificata nel checkout.", "/faq", "FAQ pagamenti")
+    }
+    return answer("payments", "Il checkout è gestito tramite Stripe. Sono previsti Visa, Mastercard, Postepay, PayPal, Apple Pay e Google Pay; Klarna e Scalapay compaiono quando disponibili e abilitati.", "/faq", "Metodi di pagamento")
   }
 
   if (hasAny(message, ["personalizzare", "personalizzazione", "customizzare", "custom", "stampa", "ricamo", "creare maglietta"])) {

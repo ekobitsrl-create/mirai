@@ -101,7 +101,8 @@ export async function createCheckoutSession(cartItems: CartLineItem[]) {
 
   const session = await stripe.checkout.sessions.create({
     ui_mode: 'embedded',
-    redirect_on_completion: 'never',
+    redirect_on_completion: 'if_required',
+    return_url: `${baseUrl}/success?session_id={CHECKOUT_SESSION_ID}`,
     line_items: lineItems,
     mode: 'payment',
     // Guest checkout: collect email and shipping without requiring an account

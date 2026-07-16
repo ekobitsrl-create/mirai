@@ -29,6 +29,10 @@ export function PaymentBadges() {
         <span className="text-[13px] font-black tracking-[-0.04em] text-[#17120f]">Klarna.</span>
       </div>
 
+      <div className={`${badgeClass} bg-[#f1c4df]`} role="listitem" aria-label="Scalapay">
+        <span className="text-[12px] font-black tracking-[-0.04em] text-[#17120f]">scalapay</span>
+      </div>
+
       <div className={badgeClass} role="listitem" aria-label="Google Pay">
         <span className="mr-1 text-[14px] font-bold">
           <span className="text-[#4285f4]">G</span>
