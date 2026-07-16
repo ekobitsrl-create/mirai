@@ -83,9 +83,18 @@ export function Footer() {
         </div>
 
         <div className="mt-16 flex flex-col items-center justify-between gap-6 border-t border-border pt-8 md:flex-row">
-          <p className="text-xs text-muted-foreground">
-            &copy; 2026 MIRAI. {t.footer.allRightsReserved}
-          </p>
+          <div className="flex flex-col items-center gap-2 md:items-start">
+            <p className="text-xs text-muted-foreground">
+              &copy; 2026 MIRAI. {t.footer.allRightsReserved}
+            </p>
+            <button
+              type="button"
+              onClick={() => window.dispatchEvent(new Event("mirai:open-cookie-settings"))}
+              className="text-[11px] text-muted-foreground underline underline-offset-4 transition-colors hover:text-foreground"
+            >
+              {t.footer.manageCookies}
+            </button>
+          </div>
           <div className="flex flex-col items-center gap-2 md:items-end">
             <span className="text-[9px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">
               Pagamenti accettati

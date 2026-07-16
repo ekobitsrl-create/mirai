@@ -8,6 +8,7 @@ import { WhatsAppButton } from '@/components/whatsapp-button'
 import { BackgroundMusic } from '@/components/background-music'
 import { SiteIntro } from '@/components/site-intro'
 import { MiraGuide } from '@/components/mira-guide'
+import { MarketingPixels } from '@/components/marketing-pixels'
 import './globals.css'
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
@@ -132,6 +133,7 @@ export default function RootLayout({
             <CookieBanner />
           </CartProvider>
         </LanguageProvider>
+        <MarketingPixels />
         <Analytics />
       </body>
     </html>

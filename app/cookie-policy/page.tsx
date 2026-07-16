@@ -22,7 +22,7 @@ export default function CookiePolicyPage() {
           <h1 className="font-[family-name:var(--font-space-grotesk)] text-4xl md:text-5xl font-bold tracking-tight text-foreground mb-2 text-balance">
             Cookie Policy
           </h1>
-          <p className="text-sm text-muted-foreground mb-12">Ultimo aggiornamento: 20 febbraio 2026</p>
+          <p className="text-sm text-muted-foreground mb-12">Ultimo aggiornamento: 16 luglio 2026</p>
 
           <div className="flex flex-col gap-10 text-muted-foreground leading-relaxed">
             <div className="flex flex-col gap-3">
@@ -47,7 +47,7 @@ export default function CookiePolicyPage() {
                       { tipo: "Autenticazione", finalita: "Mantenimento dell'accesso all'account utente", durata: "30 giorni" },
                       { tipo: "Preferenze", finalita: "Salvataggio delle preferenze (cookie consent, lingua)", durata: "1 anno" },
                       { tipo: "Analitici", finalita: "Analisi anonimizzata del traffico tramite Vercel Analytics", durata: "Sessione" },
-                      { tipo: "Marketing", finalita: "Al momento non utilizziamo cookie di marketing o profilazione", durata: "N/A" },
+                      { tipo: "Marketing", finalita: "Misurazione delle campagne e delle conversioni tramite Google Tag Manager e TikTok Pixel, solo dopo il consenso", durata: "Secondo le impostazioni dei fornitori" },
                     ].map((row) => (
                       <tr key={row.tipo} className="border-b border-border last:border-0">
                         <td className="p-4 text-foreground font-medium">{row.tipo}</td>
@@ -68,6 +68,8 @@ export default function CookiePolicyPage() {
                   "Stripe: per l'elaborazione sicura dei pagamenti",
                   "Vercel Analytics: per statistiche anonime sulle visite",
                   "Supabase: per la gestione dell'autenticazione",
+                  "Google Tag Manager: per gestire i tag di misurazione e advertising, solo dopo il consenso",
+                  "TikTok Pixel: per misurare visite, campagne e conversioni pubblicitarie, solo dopo il consenso",
                 ].map((item) => (
                   <li key={item} className="flex items-start gap-2 text-sm">
                     <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-primary shrink-0" />

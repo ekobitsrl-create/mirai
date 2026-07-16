@@ -12,21 +12,38 @@ export function CookieBanner() {
     const consent = document.cookie
       .split("; ")
       .find((row) => row.startsWith("cookie_consent="))
+    let timer: ReturnType<typeof setTimeout> | undefined
+
     if (!consent) {
       // Small delay so it doesn't flash on load
-      const timer = setTimeout(() => setVisible(true), 1000)
-      return () => clearTimeout(timer)
+      timer = setTimeout(() => setVisible(true), 1000)
+    }
+
+    const openSettings = () => setVisible(true)
+    window.addEventListener("mirai:open-cookie-settings", openSettings)
+
+    return () => {
+      if (timer) clearTimeout(timer)
+      window.removeEventListener("mirai:open-cookie-settings", openSettings)
     }
   }, [])
 
   function acceptAll() {
     document.cookie = "cookie_consent=all; path=/; max-age=31536000; SameSite=Lax"
+    window.dispatchEvent(new CustomEvent("mirai:cookie-consent", { detail: "all" }))
     setVisible(false)
   }
 
   function acceptNecessary() {
+    const hadMarketingConsent = document.cookie
+      .split("; ")
+      .some((row) => row === "cookie_consent=all")
+
     document.cookie = "cookie_consent=necessary; path=/; max-age=31536000; SameSite=Lax"
+    window.dispatchEvent(new CustomEvent("mirai:cookie-consent", { detail: "necessary" }))
     setVisible(false)
+
+    if (hadMarketingConsent) window.location.reload()
   }
 
   if (!visible) return null

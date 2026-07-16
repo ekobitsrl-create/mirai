@@ -147,6 +147,7 @@ export const translations = {
       privacyPolicy: "Privacy Policy",
       termsConditions: "Termini e Condizioni",
       cookiePolicy: "Cookie Policy",
+      manageCookies: "Gestisci cookie",
       allRightsReserved: "Tutti i diritti riservati.",
     },
     // Cart
@@ -175,7 +176,7 @@ export const translations = {
     // Cookie Banner
     cookies: {
       title: "Questo sito utilizza i cookie",
-      description: "Utilizziamo cookie tecnici necessari al funzionamento del sito e cookie analitici per migliorare la tua esperienza. Puoi accettare tutti i cookie o scegliere di accettare solo quelli necessari. Per maggiori informazioni, consulta la nostra",
+      description: "Utilizziamo cookie tecnici necessari e, con il tuo consenso, cookie analitici e di marketing per misurare le visite e le campagne pubblicitarie. Puoi accettare tutti i cookie o scegliere solo quelli necessari. Per maggiori informazioni, consulta la nostra",
       cookiePolicy: "Cookie Policy",
       and: "e la",
       privacyPolicy: "Privacy Policy",
@@ -317,6 +318,7 @@ export const translations = {
       privacyPolicy: "Privacy Policy",
       termsConditions: "Terms & Conditions",
       cookiePolicy: "Cookie Policy",
+      manageCookies: "Manage cookies",
       allRightsReserved: "All rights reserved.",
     },
     // Cart
@@ -345,7 +347,7 @@ export const translations = {
     // Cookie Banner
     cookies: {
       title: "This site uses cookies",
-      description: "We use technical cookies necessary for the site to function and analytical cookies to improve your experience. You can accept all cookies or choose to accept only necessary ones. For more information, see our",
+      description: "We use necessary technical cookies and, with your consent, analytics and marketing cookies to measure visits and advertising campaigns. You can accept all cookies or choose only necessary ones. For more information, see our",
       cookiePolicy: "Cookie Policy",
       and: "and",
       privacyPolicy: "Privacy Policy",
@@ -487,6 +489,7 @@ export const translations = {
       privacyPolicy: "Política de Privacidad",
       termsConditions: "Términos y Condiciones",
       cookiePolicy: "Política de Cookies",
+      manageCookies: "Gestionar cookies",
       allRightsReserved: "Todos los derechos reservados.",
     },
     // Cart
@@ -515,7 +518,7 @@ export const translations = {
     // Cookie Banner
     cookies: {
       title: "Este sitio utiliza cookies",
-      description: "Utilizamos cookies técnicas necesarias para el funcionamiento del sitio y cookies analíticas para mejorar tu experiencia. Puedes aceptar todas las cookies o elegir aceptar solo las necesarias. Para más información, consulta nuestra",
+      description: "Utilizamos cookies técnicas necesarias y, con tu consentimiento, cookies analíticas y de marketing para medir visitas y campañas publicitarias. Puedes aceptar todas las cookies o elegir solo las necesarias. Para más información, consulta nuestra",
       cookiePolicy: "Política de Cookies",
       and: "y la",
       privacyPolicy: "Política de Privacidad",
@@ -657,6 +660,7 @@ export const translations = {
       privacyPolicy: "Datenschutzerklärung",
       termsConditions: "Allgemeine Geschäftsbedingungen",
       cookiePolicy: "Cookie-Richtlinie",
+      manageCookies: "Cookies verwalten",
       allRightsReserved: "Alle Rechte vorbehalten.",
     },
     // Cart
@@ -685,7 +689,7 @@ export const translations = {
     // Cookie Banner
     cookies: {
       title: "Diese Website verwendet Cookies",
-      description: "Wir verwenden technische Cookies, die für das Funktionieren der Website erforderlich sind, und analytische Cookies, um deine Erfahrung zu verbessern. Du kannst alle Cookies akzeptieren oder nur die erforderlichen auswählen. Weitere Informationen findest du in unserer",
+      description: "Wir verwenden notwendige technische Cookies und, mit deiner Einwilligung, Analyse- und Marketing-Cookies zur Messung von Besuchen und Werbekampagnen. Du kannst alle Cookies akzeptieren oder nur die notwendigen auswählen. Weitere Informationen findest du in unserer",
       cookiePolicy: "Cookie-Richtlinie",
       and: "und",
       privacyPolicy: "Datenschutzerklärung",
@@ -827,6 +831,7 @@ export const translations = {
       privacyPolicy: "Politique de Confidentialité",
       termsConditions: "Conditions Générales",
       cookiePolicy: "Politique de Cookies",
+      manageCookies: "Gérer les cookies",
       allRightsReserved: "Tous droits réservés.",
     },
     // Cart
@@ -855,7 +860,7 @@ export const translations = {
     // Cookie Banner
     cookies: {
       title: "Ce site utilise des cookies",
-      description: "Nous utilisons des cookies techniques nécessaires au fonctionnement du site et des cookies analytiques pour améliorer votre expérience. Vous pouvez accepter tous les cookies ou choisir d'accepter uniquement ceux nécessaires. Pour plus d'informations, consultez notre",
+      description: "Nous utilisons des cookies techniques nécessaires et, avec votre consentement, des cookies analytiques et marketing pour mesurer les visites et les campagnes publicitaires. Vous pouvez accepter tous les cookies ou choisir uniquement les cookies nécessaires. Pour plus d'informations, consultez notre",
       cookiePolicy: "Politique de Cookies",
       and: "et notre",
       privacyPolicy: "Politique de Confidentialité",
