@@ -5,9 +5,37 @@ import { Navbar } from "@/components/navbar"
 import { Footer } from "@/components/footer"
 import { CollectionProducts } from "@/components/collection-products"
 import { notFound } from "next/navigation"
-import { withoutBlackIslandProducts } from "@/lib/products"
+import { DEMO_PRODUCTS, withoutBlackIslandProducts, type StoreProduct } from "@/lib/products"
 
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://mirai-clothing.vercel.app"
+
+const STATIC_CATEGORY_NAMES: Record<string, string> = {
+  "t-shirt": "T-Shirt",
+  camicie: "Camicie",
+  pantaloni: "Pantaloni e Bermuda",
+}
+
+function getStaticCategory(slug: string) {
+  const matchingProduct = DEMO_PRODUCTS.find((product) => product.category === slug)
+  if (!matchingProduct) return null
+
+  return {
+    id: `static-${slug}`,
+    name: STATIC_CATEGORY_NAMES[slug] || slug.replace(/-/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase()),
+    slug,
+    description: `Scopri i nuovi capi ${STATIC_CATEGORY_NAMES[slug] || slug} disponibili su MIRAI LAB STORE.`,
+    image_url: matchingProduct.image_url,
+    parent_id: null,
+    sort_order: 99,
+  }
+}
+
+function mergeProducts(databaseProducts: StoreProduct[], staticProducts: StoreProduct[]) {
+  const productsById = new Map(
+    [...staticProducts, ...databaseProducts].map((product) => [product.id, product])
+  )
+  return withoutBlackIslandProducts([...productsById.values()])
+}
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug: rawSlug } = await params
@@ -18,6 +46,8 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     const { data: categoryByIlike } = await supabase.from("categories").select("name, description").ilike("slug", slug).single()
     category = categoryByIlike
   }
+
+  if (!category) category = getStaticCategory(slug)
 
   if (!category) return { title: "Collezione non trovata" }
 
@@ -55,6 +85,8 @@ export default async function CollezionePage({ params }: { params: Promise<{ slu
     category = categoryByIlike
   }
 
+  if (!category) category = getStaticCategory(slug)
+
   if (!category) {
     notFound()
   }
@@ -82,14 +114,23 @@ export default async function CollezionePage({ params }: { params: Promise<{ slu
       .select("*")
       .in("category", subSlugs)
       .order("created_at", { ascending: false })
-    products = withoutBlackIslandProducts(data || [])
+    const staticSlugs = category.slug === "abbigliamento"
+      ? [...new Set([...subSlugs, "t-shirt", "camicie", "pantaloni"])]
+      : subSlugs
+    products = mergeProducts(
+      (data || []) as StoreProduct[],
+      DEMO_PRODUCTS.filter((product) => staticSlugs.includes(product.category))
+    )
   } else {
     const { data } = await supabase
       .from("products")
       .select("*")
       .eq("category", category.slug)
       .order("created_at", { ascending: false })
-    products = withoutBlackIslandProducts(data || [])
+    products = mergeProducts(
+      (data || []) as StoreProduct[],
+      DEMO_PRODUCTS.filter((product) => product.category === category.slug)
+    )
   }
 
   // Get all parent categories for sidebar navigation

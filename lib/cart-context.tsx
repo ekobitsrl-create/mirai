@@ -12,6 +12,7 @@ export type CartItem = {
   size: string
   lineId?: string
   customization?: CustomizationDetails
+  maxQuantity?: number
 }
 
 type CartContextType = {
@@ -62,11 +63,21 @@ export function CartProvider({ children }: { children: ReactNode }) {
         if (existing) {
           return prev.map((i) =>
             (item.lineId ? i.lineId === item.lineId : i.productId === item.productId && i.size === item.size && !i.lineId)
-              ? { ...i, quantity: Math.min(10, i.quantity + (item.quantity || 1)) }
+              ? {
+                  ...i,
+                  maxQuantity: item.maxQuantity ?? i.maxQuantity,
+                  quantity: Math.min(item.maxQuantity ?? i.maxQuantity ?? 10, i.quantity + (item.quantity || 1)),
+                }
               : i
           )
         }
-        return [...prev, { ...item, quantity: item.quantity || 1 }]
+        return [
+          ...prev,
+          {
+            ...item,
+            quantity: Math.min(item.maxQuantity ?? 10, item.quantity || 1),
+          },
+        ]
       })
     },
     []
@@ -87,7 +98,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
       setItems((prev) =>
         prev.map((i) =>
           (lineId ? i.lineId === lineId : i.productId === productId && i.size === size && !i.lineId)
-          ? { ...i, quantity: Math.min(10, quantity) }
+          ? { ...i, quantity: Math.min(i.maxQuantity ?? 10, quantity) }
             : i
         )
       )

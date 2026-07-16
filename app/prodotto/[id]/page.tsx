@@ -3,7 +3,7 @@ import { notFound } from "next/navigation"
 import { Navbar } from "@/components/navbar"
 import { Footer } from "@/components/footer"
 import { ProductDetail } from "@/components/product-detail"
-import { getDemoProduct, isBlackIslandProduct, withoutBlackIslandProducts } from "@/lib/products"
+import { DEMO_PRODUCTS, getDemoProduct, isBlackIslandProduct, withoutBlackIslandProducts } from "@/lib/products"
 
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://mirai-clothing.vercel.app"
 
@@ -65,6 +65,14 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
     .eq("in_stock", true)
     .limit(4)
 
+  const relatedById = new Map(
+    [
+      ...DEMO_PRODUCTS.filter((item) => item.id !== product.id && item.category === product.category && item.in_stock),
+      ...(related || []),
+    ].map((item) => [item.id, item])
+  )
+  const relatedProducts = withoutBlackIslandProducts([...relatedById.values()]).slice(0, 4)
+
   // Resolve subcategory → parent category for breadcrumb
   const { data: subcat } = await supabase
     .from("categories")
@@ -98,7 +106,7 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
     image: product.image_url ? imageUrl : undefined,
     brand: {
       "@type": "Brand",
-      name: "MIRAI",
+      name: product.brand || "MIRAI",
     },
     offers: {
       "@type": "Offer",
@@ -158,7 +166,7 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
         <div className="absolute left-1/2 top-[520px] h-64 w-[70%] -translate-x-1/2 rounded-full bg-primary/10 blur-[130px]" />
       </div>
       <div className="relative pb-24 pt-36">
-        <ProductDetail product={product} relatedProducts={withoutBlackIslandProducts(related || [])} />
+        <ProductDetail product={product} relatedProducts={relatedProducts} />
       </div>
       <div className="relative">
         <Footer />

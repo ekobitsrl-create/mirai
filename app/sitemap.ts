@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next"
 import { createClient } from "@/lib/supabase/server"
+import { DEMO_PRODUCTS } from "@/lib/products"
 
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://mirai-clothing.vercel.app"
 
@@ -23,6 +24,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     changeFrequency: "weekly" as const,
     priority: 0.8,
   }))
+
+  const databaseProductIds = new Set((products || []).map((product) => product.id))
+  const staticProductUrls: MetadataRoute.Sitemap = DEMO_PRODUCTS
+    .filter((product) => product.in_stock && !databaseProductIds.has(product.id))
+    .map((product) => ({
+      url: `${BASE_URL}/prodotto/${product.id}`,
+      lastModified: product.created_at,
+      changeFrequency: "weekly" as const,
+      priority: 0.8,
+    }))
 
   const categoryUrls: MetadataRoute.Sitemap = (categories || []).map((c) => ({
     url: `${BASE_URL}/collezione/${c.slug}`,
@@ -94,5 +105,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
   ]
 
-  return [...staticPages, ...categoryUrls, ...productUrls]
+  return [...staticPages, ...categoryUrls, ...staticProductUrls, ...productUrls]
 }

@@ -127,6 +127,23 @@ export async function POST(request: NextRequest) {
         throw new Error(`Prodotto ${cartItem.productId} non trovato`)
       }
 
+      const requestedQuantity = Number(cartItem.quantity)
+      if (!Number.isInteger(requestedQuantity) || requestedQuantity < 1) {
+        throw new Error(`Quantità non valida per ${product.name}`)
+      }
+
+      const staticProduct = product as StoreProduct
+      if (staticProduct.stock_by_size) {
+        const requestedSize = cartItem.size || ""
+        const sizeStock = staticProduct.stock_by_size[requestedSize]
+        if (!sizeStock) {
+          throw new Error(`Taglia ${requestedSize || "non selezionata"} non disponibile per ${product.name}`)
+        }
+        if (requestedQuantity > sizeStock) {
+          throw new Error(`Sono disponibili solo ${sizeStock} pezzi di ${product.name} in taglia ${requestedSize}`)
+        }
+      }
+
       const customization = cartItem.productId === CUSTOM_TEE_PRODUCT_ID
         ? sanitizeCustomization(cartItem.customization)
         : null
@@ -140,12 +157,14 @@ export async function POST(request: NextRequest) {
           product_data: {
             name: product.name + (cartItem.size ? ` - Taglia ${cartItem.size}` : ''),
             description: customization ? customizationSummary(customization) : product.description || undefined,
-            images: product.image_url?.startsWith('http') ? [product.image_url] : undefined,
+            images: product.image_url
+              ? [product.image_url.startsWith('http') ? product.image_url : `${baseUrl}${product.image_url.startsWith('/') ? '' : '/'}${product.image_url}`]
+              : undefined,
             ...(customization ? { metadata: customizationMetadata(customization) } : {}),
           },
           unit_amount: Math.round(Number(product.price) * 100), // Stripe usa i centesimi
         },
-        quantity: cartItem.quantity,
+        quantity: requestedQuantity,
       }
     })
 

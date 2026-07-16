@@ -18,6 +18,7 @@ type Product = {
   sizes: string[]
   in_stock: boolean
   is_new: boolean
+  stock_by_size?: Record<string, number>
 }
 
 export function ProductGrid({ products, title, subtitle }: { products: Product[]; title?: string; subtitle?: string }) {
@@ -95,6 +96,7 @@ export function ProductGrid({ products, title, subtitle }: { products: Product[]
                             price: Number(product.price),
                             image_url: product.image_url,
                             size: product.sizes?.[0] || "OS",
+                            maxQuantity: product.stock_by_size?.[product.sizes?.[0] || "OS"],
                           })
                         }}
                         className="w-full py-3 bg-primary text-primary-foreground text-[10px] md:text-xs font-bold tracking-widest uppercase rounded-sm hover:bg-primary/90 transition-all duration-300"

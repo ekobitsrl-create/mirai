@@ -204,6 +204,7 @@ export function ShopGrid({
       price: Number(product.price),
       image_url: product.image_url,
       size,
+      maxQuantity: product.stock_by_size?.[size],
     })
     setQuickAddProduct(null)
     setQuickAddSize(null)

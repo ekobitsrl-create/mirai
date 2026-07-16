@@ -54,6 +54,11 @@ export function ProductDetail({
   const [paymentError, setPaymentError] = useState<string | null>(null)
 
   const sizes = product.sizes || []
+  const selectedStock = selectedSize ? product.stock_by_size?.[selectedSize] : undefined
+  const maxQuantity = selectedStock ?? 10
+  const colorName = product.color_name || "Multicolor"
+  const fitNote = product.fit_note || "Consulta la guida alle taglie prima di scegliere."
+  const detailItems = product.detail_items || []
 
   useEffect(() => {
     try {
@@ -100,6 +105,7 @@ export function ProductDetail({
       image_url: product.image_url,
       size: selectedSize || "OS",
       quantity,
+      maxQuantity,
     })
     setAdded(true)
     window.setTimeout(() => setAdded(false), 2200)
@@ -171,7 +177,7 @@ export function ProductDetail({
         <section className="grid gap-3 md:grid-cols-[72px_minmax(0,1fr)]">
           <div className="order-2 flex gap-2 md:order-1 md:flex-col">
             <button type="button" className="relative aspect-square w-16 overflow-hidden border border-primary/70 bg-[#d9d4ca] shadow-[0_0_20px_rgba(159,134,255,0.2)] md:w-[72px]" aria-label="Vista frontale">
-              {product.image_url && <Image src={product.image_url} alt="" fill className="object-cover" sizes="72px" />}
+              {product.image_url && <Image src={product.image_url} alt="" fill className="object-contain" sizes="72px" />}
             </button>
             <div className="hidden aspect-square w-[72px] items-center justify-center border border-white/15 bg-white/[0.06] text-[8px] uppercase tracking-[0.16em] text-white/45 md:flex">01 / 01</div>
           </div>
@@ -186,7 +192,7 @@ export function ProductDetail({
                 src={product.image_url}
                 alt={product.name}
                 fill
-                className="object-cover object-center transition-transform duration-700 group-hover:scale-[1.025]"
+                className="object-contain object-center transition-transform duration-700 group-hover:scale-[1.025]"
                 sizes="(max-width: 1024px) 100vw, 60vw"
                 priority
               />
@@ -205,8 +211,9 @@ export function ProductDetail({
         <section className="relative overflow-hidden rounded-2xl border border-primary/35 bg-[#2a2034]/92 p-5 shadow-[0_0_70px_rgba(126,87,194,0.24)] backdrop-blur-xl before:pointer-events-none before:absolute before:inset-x-12 before:top-0 before:h-px before:bg-gradient-to-r before:from-transparent before:via-primary before:to-transparent before:shadow-[0_0_18px_rgba(159,134,255,0.9)] sm:p-7 lg:sticky lg:top-32 lg:self-start lg:p-8">
           <div className="flex items-start justify-between gap-6">
             <div>
-              <p className="text-[9px] font-semibold uppercase tracking-[0.3em] text-[#9f86ff]">MIRAI / {formatCategory(product.category)}</p>
+              <p className="text-[9px] font-semibold uppercase tracking-[0.3em] text-[#9f86ff]">MIRAI LAB / {product.brand || formatCategory(product.category)}</p>
               <h1 className="mt-3 max-w-xl text-4xl font-medium leading-[0.95] tracking-[-0.045em] text-white md:text-5xl">{product.name}</h1>
+              {product.supplier_sku && <p className="mt-3 text-[9px] uppercase tracking-[0.2em] text-white/40">Codice {product.supplier_sku}</p>}
               <p className="mt-5 text-lg font-medium">{formatPrice(product.price)}</p>
               <p className="mt-1 text-[10px] text-white/55">IVA inclusa</p>
             </div>
@@ -223,10 +230,10 @@ export function ProductDetail({
           <div className="mt-8 border-t border-white/15 pt-7">
             <div className="flex items-center justify-between">
               <p className="text-[10px] font-semibold uppercase tracking-[0.22em]">Colore</p>
-              <span className="text-xs text-white/65">White / Multi</span>
+              <span className="text-xs text-white/65">{colorName}</span>
             </div>
-            <button type="button" className="mt-3 flex items-center gap-2 border border-white bg-white px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.15em] text-black">
-              <span className="h-3 w-3 rounded-full border border-black/15 bg-white" /> Bianco
+            <button type="button" className="mt-3 flex items-center gap-2 border border-white/30 bg-white/[0.06] px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.15em] text-white">
+              <span className="h-3 w-3 rounded-full border border-white/25" style={{ backgroundColor: product.color_hex || "#ffffff" }} /> {colorName}
             </button>
           </div>
 
@@ -243,7 +250,12 @@ export function ProductDetail({
                   <button
                     key={size}
                     type="button"
-                    onClick={() => { setSelectedSize(size); setSizeError(false) }}
+                    onClick={() => {
+                      setSelectedSize(size)
+                      setQuantity((value) => Math.min(value, product.stock_by_size?.[size] ?? 10))
+                      setSizeError(false)
+                    }}
+                    aria-label={product.stock_by_size?.[size] ? `Taglia ${size}, ${product.stock_by_size[size]} disponibili` : `Taglia ${size}`}
                     className={`border py-3 text-xs font-medium transition-all ${selectedSize === size ? "border-[#9f86ff] bg-[#9f86ff] text-black shadow-[0_0_20px_rgba(159,134,255,0.35)]" : "border-white/20 bg-white/[0.035] text-white/75 hover:border-primary/70 hover:text-white"}`}
                   >
                     {size}
@@ -251,7 +263,11 @@ export function ProductDetail({
                 ))}
               </div>
               <p className={`mt-2 min-h-4 text-[10px] transition-colors ${sizeError ? "text-[#ff9b9b]" : "text-white/50"}`}>
-                {sizeError ? "Seleziona una taglia prima di continuare." : "Vestibilità oversize — scegli la tua taglia abituale."}
+                {sizeError
+                  ? "Seleziona una taglia prima di continuare."
+                  : selectedStock !== undefined
+                    ? `${fitNote} Disponibilità: ${selectedStock} ${selectedStock === 1 ? "pezzo" : "pezzi"}.`
+                    : fitNote}
               </p>
             </div>
           )}
@@ -260,7 +276,7 @@ export function ProductDetail({
             <div className="flex h-14 shrink-0 items-center border border-white/20 bg-black/10">
               <button type="button" onClick={() => setQuantity((value) => Math.max(1, value - 1))} className="flex h-full w-10 items-center justify-center text-white/45 hover:text-white" aria-label="Riduci quantità"><Minus className="h-3.5 w-3.5" /></button>
               <span className="w-8 text-center text-xs font-medium">{quantity}</span>
-              <button type="button" onClick={() => setQuantity((value) => Math.min(10, value + 1))} className="flex h-full w-10 items-center justify-center text-white/45 hover:text-white" aria-label="Aumenta quantità"><Plus className="h-3.5 w-3.5" /></button>
+              <button type="button" onClick={() => setQuantity((value) => Math.min(maxQuantity, value + 1))} className="flex h-full w-10 items-center justify-center text-white/45 hover:text-white" aria-label="Aumenta quantità"><Plus className="h-3.5 w-3.5" /></button>
             </div>
             <button
               type="button"
@@ -325,16 +341,18 @@ export function ProductDetail({
 
           <div className="mt-1">
             <Details title="Dettagli prodotto" open>
-              <ul className="space-y-1.5">
-                <li>• Cotone heavyweight premium</li>
-                <li>• Fit oversize con spalla scesa</li>
-                <li>• Stampa frontale Valley Athletic</li>
-                <li>• Collo a costine rinforzato</li>
-              </ul>
+              {detailItems.length > 0 ? (
+                <ul className="space-y-1.5">
+                  {detailItems.map((detail) => <li key={detail}>• {detail}</li>)}
+                </ul>
+              ) : product.description}
             </Details>
-            <Details title="Composizione e cura">
-              Lavare al rovescio a 30°C con colori simili. Non candeggiare. Stirare al rovescio a bassa temperatura e non passare il ferro direttamente sulla stampa.
-            </Details>
+            {(product.composition || product.care) && (
+              <Details title="Composizione e cura">
+                {product.composition && <p>{product.composition}</p>}
+                {product.care && <p className={product.composition ? "mt-2" : undefined}>{product.care}</p>}
+              </Details>
+            )}
             <Details title="Spedizioni e resi">
               Spedizione tracciata in Italia e in Europa. Puoi richiedere il reso entro 14 giorni dalla consegna, purché il capo sia integro e con i cartellini originali.
             </Details>
@@ -375,7 +393,7 @@ export function ProductDetail({
       )}
 
       {sizeGuideOpen && (
-        <SizeGuide onClose={() => setSizeGuideOpen(false)} />
+        <SizeGuide product={product} onClose={() => setSizeGuideOpen(false)} />
       )}
     </div>
   )
@@ -403,7 +421,7 @@ function Details({ title, children, open = false }: { title: string; children: R
   )
 }
 
-function SizeGuide({ onClose }: { onClose: () => void }) {
+function SizeGuide({ product, onClose }: { product: StoreProduct; onClose: () => void }) {
   const rows = [
     ["S", "52", "69", "22"],
     ["M", "55", "71", "23"],
@@ -418,13 +436,27 @@ function SizeGuide({ onClose }: { onClose: () => void }) {
           <div><p className="text-[9px] uppercase tracking-[0.26em] text-[#9f86ff]">MIRAI fit guide</p><h2 className="mt-2 text-2xl font-medium">Guida alle taglie</h2></div>
           <button type="button" onClick={onClose} className="p-1 text-white/40 hover:text-white" aria-label="Chiudi"><X className="h-5 w-5" /></button>
         </div>
-        <p className="mt-5 text-xs leading-6 text-white/45">La Valley Athletic Tee ha un fit oversize. Le misure sono espresse in centimetri e prese sul capo steso.</p>
-        <div className="mt-6 overflow-x-auto">
-          <table className="w-full min-w-[480px] text-left text-xs">
-            <thead className="border-b border-white/15 text-[9px] uppercase tracking-[0.16em] text-white/35"><tr><th className="py-3">Taglia</th><th className="py-3">Torace</th><th className="py-3">Lunghezza</th><th className="py-3">Manica</th></tr></thead>
-            <tbody>{rows.map((row) => <tr key={row[0]} className="border-b border-white/10">{row.map((value) => <td key={value} className="py-4">{value}</td>)}</tr>)}</tbody>
-          </table>
-        </div>
+        <p className="mt-5 text-xs leading-6 text-white/45">{product.fit_note || "Scegli la tua taglia abituale."}</p>
+        {product.id === "71a11e7e-5b68-4e2c-9f65-0dca2b967104" ? (
+          <div className="mt-6 overflow-x-auto">
+            <table className="w-full min-w-[480px] text-left text-xs">
+              <thead className="border-b border-white/15 text-[9px] uppercase tracking-[0.16em] text-white/35"><tr><th className="py-3">Taglia</th><th className="py-3">Torace</th><th className="py-3">Lunghezza</th><th className="py-3">Manica</th></tr></thead>
+              <tbody>{rows.map((row) => <tr key={row[0]} className="border-b border-white/10">{row.map((value) => <td key={value} className="py-4">{value}</td>)}</tr>)}</tbody>
+            </table>
+          </div>
+        ) : (
+          <div className="mt-6">
+            <p className="text-[9px] uppercase tracking-[0.2em] text-white/35">Taglie disponibili</p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              {product.sizes.map((size) => (
+                <span key={size} className="border border-white/15 px-4 py-3 text-xs">
+                  {size}{product.stock_by_size?.[size] !== undefined ? ` · ${product.stock_by_size[size]} pz` : ""}
+                </span>
+              ))}
+            </div>
+            <p className="mt-5 text-[10px] leading-5 text-white/40">Le misure precise possono variare in base al modello. Per una verifica prima dell'acquisto contatta l'assistenza indicando il codice {product.supplier_sku || product.id}.</p>
+          </div>
+        )}
         <button type="button" onClick={onClose} className="mt-7 w-full bg-white py-4 text-[10px] font-bold uppercase tracking-[0.2em] text-black hover:bg-[#9f86ff]">Ho capito</button>
       </div>
     </div>

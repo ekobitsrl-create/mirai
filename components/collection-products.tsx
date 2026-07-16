@@ -44,7 +44,7 @@ const categoryImages: Record<string, string> = {
 const defaultImage = "/images/collection-tshirt.jpg"
 
 function getCategoryImage(slug: string, dbImage: string | null): string {
-  if (dbImage && dbImage.startsWith("http")) return dbImage
+  if (dbImage) return dbImage
   return categoryImages[slug.toLowerCase()] || defaultImage
 }
 
@@ -58,6 +58,7 @@ type Product = {
   sizes: string[]
   in_stock: boolean
   is_new: boolean
+  stock_by_size?: Record<string, number>
 }
 
 type Category = {
@@ -284,6 +285,7 @@ export function CollectionProducts({
                                   price: Number(product.price),
                                   image_url: product.image_url,
                                   size: product.sizes?.[0] || "OS",
+                                  maxQuantity: product.stock_by_size?.[product.sizes?.[0] || "OS"],
                                 })
                               }}
                               className="w-full py-3 bg-primary text-primary-foreground text-xs font-bold tracking-widest uppercase rounded-sm hover:bg-primary/90 hover:shadow-[0_0_20px_rgba(168,85,247,0.25)] transition-all duration-300"

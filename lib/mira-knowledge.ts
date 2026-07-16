@@ -358,14 +358,14 @@ export function getMiraLocalReply(rawMessage: string, context: MiraKnowledgeCont
 
   if (hasAny(message, ["taglia", "taglie", "misura", "torace", "lunghezza", "manica", "s m l", "xl"])) {
     if (product) {
-      return answer("size", `${product.name} è disponibile nelle taglie ${product.sizes.join(", ")}. Per il fit indicato come oversize puoi scegliere la taglia abituale; nella pagina prodotto trovi la tabella misure.`, `/prodotto/${product.id}`, "Apri la guida taglie", product.id)
+      return answer("size", `${product.name} è disponibile nelle taglie ${product.sizes.join(", ")}. ${product.fit_note || "Consulta la guida nella pagina prodotto prima di scegliere."}`, `/prodotto/${product.id}`, "Apri la guida taglie", product.id)
     }
     return answer("size", "Ogni pagina prodotto contiene la guida con torace, lunghezza e manica. Quando il fit è indicato come oversize, puoi partire dalla tua taglia abituale.", "/collezioni", "Scegli un capo")
   }
 
   if (hasAny(message, ["fit", "vestibilita", "oversize", "largo", "stretto", "veste"])) {
     return answer("fit", product
-      ? `${product.name} ha un fit oversize: il consiglio mostrato sul sito è scegliere la propria taglia abituale.`
+      ? `${product.name}: ${product.fit_note || "controlla la guida alle taglie nella pagina prodotto."}`
       : "Il fit cambia in base al prodotto. Se è indicato come oversize, scegli la taglia abituale; per un effetto meno ampio valuta una taglia in meno.", product ? `/prodotto/${product.id}` : "/collezioni", product ? `Guarda ${product.name}` : "Apri lo shop", product?.id)
   }
 
@@ -377,13 +377,16 @@ export function getMiraLocalReply(rawMessage: string, context: MiraKnowledgeCont
   }
 
   if (hasAny(message, ["lavare", "lavaggio", "lavatrice", "stirare", "cura", "candeggina"])) {
-    if (product?.id === DEMO_PRODUCTS[0]?.id) {
-      return answer("care", "Per la Valley Athletic Tee: lavaggio al rovescio a 30 °C con colori simili, niente candeggina e ferro a bassa temperatura senza passarlo direttamente sulla stampa.", `/prodotto/${product.id}`, "Dettagli del capo", product.id)
+    if (product?.care) {
+      return answer("care", `Per ${product.name}: ${product.care}`, `/prodotto/${product.id}`, "Dettagli del capo", product.id)
     }
     return answer("care", "Controlla sempre le istruzioni nella pagina del prodotto e sull’etichetta. Se mi dici il nome del capo posso darti l’indicazione disponibile sul sito.", "/collezioni", "Trova il prodotto")
   }
 
   if (hasAny(message, ["colore", "colori", "foto", "dal vivo", "schermo"])) {
+    if (product?.color_name) {
+      return answer("colors", `${product.name} è disponibile nella variante ${product.color_name}. Le foto possono variare leggermente in base a luce e schermo.`, `/prodotto/${product.id}`, `Guarda ${product.name}`, product.id)
+    }
     return answer("colors", "Le foto cercano di rappresentare fedelmente i colori, ma può esserci una leggera variazione dovuta allo schermo e alla luce.", "/collezioni", "Guarda i prodotti")
   }
 
