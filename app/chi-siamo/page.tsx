@@ -38,7 +38,7 @@ export default function ChiSiamoPage() {
               <ArrowLeft className="h-4 w-4" />
               Torna alla Home
             </Link>
-            <h1 className="font-[family-name:var(--font-space-grotesk)] text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-foreground text-balance">
+            <h1 className="font-[family-name:var(--font-space-grotesk)] text-3xl font-bold tracking-tight text-foreground text-balance md:text-4xl">
               Chi Siamo
             </h1>
           </div>

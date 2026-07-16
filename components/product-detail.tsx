@@ -212,7 +212,7 @@ export function ProductDetail({
           <div className="flex items-start justify-between gap-6">
             <div>
               <p className="text-[9px] font-semibold uppercase tracking-[0.3em] text-[#9f86ff]">MIRAI LAB / {product.brand || formatCategory(product.category)}</p>
-              <h1 className="mt-3 max-w-xl text-4xl font-medium leading-[0.95] tracking-[-0.045em] text-white md:text-5xl">{product.name}</h1>
+              <h1 className="mt-3 max-w-xl text-2xl font-medium leading-tight tracking-[-0.03em] text-white sm:text-3xl md:text-4xl">{product.name}</h1>
               {product.supplier_sku && <p className="mt-3 text-[9px] uppercase tracking-[0.2em] text-white/40">Codice {product.supplier_sku}</p>}
               <p className="mt-5 text-lg font-medium">{formatPrice(product.price)}</p>
               <p className="mt-1 text-[10px] text-white/55">IVA inclusa</p>

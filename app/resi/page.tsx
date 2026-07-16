@@ -19,7 +19,7 @@ export default function ResiPage() {
             <ArrowLeft className="h-4 w-4" />
             Torna alla Home
           </Link>
-          <h1 className="font-[family-name:var(--font-space-grotesk)] text-4xl md:text-5xl font-bold tracking-tight text-foreground mb-4 text-balance">
+          <h1 className="mb-4 font-[family-name:var(--font-space-grotesk)] text-3xl font-bold tracking-tight text-foreground text-balance md:text-4xl">
             Resi e Rimborsi
           </h1>
           <p className="text-lg text-muted-foreground mb-12 max-w-2xl text-pretty">

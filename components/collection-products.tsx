@@ -131,7 +131,7 @@ export function CollectionProducts({
             <ArrowLeft className="h-4 w-4" /> Tutte le Collezioni
           </Link>
           <h1
-            className="text-4xl md:text-6xl font-bold tracking-tight text-foreground"
+            className="text-3xl font-bold tracking-tight text-foreground md:text-4xl"
             style={{ fontFamily: "var(--font-space-grotesk)" }}
           >
             {category.name}

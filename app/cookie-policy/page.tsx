@@ -19,7 +19,7 @@ export default function CookiePolicyPage() {
             <ArrowLeft className="h-4 w-4" />
             Torna alla Home
           </Link>
-          <h1 className="font-[family-name:var(--font-space-grotesk)] text-4xl md:text-5xl font-bold tracking-tight text-foreground mb-2 text-balance">
+          <h1 className="mb-2 font-[family-name:var(--font-space-grotesk)] text-3xl font-bold tracking-tight text-foreground text-balance md:text-4xl">
             Cookie Policy
           </h1>
           <p className="text-sm text-muted-foreground mb-12">Ultimo aggiornamento: 16 luglio 2026</p>

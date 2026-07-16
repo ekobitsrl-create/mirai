@@ -223,7 +223,7 @@ export function ShopGrid({
                 <Sparkles className="h-3.5 w-3.5" />
                 Drop 01 / Shop all
               </div>
-              <h1 className="text-[clamp(2rem,4vw,3.5rem)] font-semibold uppercase leading-[0.95] tracking-[-0.04em] text-foreground">
+              <h1 className="text-[clamp(1.75rem,3vw,2.75rem)] font-semibold uppercase leading-none tracking-[-0.03em] text-foreground">
                 The shop
               </h1>
               <p className="mt-6 max-w-xl text-sm leading-6 text-white/55 md:text-base">
