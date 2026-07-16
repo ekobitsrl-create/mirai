@@ -48,6 +48,8 @@ export function CheckoutButton({
         productId: item.productId,
         quantity: item.quantity,
         size: item.size,
+        lineId: item.lineId,
+        customization: item.customization,
       }))
 
       // Chiama l'API per creare la sessione checkout

@@ -4,11 +4,19 @@ import { assertStripeConfigured, stripe } from '@/lib/stripe'
 import { createClient } from '@/lib/supabase/server'
 import { getDemoProduct, isBlackIslandProduct, type StoreProduct } from '@/lib/products'
 import { getStripeShippingOptions, SHIPPING_CONFIG } from '@/lib/shipping'
+import {
+  CUSTOM_TEE_PRODUCT_ID,
+  customizationMetadata,
+  customizationSummary,
+  sanitizeCustomization,
+} from '@/lib/customization'
 
 type CartLineItem = {
   productId: string
   quantity: number
   size?: string
+  lineId?: string
+  customization?: unknown
 }
 
 export async function createCheckoutSession(cartItems: CartLineItem[]) {
@@ -42,12 +50,20 @@ export async function createCheckoutSession(cartItems: CartLineItem[]) {
       throw new Error(`Prodotto ${cartItem.productId} non trovato`)
     }
 
+    const customization = cartItem.productId === CUSTOM_TEE_PRODUCT_ID
+      ? sanitizeCustomization(cartItem.customization)
+      : null
+    if (cartItem.productId === CUSTOM_TEE_PRODUCT_ID && !customization) {
+      throw new Error('Personalizzazione della T-shirt non valida')
+    }
+
     return {
       price_data: {
         currency: 'eur',
         product_data: {
           name: product.name + (cartItem.size ? ` - Taglia ${cartItem.size}` : ''),
-          description: product.description || undefined,
+          description: customization ? customizationSummary(customization) : product.description || undefined,
+          ...(customization ? { metadata: customizationMetadata(customization) } : {}),
         },
         unit_amount: Math.round(Number(product.price) * 100),
       },

@@ -90,6 +90,7 @@ function getContextPrompt(pathname: string) {
     return "Bro, cosa cerchi? Ti aiuto a trovare il capo giusto."
   }
   if (pathname.startsWith("/checkout")) return "Ci siamo quasi. Serve una mano con ordine o consegna?"
+  if (pathname.startsWith("/custom-lab")) return "Yo, vuoi creare la tua tee? Ti guido io nel Custom Lab."
   if (pathname.startsWith("/spedizioni")) return "La spedizione standard è gratuita. Vuoi sapere i tempi?"
   if (pathname.startsWith("/resi")) return "Hai un dubbio sul reso? Dimmi pure."
   return "Yo, serve una mano per un capo?"

@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react"
 import Link from "next/link"
 import dynamic from "next/dynamic"
-import { Search, Menu, X, User, ShoppingBag, ChevronDown, ChevronRight } from "lucide-react"
+import { Search, Menu, X, User, ShoppingBag, ChevronDown, ChevronRight, WandSparkles } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 import { useCart } from "@/lib/cart-context"
 import { useLanguage } from "@/lib/language-context"
@@ -165,6 +165,13 @@ export function Navbar() {
                 {t.nav.shop}
               </Link>
               <Link
+                href="/custom-lab"
+                className="inline-flex items-center gap-1.5 rounded-full border border-primary/45 bg-primary/5 px-3 py-2 text-[10px] font-bold uppercase tracking-[0.16em] text-primary transition-all hover:border-primary hover:bg-primary/15 hover:text-white hover:shadow-[0_0_24px_rgba(159,134,255,0.2)]"
+              >
+                <WandSparkles className="h-3.5 w-3.5" />
+                Personalizza
+              </Link>
+              <Link
                 href="/#prodotti"
                 className="text-sm tracking-widest uppercase text-white/55 hover:text-white transition-colors"
               >
@@ -282,6 +289,13 @@ export function Navbar() {
               onClick={() => setMobileOpen(false)}
             >
               {t.nav.shop}
+            </Link>
+            <Link
+              href="/custom-lab"
+              className="flex items-center justify-center gap-2 rounded-sm border border-primary/45 bg-primary/10 px-4 py-3 text-xs font-bold uppercase tracking-[0.2em] text-primary"
+              onClick={() => setMobileOpen(false)}
+            >
+              <WandSparkles className="h-4 w-4" /> Personalizza
             </Link>
             <Link
               href="/#prodotti"

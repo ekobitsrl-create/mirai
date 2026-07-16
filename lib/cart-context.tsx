@@ -1,6 +1,7 @@
 "use client"
 
 import { createContext, useContext, useState, useCallback, useEffect, type ReactNode } from "react"
+import type { CustomizationDetails } from "@/lib/customization"
 
 export type CartItem = {
   productId: string
@@ -9,13 +10,15 @@ export type CartItem = {
   image_url: string | null
   quantity: number
   size: string
+  lineId?: string
+  customization?: CustomizationDetails
 }
 
 type CartContextType = {
   items: CartItem[]
   addItem: (item: Omit<CartItem, "quantity"> & { quantity?: number }) => void
-  removeItem: (productId: string, size: string) => void
-  updateQuantity: (productId: string, size: string, quantity: number) => void
+  removeItem: (productId: string, size: string, lineId?: string) => void
+  updateQuantity: (productId: string, size: string, quantity: number, lineId?: string) => void
   clearCart: () => void
   getTotal: () => number
   itemCount: number
@@ -53,12 +56,12 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const addItem = useCallback(
     (item: Omit<CartItem, "quantity"> & { quantity?: number }) => {
       setItems((prev) => {
-        const existing = prev.find(
-          (i) => i.productId === item.productId && i.size === item.size
-        )
+        const existing = prev.find((i) => item.lineId
+          ? i.lineId === item.lineId
+          : i.productId === item.productId && i.size === item.size && !i.lineId)
         if (existing) {
           return prev.map((i) =>
-            i.productId === item.productId && i.size === item.size
+            (item.lineId ? i.lineId === item.lineId : i.productId === item.productId && i.size === item.size && !i.lineId)
               ? { ...i, quantity: Math.min(10, i.quantity + (item.quantity || 1)) }
               : i
           )
@@ -69,21 +72,21 @@ export function CartProvider({ children }: { children: ReactNode }) {
     []
   )
 
-  const removeItem = useCallback((productId: string, size: string) => {
+  const removeItem = useCallback((productId: string, size: string, lineId?: string) => {
     setItems((prev) =>
-      prev.filter((i) => !(i.productId === productId && i.size === size))
+      prev.filter((i) => !(lineId ? i.lineId === lineId : i.productId === productId && i.size === size && !i.lineId))
     )
   }, [])
 
   const updateQuantity = useCallback(
-    (productId: string, size: string, quantity: number) => {
+    (productId: string, size: string, quantity: number, lineId?: string) => {
       if (quantity <= 0) {
-        removeItem(productId, size)
+        removeItem(productId, size, lineId)
         return
       }
       setItems((prev) =>
         prev.map((i) =>
-          i.productId === productId && i.size === size
+          (lineId ? i.lineId === lineId : i.productId === productId && i.size === size && !i.lineId)
           ? { ...i, quantity: Math.min(10, quantity) }
             : i
         )

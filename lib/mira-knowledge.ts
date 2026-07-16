@@ -196,7 +196,7 @@ function contextualFollowUp(message: string, context: MiraKnowledgeContext) {
   }
 
   if (context.lastIntent === "customization") {
-    return answer("customization", "La personalizzazione è disponibile nel MIRAI LAB STORE di Catania; per sapere opzioni e prezzo online scrivi a info@mirai.store. I prodotti personalizzati non sono restituibili.", "/contatti", "Chiedi informazioni")
+    return answer("customization", "Nel Custom Lab puoi scegliere colore, taglia, fronte o retro e aggiungere testo o una grafica. La Custom Heavy Tee parte da 79 €; i prodotti personalizzati non sono restituibili salvo difetti.", "/custom-lab#editor", "Apri il Custom Lab")
   }
 
   if (["product", "size", "fit", "stock", "care", "colors", "budget"].includes(context.lastIntent)) {
@@ -323,7 +323,7 @@ export function getMiraLocalReply(rawMessage: string, context: MiraKnowledgeCont
   }
 
   if (hasAny(message, ["personalizzare", "personalizzazione", "customizzare", "custom", "stampa", "ricamo", "creare maglietta"])) {
-    return answer("customization", "Nel MIRAI LAB STORE di Catania è previsto un servizio di personalizzazione manuale. Per le opzioni online scrivi a info@mirai.store; ricorda che i prodotti personalizzati non possono essere restituiti.", "/contatti", "Chiedi una personalizzazione")
+    return answer("customization", "Puoi creare online una MIRAI Custom Heavy Tee: scegli colore, taglia, lato di stampa, testo o grafica e guarda subito l’anteprima. Costa 79 € con una stampa inclusa.", "/custom-lab#editor", "Crea la tua T-shirt")
   }
 
   if (hasAny(message, ["negozio", "store", "lab store", "dove siete", "indirizzo", "catania", "ritiro in negozio", "apertura"])) {

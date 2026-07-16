@@ -127,6 +127,9 @@ function getSuggestion(message: string, products: StoreProduct[]) {
   if (/pagament|paypal|klarna|carta|apple pay|google pay/.test(normalized)) {
     return { href: "/faq", label: "FAQ pagamenti" }
   }
+  if (/custom|personalizz|stampa|grafica/.test(normalized)) {
+    return { href: "/custom-lab#editor", label: "Apri il Custom Lab" }
+  }
 
   const availableProducts = products.filter((product) => product.in_stock)
   const matchedProduct = availableProducts.find((product) => {
@@ -202,6 +205,7 @@ INFORMAZIONI NEGOZIO:
 - Spedizione express: ${formatShippingPrice(SHIPPING_CONFIG.expressPriceCents)}, ${SHIPPING_CONFIG.expressDeliveryDays.minimum}-${SHIPPING_CONFIG.expressDeliveryDays.maximum} giorni lavorativi.
 - Reso richiedibile entro 14 giorni dalla consegna; rimborso entro 7 giorni lavorativi dalla verifica.
 - Pagamenti gestiti tramite Stripe. I metodi effettivamente mostrati al checkout dipendono dalla configurazione attiva.
+- Custom Lab online: T-shirt heavyweight oversize personalizzabile con colore, taglia, stampa fronte o retro, testo o grafica. Prezzo 79 euro con una stampa inclusa. I prodotti personalizzati non sono restituibili salvo difetti.
 
 CATALOGO ATTUALE:
 ${JSON.stringify(catalogForPrompt(products))}`

@@ -21,6 +21,8 @@ export default function CheckoutPage() {
       productId: item.productId,
       quantity: item.quantity,
       size: item.size,
+      lineId: item.lineId,
+      customization: item.customization,
     }))
     const clientSecret = await createCheckoutSession(cartLineItems)
     if (!clientSecret) {

@@ -13,6 +13,7 @@ export function Footer() {
       links: [
         { label: t.footer.newArrivals, href: "/#nuovi-arrivi" },
         { label: t.footer.collections, href: "/collezioni" },
+        { label: "T-shirt personalizzate", href: "/custom-lab" },
       ],
     },
     info: {

@@ -1,3 +1,5 @@
+import { CUSTOM_TEE_IMAGE, CUSTOM_TEE_PRICE, CUSTOM_TEE_PRODUCT_ID } from "@/lib/customization"
+
 type ProductIdentity = {
   name?: string | null
   image_url?: string | null
@@ -32,6 +34,19 @@ export const VALLEY_ATHLETIC_TEE: StoreProduct = {
 
 export const DEMO_PRODUCTS: StoreProduct[] = [VALLEY_ATHLETIC_TEE]
 
+export const CUSTOM_TEE_PRODUCT: StoreProduct = {
+  id: CUSTOM_TEE_PRODUCT_ID,
+  name: "MIRAI Custom Heavy Tee",
+  description: "T-shirt heavyweight oversize personalizzata nel MIRAI Custom Lab. Una stampa fronte o retro inclusa.",
+  price: CUSTOM_TEE_PRICE,
+  category: "custom",
+  image_url: CUSTOM_TEE_IMAGE,
+  sizes: ["S", "M", "L", "XL", "XXL"],
+  in_stock: true,
+  is_new: true,
+  created_at: "2026-07-16T12:00:00.000Z",
+}
+
 const BLACK_ISLAND_PATTERN = /black[\s_-]*island/i
 
 export function isBlackIslandProduct(product: ProductIdentity) {
@@ -53,5 +68,6 @@ export function withDemoProducts<T extends StoreProduct>(products: T[]): StorePr
 }
 
 export function getDemoProduct(id: string) {
+  if (id === CUSTOM_TEE_PRODUCT.id) return CUSTOM_TEE_PRODUCT
   return DEMO_PRODUCTS.find((product) => product.id === id) || null
 }

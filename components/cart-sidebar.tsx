@@ -1,17 +1,24 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { X, Plus, Minus, ShoppingBag } from "lucide-react"
 import { useCart } from "@/lib/cart-context"
 import { useLanguage } from "@/lib/language-context"
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
+import { customizationSummary } from "@/lib/customization"
 
 export function CartSidebar() {
   const { items, removeItem, updateQuantity, getTotal, itemCount, clearCart } = useCart()
   const { t } = useLanguage()
   const [open, setOpen] = useState(false)
+
+  useEffect(() => {
+    const openCart = () => setOpen(true)
+    window.addEventListener("mirai:open-cart", openCart)
+    return () => window.removeEventListener("mirai:open-cart", openCart)
+  }, [])
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
@@ -30,6 +37,9 @@ export function CartSidebar() {
           <SheetTitle className="text-foreground text-lg tracking-widest uppercase">
             {t.cart.title} ({itemCount})
           </SheetTitle>
+          <SheetDescription className="sr-only">
+            Riepilogo dei prodotti selezionati e accesso al checkout.
+          </SheetDescription>
         </SheetHeader>
 
         {items.length === 0 ? (
@@ -48,7 +58,7 @@ export function CartSidebar() {
             <div className="flex-1 overflow-y-auto -mx-5 px-5">
               <div className="flex flex-col gap-4 py-4">
                 {items.map((item) => (
-                  <div key={`${item.productId}-${item.size}`} className="flex gap-4 py-3 border-b border-border">
+                  <div key={item.lineId || `${item.productId}-${item.size}`} className="flex gap-4 py-3 border-b border-border">
                     <div className="relative w-20 h-24 flex-shrink-0 bg-card rounded-sm overflow-hidden">
                       <Image
                         src={item.image_url || "/placeholder.jpg"}
@@ -61,11 +71,16 @@ export function CartSidebar() {
                       <div>
                         <h4 className="text-sm font-medium text-foreground truncate">{item.name}</h4>
                         <p className="text-xs text-muted-foreground mt-0.5">{t.cart.size}: {item.size}</p>
+                        {item.customization && (
+                          <p className="mt-1 line-clamp-2 text-[10px] leading-relaxed text-primary/80">
+                            {customizationSummary(item.customization)}
+                          </p>
+                        )}
                       </div>
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
                           <button
-                            onClick={() => updateQuantity(item.productId, item.size, item.quantity - 1)}
+                            onClick={() => updateQuantity(item.productId, item.size, item.quantity - 1, item.lineId)}
                             className="p-1 text-muted-foreground hover:text-foreground transition-colors"
                             aria-label={t.cart.decreaseQuantity}
                           >
@@ -73,7 +88,7 @@ export function CartSidebar() {
                           </button>
                           <span className="text-xs font-medium text-foreground w-5 text-center">{item.quantity}</span>
                           <button
-                            onClick={() => updateQuantity(item.productId, item.size, item.quantity + 1)}
+                            onClick={() => updateQuantity(item.productId, item.size, item.quantity + 1, item.lineId)}
                             className="p-1 text-muted-foreground hover:text-foreground transition-colors"
                             aria-label={t.cart.increaseQuantity}
                           >
@@ -86,7 +101,7 @@ export function CartSidebar() {
                       </div>
                     </div>
                     <button
-                      onClick={() => removeItem(item.productId, item.size)}
+                      onClick={() => removeItem(item.productId, item.size, item.lineId)}
                       className="self-start p-1 text-muted-foreground hover:text-destructive transition-colors"
                       aria-label={t.cart.remove}
                     >

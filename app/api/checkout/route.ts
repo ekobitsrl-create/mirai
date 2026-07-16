@@ -4,6 +4,20 @@ import { assertStripeConfigured, stripe } from '@/lib/stripe'
 import { createClient } from '@/lib/supabase/server'
 import { getDemoProduct, isBlackIslandProduct, type StoreProduct } from '@/lib/products'
 import { getStripeShippingOptions, SHIPPING_CONFIG } from '@/lib/shipping'
+import {
+  CUSTOM_TEE_PRODUCT_ID,
+  customizationMetadata,
+  customizationSummary,
+  sanitizeCustomization,
+} from '@/lib/customization'
+
+type CheckoutCartItem = {
+  productId: string
+  quantity: number
+  size?: string
+  lineId?: string
+  customization?: unknown
+}
 
 /**
  * POST /api/checkout
@@ -80,7 +94,7 @@ export async function POST(request: NextRequest) {
 
     // Recupera i prodotti dal database
     const supabase = await createClient()
-    const productIds = items.map((item: { productId: string }) => item.productId)
+    const productIds = items.map((item: CheckoutCartItem) => item.productId)
     
     const { data: products, error } = await supabase
       .from('products')
@@ -107,10 +121,17 @@ export async function POST(request: NextRequest) {
     }
 
     // Costruisci i line items per Stripe
-    const lineItems = items.map((cartItem: { productId: string; quantity: number; size?: string }) => {
+    const lineItems = items.map((cartItem: CheckoutCartItem) => {
       const product = checkoutProducts.find((p) => p?.id === cartItem.productId)
       if (!product) {
         throw new Error(`Prodotto ${cartItem.productId} non trovato`)
+      }
+
+      const customization = cartItem.productId === CUSTOM_TEE_PRODUCT_ID
+        ? sanitizeCustomization(cartItem.customization)
+        : null
+      if (cartItem.productId === CUSTOM_TEE_PRODUCT_ID && !customization) {
+        throw new Error('Personalizzazione della T-shirt non valida')
       }
 
       return {
@@ -118,8 +139,9 @@ export async function POST(request: NextRequest) {
           currency: 'eur',
           product_data: {
             name: product.name + (cartItem.size ? ` - Taglia ${cartItem.size}` : ''),
-            description: product.description || undefined,
+            description: customization ? customizationSummary(customization) : product.description || undefined,
             images: product.image_url?.startsWith('http') ? [product.image_url] : undefined,
+            ...(customization ? { metadata: customizationMetadata(customization) } : {}),
           },
           unit_amount: Math.round(Number(product.price) * 100), // Stripe usa i centesimi
         },
@@ -131,6 +153,13 @@ export async function POST(request: NextRequest) {
       (total, item) => total + item.price_data.unit_amount * item.quantity,
       0
     )
+
+    const compactOrderItems = JSON.stringify(items.map((item: CheckoutCartItem) => ({
+      productId: item.productId,
+      quantity: item.quantity,
+      size: item.size,
+      lineId: item.lineId,
+    })))
 
     // Crea la sessione Stripe Checkout
     const session = await stripe.checkout.sessions.create({
@@ -147,7 +176,9 @@ export async function POST(request: NextRequest) {
       cancel_url: `${baseUrl}${safeCancelPath}`,
       // Metadata per tracciamento ordine
       metadata: {
-        order_items: JSON.stringify(items),
+        ...(compactOrderItems.length <= 500
+          ? { order_items: compactOrderItems }
+          : { order_item_count: String(items.length) }),
         ...(quickPaymentMethod ? { requested_payment_method: quickPaymentMethod } : {}),
       },
     })
