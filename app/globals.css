@@ -222,6 +222,41 @@
   }
 }
 
+@keyframes mira-model-curious {
+  0%, 100% {
+    transform: translate3d(0, 0, 0) rotate(-1deg) scaleX(var(--mira-flip));
+  }
+  45% {
+    transform: translate3d(-3px, -5px, 0) rotate(-3deg) scaleX(var(--mira-flip));
+  }
+  72% {
+    transform: translate3d(1px, -3px, 0) rotate(-1.7deg) scaleX(var(--mira-flip));
+  }
+}
+
+@keyframes mira-model-dragging {
+  0%, 100% {
+    transform: translate3d(0, 0, 0) rotate(-1.2deg) scale(0.98) scaleX(var(--mira-flip));
+  }
+  50% {
+    transform: translate3d(0, -3px, 0) rotate(1.2deg) scale(1.02) scaleX(var(--mira-flip));
+  }
+}
+
+@keyframes mira-model-scan {
+  0% {
+    top: 15%;
+    opacity: 0;
+  }
+  18%, 72% {
+    opacity: 0.22;
+  }
+  100% {
+    top: 88%;
+    opacity: 0;
+  }
+}
+
 @keyframes mira-model-glow {
   0%, 100% {
     opacity: 0.4;
@@ -281,6 +316,22 @@
   filter: drop-shadow(0 0 9px rgba(159, 134, 255, 0.35));
 }
 
+.mira-model-reactive-shell {
+  transition: transform 180ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  will-change: transform;
+}
+
+.mira-model-scan {
+  top: 15%;
+  opacity: 0;
+  animation: mira-model-scan 5.8s ease-in-out infinite;
+}
+
+.mira-model-state-listening .mira-model-scan,
+.mira-model-state-speaking .mira-model-scan {
+  animation-duration: 1.9s;
+}
+
 .mira-model-flipped {
   --mira-flip: -1;
 }
@@ -301,6 +352,18 @@
   animation:
     mira-model-in 0.32s ease both,
     mira-model-speaking 1.45s ease-in-out 0.32s infinite;
+}
+
+.mira-model-curious {
+  animation:
+    mira-model-in 0.32s ease both,
+    mira-model-curious 1.8s ease-in-out 0.32s infinite;
+}
+
+.mira-model-dragging {
+  animation:
+    mira-model-in 0.22s ease both,
+    mira-model-dragging 0.78s ease-in-out 0.22s infinite;
 }
 
 .mira-model-glow {
@@ -391,6 +454,9 @@
   .mira-model-idle,
   .mira-model-listening,
   .mira-model-speaking,
+  .mira-model-curious,
+  .mira-model-dragging,
+  .mira-model-scan,
   .mira-model-glow,
   .mira-neon-bubble,
   .mira-voice-wave span,

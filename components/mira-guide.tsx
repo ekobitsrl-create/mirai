@@ -12,14 +12,18 @@ import {
   useRef,
   useState,
 } from "react"
+import { getMiraLocalReply, type MiraIntent } from "@/lib/mira-knowledge"
 
 type MiraVariant = "male" | "female"
-type MiraPose = "idle" | "listening" | "speaking"
+type MiraAssetPose = "idle" | "listening" | "speaking"
+type MiraPose = MiraAssetPose | "curious" | "dragging"
 
-const MIRA_POSE_ASSET: Record<MiraPose, MiraPose> = {
+const MIRA_POSE_ASSET: Record<MiraPose, MiraAssetPose> = {
   idle: "speaking",
   listening: "listening",
   speaking: "idle",
+  curious: "listening",
+  dragging: "speaking",
 }
 
 type MiraPosition = {
@@ -29,6 +33,18 @@ type MiraPosition = {
 
 type MiraReply = {
   text: string
+  href?: string
+  label?: string
+}
+
+type MiraTurn = {
+  role: "user" | "assistant"
+  content: string
+}
+
+type MiraApiResponse = {
+  configured?: boolean
+  reply?: string
   href?: string
   label?: string
 }
@@ -79,74 +95,6 @@ function getContextPrompt(pathname: string) {
   return "Yo, serve una mano per un capo?"
 }
 
-function getMiraReply(input: string): MiraReply {
-  const message = input.toLocaleLowerCase("it-IT")
-
-  if (message.includes("tagli") || message.includes("misur") || message.includes("fit")) {
-    return {
-      text: "Bro, apri il capo che ti piace e controlla la guida taglie. Se il fit è oversize lo trovi indicato nei dettagli.",
-      href: "/collezioni",
-      label: "Scegli un capo",
-    }
-  }
-
-  if (message.includes("sped") || message.includes("consegna") || message.includes("corriere")) {
-    return {
-      text: "La spedizione standard è sempre gratuita, senza importo minimo. La consegna richiede 3–5 giorni lavorativi; l'express 1–2 giorni.",
-      href: "/spedizioni",
-      label: "Dettagli spedizioni",
-    }
-  }
-
-  if (message.includes("reso") || message.includes("rimbor")) {
-    return {
-      text: "Puoi richiedere il reso entro 14 giorni dalla consegna. Per gli ordini spediti in Italia il reso è gratuito.",
-      href: "/resi",
-      label: "Come fare un reso",
-    }
-  }
-
-  if (
-    message.includes("pagament") ||
-    message.includes("paypal") ||
-    message.includes("klarna") ||
-    message.includes("carta")
-  ) {
-    return {
-      text: "Il pagamento è gestito in sicurezza da Stripe. Puoi usare carta e, quando disponibili, PayPal, Klarna, Apple Pay o Google Pay.",
-      href: "/faq",
-      label: "FAQ pagamenti",
-    }
-  }
-
-  if (
-    message.includes("shop") ||
-    message.includes("prodot") ||
-    message.includes("capo") ||
-    message.includes("magli") ||
-    message.includes("felpa") ||
-    message.includes("pantalon")
-  ) {
-    return {
-      text: "Ci penso io. Entra nello shop e usa ricerca e filtri per trovare il capo con la vibe giusta.",
-      href: "/collezioni#shop-search",
-      label: "Cerca nello shop",
-    }
-  }
-
-  if (message.includes("ciao") || message.includes("hey") || message.includes("yo") || message.includes("salve")) {
-    return {
-      text: "Yo! Dimmi cosa cerchi: un capo, una taglia, una consegna oppure un pagamento.",
-    }
-  }
-
-  return {
-    text: "Bro, per ora posso guidarti tra capi, taglie, spedizioni, resi e pagamenti. Dimmi da dove partiamo.",
-    href: "/faq",
-    label: "Guarda le FAQ",
-  }
-}
-
 function getStageSize() {
   const desktop = window.innerWidth >= 768
   return { width: desktop ? 144 : 96, height: desktop ? 208 : 128 }
@@ -177,11 +125,12 @@ function MiraModel({
 }) {
   return (
     <div
-      className={`mira-model relative h-32 w-24 md:h-52 md:w-36 ${className}`}
+      className={`mira-model mira-model-state-${pose} relative h-32 w-24 md:h-52 md:w-36 ${className}`}
       role="img"
       aria-label={`MIRA, avatar ${variant === "female" ? "femminile" : "maschile"}, posa ${pose}`}
     >
       <div className="mira-model-glow absolute inset-x-[7%] bottom-[1%] h-[24%] rounded-full bg-primary/45 blur-2xl" />
+      <div className="mira-model-scan pointer-events-none absolute inset-x-[15%] z-10 h-px bg-gradient-to-r from-transparent via-primary/70 to-transparent shadow-[0_0_9px_rgba(159,134,255,0.8)]" />
       <div
         key={`${variant}-${pose}-${faceRight}`}
         className={`mira-model-sprite mira-model-${pose} absolute inset-0 ${faceRight ? "mira-model-flipped" : ""}`}
@@ -259,6 +208,9 @@ export function MiraGuide() {
   const [isThinking, setIsThinking] = useState(false)
   const [isSpeaking, setIsSpeaking] = useState(false)
   const [isListening, setIsListening] = useState(false)
+  const [isHovering, setIsHovering] = useState(false)
+  const [ambientCurious, setAmbientCurious] = useState(false)
+  const [lookOffset, setLookOffset] = useState({ x: 0, y: 0 })
   const [speechSupported, setSpeechSupported] = useState(false)
   const [isDragging, setIsDragging] = useState(false)
   const [positionReady, setPositionReady] = useState(false)
@@ -269,9 +221,13 @@ export function MiraGuide() {
   const stageRef = useRef<HTMLElement>(null)
   const positionRef = useRef(position)
   const holdTimerRef = useRef<number | null>(null)
-  const replyTimerRef = useRef<number | null>(null)
   const poseTimerRef = useRef<number | null>(null)
   const recognitionRef = useRef<SpeechRecognitionInstance | null>(null)
+  const conversationRef = useRef<MiraTurn[]>([])
+  const requestInFlightRef = useRef(false)
+  const requestAbortRef = useRef<AbortController | null>(null)
+  const lastLocalIntentRef = useRef<MiraIntent | null>(null)
+  const lastLocalProductRef = useRef<string | null>(null)
   const suppressClickRef = useRef(false)
   const dragRef = useRef({
     pointerId: -1,
@@ -360,11 +316,37 @@ export function MiraGuide() {
   }, [expanded, isDragging, pathname, showSelector, variant])
 
   useEffect(() => {
+    if (
+      !variant
+      || showSelector
+      || expanded
+      || isDragging
+      || isListening
+      || isThinking
+      || isSpeaking
+    ) {
+      setAmbientCurious(false)
+      return
+    }
+
+    let resetTimer: number | null = null
+    const lookTimer = window.setTimeout(() => {
+      setAmbientCurious(true)
+      resetTimer = window.setTimeout(() => setAmbientCurious(false), 1800)
+    }, 8500 + Math.random() * 6500)
+
+    return () => {
+      window.clearTimeout(lookTimer)
+      if (resetTimer) window.clearTimeout(resetTimer)
+    }
+  }, [expanded, isDragging, isListening, isSpeaking, isThinking, pathname, showSelector, variant])
+
+  useEffect(() => {
     return () => {
       if (holdTimerRef.current) window.clearTimeout(holdTimerRef.current)
-      if (replyTimerRef.current) window.clearTimeout(replyTimerRef.current)
       if (poseTimerRef.current) window.clearTimeout(poseTimerRef.current)
       recognitionRef.current?.abort()
+      requestAbortRef.current?.abort()
     }
   }, [])
 
@@ -416,12 +398,15 @@ export function MiraGuide() {
     window.speechSynthesis.speak(utterance)
   }
 
-  function askMira(rawMessage: string, voiceRequest = false) {
+  async function askMira(rawMessage: string, voiceRequest = false) {
     const cleanMessage = rawMessage.trim()
-    if (!cleanMessage || isThinking) return
+    if (!cleanMessage || requestInFlightRef.current) return
 
-    if (replyTimerRef.current) window.clearTimeout(replyTimerRef.current)
     if (poseTimerRef.current) window.clearTimeout(poseTimerRef.current)
+    requestAbortRef.current?.abort()
+    const controller = new AbortController()
+    requestAbortRef.current = controller
+    requestInFlightRef.current = true
     setExpanded(true)
     setShowNudge(false)
     setInput("")
@@ -429,15 +414,62 @@ export function MiraGuide() {
     setIsSpeaking(false)
     setReply({ text: "Un attimo, ci penso io…" })
 
-    replyTimerRef.current = window.setTimeout(() => {
-      const nextReply = getMiraReply(cleanMessage)
+    const fallbackReply = getMiraLocalReply(cleanMessage, {
+      pathname,
+      lastIntent: lastLocalIntentRef.current,
+      lastProductId: lastLocalProductRef.current,
+    })
+    lastLocalIntentRef.current = fallbackReply.intent
+    if (fallbackReply.productId) lastLocalProductRef.current = fallbackReply.productId
+    let nextReply: MiraReply = fallbackReply
+    const timeout = window.setTimeout(() => controller.abort(), 17_000)
+
+    try {
+      const [response] = await Promise.all([
+        fetch("/api/mira", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            message: cleanMessage,
+            pathname,
+            history: conversationRef.current,
+          }),
+          signal: controller.signal,
+        }),
+        new Promise((resolve) => window.setTimeout(resolve, 520)),
+      ])
+
+      if (response.ok) {
+        const payload = await response.json() as MiraApiResponse
+        if (payload.reply?.trim()) {
+          nextReply = {
+            text: payload.reply.trim(),
+            href: payload.href,
+            label: payload.label,
+          }
+        }
+      }
+    } catch {
+      // The local guide remains available if the AI service is unavailable.
+    } finally {
+      window.clearTimeout(timeout)
+      requestInFlightRef.current = false
+      requestAbortRef.current = null
+
+      const updatedConversation: MiraTurn[] = [
+        ...conversationRef.current,
+        { role: "user", content: cleanMessage },
+        { role: "assistant", content: nextReply.text },
+      ]
+      conversationRef.current = updatedConversation.slice(-6)
+
       setReply(nextReply)
       setIsThinking(false)
       setIsSpeaking(true)
       if (voiceRequest) speakReply(nextReply.text)
 
       poseTimerRef.current = window.setTimeout(() => setIsSpeaking(false), 5200)
-    }, 650)
+    }
   }
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -516,6 +548,7 @@ export function MiraGuide() {
       dragRef.current.dragging = true
       suppressClickRef.current = true
       setIsDragging(true)
+      setLookOffset({ x: 0, y: 0 })
       setExpanded(false)
       setShowNudge(false)
       navigator.vibrate?.(18)
@@ -527,6 +560,14 @@ export function MiraGuide() {
     if (drag.pointerId !== event.pointerId) return
 
     if (!drag.dragging) {
+      if (event.pointerType === "mouse") {
+        const rect = event.currentTarget.getBoundingClientRect()
+        setLookOffset({
+          x: ((event.clientX - rect.left) / rect.width - 0.5) * 6,
+          y: ((event.clientY - rect.top) / rect.height - 0.5) * 4,
+        })
+      }
+
       const distance = Math.hypot(event.clientX - drag.startX, event.clientY - drag.startY)
       if (distance > 10 && holdTimerRef.current) {
         window.clearTimeout(holdTimerRef.current)
@@ -612,11 +653,15 @@ export function MiraGuide() {
         : position.y + stageSize.height / 2 - estimatedBubbleHeight / 2,
     ),
   )
-  const currentPose: MiraPose = isListening || isThinking
-    ? "listening"
-    : isSpeaking || showNudge
-      ? "speaking"
-      : "idle"
+  const currentPose: MiraPose = isDragging
+    ? "dragging"
+    : isListening || isThinking
+      ? "listening"
+      : isSpeaking || showNudge || isHovering
+        ? "speaking"
+        : ambientCurious
+          ? "curious"
+          : "idle"
 
   return (
     <div className="mira-guide-root">
@@ -791,11 +836,21 @@ export function MiraGuide() {
             onPointerMove={handlePointerMove}
             onPointerUp={finishPointer}
             onPointerCancel={finishPointer}
+            onPointerEnter={() => setIsHovering(true)}
+            onPointerLeave={() => {
+              setIsHovering(false)
+              if (!isDragging) setLookOffset({ x: 0, y: 0 })
+            }}
             className="mira-character-button group relative block touch-none select-none rounded-[45%] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary"
             aria-label="Apri MIRA. Tieni premuto per spostarla"
           >
             <span className="absolute inset-x-[12%] bottom-[6%] h-14 rounded-full border border-primary/22 bg-[#120c19]/45 shadow-[0_0_38px_rgba(159,134,255,0.34)] backdrop-blur-sm transition-all group-hover:border-primary/55 group-hover:shadow-[0_0_54px_rgba(159,134,255,0.55)]" />
-            <MiraModel variant={activeVariant} pose={currentPose} faceRight={!bubbleOnLeft} />
+            <div
+              className="mira-model-reactive-shell"
+              style={{ transform: `translate3d(${lookOffset.x}px, ${lookOffset.y}px, 0)` }}
+            >
+              <MiraModel variant={activeVariant} pose={currentPose} faceRight={!bubbleOnLeft} />
+            </div>
             <span className="absolute bottom-1.5 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full border border-primary/30 bg-black/70 px-2.5 py-1 text-[7px] font-semibold uppercase tracking-[0.18em] text-white/85 backdrop-blur-md">
               {isListening ? "ASCOLTO" : "MIRA"}
             </span>
