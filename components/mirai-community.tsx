@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { ArrowRight, AudioLines, Eye, MessageCircleMore, Radio, Sparkles, TicketCheck, UsersRound } from "lucide-react"
+import { ArrowRight, AudioLines, Eye, MessageCircleMore, Radio, ShieldCheck, Sparkles, TicketCheck, UsersRound } from "lucide-react"
 
 type CommunityMember = {
   id: string
@@ -106,13 +106,34 @@ export function CommunityPreview({ member }: { member: CommunityMember }) {
   )
 }
 
-export function CommunityHub({ member }: { member: CommunityMember }) {
+function AdminCommunityAccess() {
+  return (
+    <div className="relative overflow-hidden rounded-[1.6rem] border border-primary/30 bg-[#120d19] p-6 text-white shadow-[0_25px_80px_rgba(0,0,0,0.45),0_0_60px_rgba(144,82,255,0.13)] sm:p-7">
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_15%_10%,rgba(199,184,255,0.22),transparent_34%),radial-gradient(circle_at_90%_95%,rgba(213,77,255,0.19),transparent_36%)]" />
+      <div className="relative flex items-start justify-between gap-4">
+        <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-primary/30 bg-primary/10 text-primary">
+          <ShieldCheck className="h-6 w-6" />
+        </div>
+        <div className="flex items-center gap-2 rounded-full border border-emerald-300/20 bg-emerald-300/10 px-3 py-1.5 text-[8px] font-bold uppercase tracking-[0.18em] text-emerald-200">
+          <span className="h-1.5 w-1.5 rounded-full bg-emerald-300 shadow-[0_0_10px_rgba(110,231,183,0.9)]" /> Accesso completo
+        </div>
+      </div>
+      <p className="relative mt-10 text-[8px] font-bold uppercase tracking-[0.28em] text-primary">Amministratore</p>
+      <h2 className="relative mt-2 text-2xl font-black uppercase tracking-[-0.03em]" style={{ fontFamily: "var(--font-space-grotesk)" }}>Tutte le aree sono aperte.</h2>
+      <p className="relative mt-3 max-w-lg text-sm leading-6 text-white/45">
+        L&apos;account admin entra direttamente nei canali e nelle funzioni della community. Non usa MIRAI PASS, livelli o requisiti membership.
+      </p>
+    </div>
+  )
+}
+
+export function CommunityHub({ member, isAdmin = false }: { member: CommunityMember; isAdmin?: boolean }) {
   return (
     <div className="mx-auto max-w-7xl px-5 pb-24 pt-36 text-white sm:px-6 sm:pt-40">
       <div className="grid gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:items-end">
         <div>
           <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-2 text-[9px] font-bold uppercase tracking-[0.24em] text-primary">
-            <Sparkles className="h-3.5 w-3.5" /> Members only
+            <Sparkles className="h-3.5 w-3.5" /> {isAdmin ? "Accesso amministratore" : "Members only"}
           </div>
           <h1 className="mt-6 text-[clamp(2.4rem,6vw,5rem)] font-black uppercase leading-[0.9] tracking-[-0.055em]" style={{ fontFamily: "var(--font-space-grotesk)" }}>
             MIRAI<br /><span className="text-primary">Community.</span>
@@ -121,7 +142,7 @@ export function CommunityHub({ member }: { member: CommunityMember }) {
             Non solo prodotti: uno spazio riservato a chi vuole vedere prima, ascoltare prima e partecipare alla costruzione di MIRAI.
           </p>
         </div>
-        <MiraiMemberPass member={member} />
+        {isAdmin ? <AdminCommunityAccess /> : <MiraiMemberPass member={member} />}
       </div>
 
       <section className="mt-16">
@@ -130,7 +151,11 @@ export function CommunityHub({ member }: { member: CommunityMember }) {
             <p className="text-[9px] font-bold uppercase tracking-[0.25em] text-primary">Canali</p>
             <h2 className="mt-2 text-2xl font-bold uppercase tracking-[-0.03em] sm:text-3xl">Dentro il network</h2>
           </div>
-          <p className="max-w-md text-xs leading-6 text-white/35">Le stanze sono in costruzione. Il tuo account e il MIRAI PASS sono già pronti per ricevere gli accessi.</p>
+          <p className="max-w-md text-xs leading-6 text-white/35">
+            {isAdmin
+              ? "L'amministratore ha accesso completo a tutti i canali, compresi quelli che verranno attivati in seguito."
+              : "Le stanze sono in costruzione. Il tuo account e il MIRAI PASS sono già pronti per ricevere gli accessi."}
+          </p>
         </div>
 
         <div className="grid gap-3 sm:grid-cols-2">
@@ -152,14 +177,18 @@ export function CommunityHub({ member }: { member: CommunityMember }) {
 
       <section className="mt-12 flex flex-col justify-between gap-5 rounded-2xl border border-primary/20 bg-[linear-gradient(115deg,rgba(159,134,255,0.12),rgba(213,77,255,0.04))] p-7 sm:flex-row sm:items-center">
         <div className="flex items-start gap-4">
-          <TicketCheck className="mt-1 h-6 w-6 shrink-0 text-primary" />
+          {isAdmin ? <ShieldCheck className="mt-1 h-6 w-6 shrink-0 text-primary" /> : <TicketCheck className="mt-1 h-6 w-6 shrink-0 text-primary" />}
           <div>
-            <h2 className="font-bold uppercase tracking-[-0.02em]">Il pass crescerà con te</h2>
-            <p className="mt-2 max-w-2xl text-sm leading-6 text-white/45">In seguito potrà raccogliere livelli, accessi agli eventi, vantaggi e partecipazione alla community. Per ora non promettiamo punti o premi: costruiamo prima un’esperienza utile.</p>
+            <h2 className="font-bold uppercase tracking-[-0.02em]">{isAdmin ? "Vista amministratore" : "Il pass crescerà con te"}</h2>
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-white/45">
+              {isAdmin
+                ? "Puoi entrare in ogni area della community senza pass, livelli o altre limitazioni."
+                : "In seguito potrà raccogliere livelli, accessi agli eventi, vantaggi e partecipazione alla community. Per ora non promettiamo punti o premi: costruiamo prima un’esperienza utile."}
+            </p>
           </div>
         </div>
-        <Link href="/account" className="inline-flex shrink-0 items-center gap-2 text-[9px] font-bold uppercase tracking-[0.18em] text-primary hover:text-white">
-          Torna all’account <ArrowRight className="h-3.5 w-3.5" />
+        <Link href={isAdmin ? "/admin" : "/account"} className="inline-flex shrink-0 items-center gap-2 text-[9px] font-bold uppercase tracking-[0.18em] text-primary hover:text-white">
+          {isAdmin ? "Apri il pannello admin" : "Torna all’account"} <ArrowRight className="h-3.5 w-3.5" />
         </Link>
       </section>
     </div>

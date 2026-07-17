@@ -48,9 +48,14 @@ export default async function AdminPage() {
             <h1 className="text-2xl font-bold text-foreground tracking-tight">Pannello Admin</h1>
             <p className="text-sm text-muted-foreground mt-1">Gestisci prodotti, categorie, ordini e utenti</p>
           </div>
-          <a href="/" className="text-xs uppercase tracking-widest text-muted-foreground hover:text-foreground transition-colors">
-            Torna al sito
-          </a>
+          <div className="flex items-center gap-5">
+            <a href="/community" className="text-xs uppercase tracking-widest text-muted-foreground hover:text-foreground transition-colors">
+              Community
+            </a>
+            <a href="/" className="text-xs uppercase tracking-widest text-muted-foreground hover:text-foreground transition-colors">
+              Torna al sito
+            </a>
+          </div>
         </div>
         <AdminDashboard
           products={products}

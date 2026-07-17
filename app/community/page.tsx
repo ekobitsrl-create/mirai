@@ -15,7 +15,8 @@ export default async function CommunityPage() {
   const { user, profile } = await getServerUserWithProfile()
   if (!user) redirect("/auth/login?redirectTo=/community")
 
-  const memberProfile = profile as { first_name?: string | null; last_name?: string | null } | null
+  const memberProfile = profile as { first_name?: string | null; last_name?: string | null; role?: string | null } | null
+  const isAdmin = memberProfile?.role === "admin" || user.email === "admin@mirai.store"
   const fullName = [memberProfile?.first_name, memberProfile?.last_name].filter(Boolean).join(" ")
   const member = {
     id: user.id,
@@ -29,7 +30,7 @@ export default async function CommunityPage() {
       <Navbar />
       <div className="pointer-events-none fixed inset-0 bg-[radial-gradient(circle_at_18%_18%,rgba(159,134,255,0.13),transparent_28%),radial-gradient(circle_at_88%_70%,rgba(213,77,255,0.07),transparent_34%)]" />
       <div className="relative">
-        <CommunityHub member={member} />
+        <CommunityHub member={member} isAdmin={isAdmin} />
       </div>
       <Footer />
     </main>

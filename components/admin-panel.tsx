@@ -92,6 +92,9 @@ export function AdminPanel() {
             </div>
           </div>
           <div className="flex items-center gap-4">
+            <Link href="/community" className="text-xs uppercase tracking-widest text-muted-foreground hover:text-foreground transition-colors">
+              Community
+            </Link>
             <Link href="/account" className="text-xs uppercase tracking-widest text-muted-foreground hover:text-foreground transition-colors">
               Account
             </Link>
