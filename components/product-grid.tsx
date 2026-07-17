@@ -21,6 +21,14 @@ type Product = {
   stock_by_size?: Record<string, number>
 }
 
+function getFirstAvailableSize(product: Product) {
+  const sizes = product.sizes?.length ? product.sizes : ["OS"]
+  return sizes.find((size) => {
+    const quantity = product.stock_by_size?.[size]
+    return quantity === undefined || Number(quantity) > 0
+  }) || null
+}
+
 export function ProductGrid({ products, title, subtitle }: { products: Product[]; title?: string; subtitle?: string }) {
   const [wishlist, setWishlist] = useState<string[]>([])
   const { addItem } = useCart()
@@ -85,18 +93,20 @@ export function ProductGrid({ products, title, subtitle }: { products: Product[]
                     <Heart className={`h-4 w-4 ${wishlist.includes(product.id) ? "fill-primary text-primary" : ""}`} />
                   </button>
 
-                  {product.in_stock && (
+                  {product.in_stock && getFirstAvailableSize(product) && (
                     <div className="absolute inset-x-0 bottom-0 p-3 translate-y-full group-hover:translate-y-0 transition-transform duration-400 ease-out">
                       <button
                         onClick={(e) => {
                           e.preventDefault()
+                          const availableSize = getFirstAvailableSize(product)
+                          if (!availableSize) return
                           addItem({
                             productId: product.id,
                             name: product.name,
                             price: Number(product.price),
                             image_url: product.image_url,
-                            size: product.sizes?.[0] || "OS",
-                            maxQuantity: product.stock_by_size?.[product.sizes?.[0] || "OS"],
+                            size: availableSize,
+                            maxQuantity: product.stock_by_size?.[availableSize],
                           })
                         }}
                         className="w-full py-3 bg-primary text-primary-foreground text-[10px] md:text-xs font-bold tracking-widest uppercase rounded-sm hover:bg-primary/90 transition-all duration-300"

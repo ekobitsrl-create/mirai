@@ -8,6 +8,7 @@ import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { User, Shield, Package, ArrowRight, LogOut } from "lucide-react"
 import { AdminPanel } from "@/components/admin-panel"
+import { CommunityPreview } from "@/components/mirai-community"
 
 export default function AccountPage() {
   const supabase = createClient()
@@ -47,8 +48,9 @@ export default function AccountPage() {
         .eq("id", currentUser.id)
         .single()
       
-      setProfile(prof)
-      if (prof?.role === "admin") {
+      const typedProfile = prof as { role?: string; first_name?: string; last_name?: string } | null
+      setProfile(typedProfile)
+      if (typedProfile?.role === "admin") {
         setIsAdmin(true)
       }
       setLoading(false)
@@ -79,6 +81,14 @@ export default function AccountPage() {
   }
 
   // Normal user account page
+  const fullName = [profile?.first_name, profile?.last_name].filter(Boolean).join(" ")
+  const communityMember = {
+    id: user.id,
+    name: fullName || user.email?.split("@")[0] || "MIRAI Member",
+    email: user.email || "",
+    createdAt: user.created_at,
+  }
+
   return (
     <div className="min-h-svh bg-background">
       <div className="border-b border-border">
@@ -165,6 +175,8 @@ export default function AccountPage() {
             </div>
           </div>
         </div>
+
+        <CommunityPreview member={communityMember} />
       </div>
     </div>
   )

@@ -5,7 +5,14 @@ import { useLanguage } from "@/lib/language-context"
 import { PaymentBadges } from "@/components/payment-badges"
 
 export function Footer() {
-  const { t } = useLanguage()
+  const { t, locale } = useLanguage()
+  const storeLabel = {
+    it: "Negozio fisico",
+    en: "Physical store",
+    es: "Tienda física",
+    de: "Ladengeschäft",
+    fr: "Boutique physique",
+  }[locale]
 
   const footerLinks = {
     shop: {
@@ -20,6 +27,7 @@ export function Footer() {
       title: t.footer.info,
       links: [
         { label: t.footer.aboutUs, href: "/chi-siamo" },
+        { label: storeLabel, href: "/negozio" },
         { label: t.footer.contact, href: "/contatti" },
         { label: t.footer.shipping, href: "/spedizioni" },
         { label: t.footer.returnsRefunds, href: "/resi" },

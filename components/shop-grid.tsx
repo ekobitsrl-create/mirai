@@ -18,6 +18,7 @@ import {
 } from "lucide-react"
 import { useCart } from "@/lib/cart-context"
 import type { StoreProduct } from "@/lib/products"
+import { useLanguage } from "@/lib/language-context"
 
 type Category = {
   id: string
@@ -32,12 +33,91 @@ type Category = {
 type SortKey = "newest" | "price-asc" | "price-desc" | "name"
 type Availability = "all" | "available" | "sold-out"
 
-const sortLabels: Record<SortKey, string> = {
-  newest: "Più recenti",
-  "price-asc": "Prezzo crescente",
-  "price-desc": "Prezzo decrescente",
-  name: "Nome A–Z",
+const sortCopy: Record<string, Record<SortKey, string>> = {
+  it: { newest: "Più recenti", "price-asc": "Prezzo crescente", "price-desc": "Prezzo decrescente", name: "Nome A–Z" },
+  en: { newest: "Newest", "price-asc": "Price: low to high", "price-desc": "Price: high to low", name: "Name A–Z" },
+  es: { newest: "Más recientes", "price-asc": "Precio ascendente", "price-desc": "Precio descendente", name: "Nombre A–Z" },
+  de: { newest: "Neueste", "price-asc": "Preis aufsteigend", "price-desc": "Preis absteigend", name: "Name A–Z" },
+  fr: { newest: "Plus récents", "price-asc": "Prix croissant", "price-desc": "Prix décroissant", name: "Nom A–Z" },
 }
+
+const shopCopy = {
+  it: {
+    eyebrow: "Collezione 01 / Tutto lo shop",
+    title: "Lo shop",
+    pieces: "Capi",
+    categories: "Categorie",
+    collection: "Collezione",
+    search: "Cerca nello shop",
+    noMatch: "Nessun prodotto trovato.",
+    newProduct: "Nuovo",
+    soldOut: "Esaurito",
+    quickAdd: "Aggiunta rapida",
+    selectSize: "Seleziona taglia",
+    productDetails: "Dettagli prodotto",
+    addToCart: "Aggiungi al carrello",
+  },
+  en: {
+    eyebrow: "Collection 01 / Shop all",
+    title: "The shop",
+    pieces: "Pieces",
+    categories: "Categories",
+    collection: "Collection",
+    search: "Search the shop",
+    noMatch: "No products found.",
+    newProduct: "New",
+    soldOut: "Sold out",
+    quickAdd: "Quick add",
+    selectSize: "Select size",
+    productDetails: "Product details",
+    addToCart: "Add to cart",
+  },
+  es: {
+    eyebrow: "Colección 01 / Ver todo",
+    title: "La tienda",
+    pieces: "Prendas",
+    categories: "Categorías",
+    collection: "Colección",
+    search: "Buscar en la tienda",
+    noMatch: "No se encontraron productos.",
+    newProduct: "Nuevo",
+    soldOut: "Agotado",
+    quickAdd: "Añadir rápido",
+    selectSize: "Selecciona talla",
+    productDetails: "Detalles del producto",
+    addToCart: "Añadir al carrito",
+  },
+  de: {
+    eyebrow: "Kollektion 01 / Alles ansehen",
+    title: "Der Shop",
+    pieces: "Teile",
+    categories: "Kategorien",
+    collection: "Kollektion",
+    search: "Im Shop suchen",
+    noMatch: "Keine Produkte gefunden.",
+    newProduct: "Neu",
+    soldOut: "Ausverkauft",
+    quickAdd: "Schnell hinzufügen",
+    selectSize: "Größe wählen",
+    productDetails: "Produktdetails",
+    addToCart: "In den Warenkorb",
+  },
+  fr: {
+    eyebrow: "Collection 01 / Tout voir",
+    title: "La boutique",
+    pieces: "Pièces",
+    categories: "Catégories",
+    collection: "Collection",
+    search: "Rechercher dans la boutique",
+    noMatch: "Aucun produit trouvé.",
+    newProduct: "Nouveau",
+    soldOut: "Épuisé",
+    quickAdd: "Ajout rapide",
+    selectSize: "Choisir la taille",
+    productDetails: "Détails du produit",
+    addToCart: "Ajouter au panier",
+  },
+} as const
 
 function formatCategory(slug: string) {
   return slug.replace(/-/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase())
@@ -50,6 +130,11 @@ function formatPrice(price: number) {
   }).format(Number(price))
 }
 
+function isSizeAvailable(product: StoreProduct, size: string) {
+  const quantity = product.stock_by_size?.[size]
+  return quantity === undefined || Number(quantity) > 0
+}
+
 export function ShopGrid({
   products,
   parentCategories,
@@ -60,6 +145,9 @@ export function ShopGrid({
   subcategories: Category[]
 }) {
   const { addItem } = useCart()
+  const { locale } = useLanguage()
+  const labels = shopCopy[locale]
+  const sortLabels = sortCopy[locale]
   const searchInput = useRef<HTMLInputElement>(null)
   const [query, setQuery] = useState("")
   const [selectedCategories, setSelectedCategories] = useState<string[]>([])
@@ -138,7 +226,9 @@ export function ShopGrid({
       const matchesCategory =
         selectedCategories.length === 0 || selectedCategories.includes(product.category)
       const matchesSize =
-        selectedSizes.length === 0 || selectedSizes.some((size) => product.sizes?.includes(size))
+        selectedSizes.length === 0 || selectedSizes.some(
+          (size) => product.sizes?.includes(size) && isSizeAvailable(product, size),
+        )
       const matchesAvailability =
         availability === "all" ||
         (availability === "available" && product.in_stock) ||
@@ -188,7 +278,8 @@ export function ShopGrid({
 
   function openQuickAdd(product: StoreProduct) {
     if (!product.in_stock) return
-    const availableSizes = product.sizes || []
+    const availableSizes = (product.sizes || []).filter((size) => isSizeAvailable(product, size))
+    if (availableSizes.length === 0) return
     if (availableSizes.length <= 1) {
       addProduct(product, availableSizes[0] || "OS")
       return
@@ -221,10 +312,10 @@ export function ShopGrid({
             <div className="max-w-3xl">
               <div className="mb-4 flex items-center gap-3 text-[10px] font-semibold uppercase tracking-[0.34em] text-primary">
                 <Sparkles className="h-3.5 w-3.5" />
-                Drop 01 / Shop all
+                {labels.eyebrow}
               </div>
               <h1 className="text-[clamp(1.75rem,3vw,2.75rem)] font-semibold uppercase leading-none tracking-[-0.03em] text-foreground">
-                The shop
+                {labels.title}
               </h1>
               <p className="mt-6 max-w-xl text-sm leading-6 text-white/55 md:text-base">
                 Silhouette oversize, grafiche decise e dettagli custom. Ogni capo MIRAI nasce per vivere la strada, non per seguire una stagione.
@@ -233,15 +324,15 @@ export function ShopGrid({
             <div className="grid grid-cols-3 border-y border-white/10 py-5 text-center lg:min-w-[390px]">
               <div className="border-r border-white/10 px-4">
                 <p className="text-2xl font-medium">{products.length}</p>
-                <p className="mt-1 text-[9px] uppercase tracking-[0.25em] text-white/40">Pieces</p>
+                <p className="mt-1 text-[9px] uppercase tracking-[0.25em] text-white/40">{labels.pieces}</p>
               </div>
               <div className="border-r border-white/10 px-4">
                 <p className="text-2xl font-medium">{categories.length}</p>
-                <p className="mt-1 text-[9px] uppercase tracking-[0.25em] text-white/40">Category</p>
+                <p className="mt-1 text-[9px] uppercase tracking-[0.25em] text-white/40">{labels.categories}</p>
               </div>
               <div className="px-4">
                 <p className="text-2xl font-medium">01</p>
-                <p className="mt-1 text-[9px] uppercase tracking-[0.25em] text-white/40">Drop</p>
+                <p className="mt-1 text-[9px] uppercase tracking-[0.25em] text-white/40">{labels.collection}</p>
               </div>
             </div>
           </div>
@@ -259,7 +350,7 @@ export function ShopGrid({
               aria-label="Cerca prodotti"
               value={query}
               onChange={(event) => setQuery(event.target.value)}
-              placeholder="Cerca nel drop"
+              placeholder={labels.search}
               className="h-11 w-full border-0 border-b border-white/15 bg-transparent pl-7 pr-8 text-sm text-white outline-none transition-colors placeholder:text-white/30 focus:border-primary"
             />
             {query && (
@@ -379,7 +470,7 @@ export function ShopGrid({
         ) : (
           <div className="flex min-h-[440px] flex-col items-center justify-center border border-dashed border-white/15 px-6 text-center">
             <Search className="mb-6 h-10 w-10 text-white/20" />
-            <h2 className="text-2xl font-medium">Nessun match nel drop.</h2>
+            <h2 className="text-2xl font-medium">{labels.noMatch}</h2>
             <p className="mt-2 max-w-md text-sm leading-6 text-white/45">
               Prova un’altra ricerca o rimuovi uno dei filtri attivi.
             </p>
@@ -445,6 +536,9 @@ function ProductCard({
   onWishlist: () => void
   onQuickAdd: () => void
 }) {
+  const { locale } = useLanguage()
+  const labels = shopCopy[locale]
+
   return (
     <article className="group min-w-0" style={{ animationDelay: `${Math.min(index, 8) * 45}ms` }}>
       <div className="relative mb-4 aspect-[4/5] overflow-hidden bg-card">
@@ -463,8 +557,8 @@ function ProductCard({
         </Link>
         <div className="pointer-events-none absolute inset-x-0 top-0 flex items-start justify-between p-3 md:p-4">
           <div className="flex flex-col items-start gap-1.5">
-            {product.is_new && <span className="bg-primary px-2 py-1 text-[8px] font-bold uppercase tracking-[0.2em] text-primary-foreground">New drop</span>}
-            {!product.in_stock && <span className="bg-white px-2 py-1 text-[8px] font-bold uppercase tracking-[0.2em] text-black">Sold out</span>}
+            {product.is_new && <span className="bg-primary px-2 py-1 text-[8px] font-bold uppercase tracking-[0.2em] text-primary-foreground">{labels.newProduct}</span>}
+            {!product.in_stock && <span className="bg-white px-2 py-1 text-[8px] font-bold uppercase tracking-[0.2em] text-black">{labels.soldOut}</span>}
           </div>
           <button
             type="button"
@@ -483,7 +577,7 @@ function ProductCard({
               className="flex w-full items-center justify-center gap-2 bg-white px-3 py-3 text-[9px] font-bold uppercase tracking-[0.22em] text-black transition-colors hover:bg-primary hover:text-primary-foreground md:py-3.5 md:text-[10px]"
             >
               <ShoppingBag className="h-3.5 w-3.5" />
-              Quick add
+              {labels.quickAdd}
             </button>
           </div>
         )}
@@ -644,6 +738,9 @@ function QuickAdd({
   onClose: () => void
   onAdd: () => void
 }) {
+  const { locale } = useLanguage()
+  const labels = shopCopy[locale]
+
   return (
     <div className="fixed inset-0 z-[65] flex items-end justify-center md:items-center">
       <button type="button" className="absolute inset-0 bg-black/75 backdrop-blur-sm" onClick={onClose} aria-label="Chiudi quick add" />
@@ -655,7 +752,7 @@ function QuickAdd({
           <div className="min-w-0 flex-1">
             <div className="flex items-start justify-between gap-4">
               <div>
-                <p className="text-[9px] uppercase tracking-[0.24em] text-primary">Quick add</p>
+                <p className="text-[9px] uppercase tracking-[0.24em] text-primary">{labels.quickAdd}</p>
                 <h2 className="mt-1 text-lg font-medium">{product.name}</h2>
                 <p className="mt-1 text-sm text-white/55">{formatPrice(product.price)}</p>
               </div>
@@ -664,20 +761,30 @@ function QuickAdd({
           </div>
         </div>
         <div className="mt-7 flex items-center justify-between">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.22em]">Seleziona taglia</p>
-          <Link href={`/prodotto/${product.id}`} className="text-[9px] uppercase tracking-[0.18em] text-white/45 underline underline-offset-4 hover:text-white">Dettagli prodotto</Link>
+          <p className="text-[10px] font-semibold uppercase tracking-[0.22em]">{labels.selectSize}</p>
+          <Link href={`/prodotto/${product.id}`} className="text-[9px] uppercase tracking-[0.18em] text-white/45 underline underline-offset-4 hover:text-white">{labels.productDetails}</Link>
         </div>
         <div className="mt-3 grid grid-cols-4 gap-2">
-          {product.sizes.map((size) => (
-            <button
-              key={size}
-              type="button"
-              onClick={() => onSize(size)}
-              className={`border py-3 text-xs transition-colors ${selectedSize === size ? "border-white bg-white text-black" : "border-white/15 text-white/60 hover:border-white/50 hover:text-white"}`}
-            >
-              {size}
-            </button>
-          ))}
+          {product.sizes.map((size) => {
+            const unavailable = !isSizeAvailable(product, size)
+            return (
+              <button
+                key={size}
+                type="button"
+                disabled={unavailable}
+                onClick={() => onSize(size)}
+                className={`border py-3 text-xs transition-colors ${
+                  unavailable
+                    ? "cursor-not-allowed border-white/10 text-white/20 line-through"
+                    : selectedSize === size
+                      ? "border-white bg-white text-black"
+                      : "border-white/15 text-white/60 hover:border-white/50 hover:text-white"
+                }`}
+              >
+                {size}
+              </button>
+            )
+          })}
         </div>
         <button
           type="button"
@@ -686,7 +793,7 @@ function QuickAdd({
           className="mt-5 flex w-full items-center justify-center gap-2 bg-primary px-5 py-4 text-[10px] font-bold uppercase tracking-[0.22em] text-primary-foreground transition-colors hover:bg-white hover:text-black disabled:cursor-not-allowed disabled:bg-white/10 disabled:text-white/25"
         >
           <ShoppingBag className="h-4 w-4" />
-          Aggiungi al carrello
+          {labels.addToCart}
         </button>
       </div>
     </div>

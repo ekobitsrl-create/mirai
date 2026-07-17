@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation"
-import { getServerUserWithProfile, createClient } from "@/lib/supabase/server"
+import { getServerUserWithProfile, createUserClient } from "@/lib/supabase/server"
 import { AdminDashboard } from "@/components/admin-dashboard"
 
 export default async function AdminPage() {
@@ -15,7 +15,8 @@ export default async function AdminPage() {
   if (!user) redirect("/auth/login?redirectTo=/admin")
   if (profile?.role !== "admin") redirect("/account")
 
-  const supabase = await createClient()
+  const supabase = await createUserClient()
+  if (!supabase) redirect("/auth/login?redirectTo=/admin")
 
   const [productsRes, categoriesRes, ordersRes, usersRes] = await Promise.all([
     supabase.from("products").select("*").order("created_at", { ascending: false }),

@@ -109,6 +109,10 @@ export function ProductDetail({
       setSizeError(true)
       return
     }
+    if (selectedStock !== undefined && selectedStock <= 0) {
+      setSizeError(true)
+      return
+    }
     addItem({
       productId: product.id,
       name: product.name,
@@ -124,6 +128,10 @@ export function ProductDetail({
 
   async function handleQuickPayment(paymentMethod: "paypal" | "klarna" | "scalapay") {
     if (sizes.length > 0 && !selectedSize) {
+      setSizeError(true)
+      return
+    }
+    if (selectedStock !== undefined && selectedStock <= 0) {
       setSizeError(true)
       return
     }
@@ -280,24 +288,33 @@ export function ProductDetail({
               </div>
               <div className="mt-3 grid grid-cols-4 gap-2 sm:grid-cols-5">
                 {sizes.map((size) => (
-                  <button
-                    key={size}
-                    type="button"
-                    onClick={() => {
-                      setSelectedSize(size)
-                      setQuantity((value) => Math.min(value, product.stock_by_size?.[size] ?? 10))
-                      setSizeError(false)
-                    }}
-                    aria-label={product.stock_by_size?.[size] ? `Taglia ${size}, ${product.stock_by_size[size]} disponibili` : `Taglia ${size}`}
-                    className={`border py-3 text-xs font-medium transition-all ${selectedSize === size ? "border-[#9f86ff] bg-[#9f86ff] text-black shadow-[0_0_20px_rgba(159,134,255,0.35)]" : "border-white/20 bg-white/[0.035] text-white/75 hover:border-primary/70 hover:text-white"}`}
-                  >
-                    {size}
-                  </button>
+                  (() => {
+                    const sizeStock = product.stock_by_size?.[size]
+                    const soldOut = sizeStock !== undefined && sizeStock <= 0
+                    return (
+                      <button
+                        key={size}
+                        type="button"
+                        disabled={soldOut}
+                        onClick={() => {
+                          setSelectedSize(size)
+                          setQuantity((value) => Math.max(1, Math.min(value, sizeStock ?? 10)))
+                          setSizeError(false)
+                        }}
+                        aria-label={soldOut ? `Taglia ${size} esaurita` : sizeStock !== undefined ? `Taglia ${size}, ${sizeStock} disponibili` : `Taglia ${size}`}
+                        className={`border py-3 text-xs font-medium transition-all ${soldOut ? "cursor-not-allowed border-white/10 bg-white/[0.02] text-white/25 line-through" : selectedSize === size ? "border-[#9f86ff] bg-[#9f86ff] text-black shadow-[0_0_20px_rgba(159,134,255,0.35)]" : "border-white/20 bg-white/[0.035] text-white/75 hover:border-primary/70 hover:text-white"}`}
+                      >
+                        {size}
+                      </button>
+                    )
+                  })()
                 ))}
               </div>
               <p className={`mt-2 min-h-4 text-[10px] transition-colors ${sizeError ? "text-[#ff9b9b]" : "text-white/50"}`}>
                 {sizeError
-                  ? "Seleziona una taglia prima di continuare."
+                  ? selectedStock !== undefined && selectedStock <= 0
+                    ? "Questa taglia è esaurita. Scegline un'altra."
+                    : "Seleziona una taglia prima di continuare."
                   : selectedStock !== undefined
                     ? `${fitNote} Disponibilità: ${selectedStock} ${selectedStock === 1 ? "pezzo" : "pezzi"}.`
                     : fitNote}

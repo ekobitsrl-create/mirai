@@ -1,5 +1,6 @@
 import type { NextRequest } from "next/server"
-import { DEMO_PRODUCTS, type StoreProduct } from "@/lib/products"
+import { DEMO_PRODUCTS, withDemoProducts, type StoreProduct } from "@/lib/products"
+import { createClient } from "@/lib/supabase/server"
 
 export const runtime = "nodejs"
 export const dynamic = "force-dynamic"
@@ -15,6 +16,10 @@ const GOOGLE_CATEGORY_BY_STORE_CATEGORY: Record<string, string> = {
   pantaloni: "207",
   shorts: "207",
   bermuda: "207",
+  headwear: "173",
+  cappelli: "173",
+  caps: "173",
+  hats: "173",
 }
 
 const PRODUCT_TYPE_BY_STORE_CATEGORY: Record<string, string> = {
@@ -26,7 +31,29 @@ const PRODUCT_TYPE_BY_STORE_CATEGORY: Record<string, string> = {
   pantaloni: "Abbigliamento > Bermuda e shorts",
   shorts: "Abbigliamento > Bermuda e shorts",
   bermuda: "Abbigliamento > Bermuda e shorts",
+  headwear: "Accessori > Cappelli personalizzati",
+  cappelli: "Accessori > Cappelli personalizzati",
+  caps: "Accessori > Cappelli personalizzati",
+  hats: "Accessori > Cappelli personalizzati",
 }
+
+const HEADWEAR_CATEGORIES = new Set(["headwear", "cappelli", "caps", "hats"])
+
+const COLOR_KEYWORDS: Array<[RegExp, string]> = [
+  [/\bnavy\b/i, "Blu navy"],
+  [/\bblu\b/i, "Blu"],
+  [/\bblue\b/i, "Blu"],
+  [/\brosso\b/i, "Rosso"],
+  [/\bred\b/i, "Rosso"],
+  [/\bbianc[oa]\b/i, "Bianco"],
+  [/\bwhite\b/i, "Bianco"],
+  [/\bner[oa]\b/i, "Nero"],
+  [/\bblack\b/i, "Nero"],
+  [/\bgold\b/i, "Oro"],
+  [/\bdorat[oaie]\b/i, "Oro"],
+  [/\bargento\b/i, "Argento"],
+  [/\bsilver\b/i, "Argento"],
+]
 
 function escapeXml(value: string | number | boolean | null | undefined) {
   return String(value ?? "")
@@ -124,20 +151,59 @@ function getAdditionalImages(product: StoreProduct, baseUrl: string, primaryImag
   return [...uniqueImages].slice(0, 10)
 }
 
+function getColor(product: StoreProduct) {
+  if (product.color_name) return product.color_name
+
+  const productText = `${product.name} ${product.description || ""}`
+  const colors = COLOR_KEYWORDS
+    .filter(([pattern]) => pattern.test(productText))
+    .map(([, color]) => color)
+
+  return [...new Set(colors)].join(" / ") || "Multicolore"
+}
+
+async function getCatalogProducts() {
+  try {
+    const supabase = await createClient()
+    let { data, error } = await supabase
+      .from("products")
+      .select("id, name, description, price, category, image_url, sizes, stock_by_size, in_stock, is_new, created_at")
+      .order("created_at", { ascending: false })
+
+    if (error?.message.includes("stock_by_size")) {
+      const legacyResult = await supabase
+        .from("products")
+        .select("id, name, description, price, category, image_url, sizes, in_stock, is_new, created_at")
+        .order("created_at", { ascending: false })
+      data = legacyResult.data as typeof data
+      error = legacyResult.error
+    }
+
+    if (error) throw error
+
+    return withDemoProducts((data || []) as StoreProduct[])
+  } catch (error) {
+    console.error("Google Merchant feed: catalogo Supabase non disponibile, uso il fallback locale.", error)
+    return DEMO_PRODUCTS
+  }
+}
+
 function renderProductVariant(product: StoreProduct, size: string, baseUrl: string) {
   const itemId = getMerchantItemId(product, size)
   const productUrl = absoluteUrl(`/prodotto/${encodeURIComponent(product.id)}`, baseUrl)
   const primaryImage = product.image_url ? absoluteUrl(product.image_url, baseUrl) : ""
   const additionalImages = getAdditionalImages(product, baseUrl, primaryImage)
   const categoryKey = product.category.toLowerCase()
-  const titleParts = [product.name, product.color_name, `Taglia ${size}`].filter(Boolean)
+  const color = getColor(product)
+  const titleParts = [product.name, color, `Taglia ${size}`].filter(Boolean)
   const title = titleParts.join(" - ")
   const description = product.description || `${product.name} disponibile su MIRAI LAB STORE.`
   const brand = product.brand || "MIRAI"
   const itemGroupId = getItemGroupId(product)
   const productType = PRODUCT_TYPE_BY_STORE_CATEGORY[categoryKey] || `Abbigliamento > ${product.category}`
-  const googleCategory = GOOGLE_CATEGORY_BY_STORE_CATEGORY[categoryKey] || "1604"
+  const googleCategory = GOOGLE_CATEGORY_BY_STORE_CATEGORY[categoryKey] || "166"
   const availability = getAvailability(product, size)
+  const isHeadwear = HEADWEAR_CATEGORIES.has(categoryKey)
 
   return [
     "    <item>",
@@ -162,9 +228,9 @@ function renderProductVariant(product: StoreProduct, size: string, baseUrl: stri
     `      <g:item_group_id>${escapeXml(itemGroupId)}</g:item_group_id>`,
     `      <g:item_group_title>${escapeXml(product.name)}</g:item_group_title>`,
     `      <g:size>${escapeXml(size)}</g:size>`,
-    "      <g:size_system>EU</g:size_system>",
-    "      <g:size_type>regular</g:size_type>",
-    `      <g:color>${escapeXml(product.color_name || "Multicolore")}</g:color>`,
+    `      <g:size_system>${isHeadwear ? "US" : "EU"}</g:size_system>`,
+    isHeadwear ? "" : "      <g:size_type>regular</g:size_type>",
+    `      <g:color>${escapeXml(color)}</g:color>`,
     "      <g:gender>unisex</g:gender>",
     "      <g:age_group>adult</g:age_group>",
     "      <g:adult>no</g:adult>",
@@ -180,7 +246,8 @@ function renderProductVariant(product: StoreProduct, size: string, baseUrl: stri
 
 export async function GET(request: NextRequest) {
   const baseUrl = getBaseUrl(request)
-  const products = DEMO_PRODUCTS.filter((product) => product.image_url && Number(product.price) > 0)
+  const catalogProducts = await getCatalogProducts()
+  const products = catalogProducts.filter((product) => product.image_url && Number(product.price) > 0)
   const items = products.flatMap((product) =>
     getSizes(product).map((size) => renderProductVariant(product, size, baseUrl)),
   )
@@ -202,7 +269,7 @@ export async function GET(request: NextRequest) {
     status: 200,
     headers: {
       "Content-Type": "application/xml; charset=utf-8",
-      "Cache-Control": "public, s-maxage=3600, stale-while-revalidate=86400",
+      "Cache-Control": "public, s-maxage=300, stale-while-revalidate=3600",
     },
   })
 }

@@ -96,10 +96,19 @@ export async function POST(request: NextRequest) {
     const supabase = await createClient()
     const productIds = items.map((item: CheckoutCartItem) => item.productId)
     
-    const { data: products, error } = await supabase
+    let { data: products, error } = await supabase
       .from('products')
-      .select('id, name, description, price, image_url')
+      .select('id, name, description, price, image_url, stock_by_size')
       .in('id', productIds)
+
+    if (error?.message.includes('stock_by_size')) {
+      const legacyResult = await supabase
+        .from('products')
+        .select('id, name, description, price, image_url')
+        .in('id', productIds)
+      products = legacyResult.data as typeof products
+      error = legacyResult.error
+    }
 
     const demoProducts = productIds
       .map(getDemoProduct)

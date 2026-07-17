@@ -28,10 +28,19 @@ export async function createCheckoutSession(cartItems: CartLineItem[]) {
   const supabase = await createClient()
 
   const productIds = cartItems.map((item) => item.productId)
-  const { data: products, error } = await supabase
+  let { data: products, error } = await supabase
     .from('products')
-    .select('id, name, description, price, image_url')
+    .select('id, name, description, price, image_url, stock_by_size')
     .in('id', productIds)
+
+  if (error?.message.includes('stock_by_size')) {
+    const legacyResult = await supabase
+      .from('products')
+      .select('id, name, description, price, image_url')
+      .in('id', productIds)
+    products = legacyResult.data as typeof products
+    error = legacyResult.error
+  }
 
   const configuredBaseUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_SITE_URL || 'https://mirai-clothing.vercel.app'
   const baseUrl = configuredBaseUrl.replace(/\/$/, '')

@@ -77,10 +77,11 @@ function useCategories() {
       .order("sort_order", { ascending: true })
       .then(({ data }) => {
         if (!data) return
-        const parents = data.filter((c) => !c.parent_id)
+        const rows = data as Array<Omit<CategoryNode, "children"> & { sort_order?: number }>
+        const parents = rows.filter((c) => !c.parent_id)
         const built: CategoryNode[] = parents.map((p) => ({
           ...p,
-          children: data
+          children: rows
             .filter((c) => c.parent_id === p.id)
             .map((c) => ({ ...c, children: [] })),
         }))
@@ -99,7 +100,14 @@ export function Navbar() {
   const [mobileCollezioni, setMobileCollezioni] = useState(false)
   const dropdownTimeout = useRef<ReturnType<typeof setTimeout> | null>(null)
   const { itemCount } = useCart()
-  const { t } = useLanguage()
+  const { t, locale } = useLanguage()
+  const storeLabel = {
+    it: "Negozio",
+    en: "Store",
+    es: "Tienda",
+    de: "Store",
+    fr: "Boutique",
+  }[locale]
   const categories = useCategories()
 
   useEffect(() => {
@@ -244,6 +252,12 @@ export function Navbar() {
               >
                 {t.nav.aboutUs}
               </Link>
+              <Link
+                href="/negozio"
+                className="text-sm tracking-widest uppercase text-white/55 hover:text-white transition-colors"
+              >
+                {storeLabel}
+              </Link>
             </div>
           </div>
 
@@ -353,6 +367,13 @@ export function Navbar() {
               onClick={() => setMobileOpen(false)}
             >
               {t.nav.aboutUs}
+            </Link>
+            <Link
+              href="/negozio"
+              className="text-sm tracking-widest uppercase text-white/55 hover:text-white transition-colors"
+              onClick={() => setMobileOpen(false)}
+            >
+              {storeLabel}
             </Link>
             <Link
               href={accountHref}

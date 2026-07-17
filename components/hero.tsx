@@ -17,7 +17,7 @@ const slideHrefs = [
   "/#prodotti",
   "/collezioni",
   "/chi-siamo",
-  "/contatti",
+  "/negozio",
 ]
 
 export function Hero() {

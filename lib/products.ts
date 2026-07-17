@@ -66,7 +66,7 @@ export const ORDERED_PRODUCTS: StoreProduct[] = [
     id: "minimal-m0230-bermuda-camouflage-crystal",
     name: "Bermuda Camouflage Crystal",
     description:
-      "Bermuda cinque tasche in fantasia camouflage, rifinito con micro crystal e applicazioni multicolor distribuite sul fronte. Un capo street deciso, pensato anche in coordinato con la Camicia Oversize Camouflage Crystal.",
+      "Bermuda in tessuto camouflage con cristalli e pietre multicolor applicati sul fronte. La linea ampia e rilassata unisce ispirazione military, dettagli luminosi e comfort streetwear.",
     price: 47,
     category: "pantaloni",
     image_url: "/products/minimal-couture/m0230-bermuda-camouflage-crystal.jpg",
@@ -92,7 +92,7 @@ export const ORDERED_PRODUCTS: StoreProduct[] = [
     id: "minimal-m0236-camicia-oversize-camouflage-crystal",
     name: "Camicia Oversize Camouflage Crystal",
     description:
-      "Camicia a manica corta in fantasia camouflage con crystal e applicazioni multicolor sul fronte. Linea ampia e costruzione pulita, coordinabile con il Bermuda Camouflage Crystal.",
+      "Camicia oversize in tessuto camouflage con cristalli e pietre multicolor. Il fit boxy e la decorazione degradé sulle spalle fondono attitudine military e finiture luxury.",
     price: 47,
     category: "camicie",
     image_url: "/products/minimal-couture/m0236-camicia-camouflage-crystal.jpg",
@@ -144,7 +144,7 @@ export const ORDERED_PRODUCTS: StoreProduct[] = [
     id: "minimal-m0259-tshirt-croci-color-black",
     name: "T-shirt Croci Color Black",
     description:
-      "T-shirt nera in cotone con trattamento distressed e micro rotture diffuse. La stampa frontale di croci colorate crea un contrasto deciso su una silhouette ampia e contemporanea.",
+      "T-shirt in cotone nero con trattamento distressed e micro rotture diffuse. La stampa frontale aggiunge carattere a una silhouette contemporanea e vissuta.",
     price: 44,
     category: "t-shirt",
     image_url: "/products/minimal-couture/m0259-tshirt-croci-color-black.jpg",
@@ -170,7 +170,7 @@ export const ORDERED_PRODUCTS: StoreProduct[] = [
     id: "minimal-m0273-tshirt-croce-panna",
     name: "T-shirt Graphic Cross Panna",
     description:
-      "T-shirt panna oversize con micro rotture, grande croce nera e grafica figurativa sul fronte. Il modello corrisponde al codice M.0273 del catalogo fornitore.",
+      "T-shirt oversize off white in cotone, con maxi croce a effetto pennellata, figura centrale e lettering destrutturato. Spalle scese, maniche ampie e fondo destroyed completano il design unisex.",
     price: 44,
     category: "t-shirt",
     image_url: "/products/minimal-couture/m0273-tshirt-croce-panna.jpeg",
@@ -196,7 +196,7 @@ export const ORDERED_PRODUCTS: StoreProduct[] = [
     id: "minimal-m0259-tshirt-croci-color-panna",
     name: "T-shirt Croci Color Panna",
     description:
-      "T-shirt panna oversize con trattamento distressed, stampa frontale di croci colorate e lettering sul retro. Una variante luminosa dello stesso modello M.0259.",
+      "T-shirt in cotone chiaro con trattamento distressed e micro rotture diffuse. La stampa frontale dona personalità al capo mantenendo un’estetica pulita e contemporanea.",
     price: 44,
     category: "t-shirt",
     image_url: "/products/minimal-couture/m0259-tshirt-croci-panna-front.jpeg",
@@ -232,7 +232,7 @@ export const ORDERED_PRODUCTS: StoreProduct[] = [
     id: "minimal-m0095-tshirt-madonna-viola",
     name: "T-shirt Madonna Distressed Viola",
     description:
-      "T-shirt viola oversize con trattamento distressed, grafica Madonna sul fronte e lettering sul retro. Il colore intenso e i bordi vissuti ne definiscono l'estetica street.",
+      "T-shirt viola in cotone con trattamento distressed e micro rotture diffuse. La stampa frontale e la costruzione oversize definiscono un’estetica decisa e contemporanea.",
     price: 44,
     category: "t-shirt",
     image_url: "/products/minimal-couture/m0095-tshirt-madonna-viola-front.jpeg",
@@ -268,7 +268,7 @@ export const ORDERED_PRODUCTS: StoreProduct[] = [
     id: "minimal-m0268-canotta-eagle-bordeaux",
     name: "Canotta Minimal Eagle Bordeaux",
     description:
-      "Canotta bordeaux dal taglio ampio con stampa aquila e fiamme sul fronte. Lavaggio vissuto, giromanica raw cut e grafica centrale dal carattere deciso.",
+      "Canotta oversize bordeaux con stampa Minimal Eagle sul fronte, lavaggio vissuto e giromanica ampio dal taglio streetwear.",
     price: 39,
     category: "canotte",
     image_url: "/products/minimal-couture/m0268-canotta-eagle-bordeaux.jpeg",
@@ -294,7 +294,7 @@ export const ORDERED_PRODUCTS: StoreProduct[] = [
     id: "minimal-m0267-canotta-crown-verde",
     name: "Canotta Minimal Crown Verde",
     description:
-      "Canotta verde lavato con grafica Crown, occhio e dadi sul fronte. Il taglio ampio e le finiture distressed completano l'estetica street del modello.",
+      "Canotta oversize verde con stampa Crown sul fronte, lavaggio vissuto e finiture distressed per un’attitudine street immediata.",
     price: 39,
     category: "canotte",
     image_url: "/products/minimal-couture/m0267-canotta-crown-verde.jpeg",

@@ -54,14 +54,12 @@ function LoginForm() {
         .eq('id', data.user.id)
         .single()
 
-      const isAdmin = profile?.role === 'admin'
-      // Use redirectTo param if provided and user is admin, otherwise default behavior
+      const isAdmin = (profile as { role?: string } | null)?.role === 'admin'
+      // Respect safe internal redirects. Only the admin area requires an admin role.
       let redirectUrl = isAdmin ? '/admin' : '/account'
-      if (redirectTo && isAdmin) {
-        redirectUrl = redirectTo
-      } else if (redirectTo && !isAdmin) {
-        // Non-admin trying to access admin area - redirect to account
-        redirectUrl = '/account'
+      const safeRedirect = typeof redirectTo === 'string' && redirectTo.startsWith('/') && !redirectTo.startsWith('//')
+      if (safeRedirect && redirectTo) {
+        redirectUrl = redirectTo.startsWith('/admin') && !isAdmin ? '/account' : redirectTo
       }
 
       // Small delay to ensure cookies are properly saved by the browser

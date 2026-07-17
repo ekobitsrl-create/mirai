@@ -1,15 +1,54 @@
 "use server"
 
-import { createClient, getServerUserWithProfile } from "@/lib/supabase/server"
+import { createUserClient, getServerUserWithProfile } from "@/lib/supabase/server"
 import { revalidatePath } from "next/cache"
+import { isBlackIslandProduct } from "@/lib/products"
+
+function parseProductInventory(formData: FormData) {
+  const sizesRaw = formData.get("sizes") as string
+  const sizes = sizesRaw
+    ? [...new Set(sizesRaw.split(",").map((size) => size.trim().toUpperCase()).filter(Boolean))]
+    : []
+
+  let submittedStock: Record<string, unknown> = {}
+  try {
+    const parsed = JSON.parse((formData.get("stock_by_size") as string) || "{}")
+    if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) submittedStock = parsed
+  } catch {
+    submittedStock = {}
+  }
+
+  const stock_by_size = Object.fromEntries(
+    sizes.map((size) => {
+      const quantity = Number(submittedStock[size] ?? 0)
+      return [size, Number.isFinite(quantity) ? Math.max(0, Math.floor(quantity)) : 0]
+    }),
+  )
+  const requestedAvailability = formData.get("in_stock") === "on"
+  const in_stock = sizes.length > 0
+    ? requestedAvailability && Object.values(stock_by_size).some((quantity) => quantity > 0)
+    : requestedAvailability
+
+  return { sizes, stock_by_size, in_stock }
+}
+
+function revalidateCatalog(productId?: string) {
+  revalidatePath("/admin")
+  revalidatePath("/")
+  revalidatePath("/collezioni")
+  revalidatePath("/google-merchant-feed.xml")
+  revalidatePath("/sitemap.xml")
+  if (productId) revalidatePath(`/prodotto/${productId}`)
+}
 
 async function assertAdmin() {
   const { user, profile } = await getServerUserWithProfile()
   if (!user) throw new Error("Non autenticato")
   if (profile?.role !== "admin") throw new Error("Non autorizzato")
 
-  // Service client for DB operations
-  const supabase = await createClient()
+  // Use the signed-in admin session so product policies work even without a service key.
+  const supabase = await createUserClient()
+  if (!supabase) throw new Error("Sessione admin scaduta")
   return { supabase, user }
 }
 
@@ -21,11 +60,7 @@ export async function createProduct(formData: FormData) {
   const price = parseFloat(formData.get("price") as string)
   const category = formData.get("category") as string
   const image_url = formData.get("image_url") as string
-  const sizesRaw = formData.get("sizes") as string
-  const sizes = sizesRaw
-    ? sizesRaw.split(",").map((s) => s.trim().toUpperCase())
-    : []
-  const in_stock = formData.get("in_stock") === "on"
+  const { sizes, stock_by_size, in_stock } = parseProductInventory(formData)
   const is_new = formData.get("is_new") === "on"
 
   const { error } = await supabase.from("products").insert({
@@ -35,14 +70,14 @@ export async function createProduct(formData: FormData) {
     category,
     image_url: image_url || null,
     sizes,
+    stock_by_size,
     in_stock,
     is_new,
   })
 
   if (error) throw new Error(error.message)
 
-  revalidatePath("/admin")
-  revalidatePath("/")
+  revalidateCatalog()
 }
 
 export async function updateProduct(formData: FormData) {
@@ -54,11 +89,7 @@ export async function updateProduct(formData: FormData) {
   const price = parseFloat(formData.get("price") as string)
   const category = formData.get("category") as string
   const image_url = formData.get("image_url") as string
-  const sizesRaw = formData.get("sizes") as string
-  const sizes = sizesRaw
-    ? sizesRaw.split(",").map((s) => s.trim().toUpperCase())
-    : []
-  const in_stock = formData.get("in_stock") === "on"
+  const { sizes, stock_by_size, in_stock } = parseProductInventory(formData)
   const is_new = formData.get("is_new") === "on"
 
   const { error } = await supabase
@@ -70,6 +101,7 @@ export async function updateProduct(formData: FormData) {
       category,
       image_url: image_url || null,
       sizes,
+      stock_by_size,
       in_stock,
       is_new,
       updated_at: new Date().toISOString(),
@@ -78,8 +110,7 @@ export async function updateProduct(formData: FormData) {
 
   if (error) throw new Error(error.message)
 
-  revalidatePath("/admin")
-  revalidatePath("/")
+  revalidateCatalog(id)
 }
 
 export async function deleteProduct(formData: FormData) {
@@ -91,8 +122,32 @@ export async function deleteProduct(formData: FormData) {
 
   if (error) throw new Error(error.message)
 
-  revalidatePath("/admin")
-  revalidatePath("/")
+  revalidateCatalog(id)
+}
+
+export async function deleteBlackIslandProducts() {
+  const { supabase } = await assertAdmin()
+  const { data: candidates, error: selectError } = await supabase
+    .from("products")
+    .select("id, name, image_url")
+
+  if (selectError) throw new Error(selectError.message)
+
+  const ids = (candidates || [])
+    .filter(isBlackIslandProduct)
+    .map((product) => product.id)
+
+  if (ids.length === 0) return { deleted: 0 }
+
+  const { error: deleteError } = await supabase
+    .from("products")
+    .delete()
+    .in("id", ids)
+
+  if (deleteError) throw new Error(deleteError.message)
+
+  revalidateCatalog()
+  return { deleted: ids.length }
 }
 
 // --- Orders ---

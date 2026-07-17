@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next"
 import { createClient } from "@/lib/supabase/server"
-import { DEMO_PRODUCTS } from "@/lib/products"
+import { DEMO_PRODUCTS, withoutBlackIslandProducts } from "@/lib/products"
 
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://mirai-clothing.vercel.app"
 
@@ -10,7 +10,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Fetch all products
   const { data: products } = await supabase
     .from("products")
-    .select("id, updated_at")
+    .select("id, name, image_url, updated_at")
     .eq("in_stock", true)
 
   // Fetch all categories
@@ -18,14 +18,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     .from("categories")
     .select("slug, updated_at")
 
-  const productUrls: MetadataRoute.Sitemap = (products || []).map((p) => ({
+  const visibleDatabaseProducts = withoutBlackIslandProducts(products || [])
+
+  const productUrls: MetadataRoute.Sitemap = visibleDatabaseProducts.map((p) => ({
     url: `${BASE_URL}/prodotto/${p.id}`,
     lastModified: p.updated_at || new Date().toISOString(),
     changeFrequency: "weekly" as const,
     priority: 0.8,
   }))
 
-  const databaseProductIds = new Set((products || []).map((product) => product.id))
+  const databaseProductIds = new Set(visibleDatabaseProducts.map((product) => product.id))
   const staticProductUrls: MetadataRoute.Sitemap = DEMO_PRODUCTS
     .filter((product) => product.in_stock && !databaseProductIds.has(product.id))
     .map((product) => ({
@@ -60,6 +62,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: new Date().toISOString(),
       changeFrequency: "weekly",
       priority: 0.9,
+    },
+    {
+      url: `${BASE_URL}/negozio`,
+      lastModified: new Date().toISOString(),
+      changeFrequency: "monthly",
+      priority: 0.7,
     },
     {
       url: `${BASE_URL}/chi-siamo`,

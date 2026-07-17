@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { createProduct, updateProduct, deleteProduct } from "@/app/admin/actions"
+import { createProduct, updateProduct, deleteProduct, deleteBlackIslandProducts } from "@/app/admin/actions"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -17,6 +17,7 @@ type Product = {
   category: string
   image_url: string | null
   sizes: string[]
+  stock_by_size?: Record<string, number>
   in_stock: boolean
   is_new: boolean
   created_at: string
@@ -34,14 +35,18 @@ export function AdminProductTable({ products, categories = [] }: { products: Pro
   const [showForm, setShowForm] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [feedback, setFeedback] = useState<string | null>(null)
+  const blackIslandCount = products.filter((product) => /black[\s_-]*island/i.test(`${product.name || ""} ${product.image_url || ""}`)).length
 
   const handleCreate = async (formData: FormData) => {
     setIsSubmitting(true)
+    setFeedback(null)
     try {
       await createProduct(formData)
       setShowForm(false)
     } catch (err) {
       console.error(err)
+      setFeedback(err instanceof Error ? err.message : "Impossibile creare il prodotto.")
     } finally {
       setIsSubmitting(false)
     }
@@ -49,11 +54,13 @@ export function AdminProductTable({ products, categories = [] }: { products: Pro
 
   const handleUpdate = async (formData: FormData) => {
     setIsSubmitting(true)
+    setFeedback(null)
     try {
       await updateProduct(formData)
       setEditingId(null)
     } catch (err) {
       console.error(err)
+      setFeedback(err instanceof Error ? err.message : "Impossibile aggiornare il prodotto.")
     } finally {
       setIsSubmitting(false)
     }
@@ -62,10 +69,27 @@ export function AdminProductTable({ products, categories = [] }: { products: Pro
   const handleDelete = async (formData: FormData) => {
     if (!confirm("Sei sicuro di voler eliminare questo prodotto?")) return
     setIsSubmitting(true)
+    setFeedback(null)
     try {
       await deleteProduct(formData)
     } catch (err) {
       console.error(err)
+      setFeedback(err instanceof Error ? err.message : "Impossibile eliminare il prodotto.")
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  const handleBlackIslandCleanup = async () => {
+    if (!confirm(`Eliminare definitivamente ${blackIslandCount} prodotti Black Island da Supabase?`)) return
+    setIsSubmitting(true)
+    setFeedback(null)
+    try {
+      const result = await deleteBlackIslandProducts()
+      setFeedback(`${result.deleted} prodotti Black Island eliminati definitivamente.`)
+    } catch (err) {
+      console.error(err)
+      setFeedback(err instanceof Error ? err.message : "Pulizia Black Island non riuscita.")
     } finally {
       setIsSubmitting(false)
     }
@@ -74,7 +98,7 @@ export function AdminProductTable({ products, categories = [] }: { products: Pro
   return (
     <div>
       {/* Add product button */}
-      <div className="mb-6">
+      <div className="mb-6 flex flex-wrap items-center gap-3">
         <Button
           onClick={() => { setShowForm(!showForm); setEditingId(null) }}
           className="bg-primary text-primary-foreground hover:bg-primary/90 uppercase tracking-widest text-xs h-10 gap-2"
@@ -82,7 +106,25 @@ export function AdminProductTable({ products, categories = [] }: { products: Pro
           <Plus className="w-4 h-4" />
           Nuovo Prodotto
         </Button>
+        {blackIslandCount > 0 && (
+          <Button
+            type="button"
+            variant="outline"
+            disabled={isSubmitting}
+            onClick={handleBlackIslandCleanup}
+            className="h-10 gap-2 border-destructive/40 text-xs uppercase tracking-widest text-destructive hover:bg-destructive/10 hover:text-destructive"
+          >
+            <Trash2 className="h-4 w-4" />
+            Elimina {blackIslandCount} Black Island
+          </Button>
+        )}
       </div>
+
+      {feedback && (
+        <div className="mb-6 rounded-md border border-primary/25 bg-primary/10 px-4 py-3 text-sm text-foreground">
+          {feedback}
+        </div>
+      )}
 
       {/* Create form */}
       {showForm && (
@@ -193,6 +235,11 @@ export function AdminProductTable({ products, categories = [] }: { products: Pro
                       </span>
                       <span className="uppercase tracking-widest">{product.category}</span>
                       <span>{product.sizes?.join(", ") || "N/A"}</span>
+                      {product.stock_by_size && (
+                        <span>
+                          {Object.values(product.stock_by_size).reduce((total, quantity) => total + Number(quantity || 0), 0)} pezzi
+                        </span>
+                      )}
                     </div>
                   </div>
 
@@ -232,6 +279,18 @@ export function AdminProductTable({ products, categories = [] }: { products: Pro
 }
 
 function ProductForm({ product, categories = [] }: { product?: Product; categories?: Category[] }) {
+  const [sizeInput, setSizeInput] = useState(product?.sizes?.join(", ") || "")
+  const [stockBySize, setStockBySize] = useState<Record<string, number>>(product?.stock_by_size || {})
+  const parsedSizes = [...new Set(
+    sizeInput
+      .split(",")
+      .map((size) => size.trim().toUpperCase())
+      .filter(Boolean),
+  )]
+  const normalizedStock = Object.fromEntries(
+    parsedSizes.map((size) => [size, Math.max(0, Math.floor(Number(stockBySize[size] ?? 1)))]),
+  )
+
   return (
     <div className="grid gap-5 md:grid-cols-2">
       <div className="flex flex-col gap-2">
@@ -300,7 +359,8 @@ function ProductForm({ product, categories = [] }: { product?: Product; categori
         <Input
           id="sizes"
           name="sizes"
-          defaultValue={product?.sizes?.join(", ") || ""}
+          value={sizeInput}
+          onChange={(event) => setSizeInput(event.target.value)}
           placeholder="S, M, L, XL"
           className="bg-secondary border-border text-foreground"
         />
@@ -324,6 +384,39 @@ function ProductForm({ product, categories = [] }: { product?: Product; categori
           />
           <span className="text-xs uppercase tracking-widest text-muted-foreground">Nuovo</span>
         </label>
+      </div>
+      <div className="flex flex-col gap-2 md:col-span-2">
+        <input type="hidden" name="stock_by_size" value={JSON.stringify(normalizedStock)} />
+        <Label className="text-xs uppercase tracking-widest text-muted-foreground">
+          Quantita disponibile per taglia
+        </Label>
+        {parsedSizes.length > 0 ? (
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-5">
+            {parsedSizes.map((size) => (
+              <label key={size} className="rounded-md border border-border bg-secondary/50 p-3">
+                <span className="mb-2 block text-[10px] font-semibold uppercase tracking-widest text-foreground">
+                  {size}
+                </span>
+                <Input
+                  type="number"
+                  min="0"
+                  step="1"
+                  value={normalizedStock[size]}
+                  onChange={(event) => {
+                    const quantity = Math.max(0, Math.floor(Number(event.target.value || 0)))
+                    setStockBySize((current) => ({ ...current, [size]: quantity }))
+                  }}
+                  aria-label={`Quantita taglia ${size}`}
+                  className="bg-background border-border text-foreground"
+                />
+              </label>
+            ))}
+          </div>
+        ) : (
+          <p className="text-xs text-muted-foreground">
+            Inserisci prima le taglie, separate da una virgola.
+          </p>
+        )}
       </div>
       <div className="flex flex-col gap-2 md:col-span-2">
         <Label htmlFor="description" className="text-xs uppercase tracking-widest text-muted-foreground">
