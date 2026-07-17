@@ -90,7 +90,170 @@
   }
   body {
     @apply bg-background text-foreground;
+    background-image:
+      radial-gradient(circle at 12% 8%, rgba(126, 87, 194, 0.08), transparent 26rem),
+      radial-gradient(circle at 88% 42%, rgba(213, 77, 255, 0.045), transparent 30rem);
+    background-attachment: fixed;
   }
+}
+
+@keyframes mirai-aurora-drift {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(0.92); opacity: 0.35; }
+  35% { transform: translate3d(7%, -5%, 0) scale(1.08); opacity: 0.62; }
+  70% { transform: translate3d(-5%, 8%, 0) scale(0.98); opacity: 0.44; }
+}
+
+@keyframes mirai-neon-breathe {
+  0%, 100% {
+    box-shadow: 0 24px 65px rgba(0, 0, 0, 0.34), 0 0 34px rgba(126, 87, 194, 0.12), inset 0 0 24px rgba(159, 134, 255, 0.035);
+  }
+  50% {
+    box-shadow: 0 30px 82px rgba(0, 0, 0, 0.42), 0 0 58px rgba(159, 134, 255, 0.24), inset 0 0 32px rgba(213, 77, 255, 0.07);
+  }
+}
+
+@keyframes mirai-hero-focus {
+  from { transform: scale(1.025); filter: blur(7px) saturate(0.88); }
+  to { transform: scale(1); filter: blur(0) saturate(1.06); }
+}
+
+@keyframes mirai-soft-float {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50% { transform: translate3d(0, -7px, 0); }
+}
+
+.mirai-aurora-orb {
+  position: absolute;
+  border-radius: 999px;
+  background: radial-gradient(circle, rgba(182, 137, 255, 0.34), rgba(126, 87, 194, 0.1) 42%, transparent 72%);
+  filter: blur(34px);
+  pointer-events: none;
+  animation: mirai-aurora-drift 11s ease-in-out infinite;
+}
+
+.mirai-neon-frame {
+  position: relative;
+  isolation: isolate;
+  border-color: transparent !important;
+  box-shadow:
+    0 22px 62px rgba(0, 0, 0, 0.32),
+    0 0 34px rgba(126, 87, 194, 0.12),
+    inset 0 0 28px rgba(159, 134, 255, 0.04);
+  transition: transform 650ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 650ms ease, filter 650ms ease;
+}
+
+.mirai-neon-frame::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  background: linear-gradient(112deg, transparent 18%, rgba(224, 213, 255, 0.13) 42%, rgba(213, 77, 255, 0.08) 50%, transparent 72%);
+  transform: translateX(-135%);
+  transition: transform 900ms cubic-bezier(0.16, 1, 0.3, 1);
+  mix-blend-mode: screen;
+}
+
+.group:hover .mirai-neon-frame,
+.mirai-neon-frame:hover {
+  box-shadow:
+    0 28px 78px rgba(0, 0, 0, 0.4),
+    0 0 54px rgba(159, 134, 255, 0.25),
+    0 0 110px rgba(213, 77, 255, 0.08),
+    inset 0 0 35px rgba(159, 134, 255, 0.065);
+}
+
+.group:hover .mirai-neon-frame::after,
+.mirai-neon-frame:hover::after {
+  transform: translateX(135%);
+}
+
+.mirai-neon-lift:hover,
+.group:hover .mirai-neon-lift {
+  transform: translateY(-6px) scale(1.008);
+  filter: saturate(1.06) brightness(1.025);
+}
+
+.mirai-neon-card {
+  position: relative;
+  border-color: transparent !important;
+  background:
+    linear-gradient(145deg, rgba(43, 31, 57, 0.78), rgba(14, 10, 20, 0.88));
+  box-shadow:
+    0 24px 70px rgba(0, 0, 0, 0.36),
+    0 0 42px rgba(126, 87, 194, 0.14),
+    inset 0 0 32px rgba(159, 134, 255, 0.045);
+  backdrop-filter: blur(22px);
+}
+
+.mirai-neon-divider {
+  border-color: transparent !important;
+  box-shadow: inset 0 22px 54px -50px rgba(213, 77, 255, 0.85), 0 -18px 58px -46px rgba(159, 134, 255, 0.7);
+}
+
+.mirai-neon-control {
+  border: 0;
+  background: rgba(18, 12, 26, 0.44);
+  color: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 0 30px rgba(126, 87, 194, 0.2), inset 0 0 18px rgba(255, 255, 255, 0.035);
+  backdrop-filter: blur(18px);
+  transition: transform 300ms ease, box-shadow 300ms ease, background 300ms ease;
+}
+
+.mirai-neon-control:hover {
+  transform: translateY(-50%) scale(1.09);
+  background: rgba(85, 51, 130, 0.56);
+  box-shadow: 0 0 38px rgba(159, 134, 255, 0.48), inset 0 0 20px rgba(255, 255, 255, 0.08);
+}
+
+.mirai-neon-outline {
+  border-color: transparent !important;
+  background: linear-gradient(145deg, rgba(159, 134, 255, 0.1), rgba(213, 77, 255, 0.035));
+  box-shadow: 0 0 28px rgba(126, 87, 194, 0.12), inset 0 0 20px rgba(159, 134, 255, 0.04);
+  backdrop-filter: blur(16px);
+}
+
+.mirai-neon-outline:hover {
+  box-shadow: 0 0 42px rgba(159, 134, 255, 0.32), inset 0 0 24px rgba(159, 134, 255, 0.09);
+}
+
+.mirai-neon-primary {
+  box-shadow: 0 0 28px rgba(159, 134, 255, 0.28), 0 12px 38px rgba(44, 21, 75, 0.3);
+}
+
+.mirai-neon-primary:hover {
+  box-shadow: 0 0 44px rgba(159, 134, 255, 0.5), 0 16px 46px rgba(44, 21, 75, 0.36);
+}
+
+.mirai-hero-stage::after {
+  content: "";
+  position: absolute;
+  inset: auto 12% -18% 12%;
+  height: 44%;
+  border-radius: 50%;
+  background: radial-gradient(ellipse, rgba(126, 87, 194, 0.3), transparent 68%);
+  filter: blur(48px);
+  pointer-events: none;
+  z-index: 12;
+}
+
+.mirai-hero-slide-active {
+  animation: mirai-hero-focus 1.15s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.mirai-hero-panel {
+  border-radius: 2rem;
+  background: radial-gradient(circle at 50% 100%, rgba(72, 42, 104, 0.34), rgba(8, 6, 12, 0.06) 66%);
+  filter: drop-shadow(0 0 34px rgba(126, 87, 194, 0.18));
+  backdrop-filter: blur(3px);
+}
+
+.mirai-soft-float {
+  animation: mirai-soft-float 5.5s ease-in-out infinite;
+}
+
+.mirai-neon-breathe {
+  animation: mirai-neon-breathe 5.8s ease-in-out infinite;
 }
 
 @keyframes marquee {
@@ -511,5 +674,18 @@
   .mira-selector-backdrop,
   .mira-is-dragging .mira-character-button {
     animation: none !important;
+  }
+
+  .mirai-aurora-orb,
+  .mirai-neon-breathe,
+  .mirai-hero-slide-active,
+  .mirai-soft-float {
+    animation: none !important;
+  }
+
+  .mirai-neon-frame,
+  .mirai-neon-control,
+  .mirai-neon-frame::after {
+    transition-duration: 0.01ms !important;
   }
 }

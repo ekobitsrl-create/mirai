@@ -34,15 +34,16 @@ export function Features() {
   ]
 
   return (
-    <section className="py-20 px-6 border-t border-border" ref={ref}>
+    <section className="mirai-neon-divider relative overflow-hidden px-6 py-20" ref={ref}>
+      <div className="mirai-aurora-orb -right-48 top-0 h-96 w-96 [animation-delay:-3s]" />
       <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
         {features.map((feature, i) => (
           <div
             key={i}
-            className={`text-center transition-all duration-700 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}
+            className={`mirai-neon-card relative rounded-2xl px-5 py-7 text-center transition-all duration-700 hover:-translate-y-1 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}
             style={{ transitionDelay: isVisible ? `${i * 0.1}s` : "0s" }}
           >
-            <div className="inline-flex items-center justify-center w-12 h-12 rounded-full border border-primary/30 mb-4 text-primary bg-primary/5 transition-all duration-300 hover:bg-primary/10 hover:border-primary/50 hover:shadow-[0_0_20px_rgba(168,85,247,0.15)]">
+            <div className="mirai-soft-float mb-4 inline-flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary shadow-[0_0_28px_rgba(159,134,255,0.28)] transition-all duration-300 hover:bg-primary/15 hover:shadow-[0_0_38px_rgba(159,134,255,0.48)]">
               <feature.icon className="h-5 w-5" />
             </div>
             <h3 className="text-sm font-semibold tracking-wide uppercase text-foreground mb-2">

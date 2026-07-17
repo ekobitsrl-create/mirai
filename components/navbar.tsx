@@ -19,7 +19,7 @@ type CategoryNode = {
 
 function DiscountMarquee({ onClose, discountText, codeText, closeLabel }: { onClose: () => void; discountText: string; codeText: string; closeLabel: string }) {
   return (
-    <div className="relative border-b border-white/10 bg-[#17121f]">
+    <div className="mirai-neon-divider relative bg-[#17121f]">
       <div className="overflow-hidden py-2">
         <div className="animate-marquee-fast flex whitespace-nowrap">
           {[0, 1, 2].map((copy) => (
@@ -153,7 +153,7 @@ export function Navbar() {
           closeLabel={t.nav.closeBanner}
         />
       )}
-      <nav className="border-b border-white/10 bg-[#0c0c0d]/90 backdrop-blur-xl">
+      <nav className="mirai-neon-divider bg-[#0c0c0d]/88 backdrop-blur-2xl">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
           <div className="flex items-center gap-8">
             <Link href="/" className="flex items-center shrink-0">
@@ -204,7 +204,7 @@ export function Navbar() {
 
                 {dropdownOpen && categories.length > 0 && (
                   <div className="absolute top-full left-1/2 -translate-x-1/2 pt-3">
-                    <div className="min-w-[480px] rounded-lg border border-white/10 bg-[#151517] p-5 shadow-2xl">
+                    <div className="mirai-neon-card min-w-[480px] rounded-2xl p-5">
                       <div className="grid grid-cols-2 gap-6">
                         {categories.map((parent) => (
                           <div key={parent.id}>

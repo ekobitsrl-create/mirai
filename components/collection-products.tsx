@@ -120,7 +120,8 @@ export function CollectionProducts({
   return (
     <div className="pt-24">
       {/* Hero banner */}
-      <section className="relative h-[40vh] min-h-[300px] flex items-end bg-secondary/30">
+      <section className="mirai-neon-divider relative flex h-[40vh] min-h-[300px] items-end overflow-hidden bg-secondary/20">
+        <div className="mirai-aurora-orb left-1/2 top-1/2 h-[28rem] w-[28rem] -translate-x-1/2 -translate-y-1/2" />
         <div className="absolute inset-0 flex items-center justify-center">
           <Image
             src={getCategoryImage(category.slug, category.image_url)}
@@ -245,7 +246,7 @@ export function CollectionProducts({
                       href={`/prodotto/${product.id}`}
                       className="block"
                     >
-                      <div className="relative aspect-[3/4] overflow-hidden rounded-sm bg-card mb-4">
+                      <div className="mirai-neon-frame mirai-neon-lift relative mb-4 aspect-[3/4] overflow-hidden rounded-2xl bg-card">
                         <Image
                           src={product.image_url || "/placeholder.jpg"}
                           alt={product.name}

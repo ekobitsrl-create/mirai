@@ -55,29 +55,31 @@ export function Hero() {
   const slides = t.hero.slides
 
   return (
-    <section className="relative min-h-[100svh] overflow-hidden bg-[#0a0610]">
+    <section className="mirai-hero-stage relative min-h-[100svh] overflow-hidden bg-[#0a0610]">
+      <div className="mirai-aurora-orb -left-32 top-20 z-[1] h-[28rem] w-[28rem]" />
+      <div className="mirai-aurora-orb -right-40 bottom-16 z-[1] h-[34rem] w-[34rem] [animation-delay:-4s]" />
       {slideImages.map((image, i) => (
         <div
           key={i}
           className={`absolute inset-0 transition-all duration-700 ease-in-out ${
-            i === current ? "opacity-100 scale-100 z-10" : "opacity-0 scale-105 z-0"
+            i === current ? "mirai-hero-slide-active opacity-100 z-10" : "opacity-0 scale-105 blur-sm z-0"
           }`}
         >
           <Image
             src={image.src}
             alt={slides[i]?.title.replace("\n", " ") || ""}
             fill
-            className={`object-contain ${image.position} ${image.scale}`}
+            className={`object-contain drop-shadow-[0_0_48px_rgba(159,134,255,0.16)] ${image.position} ${image.scale}`}
             priority={i === 0}
             sizes="100vw"
           />
-          <div className="absolute inset-0 bg-black/30" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_12%,rgba(8,5,12,0.2)_48%,rgba(7,4,11,0.76)_100%)]" />
         </div>
       ))}
 
       {/* Content */}
       <div className="absolute inset-0 z-20 flex items-end justify-center text-center px-6 pb-24 md:pb-28">
-        <div>
+        <div className="mirai-hero-panel px-8 py-7 md:px-14 md:py-9">
           <p
             className={`text-[10px] md:text-xs tracking-[0.4em] uppercase text-primary mb-4 font-sans transition-all duration-500 ${loaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}
           >
@@ -91,7 +93,7 @@ export function Hero() {
           </h1>
           <Link
             href={slideHrefs[current]}
-            className="inline-flex items-center justify-center px-8 py-3 bg-primary text-primary-foreground text-xs font-bold tracking-widest uppercase hover:bg-primary/90 transition-all duration-300 rounded-sm hover:shadow-[0_0_30px_rgba(168,85,247,0.3)]"
+            className="mirai-neon-primary inline-flex items-center justify-center rounded-full bg-primary px-8 py-3 text-xs font-bold uppercase tracking-widest text-primary-foreground transition-all duration-300 hover:-translate-y-0.5 hover:bg-primary/90"
           >
             {slides[current]?.cta}
           </Link>
@@ -102,14 +104,14 @@ export function Hero() {
       <button
         onClick={prev}
         aria-label={t.hero.prevSlide}
-        className="absolute left-4 md:left-8 top-1/2 -translate-y-1/2 z-30 p-3 bg-background/30 backdrop-blur-sm text-foreground hover:bg-background/50 transition-all duration-300 rounded-full"
+        className="mirai-neon-control absolute left-4 top-1/2 z-30 -translate-y-1/2 rounded-full p-3 md:left-8"
       >
         <ChevronLeft className="h-5 w-5" />
       </button>
       <button
         onClick={next}
         aria-label={t.hero.nextSlide}
-        className="absolute right-4 md:right-8 top-1/2 -translate-y-1/2 z-30 p-3 bg-background/30 backdrop-blur-sm text-foreground hover:bg-background/50 transition-all duration-300 rounded-full"
+        className="mirai-neon-control absolute right-4 top-1/2 z-30 -translate-y-1/2 rounded-full p-3 md:right-8"
       >
         <ChevronRight className="h-5 w-5" />
       </button>
@@ -123,8 +125,8 @@ export function Hero() {
             aria-label={`${t.hero.goToSlide} ${i + 1}`}
             className={`transition-all duration-300 rounded-full ${
               i === current
-                ? "w-8 h-2 bg-primary"
-                : "w-2 h-2 bg-foreground/40 hover:bg-foreground/60"
+                ? "h-2 w-8 bg-primary shadow-[0_0_18px_rgba(159,134,255,0.9)]"
+                : "h-2 w-2 bg-foreground/30 shadow-[0_0_10px_rgba(255,255,255,0.12)] hover:bg-primary/70 hover:shadow-[0_0_16px_rgba(159,134,255,0.6)]"
             }`}
           />
         ))}

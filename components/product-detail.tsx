@@ -202,7 +202,7 @@ export function ProductDetail({
                 onClick={() => setSelectedImageIndex(index)}
                 aria-label={`Mostra immagine ${index + 1} di ${gallery.length}`}
                 aria-current={selectedImageIndex === index ? "true" : undefined}
-                className={`relative aspect-square w-16 shrink-0 overflow-hidden bg-[#d9d4ca] transition-all md:w-[72px] ${selectedImageIndex === index ? "border border-primary/80 shadow-[0_0_20px_rgba(159,134,255,0.3)]" : "border border-white/15 opacity-65 hover:opacity-100"}`}
+                className={`relative aspect-square w-16 shrink-0 overflow-hidden rounded-xl bg-[#d9d4ca] transition-all md:w-[72px] ${selectedImageIndex === index ? "shadow-[0_0_28px_rgba(159,134,255,0.48)]" : "opacity-55 shadow-[0_0_18px_rgba(126,87,194,0.08)] hover:opacity-100 hover:shadow-[0_0_24px_rgba(159,134,255,0.25)]"}`}
               >
                 <Image
                   src={image.src}
@@ -224,7 +224,7 @@ export function ProductDetail({
             type="button"
             onClick={() => setZoomOpen(true)}
             disabled={!selectedImage}
-            className="group relative order-1 aspect-square min-w-0 overflow-hidden rounded-sm border border-primary/25 bg-[#d8d2c7] shadow-[0_0_55px_rgba(159,134,255,0.18)] md:order-2"
+            className="mirai-neon-frame mirai-neon-breathe group relative order-1 aspect-square min-w-0 overflow-hidden rounded-[1.75rem] bg-[#d8d2c7] md:order-2"
             aria-label="Ingrandisci immagine prodotto"
           >
             {selectedImage ? (
@@ -249,7 +249,7 @@ export function ProductDetail({
           </button>
         </section>
 
-        <section className="relative overflow-hidden rounded-2xl border border-primary/35 bg-[#2a2034]/92 p-5 shadow-[0_0_70px_rgba(126,87,194,0.24)] backdrop-blur-xl before:pointer-events-none before:absolute before:inset-x-12 before:top-0 before:h-px before:bg-gradient-to-r before:from-transparent before:via-primary before:to-transparent before:shadow-[0_0_18px_rgba(159,134,255,0.9)] sm:p-7 lg:sticky lg:top-32 lg:self-start lg:p-8">
+        <section className="mirai-neon-card relative overflow-hidden rounded-[1.75rem] p-5 sm:p-7 lg:sticky lg:top-32 lg:self-start lg:p-8">
           <div className="flex items-start justify-between gap-6">
             <div>
               <p className="text-[9px] font-semibold uppercase tracking-[0.3em] text-[#9f86ff]">MIRAI LAB / {product.brand || formatCategory(product.category)}</p>
@@ -431,7 +431,7 @@ export function ProductDetail({
           <div className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-5">
             {relatedProducts.map((item) => (
               <Link key={item.id} href={`/prodotto/${item.id}`} className="group min-w-0">
-                <div className="relative mb-3 aspect-[4/5] overflow-hidden border border-white/10 bg-white/5 shadow-[0_0_30px_rgba(159,134,255,0.08)] transition-all group-hover:border-primary/40 group-hover:shadow-[0_0_35px_rgba(159,134,255,0.18)]">
+                <div className="mirai-neon-frame mirai-neon-lift relative mb-3 aspect-[4/5] overflow-hidden rounded-2xl bg-white/5">
                   {item.image_url && <Image src={item.image_url} alt={item.name} fill className="object-cover transition-transform duration-700 group-hover:scale-[1.035]" sizes="(max-width: 768px) 50vw, 25vw" />}
                 </div>
                 <h3 className="truncate text-xs font-medium group-hover:text-[#9f86ff]">{item.name}</h3>

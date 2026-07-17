@@ -80,7 +80,7 @@ export function SiteIntro() {
       }`}
       aria-label="Introduzione MIRAI"
     >
-      <div className="relative aspect-[46/25] w-full max-w-[1080px] overflow-hidden rounded-xl border border-white/10 bg-black shadow-[0_30px_100px_rgba(88,28,135,0.4)] sm:w-[94vw] md:w-[82vw] xl:w-[72vw]">
+      <div className="mirai-neon-frame mirai-neon-breathe relative aspect-[46/25] w-full max-w-[1080px] overflow-hidden rounded-[1.75rem] bg-black sm:w-[94vw] md:w-[82vw] xl:w-[72vw]">
         <video
           ref={videoRef}
           className="h-full w-full object-contain [filter:contrast(1.06)_saturate(1.05)_brightness(1.01)]"

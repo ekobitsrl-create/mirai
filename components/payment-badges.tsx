@@ -1,5 +1,5 @@
 const badgeClass =
-  "flex h-9 min-w-[62px] items-center justify-center rounded-md border border-white/10 bg-white px-2.5 shadow-sm"
+  "flex h-9 min-w-[62px] items-center justify-center rounded-lg bg-white px-2.5 shadow-[0_8px_24px_rgba(0,0,0,0.22),0_0_18px_rgba(159,134,255,0.08)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_10px_30px_rgba(0,0,0,0.28),0_0_26px_rgba(159,134,255,0.2)]"
 
 export function PaymentBadges() {
   return (

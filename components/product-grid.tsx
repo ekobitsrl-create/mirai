@@ -65,7 +65,7 @@ export function ProductGrid({ products, title, subtitle }: { products: Product[]
               style={{ transitionDelay: isVisible ? `${(i % 4) * 0.08}s` : "0s" }}
             >
               <Link href={`/prodotto/${product.id}`} className="block">
-                <div className="relative aspect-[3/4] overflow-hidden rounded-sm bg-card mb-3">
+                <div className="mirai-neon-frame mirai-neon-lift relative mb-4 aspect-[3/4] overflow-hidden rounded-2xl bg-card">
                   <Image
                     src={product.image_url || "/placeholder.jpg"}
                     alt={product.name}
@@ -109,7 +109,7 @@ export function ProductGrid({ products, title, subtitle }: { products: Product[]
                             maxQuantity: product.stock_by_size?.[availableSize],
                           })
                         }}
-                        className="w-full py-3 bg-primary text-primary-foreground text-[10px] md:text-xs font-bold tracking-widest uppercase rounded-sm hover:bg-primary/90 transition-all duration-300"
+                        className="mirai-neon-primary w-full rounded-xl bg-primary py-3 text-[10px] font-bold uppercase tracking-widest text-primary-foreground transition-all duration-300 hover:bg-primary/90 md:text-xs"
                       >
                         {t.products.addToCart}
                       </button>
@@ -140,7 +140,7 @@ export function ProductGrid({ products, title, subtitle }: { products: Product[]
         >
           <Link
             href="/collezioni"
-            className="inline-flex items-center justify-center px-10 py-3.5 border border-border text-foreground text-xs font-bold tracking-widest uppercase hover:border-primary hover:text-primary transition-all duration-300 rounded-sm"
+            className="mirai-neon-outline inline-flex items-center justify-center rounded-full px-10 py-3.5 text-xs font-bold uppercase tracking-widest text-foreground transition-all duration-300 hover:-translate-y-0.5 hover:text-primary"
           >
             {t.products.viewAll}
           </Link>

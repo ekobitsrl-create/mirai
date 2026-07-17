@@ -3,6 +3,7 @@
 import Link from "next/link"
 import { useLanguage } from "@/lib/language-context"
 import { PaymentBadges } from "@/components/payment-badges"
+import { Building2, Mail, MapPin } from "lucide-react"
 
 export function Footer() {
   const { t, locale } = useLanguage()
@@ -12,6 +13,13 @@ export function Footer() {
     es: "Tienda física",
     de: "Ladengeschäft",
     fr: "Boutique physique",
+  }[locale]
+  const companyLabel = {
+    it: "Dati aziendali",
+    en: "Company details",
+    es: "Datos de la empresa",
+    de: "Unternehmensangaben",
+    fr: "Informations légales",
   }[locale]
 
   const footerLinks = {
@@ -44,8 +52,10 @@ export function Footer() {
     },
   }
   return (
-    <footer className="border-t border-border bg-card">
-      <div className="max-w-7xl mx-auto px-6 py-16">
+    <footer className="mirai-neon-divider relative overflow-hidden bg-card/85">
+      <div className="mirai-aurora-orb -left-40 top-8 h-80 w-80" />
+      <div className="mirai-aurora-orb -right-40 bottom-0 h-96 w-96 [animation-delay:-5s]" />
+      <div className="relative max-w-7xl mx-auto px-6 py-16">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
           <div>
             <span
@@ -91,7 +101,36 @@ export function Footer() {
           ))}
         </div>
 
-        <div className="mt-16 flex flex-col items-center justify-between gap-6 border-t border-border pt-8 md:flex-row">
+        <section className="mirai-neon-card mt-14 overflow-hidden rounded-2xl px-5 py-6 sm:px-7">
+          <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+            <div className="flex items-start gap-4">
+              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary shadow-[0_0_28px_rgba(159,134,255,0.24)]">
+                <Building2 className="h-5 w-5" />
+              </span>
+              <div>
+                <p className="text-[9px] font-bold uppercase tracking-[0.25em] text-primary">{companyLabel}</p>
+                <p className="mt-2 text-sm font-semibold text-foreground">MIRAI LAB STORE DI SCRIVANO CHRISTIAN</p>
+                <div className="mt-3 flex flex-wrap gap-x-5 gap-y-2 text-[11px] text-muted-foreground">
+                  <span>P. IVA 06287920877</span>
+                  <span>CF SCRCRS99C11C351W</span>
+                  <span>REA CT - 486994</span>
+                </div>
+              </div>
+            </div>
+            <div className="grid gap-3 text-xs text-muted-foreground sm:grid-cols-2 lg:max-w-xl">
+              <span className="flex items-start gap-2.5">
+                <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                Via Umberto 95, 95129 Catania (CT)
+              </span>
+              <a href="mailto:mirailabstore@pec.it" className="flex items-start gap-2.5 transition-colors hover:text-foreground">
+                <Mail className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                mirailabstore@pec.it
+              </a>
+            </div>
+          </div>
+        </section>
+
+        <div className="mirai-neon-divider mt-12 flex flex-col items-center justify-between gap-6 pt-8 md:flex-row">
           <div className="flex flex-col items-center gap-2 md:items-start">
             <p className="text-xs text-muted-foreground">
               &copy; 2026 MIRAI. {t.footer.allRightsReserved}

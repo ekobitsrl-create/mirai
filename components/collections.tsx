@@ -62,8 +62,9 @@ export function Collections({ categories = [] }: { categories?: Category[] }) {
   if (categories.length === 0) return null
 
   return (
-    <section id="collezioni" className="py-16 md:py-24 bg-secondary/30" ref={ref}>
-      <div className="max-w-7xl mx-auto px-6">
+    <section id="collezioni" className="mirai-neon-divider relative overflow-hidden bg-secondary/20 py-16 md:py-24" ref={ref}>
+      <div className="mirai-aurora-orb -left-40 top-1/3 h-96 w-96" />
+      <div className="relative max-w-7xl mx-auto px-6">
         {/* Header */}
         <div className={`text-center mb-12 transition-all duration-700 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
           <p className="text-xs tracking-[0.3em] uppercase text-primary mb-3">{t.collections.title}</p>
@@ -81,7 +82,7 @@ export function Collections({ categories = [] }: { categories?: Category[] }) {
             <Link
               key={cat.id}
               href={`/collezione/${cat.slug}`}
-              className={`group relative aspect-[3/4] overflow-hidden rounded-lg bg-secondary/50 transition-all duration-700 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-12"}`}
+              className={`mirai-neon-frame mirai-neon-lift group relative aspect-[3/4] overflow-hidden rounded-2xl bg-secondary/50 transition-all duration-700 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-12"}`}
               style={{ transitionDelay: isVisible ? `${i * 0.1}s` : "0s" }}
             >
               <Image
@@ -113,8 +114,6 @@ export function Collections({ categories = [] }: { categories?: Category[] }) {
                 </span>
               </div>
 
-              {/* Border glow effect on hover */}
-              <div className="absolute inset-0 rounded-lg border-2 border-transparent group-hover:border-primary/50 transition-colors duration-300" />
             </Link>
           ))}
         </div>
@@ -123,7 +122,7 @@ export function Collections({ categories = [] }: { categories?: Category[] }) {
         <div className={`text-center mt-10 transition-all duration-700 delay-300 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
           <Link
             href="/collezioni"
-            className="inline-flex items-center gap-2 px-8 py-3 border border-border text-foreground text-xs font-bold tracking-widest uppercase hover:border-primary hover:text-primary transition-all duration-300 rounded-sm"
+            className="mirai-neon-outline inline-flex items-center gap-2 rounded-full px-8 py-3 text-xs font-bold uppercase tracking-widest text-foreground transition-all duration-300 hover:-translate-y-0.5 hover:text-primary"
           >
             {t.collections.viewAll || "Vedi Tutte le Collezioni"}
             <ArrowRight className="h-4 w-4" />

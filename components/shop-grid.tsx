@@ -304,7 +304,7 @@ export function ShopGrid({
 
   return (
     <div className="min-h-screen bg-background pb-24 pt-28 text-foreground md:pt-32">
-      <section className="relative overflow-hidden border-b border-white/10">
+      <section className="mirai-neon-divider relative overflow-hidden">
         <div className="absolute -right-28 -top-32 h-[420px] w-[420px] rounded-full bg-primary/20 blur-[110px]" />
         <div className="absolute -left-32 bottom-0 h-72 w-72 rounded-full bg-primary/10 blur-[100px]" />
         <div className="mx-auto max-w-[1500px] px-5 py-10 md:px-8 md:py-12">
@@ -339,7 +339,7 @@ export function ShopGrid({
         </div>
       </section>
 
-      <section className="sticky top-[95px] z-30 border-b border-white/10 bg-background/95 backdrop-blur-xl">
+      <section className="mirai-neon-divider sticky top-[95px] z-30 bg-background/90 backdrop-blur-2xl">
         <div className="mx-auto flex max-w-[1500px] items-center gap-3 px-5 py-3 md:px-8">
           <div className="relative min-w-0 flex-1 md:max-w-md">
             <Search className="absolute left-0 top-1/2 h-4 w-4 -translate-y-1/2 text-white/40" />
@@ -369,7 +369,7 @@ export function ShopGrid({
             type="button"
             onClick={() => setFiltersOpen(true)}
             aria-label="Apri filtri"
-            className="relative flex h-11 items-center gap-2 border border-white/15 px-4 text-[10px] font-semibold uppercase tracking-[0.2em] transition-colors hover:border-white/40"
+            className="mirai-neon-outline relative flex h-11 items-center gap-2 rounded-full px-4 text-[10px] font-semibold uppercase tracking-[0.2em] transition-all hover:text-primary"
           >
             <SlidersHorizontal className="h-4 w-4" />
             <span className="hidden sm:inline">Filtri</span>
@@ -385,7 +385,7 @@ export function ShopGrid({
               type="button"
               onClick={() => setSortOpen((open) => !open)}
               aria-label={`Ordina: ${sortLabels[sort]}`}
-              className="flex h-11 items-center gap-2 border border-white/15 px-4 text-[10px] font-semibold uppercase tracking-[0.2em] transition-colors hover:border-white/40"
+              className="mirai-neon-outline flex h-11 items-center gap-2 rounded-full px-4 text-[10px] font-semibold uppercase tracking-[0.2em] transition-all hover:text-primary"
               aria-expanded={sortOpen}
             >
               <ArrowDownUp className="h-4 w-4" />
@@ -468,7 +468,7 @@ export function ShopGrid({
             ))}
           </div>
         ) : (
-          <div className="flex min-h-[440px] flex-col items-center justify-center border border-dashed border-white/15 px-6 text-center">
+          <div className="mirai-neon-card flex min-h-[440px] flex-col items-center justify-center rounded-[2rem] px-6 text-center">
             <Search className="mb-6 h-10 w-10 text-white/20" />
             <h2 className="text-2xl font-medium">{labels.noMatch}</h2>
             <p className="mt-2 max-w-md text-sm leading-6 text-white/45">
@@ -541,7 +541,7 @@ function ProductCard({
 
   return (
     <article className="group min-w-0" style={{ animationDelay: `${Math.min(index, 8) * 45}ms` }}>
-      <div className="relative mb-4 aspect-[4/5] overflow-hidden bg-card">
+      <div className="mirai-neon-frame mirai-neon-lift relative mb-4 aspect-[4/5] overflow-hidden rounded-2xl bg-card">
         <Link href={`/prodotto/${product.id}`} className="absolute inset-0">
           {product.image_url ? (
             <Image
@@ -574,7 +574,7 @@ function ProductCard({
             <button
               type="button"
               onClick={onQuickAdd}
-              className="flex w-full items-center justify-center gap-2 bg-white px-3 py-3 text-[9px] font-bold uppercase tracking-[0.22em] text-black transition-colors hover:bg-primary hover:text-primary-foreground md:py-3.5 md:text-[10px]"
+              className="mirai-neon-primary flex w-full items-center justify-center gap-2 rounded-xl bg-white px-3 py-3 text-[9px] font-bold uppercase tracking-[0.22em] text-black transition-all hover:bg-primary hover:text-primary-foreground md:py-3.5 md:text-[10px]"
             >
               <ShoppingBag className="h-3.5 w-3.5" />
               {labels.quickAdd}

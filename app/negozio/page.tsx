@@ -58,7 +58,7 @@ export default function NegozioPage() {
           </div>
 
           <div className="order-1 lg:order-2">
-            <div className="relative mx-auto w-full max-w-3xl overflow-hidden rounded-[1.75rem] border border-white/10 bg-[#100c16] p-2 shadow-[0_30px_100px_rgba(0,0,0,0.55),0_0_75px_rgba(130,76,255,0.13)] sm:p-3">
+            <div className="mirai-neon-frame mirai-neon-breathe relative mx-auto w-full max-w-3xl overflow-hidden rounded-[1.75rem] bg-[#100c16] p-2 sm:p-3">
               <div className="pointer-events-none absolute inset-x-12 top-0 z-10 h-px bg-gradient-to-r from-transparent via-primary to-transparent shadow-[0_0_18px_rgba(159,134,255,0.9)]" />
               <video
                 className="max-h-[70svh] w-full rounded-[1.25rem] bg-black object-contain"
