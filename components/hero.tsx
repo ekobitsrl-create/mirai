@@ -62,7 +62,7 @@ export function Hero() {
         <div
           key={i}
           className={`absolute inset-0 transition-all duration-700 ease-in-out ${
-            i === current ? "mirai-hero-slide-active opacity-100 z-10" : "opacity-0 scale-105 blur-sm z-0"
+            i === current ? "mirai-hero-slide-active opacity-100 z-10" : "opacity-0 scale-105 z-0"
           }`}
         >
           <Image
@@ -73,7 +73,7 @@ export function Hero() {
             priority={i === 0}
             sizes="100vw"
           />
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_12%,rgba(8,5,12,0.2)_48%,rgba(7,4,11,0.76)_100%)]" />
+          <div className="mirai-image-edge-fade absolute inset-0" />
         </div>
       ))}
 

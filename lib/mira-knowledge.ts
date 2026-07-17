@@ -1,4 +1,4 @@
-import { DEMO_PRODUCTS, isStripeTestProduct, type StoreProduct } from "@/lib/products"
+import { DEMO_PRODUCTS, isPrivateCheckoutProduct, type StoreProduct } from "@/lib/products"
 import { formatShippingPrice, SHIPPING_CONFIG } from "@/lib/shipping"
 
 export type MiraIntent =
@@ -45,7 +45,7 @@ export type MiraKnowledgeReply = {
 }
 
 const EXPRESS_PRICE = formatShippingPrice(SHIPPING_CONFIG.expressPriceCents)
-const MIRA_PRODUCTS = DEMO_PRODUCTS.filter((product) => !isStripeTestProduct(product))
+const MIRA_PRODUCTS = DEMO_PRODUCTS.filter((product) => !isPrivateCheckoutProduct(product))
 
 function normalize(value: string) {
   return value

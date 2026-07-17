@@ -61,32 +61,32 @@ export const VALLEY_ATHLETIC_TEE: StoreProduct = {
   care: "Lavare al rovescio a 30°C con colori simili. Non candeggiare e non stirare direttamente sulla stampa.",
 }
 
-export const STRIPE_LIVE_TEST_PRODUCT: StoreProduct = {
-  id: "mirai-stripe-live-check-2-euro",
-  name: "MIRAI Stripe Live Check",
+export const PRIVATE_CHECKOUT_PRODUCT: StoreProduct = {
+  id: "felpa-mirai-nocturne",
+  name: "Felpa MIRAI Nocturne",
   description:
-    "Prodotto tecnico temporaneo da 2 euro creato per verificare il checkout Stripe in modalità live. Non corrisponde a un articolo fisico e non prevede alcuna spedizione.",
+    "Felpa oversize in cotone pesante, costruita per un fit morbido e strutturato. Il nero profondo incontra il ricamo triangolare viola MIRAI sul petto e un dettaglio tono su tono sul cappuccio.",
   price: 2,
-  category: "test-stripe",
-  image_url: "/images/stripe-live-check.svg",
-  sizes: ["TEST"],
+  category: "felpe",
+  image_url: "/images/felpa-mirai-nocturne.png",
+  sizes: ["XS", "S", "M", "L", "XL"],
   in_stock: true,
-  is_new: false,
+  is_new: true,
   created_at: "2026-07-17T12:00:00.000Z",
   brand: "MIRAI LAB",
-  supplier_sku: "STRIPE-LIVE-002",
-  color_name: "Neon viola",
-  color_hex: "#7c4dff",
-  fit_note: "Seleziona la taglia TEST per procedere al pagamento.",
+  supplier_sku: "ML-HOOD-NCT-001",
+  color_name: "Nero / Viola",
+  color_hex: "#111013",
+  fit_note: "Vestibilità oversize. Scegli la tua taglia abituale per un fit ampio oppure una taglia in meno per una linea più regolare.",
   detail_items: [
-    "Importo reale di prova: 2,00 euro",
-    "Checkout live gestito da Stripe",
-    "Nessun articolo fisico verrà spedito",
-    "Prodotto temporaneo, rimovibile dopo la verifica",
+    "Cotone felpato pesante da 420 g/m²",
+    "Taglio oversize con spalla scesa",
+    "Ricamo MIRAI viola sul petto",
+    "Cappuccio doppio e tasca a marsupio",
   ],
-  composition: "Prodotto tecnico digitale per il collaudo del sistema di pagamento.",
-  care: "Dopo il pagamento di prova, il prodotto può essere rimosso dal catalogo.",
-  stock_by_size: { TEST: 25 },
+  composition: "100% cotone felpato premium. Ricamo in filo poliestere ad alta resistenza.",
+  care: "Lavare al rovescio a 30°C con colori simili. Non candeggiare, non asciugare in asciugatrice e non stirare direttamente sul ricamo.",
+  stock_by_size: { XS: 5, S: 5, M: 5, L: 5, XL: 5 },
 }
 
 export const ORDERED_PRODUCTS: StoreProduct[] = [
@@ -542,7 +542,7 @@ export const ORDERED_PRODUCTS: StoreProduct[] = [
   },
 ]
 
-export const DEMO_PRODUCTS: StoreProduct[] = [...ORDERED_PRODUCTS, VALLEY_ATHLETIC_TEE, STRIPE_LIVE_TEST_PRODUCT]
+export const DEMO_PRODUCTS: StoreProduct[] = [...ORDERED_PRODUCTS, VALLEY_ATHLETIC_TEE, PRIVATE_CHECKOUT_PRODUCT]
 
 export const CUSTOM_TEE_PRODUCT: StoreProduct = {
   id: CUSTOM_TEE_PRODUCT_ID,
@@ -568,8 +568,8 @@ export function isBlackIslandProduct(product: ProductIdentity) {
     || BLACK_ISLAND_PATTERN.test(product.image_url || "")
 }
 
-export function isStripeTestProduct(product: ProductIdentity & { id?: string | null }) {
-  return product.id === STRIPE_LIVE_TEST_PRODUCT.id
+export function isPrivateCheckoutProduct(product: ProductIdentity & { id?: string | null }) {
+  return product.id === PRIVATE_CHECKOUT_PRODUCT.id
 }
 
 export function withoutBlackIslandProducts<T extends ProductIdentity>(products: T[]) {
