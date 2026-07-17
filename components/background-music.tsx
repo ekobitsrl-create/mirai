@@ -14,7 +14,7 @@ export function BackgroundMusic() {
     const audio = audioRef.current
     if (!audio) return
 
-    audio.volume = 0.35
+    audio.volume = 0.18
 
     const tryPlay = async () => {
       try {
@@ -77,7 +77,7 @@ export function BackgroundMusic() {
 
   return (
     <>
-      <audio ref={audioRef} src="/audio/mirai-beat.wav" loop preload="auto" aria-hidden="true" />
+      <audio ref={audioRef} src="/audio/mirai-soundtrack.mpeg" loop preload="auto" aria-hidden="true" />
       {ready && (
         <button
           type="button"
