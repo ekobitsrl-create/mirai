@@ -70,7 +70,7 @@ export default function NegozioPage() {
                 preload="metadata"
                 aria-label="Anteprima del futuro negozio fisico MIRAI LAB STORE"
               />
-              <div className="pointer-events-none absolute bottom-6 left-6 right-6 flex items-center justify-between rounded-full border border-white/10 bg-black/55 px-4 py-2.5 backdrop-blur-xl sm:bottom-8 sm:left-8 sm:right-8">
+              <div className="pointer-events-none absolute bottom-6 left-6 right-6 flex items-center justify-between rounded-full border border-white/10 bg-black/80 px-4 py-2.5 sm:bottom-8 sm:left-8 sm:right-8">
                 <span className="flex items-center gap-2 text-[8px] font-semibold uppercase tracking-[0.22em] text-white/70">
                   <Sparkles className="h-3.5 w-3.5 text-primary" /> Work in progress
                 </span>

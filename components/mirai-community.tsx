@@ -11,31 +11,39 @@ type CommunityMember = {
 const CHANNELS = [
   {
     icon: Eye,
+    slug: "first-look",
     name: "First Look",
     label: "Anteprime",
     description: "Capi, collaborazioni e custom piece prima della pubblicazione.",
-    status: "In preparazione",
+    status: "Aperto",
+    memberOpen: true,
   },
   {
     icon: AudioLines,
+    slug: "after-hours",
     name: "After Hours",
     label: "Podcast",
     description: "Puntate, ospiti e note audio disponibili in anticipo per i membri.",
     status: "Prossimamente",
+    memberOpen: false,
   },
   {
     icon: MessageCircleMore,
+    slug: "inner-circle",
     name: "Inner Circle",
     label: "Social room",
     description: "Uno spazio per parlare di outfit, musica, idee e cultura urbana.",
     status: "Accessi limitati",
+    memberOpen: false,
   },
   {
     icon: Radio,
+    slug: "signal",
     name: "Signal",
     label: "News & eventi",
     description: "Aperture, eventi, listening session e comunicazioni riservate.",
-    status: "Canale in arrivo",
+    status: "Aperto",
+    memberOpen: true,
   },
 ]
 
@@ -160,7 +168,7 @@ export function CommunityHub({ member, isAdmin = false }: { member: CommunityMem
 
         <div className="grid gap-3 sm:grid-cols-2">
           {CHANNELS.map((channel) => (
-            <article key={channel.name} className="group rounded-2xl border border-white/10 bg-white/[0.025] p-6 transition-colors hover:border-primary/35 hover:bg-primary/[0.045]">
+            <Link key={channel.name} href={`/community/${channel.slug}`} className="group rounded-2xl border border-white/10 bg-white/[0.025] p-6 transition-colors hover:border-primary/35 hover:bg-primary/[0.045]">
               <div className="flex items-start justify-between gap-4">
                 <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-primary/25 bg-primary/10 text-primary">
                   <channel.icon className="h-5 w-5" />
@@ -170,7 +178,10 @@ export function CommunityHub({ member, isAdmin = false }: { member: CommunityMem
               <p className="mt-6 text-[8px] font-bold uppercase tracking-[0.22em] text-primary">{channel.label}</p>
               <h3 className="mt-1 text-lg font-bold uppercase tracking-[-0.02em]">{channel.name}</h3>
               <p className="mt-3 text-sm leading-6 text-white/45">{channel.description}</p>
-            </article>
+              <span className="mt-6 inline-flex items-center gap-2 text-[8px] font-bold uppercase tracking-[0.18em] text-primary">
+                {isAdmin || channel.memberOpen ? "Entra nel canale" : "Scopri l’accesso"} <ArrowRight className="h-3 w-3 transition-transform group-hover:translate-x-1" />
+              </span>
+            </Link>
           ))}
         </div>
       </section>

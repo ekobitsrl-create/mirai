@@ -38,20 +38,37 @@ export default function SignUpPage() {
     }
 
     try {
-      const { error } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
           emailRedirectTo:
             process.env.NEXT_PUBLIC_DEV_SUPABASE_REDIRECT_URL ||
-            `${window.location.origin}/account`,
+            `${window.location.origin}/auth/confirm?next=/community`,
           data: {
             first_name: firstName,
             last_name: lastName,
+            membership: "mirai-pass",
           },
         },
       })
       if (error) throw error
+
+      if (data.session) {
+        const response = await fetch("/api/auth/set-session", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({
+            access_token: data.session.access_token,
+            refresh_token: data.session.refresh_token,
+          }),
+        })
+        if (!response.ok) throw new Error("Impossibile attivare il MIRAI PASS")
+        window.location.href = "/community"
+        return
+      }
+
       router.push("/auth/sign-up-success")
     } catch (error: unknown) {
       setError(error instanceof Error ? error.message : "Si è verificato un errore")
@@ -71,10 +88,10 @@ export default function SignUpPage() {
           <div className="w-full border border-border rounded-lg p-8 bg-card">
             <div className="flex flex-col gap-2 mb-8">
               <h1 className="font-sans text-2xl font-bold tracking-tight text-foreground">
-                Crea Account
+                Crea il tuo MIRAI PASS
               </h1>
               <p className="text-sm text-muted-foreground">
-                Registrati per accedere a tutte le funzionalità
+                Un solo account per shop, community, anteprime ed eventi.
               </p>
             </div>
 
@@ -158,7 +175,7 @@ export default function SignUpPage() {
                   className="w-full bg-primary text-primary-foreground hover:bg-primary/90 uppercase tracking-widest text-xs h-11"
                   disabled={isLoading}
                 >
-                  {isLoading ? "Registrazione in corso..." : "Registrati"}
+                  {isLoading ? "Creazione in corso..." : "Crea MIRAI PASS"}
                 </Button>
               </div>
               <div className="mt-6 text-center text-sm text-muted-foreground">

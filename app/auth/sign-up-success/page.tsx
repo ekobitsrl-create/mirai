@@ -18,11 +18,11 @@ export default function SignUpSuccessPage() {
               </div>
             </div>
             <h1 className="font-sans text-2xl font-bold tracking-tight text-foreground mb-3">
-              Registrazione completata
+              Controlla la tua email
             </h1>
             <p className="text-sm text-muted-foreground leading-relaxed">
-              Ti abbiamo inviato una email di conferma. Controlla la tua casella di posta
-              e clicca sul link per attivare il tuo account.
+              Ti abbiamo inviato il link per attivare il MIRAI PASS. Dopo la conferma entrerai
+              direttamente nel Community Hub.
             </p>
           </div>
 
