@@ -1,4 +1,4 @@
-import { DEMO_PRODUCTS, type StoreProduct } from "@/lib/products"
+import { DEMO_PRODUCTS, isStripeTestProduct, type StoreProduct } from "@/lib/products"
 import { formatShippingPrice, SHIPPING_CONFIG } from "@/lib/shipping"
 
 export type MiraIntent =
@@ -45,6 +45,7 @@ export type MiraKnowledgeReply = {
 }
 
 const EXPRESS_PRICE = formatShippingPrice(SHIPPING_CONFIG.expressPriceCents)
+const MIRA_PRODUCTS = DEMO_PRODUCTS.filter((product) => !isStripeTestProduct(product))
 
 function normalize(value: string) {
   return value
@@ -113,7 +114,7 @@ function productFromContext(message: string, context: MiraKnowledgeContext) {
   const productIdFromPath = context.pathname?.match(/^\/prodotto\/([^/?#]+)/)?.[1]
   const contextualId = productIdFromPath || context.lastProductId
 
-  return DEMO_PRODUCTS.find((product) => {
+  return MIRA_PRODUCTS.find((product) => {
     const productName = normalize(product.name)
     const words = productName.split(" ").filter((word) => word.length >= 4)
     return product.id === contextualId
@@ -152,7 +153,7 @@ function budgetReply(message: string) {
     )
   }
 
-  const matching = DEMO_PRODUCTS
+  const matching = MIRA_PRODUCTS
     .filter((product) => product.in_stock && Number(product.price) <= budget)
     .sort((left, right) => Number(right.price) - Number(left.price))
 

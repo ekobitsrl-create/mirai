@@ -1,5 +1,5 @@
 import type { NextRequest } from "next/server"
-import { DEMO_PRODUCTS, withDemoProducts, type StoreProduct } from "@/lib/products"
+import { DEMO_PRODUCTS, isStripeTestProduct, withDemoProducts, type StoreProduct } from "@/lib/products"
 import { createClient } from "@/lib/supabase/server"
 
 export const runtime = "nodejs"
@@ -247,7 +247,9 @@ function renderProductVariant(product: StoreProduct, size: string, baseUrl: stri
 export async function GET(request: NextRequest) {
   const baseUrl = getBaseUrl(request)
   const catalogProducts = await getCatalogProducts()
-  const products = catalogProducts.filter((product) => product.image_url && Number(product.price) > 0)
+  const products = catalogProducts.filter(
+    (product) => product.image_url && Number(product.price) > 0 && !isStripeTestProduct(product),
+  )
   const items = products.flatMap((product) =>
     getSizes(product).map((size) => renderProductVariant(product, size, baseUrl)),
   )

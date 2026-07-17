@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next"
 import { createClient } from "@/lib/supabase/server"
-import { DEMO_PRODUCTS, withoutBlackIslandProducts } from "@/lib/products"
+import { DEMO_PRODUCTS, isStripeTestProduct, withoutBlackIslandProducts } from "@/lib/products"
 
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://mirai-clothing.vercel.app"
 
@@ -29,7 +29,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const databaseProductIds = new Set(visibleDatabaseProducts.map((product) => product.id))
   const staticProductUrls: MetadataRoute.Sitemap = DEMO_PRODUCTS
-    .filter((product) => product.in_stock && !databaseProductIds.has(product.id))
+    .filter((product) => product.in_stock && !databaseProductIds.has(product.id) && !isStripeTestProduct(product))
     .map((product) => ({
       url: `${BASE_URL}/prodotto/${product.id}`,
       lastModified: product.created_at,

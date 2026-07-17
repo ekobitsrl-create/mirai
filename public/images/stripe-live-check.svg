@@ -1,0 +1,31 @@
+<svg width="1200" height="1500" viewBox="0 0 1200 1500" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="halo" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(610 750) rotate(90) scale(690 560)">
+      <stop stop-color="#7C4DFF" stop-opacity="0.62"/>
+      <stop offset="0.48" stop-color="#9F86FF" stop-opacity="0.16"/>
+      <stop offset="1" stop-color="#08060C" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="card" x1="250" y1="250" x2="970" y2="1280" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#24162F"/>
+      <stop offset="1" stop-color="#0B080F"/>
+    </linearGradient>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="20" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <rect width="1200" height="1500" fill="#08060C"/>
+  <rect width="1200" height="1500" fill="url(#halo)"/>
+  <circle cx="190" cy="250" r="170" fill="#D54DFF" fill-opacity="0.08"/>
+  <circle cx="1040" cy="1210" r="230" fill="#7C4DFF" fill-opacity="0.1"/>
+  <rect x="180" y="230" width="840" height="1040" rx="72" fill="url(#card)"/>
+  <rect x="182" y="232" width="836" height="1036" rx="70" stroke="#9F86FF" stroke-opacity="0.18" stroke-width="4"/>
+  <circle cx="600" cy="560" r="126" fill="#9F86FF" fill-opacity="0.11" filter="url(#glow)"/>
+  <path d="M537 563L580 606L670 516" stroke="#D8CDFF" stroke-width="22" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow)"/>
+  <text x="600" y="330" text-anchor="middle" fill="#B8A6FF" font-family="Arial, sans-serif" font-size="30" font-weight="700" letter-spacing="10">MIRAI LAB</text>
+  <text x="600" y="790" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="74" font-weight="800" letter-spacing="2">LIVE CHECK</text>
+  <text x="600" y="850" text-anchor="middle" fill="#B8A6FF" font-family="Arial, sans-serif" font-size="28" font-weight="700" letter-spacing="8">STRIPE TEST</text>
+  <rect x="430" y="960" width="340" height="124" rx="62" fill="#7C4DFF"/>
+  <text x="600" y="1043" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="62" font-weight="800">€2,00</text>
+  <text x="600" y="1170" text-anchor="middle" fill="white" fill-opacity="0.45" font-family="Arial, sans-serif" font-size="23" letter-spacing="4">PRODOTTO TECNICO TEMPORANEO</text>
+</svg>

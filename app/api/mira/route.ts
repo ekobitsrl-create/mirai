@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
-import { DEMO_PRODUCTS, withDemoProducts, type StoreProduct } from "@/lib/products"
+import { DEMO_PRODUCTS, isStripeTestProduct, withDemoProducts, type StoreProduct } from "@/lib/products"
 import { formatShippingPrice, SHIPPING_CONFIG } from "@/lib/shipping"
 
 export const runtime = "nodejs"
@@ -77,9 +77,9 @@ async function getCatalog() {
       .order("created_at", { ascending: false })
       .limit(40)
 
-    return withDemoProducts((data || []) as StoreProduct[])
+    return withDemoProducts((data || []) as StoreProduct[]).filter((product) => !isStripeTestProduct(product))
   } catch {
-    return DEMO_PRODUCTS
+    return DEMO_PRODUCTS.filter((product) => !isStripeTestProduct(product))
   }
 }
 

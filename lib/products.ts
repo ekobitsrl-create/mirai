@@ -61,6 +61,34 @@ export const VALLEY_ATHLETIC_TEE: StoreProduct = {
   care: "Lavare al rovescio a 30°C con colori simili. Non candeggiare e non stirare direttamente sulla stampa.",
 }
 
+export const STRIPE_LIVE_TEST_PRODUCT: StoreProduct = {
+  id: "mirai-stripe-live-check-2-euro",
+  name: "MIRAI Stripe Live Check",
+  description:
+    "Prodotto tecnico temporaneo da 2 euro creato per verificare il checkout Stripe in modalità live. Non corrisponde a un articolo fisico e non prevede alcuna spedizione.",
+  price: 2,
+  category: "test-stripe",
+  image_url: "/images/stripe-live-check.svg",
+  sizes: ["TEST"],
+  in_stock: true,
+  is_new: false,
+  created_at: "2026-07-17T12:00:00.000Z",
+  brand: "MIRAI LAB",
+  supplier_sku: "STRIPE-LIVE-002",
+  color_name: "Neon viola",
+  color_hex: "#7c4dff",
+  fit_note: "Seleziona la taglia TEST per procedere al pagamento.",
+  detail_items: [
+    "Importo reale di prova: 2,00 euro",
+    "Checkout live gestito da Stripe",
+    "Nessun articolo fisico verrà spedito",
+    "Prodotto temporaneo, rimovibile dopo la verifica",
+  ],
+  composition: "Prodotto tecnico digitale per il collaudo del sistema di pagamento.",
+  care: "Dopo il pagamento di prova, il prodotto può essere rimosso dal catalogo.",
+  stock_by_size: { TEST: 25 },
+}
+
 export const ORDERED_PRODUCTS: StoreProduct[] = [
   {
     id: "minimal-m0230-bermuda-camouflage-crystal",
@@ -514,7 +542,7 @@ export const ORDERED_PRODUCTS: StoreProduct[] = [
   },
 ]
 
-export const DEMO_PRODUCTS: StoreProduct[] = [...ORDERED_PRODUCTS, VALLEY_ATHLETIC_TEE]
+export const DEMO_PRODUCTS: StoreProduct[] = [...ORDERED_PRODUCTS, VALLEY_ATHLETIC_TEE, STRIPE_LIVE_TEST_PRODUCT]
 
 export const CUSTOM_TEE_PRODUCT: StoreProduct = {
   id: CUSTOM_TEE_PRODUCT_ID,
@@ -538,6 +566,10 @@ const BLACK_ISLAND_PATTERN = /black[\s_-]*island/i
 export function isBlackIslandProduct(product: ProductIdentity) {
   return BLACK_ISLAND_PATTERN.test(product.name || "")
     || BLACK_ISLAND_PATTERN.test(product.image_url || "")
+}
+
+export function isStripeTestProduct(product: ProductIdentity & { id?: string | null }) {
+  return product.id === STRIPE_LIVE_TEST_PRODUCT.id
 }
 
 export function withoutBlackIslandProducts<T extends ProductIdentity>(products: T[]) {
