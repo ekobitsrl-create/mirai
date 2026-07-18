@@ -29,6 +29,13 @@ export function Footer() {
     de: "Unsere Beats",
     fr: "Nos Beats",
   }[locale]
+  const storeAddressLabel = {
+    it: "Indirizzo negozio",
+    en: "Store address",
+    es: "Direccion de la tienda",
+    de: "Ladenadresse",
+    fr: "Adresse de la boutique",
+  }[locale]
   const communityLabel = {
     it: "Community",
     en: "Community",
@@ -134,14 +141,25 @@ export function Footer() {
                 </div>
               </div>
             </div>
-            <div className="grid gap-3 text-xs text-muted-foreground sm:grid-cols-2 lg:max-w-xl">
-              <span className="flex items-start gap-2.5">
+            <div className="grid gap-5 text-xs text-muted-foreground sm:grid-cols-2 lg:max-w-xl">
+              <a
+                href="https://www.google.com/maps/search/?api=1&query=Via+Umberto+95%2C+95129+Catania+CT"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-start gap-2.5 transition-colors hover:text-foreground"
+              >
                 <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-                Via Umberto 95, 95129 Catania (CT)
-              </span>
+                <span>
+                  <span className="mb-1 block text-[9px] font-bold uppercase tracking-[0.2em] text-primary">{storeAddressLabel}</span>
+                  Via Umberto 95, 95129 Catania (CT)
+                </span>
+              </a>
               <a href="mailto:mirailabstore@pec.it" className="flex items-start gap-2.5 transition-colors hover:text-foreground">
                 <Mail className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-                mirailabstore@pec.it
+                <span>
+                  <span className="mb-1 block text-[9px] font-bold uppercase tracking-[0.2em] text-primary">PEC</span>
+                  mirailabstore@pec.it
+                </span>
               </a>
             </div>
           </div>

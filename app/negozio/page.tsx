@@ -1,6 +1,6 @@
 import type { Metadata } from "next"
 import Link from "next/link"
-import { ArrowRight, BellRing, MapPin, Sparkles } from "lucide-react"
+import { ArrowRight, BellRing, ExternalLink, MapPin, Sparkles } from "lucide-react"
 import { Navbar } from "@/components/navbar"
 import { Footer } from "@/components/footer"
 
@@ -31,7 +31,7 @@ export default function NegozioPage() {
             </h1>
 
             <p className="mt-7 max-w-lg text-sm leading-7 text-white/55 sm:text-base">
-              Un punto d’incontro tra streetwear, custom culture e persone. Stiamo preparando il primo spazio MIRAI: data, indirizzo e accessi verranno svelati alla community.
+              Un punto d’incontro tra streetwear, custom culture e persone. Stiamo preparando il primo spazio MIRAI in Via Umberto 95, Catania: data e accessi verranno svelati alla community.
             </p>
 
             <div className="mt-8 flex flex-wrap gap-3">
@@ -77,6 +77,40 @@ export default function NegozioPage() {
                 <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-primary shadow-[0_0_12px_rgba(159,134,255,1)]" />
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="border-t border-white/10 bg-black/20 px-5 py-16 sm:px-6 sm:py-20">
+        <div className="mx-auto grid max-w-7xl gap-8 lg:grid-cols-[0.42fr_0.58fr] lg:items-stretch">
+          <div className="flex flex-col justify-between py-2">
+            <div>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-primary">Dove trovarci</p>
+              <h2 className="mt-4 max-w-md font-[family-name:var(--font-space-grotesk)] text-3xl font-bold uppercase leading-tight sm:text-4xl">
+                Via Umberto 95,<br />Catania.
+              </h2>
+              <p className="mt-5 max-w-md text-sm leading-7 text-white/55">
+                95129 Catania (CT). La mappa ti porta direttamente al futuro spazio MIRAI LAB STORE.
+              </p>
+            </div>
+            <a
+              href="https://www.google.com/maps/search/?api=1&query=Via+Umberto+95%2C+95129+Catania+CT"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-8 inline-flex w-fit items-center gap-2 border-b border-primary pb-2 text-[10px] font-bold uppercase tracking-[0.2em] text-white transition-colors hover:text-primary"
+            >
+              Apri in Google Maps <ExternalLink className="h-3.5 w-3.5" />
+            </a>
+          </div>
+
+          <div className="min-h-[360px] overflow-hidden border border-white/12 bg-[#111015] sm:min-h-[440px]">
+            <iframe
+              title="Mappa del negozio MIRAI LAB STORE, Via Umberto 95 Catania"
+              src="https://www.google.com/maps?q=Via%20Umberto%2095%2C%2095129%20Catania%20CT&z=16&output=embed"
+              className="h-full min-h-[360px] w-full border-0 sm:min-h-[440px]"
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+            />
           </div>
         </div>
       </section>
