@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
-import { DEMO_PRODUCTS, isPrivateCheckoutProduct, withDemoProducts, type StoreProduct } from "@/lib/products"
+import { isPrivateCheckoutProduct, withDemoProducts, type StoreProduct } from "@/lib/products"
 import { formatShippingPrice, SHIPPING_CONFIG } from "@/lib/shipping"
 
 export const runtime = "nodejs"
@@ -79,7 +79,7 @@ async function getCatalog() {
 
     return withDemoProducts((data || []) as StoreProduct[]).filter((product) => !isPrivateCheckoutProduct(product))
   } catch {
-    return DEMO_PRODUCTS.filter((product) => !isPrivateCheckoutProduct(product))
+    return []
   }
 }
 
