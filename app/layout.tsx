@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next'
 import { Inter, Space_Grotesk } from 'next/font/google'
+import Script from 'next/script'
 import { Analytics } from '@vercel/analytics/next'
 import { CartProvider } from '@/lib/cart-context'
 import { LanguageProvider } from '@/lib/language-context'
@@ -15,6 +16,7 @@ const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
 const spaceGrotesk = Space_Grotesk({ subsets: ['latin'], variable: '--font-space-grotesk' })
 
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://mirai-clothing.vercel.app"
+const GOOGLE_ANALYTICS_ID = "G-CY0KQKG7VG"
 
 export const metadata: Metadata = {
   metadataBase: new URL(BASE_URL),
@@ -109,6 +111,25 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="it" data-scroll-behavior="smooth">
+      <head>
+        <Script
+          src={`https://www.googletagmanager.com/gtag/js?id=${GOOGLE_ANALYTICS_ID}`}
+          strategy="beforeInteractive"
+        />
+        <Script id="mirai-google-analytics" strategy="beforeInteractive">
+          {`window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('consent', 'default', {
+  analytics_storage: 'denied',
+  ad_storage: 'denied',
+  ad_user_data: 'denied',
+  ad_personalization: 'denied',
+  wait_for_update: 500
+});
+gtag('js', new Date());
+gtag('config', '${GOOGLE_ANALYTICS_ID}');`}
+        </Script>
+      </head>
       <body className={`${inter.variable} ${spaceGrotesk.variable} font-sans antialiased`}>
         <script
           type="application/ld+json"

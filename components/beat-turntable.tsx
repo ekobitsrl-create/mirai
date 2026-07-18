@@ -6,13 +6,11 @@ import { Disc3, Pause, Play, SkipBack, SkipForward, Volume2 } from "lucide-react
 
 const TRACKS = [
   {
-    title: "MIRAI Soundtrack",
-    subtitle: "Sottofondo attuale del sito",
+    title: "Mirai Beat 1",
     src: "/audio/mirai-soundtrack.mpeg",
   },
   {
-    title: "MIRAI Beat",
-    subtitle: "Sottofondo precedente",
+    title: "Mirai Beat 2",
     src: "/audio/mirai-beat.wav",
   },
 ] as const
@@ -113,7 +111,7 @@ export function BeatTurntable() {
       />
 
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_16%_22%,rgba(0,210,190,0.18),transparent_26%),radial-gradient(circle_at_88%_20%,rgba(159,134,255,0.16),transparent_32%),linear-gradient(180deg,rgba(255,255,255,0.03),transparent_38%)]" />
-      <div className="relative mx-auto grid max-w-7xl gap-12 lg:grid-cols-[minmax(320px,0.9fr)_minmax(360px,1.1fr)] lg:items-center">
+      <div className="relative mx-auto grid max-w-7xl gap-12 lg:grid-cols-[minmax(300px,0.68fr)_minmax(580px,1.32fr)] lg:items-center">
         <div>
           <p className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.04] px-4 py-2 text-[9px] font-bold uppercase tracking-[0.24em] text-white/60">
             <Disc3 className="h-3.5 w-3.5 text-[#5eead4]" /> MIRAI radio
@@ -122,7 +120,7 @@ export function BeatTurntable() {
             I Nostri<br /><span className="text-[#5eead4]">Beat</span>
           </h1>
           <p className="mt-7 max-w-xl text-sm leading-7 text-white/55 sm:text-base">
-            Due tracce MIRAI, una console essenziale e il disco che gira quando parte il suono.
+            Il nostro studio di produzione. Acquistando i nostri capi puoi ottenerne uno.
           </p>
 
           <div className="mt-10 flex items-center gap-4">
@@ -154,30 +152,34 @@ export function BeatTurntable() {
           </div>
         </div>
 
-        <div className="grid gap-8 lg:grid-cols-[minmax(260px,0.95fr)_minmax(260px,1.05fr)] lg:items-center">
-          <div className="relative mx-auto aspect-square w-full max-w-[420px]">
-            <div className="absolute inset-0 rounded-full bg-[#050506] shadow-[0_35px_90px_rgba(0,0,0,0.58),0_0_70px_rgba(94,234,212,0.12)]" />
+        <div className="grid gap-8 lg:grid-cols-[minmax(390px,1.2fr)_minmax(270px,0.8fr)] lg:items-center">
+          <div className="relative mx-auto aspect-square w-full max-w-[600px]">
+            <div className="absolute inset-0 rounded-full border border-white/10 bg-[#050506] shadow-[0_40px_110px_rgba(0,0,0,0.7),0_0_100px_rgba(94,234,212,0.16)]" />
+            <div className="absolute inset-[2%] rounded-full border border-white/[0.07]" />
             <div
-              className={`absolute inset-[7%] rounded-full ${isPlaying ? "animate-spin" : ""}`}
+              className={`absolute inset-[6%] rounded-full ${isPlaying ? "animate-[spin_4s_linear_infinite]" : ""}`}
               style={{
-                animationDuration: "8s",
                 background:
-                  "repeating-radial-gradient(circle, #111 0 6px, #17171a 7px 9px, #0a0a0c 10px 13px), conic-gradient(from 90deg, rgba(255,255,255,.12), rgba(94,234,212,.2), rgba(255,255,255,.06), rgba(159,134,255,.24), rgba(255,255,255,.12))",
+                  "repeating-radial-gradient(circle, #101014 0 7px, #1b1b20 8px 10px, #070708 11px 15px), conic-gradient(from 15deg, rgba(94,234,212,.75) 0deg 3deg, transparent 4deg 125deg, rgba(255,255,255,.22) 126deg 129deg, transparent 130deg 250deg, rgba(159,134,255,.55) 251deg 255deg, transparent 256deg 360deg)",
               }}
             >
-              <div className="absolute inset-[35%] rounded-full border border-white/15 bg-[#141017] shadow-[inset_0_0_35px_rgba(159,134,255,0.28)]" />
-              <div className="absolute inset-[41%] flex items-center justify-center rounded-full bg-white">
-                <Image src="/favicon.svg" alt="" width={96} height={96} className="h-[76%] w-[76%] rounded-full" />
+              <div className="absolute inset-[32%] rounded-full border border-white/15 bg-[#141017] shadow-[inset_0_0_45px_rgba(159,134,255,0.32)]" />
+              <div className="absolute inset-[39%] flex items-center justify-center rounded-full border border-white/30 bg-white shadow-[0_0_30px_rgba(94,234,212,0.28)]">
+                <Image src="/favicon.svg" alt="" width={128} height={128} className="h-[76%] w-[76%] rounded-full" />
               </div>
+              <div className="absolute left-[49%] top-[5%] h-[9%] w-[2%] rounded-full bg-[#5eead4] shadow-[0_0_16px_rgba(94,234,212,0.9)]" />
+              <div className="absolute left-[8%] top-[49%] h-[2%] w-[9%] rounded-full bg-white/65" />
             </div>
-            <div className="absolute right-[5%] top-[10%] h-[58%] w-[12px] origin-top rotate-[26deg] rounded-full bg-gradient-to-b from-white/80 via-white/30 to-transparent shadow-[0_0_20px_rgba(255,255,255,0.22)]" />
-            <div className="absolute right-[6%] top-[7%] h-11 w-11 rounded-full border border-white/15 bg-white/[0.06]" />
+            <div className="absolute right-[5%] top-[8%] h-[62%] w-[14px] origin-top rotate-[26deg] rounded-full bg-gradient-to-b from-white/85 via-white/35 to-transparent shadow-[0_0_24px_rgba(255,255,255,0.24)]" />
+            <div className="absolute right-[5%] top-[5%] h-12 w-12 rounded-full border border-white/20 bg-white/[0.08]" />
+            <p className="absolute bottom-[8%] left-1/2 -translate-x-1/2 whitespace-nowrap text-[9px] font-bold uppercase tracking-[0.24em] text-white/45">
+              {isPlaying ? "In rotazione" : "Premi play"}
+            </p>
           </div>
 
           <div className="rounded-lg border border-white/12 bg-white/[0.035] p-5 shadow-[0_22px_70px_rgba(0,0,0,0.28)] sm:p-6">
             <p className="text-[9px] font-bold uppercase tracking-[0.24em] text-[#5eead4]">Now playing</p>
             <h2 className="mt-3 font-[family-name:var(--font-space-grotesk)] text-2xl font-bold uppercase tracking-tight">{currentTrack.title}</h2>
-            <p className="mt-2 text-sm text-white/45">{currentTrack.subtitle}</p>
 
             <div className="mt-7">
               <input
@@ -220,10 +222,7 @@ export function BeatTurntable() {
                     className={`flex w-full items-center justify-between gap-4 rounded-lg border px-4 py-3 text-left transition-colors ${active ? "border-[#5eead4]/70 bg-[#5eead4]/10 text-white" : "border-white/10 bg-black/10 text-white/55 hover:border-white/25 hover:text-white"}`}
                     aria-current={active ? "true" : undefined}
                   >
-                    <span>
-                      <span className="block text-sm font-semibold">{track.title}</span>
-                      <span className="mt-1 block text-[10px] uppercase tracking-[0.16em] text-white/35">{track.subtitle}</span>
-                    </span>
+                    <span className="block text-sm font-semibold">{track.title}</span>
                     <span className="font-mono text-xs text-white/35">{String(index + 1).padStart(2, "0")}</span>
                   </button>
                 )

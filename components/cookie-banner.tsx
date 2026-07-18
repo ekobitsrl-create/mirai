@@ -4,6 +4,23 @@ import { useState, useEffect } from "react"
 import Link from "next/link"
 import { useLanguage } from "@/lib/language-context"
 
+type GoogleConsentValue = "granted" | "denied"
+
+function updateGoogleConsent(consent: "all" | "necessary") {
+  const gtag = (window as Window & {
+    gtag?: (...args: unknown[]) => void
+  }).gtag
+
+  const value: GoogleConsentValue = consent === "all" ? "granted" : "denied"
+
+  gtag?.("consent", "update", {
+    analytics_storage: value,
+    ad_storage: value,
+    ad_user_data: value,
+    ad_personalization: value,
+  })
+}
+
 export function CookieBanner() {
   const [visible, setVisible] = useState(false)
   const { t } = useLanguage()
@@ -14,7 +31,11 @@ export function CookieBanner() {
       .find((row) => row.startsWith("cookie_consent="))
     let timer: ReturnType<typeof setTimeout> | undefined
 
-    if (!consent) {
+    if (consent === "cookie_consent=all") {
+      updateGoogleConsent("all")
+    } else if (consent === "cookie_consent=necessary") {
+      updateGoogleConsent("necessary")
+    } else {
       // Small delay so it doesn't flash on load
       timer = setTimeout(() => setVisible(true), 1000)
     }
@@ -30,6 +51,7 @@ export function CookieBanner() {
 
   function acceptAll() {
     document.cookie = "cookie_consent=all; path=/; max-age=31536000; SameSite=Lax"
+    updateGoogleConsent("all")
     window.dispatchEvent(new CustomEvent("mirai:cookie-consent", { detail: "all" }))
     setVisible(false)
   }
@@ -40,6 +62,7 @@ export function CookieBanner() {
       .some((row) => row === "cookie_consent=all")
 
     document.cookie = "cookie_consent=necessary; path=/; max-age=31536000; SameSite=Lax"
+    updateGoogleConsent("necessary")
     window.dispatchEvent(new CustomEvent("mirai:cookie-consent", { detail: "necessary" }))
     setVisible(false)
 
