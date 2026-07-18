@@ -100,7 +100,7 @@ export default function CookiePolicyPage() {
 
             <div className="flex flex-col gap-3">
               <h2 className="font-[family-name:var(--font-space-grotesk)] text-xl font-bold text-foreground">Aggiornamenti</h2>
-              <p>La presente Cookie Policy puo essere aggiornata periodicamente. Ti invitiamo a consultarla regolarmente. Per qualsiasi domanda, contattaci a <span className="text-primary">info@mirai.store</span> o visita la pagina <Link href="/privacy" className="text-primary hover:underline">Privacy Policy</Link>.</p>
+              <p>La presente Cookie Policy puo essere aggiornata periodicamente. Ti invitiamo a consultarla regolarmente. Per qualsiasi domanda, contattaci a <span className="text-primary">mirailabstore@gmail.com</span> o visita la pagina <Link href="/privacy" className="text-primary hover:underline">Privacy Policy</Link>.</p>
             </div>
           </div>
         </section>

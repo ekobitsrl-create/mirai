@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 }
 
 const returnSteps = [
-  "Scrivi entro 14 giorni dalla consegna a info@mirai.store indicando numero ordine, email usata per l'acquisto e motivo del reso.",
+  "Scrivi entro 14 giorni dalla consegna a mirailabstore@gmail.com indicando numero ordine, email usata per l'acquisto e motivo del reso.",
   "Riceverai le istruzioni di rientro. Per gli ordini spediti in Italia inviamo un'etichetta prepagata quando il reso e approvato.",
   "Imballa il prodotto in modo sicuro, preferibilmente nella confezione originale, con cartellini ed eventuali accessori.",
   "Consegna il pacco al corriere o al punto indicato nelle istruzioni di reso.",
@@ -144,7 +144,7 @@ export default function ResiPage() {
                 <div>
                   <h2 className="text-sm font-bold uppercase tracking-widest text-foreground">Contatto resi</h2>
                   <p className="mt-2 text-sm leading-6">
-                    Email: <a href="mailto:info@mirai.store" className="text-primary hover:underline">info@mirai.store</a>. In alternativa puoi usare la pagina <Link href="/contatti" className="text-primary hover:underline">Contatti</Link>.
+                    Email: <a href="mailto:mirailabstore@gmail.com" className="text-primary hover:underline">mirailabstore@gmail.com</a>. In alternativa puoi usare la pagina <Link href="/contatti" className="text-primary hover:underline">Contatti</Link>.
                   </p>
                 </div>
               </div>

@@ -132,7 +132,7 @@ function LoginForm() {
               <div className="mt-6 text-center text-sm text-muted-foreground">
                 {"Non hai un account? "}
                 <Link
-                  href="/auth/sign-up"
+                  href={redirectTo ? `/auth/sign-up?next=${encodeURIComponent(redirectTo)}` : "/auth/sign-up"}
                   className="text-foreground underline underline-offset-4 hover:text-primary transition-colors"
                 >
                   Registrati

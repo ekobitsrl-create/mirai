@@ -1,101 +1,178 @@
 "use client"
 
-import { Suspense, useEffect } from "react"
+import { Suspense, useEffect, useState } from "react"
 import { useSearchParams } from "next/navigation"
 import Link from "next/link"
-import { CheckCircle, Package, ArrowRight } from "lucide-react"
+import { AlertCircle, ArrowRight, CheckCircle2, Package } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { useCart } from "@/lib/cart-context"
 import { Spinner } from "@/components/ui/spinner"
+import { useCart } from "@/lib/cart-context"
 
-/**
- * Componente interno che usa useSearchParams
- * Deve essere avvolto in Suspense
- */
+type OrderSummary = {
+  id: string
+  email: string
+  amountTotal: number
+  currency: string
+  shipping: {
+    name: string | null
+    address: string | null
+    city: string | null
+    postalCode: string | null
+    country: string | null
+  } | null
+  items: Array<{ name: string; quantity: number; amount: number }>
+}
+
+function formatPrice(value: number, currency: string) {
+  return new Intl.NumberFormat("it-IT", {
+    style: "currency",
+    currency: currency.toUpperCase(),
+  }).format(value)
+}
+
 function SuccessContent() {
   const searchParams = useSearchParams()
   const sessionId = searchParams.get("session_id")
   const { clearCart } = useCart()
+  const [order, setOrder] = useState<OrderSummary | null>(null)
+  const [status, setStatus] = useState<"loading" | "pending" | "error" | "success">("loading")
 
-  // Svuota il carrello al caricamento della pagina
   useEffect(() => {
-    clearCart()
-  }, [clearCart])
+    if (!sessionId) {
+      setStatus("error")
+      return
+    }
+
+    let active = true
+    void fetch(`/api/checkout/session?session_id=${encodeURIComponent(sessionId)}`, { credentials: "include" })
+      .then(async (response) => {
+        if (!active) return
+        if (response.ok) {
+          const summary = (await response.json()) as OrderSummary
+          setOrder(summary)
+          setStatus("success")
+          clearCart()
+          return
+        }
+        setStatus(response.status === 409 ? "pending" : "error")
+      })
+      .catch(() => {
+        if (active) setStatus("error")
+      })
+
+    return () => {
+      active = false
+    }
+  }, [clearCart, sessionId])
+
+  if (status === "loading") {
+    return (
+      <main className="flex min-h-screen items-center justify-center bg-background">
+        <Spinner className="h-8 w-8" />
+      </main>
+    )
+  }
+
+  if (status === "pending") {
+    return (
+      <main className="flex min-h-screen items-center justify-center bg-background px-6">
+        <section className="w-full max-w-md border border-border bg-card p-8 text-center">
+          <Package className="mx-auto h-12 w-12 text-primary" />
+          <h1 className="mt-5 text-2xl font-bold text-foreground">Pagamento in verifica</h1>
+          <p className="mt-3 text-sm leading-6 text-muted-foreground">
+            Stiamo ricevendo la conferma del pagamento. Aggiorna questa pagina tra qualche istante.
+          </p>
+          <Button className="mt-7 w-full" onClick={() => window.location.reload()}>
+            Aggiorna stato
+          </Button>
+        </section>
+      </main>
+    )
+  }
+
+  if (status === "error" || !order) {
+    return (
+      <main className="flex min-h-screen items-center justify-center bg-background px-6">
+        <section className="w-full max-w-md border border-border bg-card p-8 text-center">
+          <AlertCircle className="mx-auto h-12 w-12 text-destructive" />
+          <h1 className="mt-5 text-2xl font-bold text-foreground">Ordine non disponibile</h1>
+          <p className="mt-3 text-sm leading-6 text-muted-foreground">
+            Accedi con il MIRAI PASS usato per il pagamento per visualizzare la conferma e i tuoi ordini.
+          </p>
+          <Link href="/account" className="mt-7 inline-flex w-full">
+            <Button className="w-full">Vai al mio account</Button>
+          </Link>
+        </section>
+      </main>
+    )
+  }
+
+  const shippingLine = [order.shipping?.postalCode, order.shipping?.city, order.shipping?.country]
+    .filter(Boolean)
+    .join(" ")
 
   return (
-    <main className="min-h-screen bg-background flex items-center justify-center px-6">
-      <div className="max-w-md w-full text-center">
-        {/* Icona successo */}
-        <div className="mb-8 flex justify-center">
-          <div className="relative">
-            <div className="absolute inset-0 bg-green-500/20 rounded-full blur-xl animate-pulse" />
-            <div className="relative bg-green-500/10 rounded-full p-6">
-              <CheckCircle className="h-16 w-16 text-green-500" />
-            </div>
+    <main className="min-h-screen bg-background px-6 py-16">
+      <section className="mx-auto w-full max-w-2xl">
+        <div className="text-center">
+          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-green-500/10 text-green-500">
+            <CheckCircle2 className="h-9 w-9" />
           </div>
+          <h1 className="mt-6 text-3xl font-bold text-foreground" style={{ fontFamily: "var(--font-space-grotesk)" }}>
+            Grazie per il tuo ordine
+          </h1>
+          <p className="mx-auto mt-3 max-w-lg text-sm leading-6 text-muted-foreground">
+            La conferma di pagamento e stata inviata a {order.email}. Prepariamo il tuo ordine e ti avviseremo alla spedizione.
+          </p>
         </div>
 
-        {/* Titolo */}
-        <h1 
-          className="text-3xl font-bold text-foreground mb-4"
-          style={{ fontFamily: "var(--font-space-grotesk)" }}
-        >
-          Ordine Confermato!
-        </h1>
-
-        {/* Messaggio */}
-        <p className="text-muted-foreground mb-8 leading-relaxed">
-          Grazie per il tuo acquisto! Riceverai una email di conferma con i dettagli 
-          del tuo ordine e le informazioni per la spedizione.
-        </p>
-
-        {/* Info ordine */}
-        <div className="bg-card border border-border rounded-lg p-6 mb-8">
-          <div className="flex items-center justify-center gap-3 mb-4">
-            <Package className="h-5 w-5 text-primary" />
-            <span className="font-medium">Dettagli Spedizione</span>
+        <div className="mt-10 border border-border bg-card">
+          <div className="flex items-center justify-between border-b border-border px-6 py-4">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Ordine</p>
+              <p className="mt-1 font-mono text-sm text-foreground">#{order.id.slice(-8).toUpperCase()}</p>
+            </div>
+            <p className="text-lg font-bold text-foreground">{formatPrice(order.amountTotal, order.currency)}</p>
           </div>
-          <p className="text-sm text-muted-foreground">
-            Il tuo ordine verrà preparato e spedito entro 1-2 giorni lavorativi.
-            Riceverai un&apos;email con il tracking non appena il pacco sarà partito.
-          </p>
-          {sessionId && (
-            <p className="text-xs text-muted-foreground/60 mt-4 font-mono">
-              ID Sessione: {sessionId.slice(0, 20)}...
-            </p>
+
+          <div className="divide-y divide-border px-6">
+            {order.items.map((item, index) => (
+              <div key={`${item.name}-${index}`} className="flex items-center justify-between gap-6 py-4 text-sm">
+                <p className="min-w-0 text-foreground">{item.name} <span className="text-muted-foreground">x{item.quantity}</span></p>
+                <p className="shrink-0 text-muted-foreground">{formatPrice(item.amount, order.currency)}</p>
+              </div>
+            ))}
+          </div>
+
+          {order.shipping && (
+            <div className="border-t border-border px-6 py-5">
+              <div className="flex items-center gap-2 text-sm font-medium text-foreground">
+                <Package className="h-4 w-4 text-primary" />
+                Spedizione
+              </div>
+              <p className="mt-2 text-sm text-muted-foreground">{order.shipping.name}</p>
+              {order.shipping.address && <p className="text-sm text-muted-foreground">{order.shipping.address}</p>}
+              {shippingLine && <p className="text-sm text-muted-foreground">{shippingLine}</p>}
+            </div>
           )}
         </div>
 
-        {/* CTA */}
-        <div className="flex flex-col gap-3">
-          <Link href="/collezioni/abbigliamento">
-            <Button className="w-full" size="lg">
-              Continua lo Shopping
-              <ArrowRight className="ml-2 h-4 w-4" />
-            </Button>
+        <div className="mt-6 grid gap-3 sm:grid-cols-2">
+          <Link href="/account" className="inline-flex">
+            <Button className="w-full">I miei ordini <Package className="ml-2 h-4 w-4" /></Button>
           </Link>
-          <Link href="/">
-            <Button variant="outline" className="w-full">
-              Torna alla Home
-            </Button>
+          <Link href="/collezioni" className="inline-flex">
+            <Button variant="outline" className="w-full">Continua lo shopping <ArrowRight className="ml-2 h-4 w-4" /></Button>
           </Link>
         </div>
-      </div>
+      </section>
     </main>
   )
 }
 
-/**
- * Pagina di successo dopo il pagamento
- * Avvolge il contenuto in Suspense per supportare useSearchParams
- */
 export default function SuccessPage() {
   return (
-    <Suspense fallback={
-      <main className="min-h-screen bg-background flex items-center justify-center">
-        <Spinner size="lg" />
-      </main>
-    }>
+    <Suspense fallback={<main className="flex min-h-screen items-center justify-center bg-background"><Spinner className="h-8 w-8" /></main>}>
       <SuccessContent />
     </Suspense>
   )

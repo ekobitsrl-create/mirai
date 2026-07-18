@@ -20,7 +20,7 @@ const faqs = [
       },
       {
         q: "Posso modificare o annullare un ordine?",
-        a: "Puoi richiedere la modifica o l'annullamento entro 2 ore dall'ordine scrivendo a info@mirai.store. Una volta spedito, l'ordine non puo essere annullato ma puoi effettuare un reso.",
+        a: "Puoi richiedere la modifica o l'annullamento entro 2 ore dall'ordine scrivendo a mirailabstore@gmail.com. Una volta spedito, l'ordine non puo essere annullato ma puoi effettuare un reso.",
       },
       {
         q: "Ricevero una conferma dell'ordine?",

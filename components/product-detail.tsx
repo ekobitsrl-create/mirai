@@ -157,6 +157,11 @@ export function ProductDetail({
       })
       const result = await response.json()
 
+      if (response.status === 401 && result.authRequired) {
+        window.location.assign(`/auth/sign-up?next=${encodeURIComponent(`/prodotto/${product.id}`)}`)
+        return
+      }
+
       if (!response.ok || !result.url) {
         throw new Error(result.error || "Pagamento momentaneamente non disponibile")
       }

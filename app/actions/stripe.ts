@@ -1,7 +1,7 @@
 'use server'
 
 import { assertStripeConfigured, stripe } from '@/lib/stripe'
-import { createClient } from '@/lib/supabase/server'
+import { createClient, getServerUser } from '@/lib/supabase/server'
 import { getDemoProduct, isBlackIslandProduct, type StoreProduct } from '@/lib/products'
 import { getStripeShippingOptions, SHIPPING_CONFIG } from '@/lib/shipping'
 import {
@@ -21,6 +21,11 @@ type CartLineItem = {
 
 export async function createCheckoutSession(cartItems: CartLineItem[]) {
   assertStripeConfigured()
+  const user = await getServerUser()
+  if (!user?.email) {
+    throw new Error('Accedi o crea il tuo MIRAI PASS per completare il pagamento')
+  }
+
   if (!cartItems.length) {
     throw new Error('Il carrello è vuoto')
   }
@@ -95,7 +100,11 @@ export async function createCheckoutSession(cartItems: CartLineItem[]) {
           images: product.image_url
             ? [product.image_url.startsWith('http') ? product.image_url : `${baseUrl}${product.image_url.startsWith('/') ? '' : '/'}${product.image_url}`]
             : undefined,
-          ...(customization ? { metadata: customizationMetadata(customization) } : {}),
+          metadata: {
+            product_id: product.id,
+            ...(cartItem.size ? { size: cartItem.size } : {}),
+            ...(customization ? customizationMetadata(customization) : {}),
+          },
         },
         unit_amount: Math.round(Number(product.price) * 100),
       },
@@ -114,13 +123,26 @@ export async function createCheckoutSession(cartItems: CartLineItem[]) {
     return_url: `${baseUrl}/success?session_id={CHECKOUT_SESSION_ID}`,
     line_items: lineItems,
     mode: 'payment',
-    // Guest checkout: collect email and shipping without requiring an account
     customer_creation: 'always',
+    customer_email: user.email,
+    client_reference_id: user.id,
+    metadata: {
+      user_id: user.id,
+      order_item_count: String(cartItems.length),
+    },
+    payment_intent_data: {
+      receipt_email: user.email,
+      metadata: { user_id: user.id },
+    },
     shipping_address_collection: {
       allowed_countries: [...SHIPPING_CONFIG.allowedCountries],
     },
     shipping_options: getStripeShippingOptions(subtotalCents),
   })
 
-  return session.client_secret
+  if (!session.client_secret) {
+    throw new Error('Impossibile inizializzare il pagamento')
+  }
+
+  return { clientSecret: session.client_secret, sessionId: session.id }
 }

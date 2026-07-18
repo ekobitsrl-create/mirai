@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import type Stripe from 'stripe'
 import { assertStripeConfigured, stripe } from '@/lib/stripe'
-import { createClient } from '@/lib/supabase/server'
+import { createClient, getServerUser } from '@/lib/supabase/server'
 import { getDemoProduct, isBlackIslandProduct, type StoreProduct } from '@/lib/products'
 import { getStripeShippingOptions, SHIPPING_CONFIG } from '@/lib/shipping'
 import {
@@ -30,6 +30,14 @@ type CheckoutCartItem = {
 export async function POST(request: NextRequest) {
   try {
     assertStripeConfigured()
+    const user = await getServerUser()
+    if (!user?.email) {
+      return NextResponse.json(
+        { error: 'Accedi o crea il tuo MIRAI PASS per completare il pagamento', authRequired: true },
+        { status: 401 }
+      )
+    }
+
     const body = await request.json()
     const { items, priceId, paymentMethod, cancelPath } = body
 
@@ -79,6 +87,14 @@ export async function POST(request: NextRequest) {
         shipping_options: getStripeShippingOptions(price.unit_amount),
         success_url: `${baseUrl}/success?session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${baseUrl}${safeCancelPath}`,
+        customer_creation: 'always',
+        customer_email: user.email,
+        client_reference_id: user.id,
+        metadata: { user_id: user.id, order_item_count: '1' },
+        payment_intent_data: {
+          receipt_email: user.email,
+          metadata: { user_id: user.id },
+        },
       })
 
       return NextResponse.json({ url: session.url })
@@ -169,7 +185,11 @@ export async function POST(request: NextRequest) {
             images: product.image_url
               ? [product.image_url.startsWith('http') ? product.image_url : `${baseUrl}${product.image_url.startsWith('/') ? '' : '/'}${product.image_url}`]
               : undefined,
-            ...(customization ? { metadata: customizationMetadata(customization) } : {}),
+            metadata: {
+              product_id: product.id,
+              ...(cartItem.size ? { size: cartItem.size } : {}),
+              ...(customization ? customizationMetadata(customization) : {}),
+            },
           },
           unit_amount: Math.round(Number(product.price) * 100), // Stripe usa i centesimi
         },
@@ -204,10 +224,18 @@ export async function POST(request: NextRequest) {
       cancel_url: `${baseUrl}${safeCancelPath}`,
       // Metadata per tracciamento ordine
       metadata: {
+        user_id: user.id,
         ...(compactOrderItems.length <= 500
           ? { order_items: compactOrderItems }
           : { order_item_count: String(items.length) }),
         ...(quickPaymentMethod ? { requested_payment_method: quickPaymentMethod } : {}),
+      },
+      customer_creation: 'always',
+      customer_email: user.email,
+      client_reference_id: user.id,
+      payment_intent_data: {
+        receipt_email: user.email,
+        metadata: { user_id: user.id },
       },
     })
 

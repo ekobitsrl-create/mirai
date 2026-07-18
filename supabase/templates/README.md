@@ -18,6 +18,6 @@ Configurazione da applicare nel progetto Supabase prima del lancio pubblico.
 Configurare un provider SMTP in **Authentication > Emails > SMTP Settings**.
 
 - Sender name: `MIRAI LAB STORE`
-- Sender email consigliata: `community@mirailabstore.com` oppure `noreply@mirailabstore.com`
+- Sender email consigliata: `mirailabstore@gmail.com`
 
 Le credenziali SMTP non devono essere salvate nel repository.

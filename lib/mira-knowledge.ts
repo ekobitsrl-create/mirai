@@ -281,15 +281,15 @@ export function getMiraLocalReply(rawMessage: string, context: MiraKnowledgeCont
   }
 
   if (hasAny(message, ["annullare", "cancellare ordine", "modificare ordine", "cambiare ordine", "ordine sbagliato"])) {
-    return answer("order", "Puoi chiedere modifica o annullamento entro 2 ore dall’ordine scrivendo a info@mirai.store. Se è già stato spedito, non può essere annullato ma puoi richiedere un reso.", "/contatti", "Contatta MIRAI")
+    return answer("order", "Puoi chiedere modifica o annullamento entro 2 ore dall’ordine scrivendo a mirailabstore@gmail.com. Se è già stato spedito, non può essere annullato ma puoi richiedere un reso.", "/contatti", "Contatta MIRAI")
   }
 
   if (hasAny(message, ["conferma ordine", "email ordine", "non ho ricevuto", "ricevuta", "numero ordine"])) {
-    return answer("order", "Dopo l’acquisto ricevi un’email con riepilogo e numero d’ordine. Controlla anche spam e promozioni; se manca, scrivi a info@mirai.store.", "/contatti", "Contatta MIRAI")
+    return answer("order", "Dopo l’acquisto ricevi un’email con riepilogo e numero d’ordine. Controlla anche spam e promozioni; se manca, scrivi a mirailabstore@gmail.com.", "/contatti", "Contatta MIRAI")
   }
 
   if (hasAny(message, ["dov e il mio ordine", "dove e il mio ordine", "stato ordine", "tracciare", "tracciamento", "tracking", "pacco"])) {
-    return answer("tracking", "Il codice di tracking arriva via email dopo la spedizione e può impiegare fino a 24 ore per attivarsi. Io non posso vedere i dati del tuo ordine: se serve assistenza, indica il numero d’ordine a info@mirai.store.", "/spedizioni", "Info tracking")
+    return answer("tracking", "Il codice di tracking arriva via email dopo la spedizione e può impiegare fino a 24 ore per attivarsi. Io non posso vedere i dati del tuo ordine: se serve assistenza, indica il numero d’ordine a mirailabstore@gmail.com.", "/spedizioni", "Info tracking")
   }
 
   if (asksShipping) {
@@ -339,7 +339,7 @@ export function getMiraLocalReply(rawMessage: string, context: MiraKnowledgeCont
   }
 
   if (hasAny(message, ["contatto", "contattare", "email", "telefono", "parlare con qualcuno", "operatore", "persona vera", "assistenza"])) {
-    return answer("contact", "Puoi scrivere a info@mirai.store oppure usare la pagina Contatti. Per un ordine esistente includi sempre il numero d’ordine.", "/contatti", "Contatta MIRAI")
+    return answer("contact", "Puoi scrivere a mirailabstore@gmail.com oppure usare la pagina Contatti. Per un ordine esistente includi sempre il numero d’ordine.", "/contatti", "Contatta MIRAI")
   }
 
   if (hasAny(message, ["account", "accedere", "login", "registrazione", "registrarmi", "password"])) {

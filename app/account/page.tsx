@@ -10,6 +10,23 @@ import { isAdminEmail } from "@/lib/admin"
 import { AdminPanel } from "@/components/admin-panel"
 import { CommunityPreview } from "@/components/mirai-community"
 
+type AccountOrder = {
+  id: string
+  total: number
+  status: string
+  created_at: string
+  order_items: Array<{ id: string; product_name: string; quantity: number }>
+}
+
+const orderStatusLabels: Record<string, string> = {
+  pending: "In attesa",
+  confirmed: "Confermato",
+  processing: "In lavorazione",
+  shipped: "Spedito",
+  delivered: "Consegnato",
+  cancelled: "Annullato",
+}
+
 export default function AccountPage() {
   const supabase = createClient()
   const router = useRouter()
@@ -17,6 +34,7 @@ export default function AccountPage() {
   const [profile, setProfile] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [isAdmin, setIsAdmin] = useState(false)
+  const [orders, setOrders] = useState<AccountOrder[]>([])
 
   useEffect(() => {
     // Listen for auth state changes - this properly waits for session hydration
@@ -41,15 +59,21 @@ export default function AccountPage() {
         return
       }
 
-      // For other users, get profile
-      const { data: prof } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("id", currentUser.id)
-        .single()
-      
-      const typedProfile = prof as { role?: string; first_name?: string; last_name?: string } | null
+      const [profileResult, ordersResult] = await Promise.all([
+        supabase
+          .from("profiles")
+          .select("*")
+          .eq("id", currentUser.id)
+          .single(),
+        supabase
+          .from("orders")
+          .select("id, total, status, created_at, order_items(id, product_name, quantity)")
+          .order("created_at", { ascending: false }),
+      ])
+
+      const typedProfile = profileResult.data as { role?: string; first_name?: string; last_name?: string } | null
       setProfile(typedProfile)
+      setOrders((ordersResult.data || []) as AccountOrder[])
       if (typedProfile?.role === "admin") {
         setIsAdmin(true)
       }
@@ -162,16 +186,40 @@ export default function AccountPage() {
                   <p className="text-xs text-muted-foreground">I tuoi ordini recenti</p>
                 </div>
               </div>
-              <p className="text-sm text-muted-foreground">
-                Nessun ordine ancora. Inizia a esplorare il nostro catalogo.
-              </p>
-              <Link
-                href="/#prodotti"
-                className="inline-flex items-center gap-1 mt-4 text-xs uppercase tracking-widest text-primary hover:text-primary/80 transition-colors"
-              >
-                Esplora prodotti
-                <ArrowRight className="w-3 h-3" />
-              </Link>
+              {orders.length === 0 ? (
+                <>
+                  <p className="text-sm text-muted-foreground">
+                    Nessun ordine ancora. Inizia a esplorare il nostro catalogo.
+                  </p>
+                  <Link
+                    href="/#prodotti"
+                    className="inline-flex items-center gap-1 mt-4 text-xs uppercase tracking-widest text-primary hover:text-primary/80 transition-colors"
+                  >
+                    Esplora prodotti
+                    <ArrowRight className="w-3 h-3" />
+                  </Link>
+                </>
+              ) : (
+                <div className="flex flex-col divide-y divide-border">
+                  {orders.map((order) => (
+                    <div key={order.id} className="py-3 first:pt-0 last:pb-0">
+                      <div className="flex items-start justify-between gap-3">
+                        <div>
+                          <p className="font-mono text-sm text-foreground">#{order.id.slice(0, 8).toUpperCase()}</p>
+                          <p className="mt-1 text-xs text-muted-foreground">
+                            {new Date(order.created_at).toLocaleDateString("it-IT", { day: "2-digit", month: "short", year: "numeric" })}
+                            {" - "}{order.order_items?.length || 0} articoli
+                          </p>
+                        </div>
+                        <div className="text-right">
+                          <p className="font-mono text-sm text-foreground">{"\u20AC"}{Number(order.total).toFixed(2)}</p>
+                          <p className="mt-1 text-[10px] uppercase tracking-widest text-primary">{orderStatusLabels[order.status] || order.status}</p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         </div>

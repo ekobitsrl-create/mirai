@@ -63,6 +63,11 @@ export function CheckoutButton({
 
       const data = await response.json()
 
+      if (response.status === 401 && data.authRequired) {
+        window.location.assign("/auth/sign-up?next=/checkout")
+        return
+      }
+
       if (!response.ok) {
         throw new Error(data.error || "Errore durante il checkout")
       }
