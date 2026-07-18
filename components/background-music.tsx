@@ -66,6 +66,7 @@ export function BackgroundMusic() {
     if (!audio) return
 
     const pauseForBeatPlayer = () => {
+      audio.muted = true
       audio.pause()
       setIsPlaying(false)
     }
@@ -80,6 +81,7 @@ export function BackgroundMusic() {
 
     if (audio.paused) {
       try {
+        audio.muted = false
         await audio.play()
         setIsPlaying(true)
       } catch {
