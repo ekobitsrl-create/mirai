@@ -3,6 +3,7 @@ import { redirect } from "next/navigation"
 import { Navbar } from "@/components/navbar"
 import { Footer } from "@/components/footer"
 import { CommunityHub } from "@/components/mirai-community"
+import { isAdminEmail } from "@/lib/admin"
 import { getServerUserWithProfile } from "@/lib/supabase/server"
 
 export const metadata: Metadata = {
@@ -16,7 +17,7 @@ export default async function CommunityPage() {
   if (!user) redirect("/auth/login?redirectTo=/community")
 
   const memberProfile = profile as { first_name?: string | null; last_name?: string | null; role?: string | null } | null
-  const isAdmin = memberProfile?.role === "admin" || user.email === "admin@mirai.store"
+  const isAdmin = memberProfile?.role === "admin" || isAdminEmail(user.email)
   const fullName = [memberProfile?.first_name, memberProfile?.last_name].filter(Boolean).join(" ")
   const member = {
     id: user.id,

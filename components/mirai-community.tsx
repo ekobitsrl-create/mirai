@@ -24,8 +24,8 @@ const CHANNELS = [
     name: "After Hours",
     label: "Podcast",
     description: "Puntate, ospiti e note audio disponibili in anticipo per i membri.",
-    status: "Prossimamente",
-    memberOpen: false,
+    status: "Aperto",
+    memberOpen: true,
   },
   {
     icon: MessageCircleMore,
@@ -33,8 +33,8 @@ const CHANNELS = [
     name: "Inner Circle",
     label: "Social room",
     description: "Uno spazio per parlare di outfit, musica, idee e cultura urbana.",
-    status: "Accessi limitati",
-    memberOpen: false,
+    status: "Aperto",
+    memberOpen: true,
   },
   {
     icon: Radio,

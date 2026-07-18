@@ -4,6 +4,7 @@ import { notFound, redirect } from "next/navigation"
 import { ArrowLeft, LockKeyhole, ShieldCheck, Sparkles } from "lucide-react"
 import { Navbar } from "@/components/navbar"
 import { Footer } from "@/components/footer"
+import { isAdminEmail } from "@/lib/admin"
 import { getServerUserWithProfile } from "@/lib/supabase/server"
 
 const CHANNELS = {
@@ -19,7 +20,7 @@ const CHANNELS = {
     label: "Podcast",
     title: "After Hours",
     description: "Puntate, ospiti e note audio disponibili in anticipo per i membri.",
-    openToMembers: false,
+    openToMembers: true,
     eyebrow: "Audio room",
     notes: ["Podcast MIRAI", "Interviste e backstage", "Ascolto anticipato per i membri"],
   },
@@ -27,7 +28,7 @@ const CHANNELS = {
     label: "Social room",
     title: "Inner Circle",
     description: "Uno spazio moderato per parlare di outfit, musica, idee e cultura urbana.",
-    openToMembers: false,
+    openToMembers: true,
     eyebrow: "Community room",
     notes: ["Profili e conversazioni", "Room tematiche", "Moderazione MIRAI"],
   },
@@ -57,7 +58,7 @@ export default async function CommunityChannelPage({ params }: { params: Promise
   if (!user) redirect(`/auth/login?redirectTo=/community/${channelSlug}`)
 
   const memberProfile = profile as { role?: string | null } | null
-  const isAdmin = memberProfile?.role === "admin" || user.email === "admin@mirai.store"
+  const isAdmin = memberProfile?.role === "admin" || isAdminEmail(user.email)
   const canEnter = channel.openToMembers || isAdmin
 
   return (

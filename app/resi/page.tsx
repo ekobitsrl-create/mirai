@@ -1,6 +1,6 @@
 import type { Metadata } from "next"
 import Link from "next/link"
-import { ArrowLeft, RotateCcw, Clock, CheckCircle, XCircle } from "lucide-react"
+import { ArrowLeft, CheckCircle, Clock, Mail, RotateCcw, XCircle } from "lucide-react"
 import { Navbar } from "@/components/navbar"
 import { Footer } from "@/components/footer"
 
@@ -9,113 +9,146 @@ export const metadata: Metadata = {
   description: "Politica di reso e rimborso per gli acquisti effettuati su MIRAI.",
 }
 
+const returnSteps = [
+  "Scrivi entro 14 giorni dalla consegna a info@mirai.store indicando numero ordine, email usata per l'acquisto e motivo del reso.",
+  "Riceverai le istruzioni di rientro. Per gli ordini spediti in Italia inviamo un'etichetta prepagata quando il reso e approvato.",
+  "Imballa il prodotto in modo sicuro, preferibilmente nella confezione originale, con cartellini ed eventuali accessori.",
+  "Consegna il pacco al corriere o al punto indicato nelle istruzioni di reso.",
+  "Dopo ricezione e verifica, il rimborso viene emesso sullo stesso metodo di pagamento usato per l'ordine.",
+]
+
+const accepted = [
+  "Prodotti non utilizzati, non lavati e non danneggiati",
+  "Cartellini originali, confezione e accessori presenti",
+  "Richiesta inviata entro 14 giorni dalla data di consegna",
+  "Prodotti difettosi o non conformi segnalati appena rilevati",
+]
+
+const refused = [
+  "Prodotti personalizzati o customizzati, salvo difetto o non conformita",
+  "Prodotti indossati, lavati, alterati o privi di cartellini",
+  "Resi inviati senza approvazione o oltre il termine indicato",
+  "Danni causati da uso improprio, lavaggio errato o normale usura",
+]
+
 export default function ResiPage() {
   return (
     <>
       <Navbar />
       <main className="pt-20">
-        <section className="max-w-4xl mx-auto px-6 py-16 md:py-24">
-          <Link href="/" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-8">
+        <section className="mx-auto max-w-4xl px-6 py-16 md:py-24">
+          <Link href="/" className="mb-8 inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground">
             <ArrowLeft className="h-4 w-4" />
             Torna alla Home
           </Link>
+
+          <p className="mb-3 text-xs font-bold uppercase tracking-[0.24em] text-primary">Policy separata e pubblica</p>
           <h1 className="mb-4 font-[family-name:var(--font-space-grotesk)] text-3xl font-bold tracking-tight text-foreground text-balance md:text-4xl">
             Resi e Rimborsi
           </h1>
-          <p className="text-lg text-muted-foreground mb-12 max-w-2xl text-pretty">
-            La tua soddisfazione e la nostra priorita. Se non sei soddisfatto del tuo acquisto, puoi restituirlo facilmente.
+          <p className="mb-12 max-w-2xl text-lg text-muted-foreground text-pretty">
+            Questa pagina e accessibile senza login e riassume tempi, metodo di reso, costi e modalita di rimborso per gli ordini MIRAI.
           </p>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
+          <div className="mb-16 grid grid-cols-1 gap-4 md:grid-cols-3">
             {[
-              { icon: Clock, title: "14 Giorni", desc: "Tempo per richiedere il reso dalla data di consegna" },
-              { icon: RotateCcw, title: "Reso Gratuito", desc: "Le spese di restituzione sono a carico di MIRAI per l'Italia" },
-              { icon: CheckCircle, title: "Rimborso Rapido", desc: "Entro 7 giorni lavorativi dalla ricezione del reso" },
+              { icon: Clock, title: "14 giorni", desc: "Puoi richiedere il reso dalla data di consegna." },
+              { icon: RotateCcw, title: "Italia gratuita", desc: "Etichetta prepagata per i resi approvati in Italia." },
+              { icon: CheckCircle, title: "7 giorni lavorativi", desc: "Tempo di emissione rimborso dopo verifica del reso." },
             ].map((item) => (
-              <div key={item.title} className="border border-border rounded-lg p-6 bg-card text-center flex flex-col items-center gap-3">
-                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary">
-                  <item.icon className="h-6 w-6" />
+              <div key={item.title} className="rounded-lg border border-border bg-card p-6 text-center">
+                <div className="mx-auto mb-4 flex h-11 w-11 items-center justify-center rounded-full bg-primary/10 text-primary">
+                  <item.icon className="h-5 w-5" />
                 </div>
-                <h3 className="text-sm font-bold tracking-widest uppercase text-primary">{item.title}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">{item.desc}</p>
+                <h2 className="text-sm font-bold uppercase tracking-widest text-primary">{item.title}</h2>
+                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{item.desc}</p>
               </div>
             ))}
           </div>
 
-          <div className="h-px bg-border mb-16" />
+          <div className="mb-16 h-px bg-border" />
 
-          <div className="flex flex-col gap-8">
-            <div className="flex flex-col gap-4">
-              <h2 className="font-[family-name:var(--font-space-grotesk)] text-2xl md:text-3xl font-bold tracking-tight text-foreground">
-                Come Effettuare un Reso
+          <div className="flex flex-col gap-10 text-muted-foreground">
+            <section className="flex flex-col gap-4">
+              <h2 className="font-[family-name:var(--font-space-grotesk)] text-2xl font-bold tracking-tight text-foreground">
+                Come effettuare un reso
               </h2>
               <ol className="flex flex-col gap-3">
-                {[
-                  "Contattaci entro 14 giorni dalla ricezione a info@mirai.store indicando il numero d'ordine.",
-                  "Riceverai un'email con le istruzioni e l'etichetta di reso prepagata.",
-                  "Imballa il prodotto nell'imballaggio originale o in una confezione adeguata.",
-                  "Consegna il pacco al punto di ritiro o al corriere indicato.",
-                  "Una volta ricevuto e verificato il reso, procederemo al rimborso.",
-                ].map((step, i) => (
-                  <li key={i} className="flex items-start gap-4 text-muted-foreground leading-relaxed">
-                    <span className="flex h-7 w-7 items-center justify-center rounded-full bg-primary text-primary-foreground text-xs font-bold shrink-0">
-                      {i + 1}
+                {returnSteps.map((step, index) => (
+                  <li key={step} className="flex items-start gap-4 leading-relaxed">
+                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground">
+                      {index + 1}
                     </span>
                     {step}
                   </li>
                 ))}
               </ol>
-            </div>
+            </section>
 
-            <div className="h-px bg-border" />
-
-            <div className="flex flex-col gap-4">
-              <h2 className="font-[family-name:var(--font-space-grotesk)] text-2xl md:text-3xl font-bold tracking-tight text-foreground">
-                Condizioni di Reso
-              </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="border border-border rounded-lg p-6 bg-card">
-                  <div className="flex items-center gap-2 mb-3">
-                    <CheckCircle className="h-5 w-5 text-green-500" />
-                    <h3 className="text-sm font-bold tracking-widest uppercase text-foreground">Accettati</h3>
-                  </div>
-                  <ul className="flex flex-col gap-2">
-                    {["Prodotti non utilizzati e con etichette originali", "Prodotti nella confezione originale", "Prodotti senza segni di usura o danni", "Prodotti difettosi o non conformi"].map((item) => (
-                      <li key={item} className="flex items-start gap-2 text-sm text-muted-foreground">
-                        <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-green-500 shrink-0" />
-                        {item}
-                      </li>
-                    ))}
-                  </ul>
+            <section className="grid grid-cols-1 gap-5 md:grid-cols-2">
+              <div className="rounded-lg border border-border bg-card p-6">
+                <div className="mb-4 flex items-center gap-2">
+                  <CheckCircle className="h-5 w-5 text-green-500" />
+                  <h2 className="text-sm font-bold uppercase tracking-widest text-foreground">Resi accettati</h2>
                 </div>
-                <div className="border border-border rounded-lg p-6 bg-card">
-                  <div className="flex items-center gap-2 mb-3">
-                    <XCircle className="h-5 w-5 text-destructive" />
-                    <h3 className="text-sm font-bold tracking-widest uppercase text-foreground">Non Accettati</h3>
-                  </div>
-                  <ul className="flex flex-col gap-2">
-                    {["Prodotti personalizzati o customizzati", "Prodotti lavati o indossati", "Prodotti senza etichette originali", "Resi dopo 14 giorni dalla consegna"].map((item) => (
-                      <li key={item} className="flex items-start gap-2 text-sm text-muted-foreground">
-                        <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-destructive shrink-0" />
-                        {item}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
+                <ul className="flex flex-col gap-2">
+                  {accepted.map((item) => (
+                    <li key={item} className="flex items-start gap-2 text-sm leading-6">
+                      <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-green-500" />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
               </div>
-            </div>
 
-            <div className="h-px bg-border" />
+              <div className="rounded-lg border border-border bg-card p-6">
+                <div className="mb-4 flex items-center gap-2">
+                  <XCircle className="h-5 w-5 text-destructive" />
+                  <h2 className="text-sm font-bold uppercase tracking-widest text-foreground">Resi non accettati</h2>
+                </div>
+                <ul className="flex flex-col gap-2">
+                  {refused.map((item) => (
+                    <li key={item} className="flex items-start gap-2 text-sm leading-6">
+                      <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-destructive" />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </section>
 
-            <div className="flex flex-col gap-4">
-              <h2 className="font-[family-name:var(--font-space-grotesk)] text-2xl md:text-3xl font-bold tracking-tight text-foreground">
+            <section className="flex flex-col gap-4">
+              <h2 className="font-[family-name:var(--font-space-grotesk)] text-2xl font-bold tracking-tight text-foreground">
+                Costi di restituzione
+              </h2>
+              <p className="leading-relaxed">
+                Per ordini consegnati in Italia, il primo reso approvato e gratuito. Per ordini fuori dall'Italia, eventuali costi di spedizione del reso sono comunicati prima dell'invio delle istruzioni e restano a carico del cliente, salvo prodotto difettoso o non conforme.
+              </p>
+              <p className="leading-relaxed">
+                MIRAI non applica costi di reintegro magazzino. Le spese di spedizione express pagate al momento dell'ordine non sono rimborsate se il servizio e gia stato eseguito, salvo diverso obbligo di legge.
+              </p>
+            </section>
+
+            <section className="flex flex-col gap-4">
+              <h2 className="font-[family-name:var(--font-space-grotesk)] text-2xl font-bold tracking-tight text-foreground">
                 Rimborsi
               </h2>
-              <p className="text-muted-foreground leading-relaxed">
-                Il rimborso viene elaborato sullo stesso metodo di pagamento utilizzato per l{"'"}acquisto entro 7 giorni lavorativi dalla verifica del reso. Riceverai una conferma via email. Per qualsiasi domanda, contattaci a{" "}
-                <Link href="/contatti" className="text-primary hover:underline">info@mirai.store</Link>.
+              <p className="leading-relaxed">
+                Dopo aver ricevuto e controllato il prodotto, emettiamo il rimborso entro 7 giorni lavorativi sullo stesso metodo di pagamento usato per l'acquisto. I tempi di accredito effettivi dipendono dal circuito di pagamento o dalla banca.
               </p>
-            </div>
+            </section>
+
+            <section className="rounded-lg border border-primary/20 bg-primary/5 p-6">
+              <div className="flex items-start gap-3">
+                <Mail className="mt-1 h-5 w-5 shrink-0 text-primary" />
+                <div>
+                  <h2 className="text-sm font-bold uppercase tracking-widest text-foreground">Contatto resi</h2>
+                  <p className="mt-2 text-sm leading-6">
+                    Email: <a href="mailto:info@mirai.store" className="text-primary hover:underline">info@mirai.store</a>. In alternativa puoi usare la pagina <Link href="/contatti" className="text-primary hover:underline">Contatti</Link>.
+                  </p>
+                </div>
+              </div>
+            </section>
           </div>
         </section>
       </main>

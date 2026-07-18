@@ -121,6 +121,14 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
         "@type": "Organization",
         name: "MIRAI",
       },
+      hasMerchantReturnPolicy: {
+        "@type": "MerchantReturnPolicy",
+        applicableCountry: "IT",
+        returnPolicyCategory: "https://schema.org/MerchantReturnFiniteReturnWindow",
+        merchantReturnDays: 14,
+        returnMethod: "https://schema.org/ReturnByMail",
+        returnFees: "https://schema.org/FreeReturn",
+      },
     },
     category: product.category,
   }

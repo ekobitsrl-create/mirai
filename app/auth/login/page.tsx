@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/client"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { isAdminEmail } from "@/lib/admin"
 import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
 import { useState, Suspense } from "react"
@@ -54,7 +55,7 @@ function LoginForm() {
         .eq('id', data.user.id)
         .single()
 
-      const isAdmin = (profile as { role?: string } | null)?.role === 'admin'
+      const isAdmin = (profile as { role?: string } | null)?.role === 'admin' || isAdminEmail(data.user.email)
       // Respect safe internal redirects. Only the admin area requires an admin role.
       let redirectUrl = isAdmin ? '/admin' : '/account'
       const safeRedirect = typeof redirectTo === 'string' && redirectTo.startsWith('/') && !redirectTo.startsWith('//')

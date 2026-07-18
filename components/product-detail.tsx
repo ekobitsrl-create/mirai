@@ -413,7 +413,7 @@ export function ProductDetail({
               </Details>
             )}
             <Details title="Spedizioni e resi">
-              Spedizione tracciata in Italia e in Europa. Puoi richiedere il reso entro 14 giorni dalla consegna, purché il capo sia integro e con i cartellini originali.
+              Spedizione tracciata in Italia e in Europa. Puoi richiedere il reso entro 14 giorni dalla consegna, purche il capo sia integro e con i cartellini originali. Consulta la pagina <Link href="/resi" className="text-[#9f86ff] underline underline-offset-4">Resi e Rimborsi</Link>.
             </Details>
           </div>
         </section>

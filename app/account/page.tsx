@@ -4,9 +4,9 @@ import { createClient } from "@/lib/supabase/client"
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import Image from "next/image"
 import { Button } from "@/components/ui/button"
-import { User, Shield, Package, ArrowRight, LogOut } from "lucide-react"
+import { User, Package, ArrowRight, LogOut } from "lucide-react"
+import { isAdminEmail } from "@/lib/admin"
 import { AdminPanel } from "@/components/admin-panel"
 import { CommunityPreview } from "@/components/mirai-community"
 
@@ -34,7 +34,7 @@ export default function AccountPage() {
       setUser(currentUser)
 
       // Check if admin by email (instant, no DB needed)
-      if (currentUser.email === "admin@mirai.store") {
+      if (isAdminEmail(currentUser.email)) {
         console.log("[v0] IS ADMIN - showing admin panel")
         setIsAdmin(true)
         setLoading(false)
@@ -93,8 +93,8 @@ export default function AccountPage() {
     <div className="min-h-svh bg-background">
       <div className="border-b border-border">
         <div className="max-w-4xl mx-auto px-6 py-6 flex items-center justify-between">
-          <Link href="/">
-            <Image src="/images/logo.png" alt="MIRAI" width={100} height={33} priority className="invert" style={{ width: 'auto', height: 'auto' }} />
+          <Link href="/" className="text-xl font-bold uppercase tracking-[0.25em] text-foreground" style={{ fontFamily: "var(--font-space-grotesk)" }}>
+            {"MIR\u039BI"}
           </Link>
           <Button variant="ghost" size="sm" onClick={handleLogout} className="text-xs uppercase tracking-widest gap-2">
             <LogOut className="w-3.5 h-3.5" /> Esci

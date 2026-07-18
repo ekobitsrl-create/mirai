@@ -22,6 +22,21 @@ export function Footer() {
     fr: "Informations légales",
   }[locale]
 
+  const beatsLabel = {
+    it: "I Nostri Beat",
+    en: "Our Beats",
+    es: "Nuestros Beats",
+    de: "Unsere Beats",
+    fr: "Nos Beats",
+  }[locale]
+  const communityLabel = {
+    it: "Community",
+    en: "Community",
+    es: "Comunidad",
+    de: "Community",
+    fr: "Communaute",
+  }[locale]
+
   const footerLinks = {
     shop: {
       title: t.footer.shop,
@@ -29,6 +44,7 @@ export function Footer() {
         { label: t.footer.newArrivals, href: "/#nuovi-arrivi" },
         { label: t.footer.collections, href: "/collezioni" },
         { label: "T-shirt personalizzate", href: "/custom-lab" },
+        { label: beatsLabel, href: "/i-nostri-beat" },
       ],
     },
     info: {
@@ -40,6 +56,7 @@ export function Footer() {
         { label: t.footer.shipping, href: "/spedizioni" },
         { label: t.footer.returnsRefunds, href: "/resi" },
         { label: t.footer.faq, href: "/faq" },
+        { label: communityLabel, href: "/community" },
       ],
     },
     legal: {

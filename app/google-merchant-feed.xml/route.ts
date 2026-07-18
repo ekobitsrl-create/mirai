@@ -6,6 +6,7 @@ export const runtime = "nodejs"
 export const dynamic = "force-dynamic"
 
 const FALLBACK_SITE_URL = "https://mirai-clothing.vercel.app"
+const RETURN_POLICY_PATH = "/resi"
 
 const GOOGLE_CATEGORY_BY_STORE_CATEGORY: Record<string, string> = {
   "t-shirt": "212",
@@ -162,6 +163,23 @@ function getColor(product: StoreProduct) {
   return [...new Set(colors)].join(" / ") || "Multicolore"
 }
 
+function renderReturnPolicy(baseUrl: string) {
+  return [
+    "      <g:returns>",
+    "        <g:country>IT</g:country>",
+    "        <g:item_condition>NEW</g:item_condition>",
+    "        <g:window_days>14</g:window_days>",
+    "        <g:window_type>FINITE_RETURN_WINDOW</g:window_type>",
+    "        <g:method>BY_MAIL</g:method>",
+    "        <g:outcome>REFUND</g:outcome>",
+    "        <g:shipping_fee>0.00 EUR</g:shipping_fee>",
+    "        <g:shipping_fee_type>DEDUCTED_FROM_REFUND</g:shipping_fee_type>",
+    "        <g:restocking_fee>0.00 EUR</g:restocking_fee>",
+    `        <g:policy_url>${escapeXml(absoluteUrl(RETURN_POLICY_PATH, baseUrl))}</g:policy_url>`,
+    "      </g:returns>",
+  ].join("\n")
+}
+
 async function getCatalogProducts() {
   try {
     const supabase = await createClient()
@@ -234,12 +252,15 @@ function renderProductVariant(product: StoreProduct, size: string, baseUrl: stri
     "      <g:gender>unisex</g:gender>",
     "      <g:age_group>adult</g:age_group>",
     "      <g:adult>no</g:adult>",
+    "      <g:excluded_destination>Local_inventory_ads</g:excluded_destination>",
+    "      <g:excluded_destination>Free_local_listings</g:excluded_destination>",
     product.is_new ? "      <g:custom_label_0>Nuovi arrivi</g:custom_label_0>" : "",
     "      <g:shipping>",
     "        <g:country>IT</g:country>",
     "        <g:service>Standard</g:service>",
     "        <g:price>0.00 EUR</g:price>",
     "      </g:shipping>",
+    renderReturnPolicy(baseUrl),
     "    </item>",
   ].filter(Boolean).join("\n")
 }

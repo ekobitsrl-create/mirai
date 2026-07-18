@@ -1,18 +1,21 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
+import { usePathname } from "next/navigation"
 import { Volume2, VolumeX } from "lucide-react"
 
 export function BackgroundMusic() {
+  const pathname = usePathname()
   const audioRef = useRef<HTMLAudioElement | null>(null)
   const [isPlaying, setIsPlaying] = useState(false)
   const [ready, setReady] = useState(false)
+  const isBeatPage = pathname?.startsWith("/i-nostri-beat")
 
   // Try to start playback, and if the browser blocks autoplay,
   // begin on the first user interaction anywhere on the page.
   useEffect(() => {
     const audio = audioRef.current
-    if (!audio) return
+    if (!audio || isBeatPage) return
 
     audio.volume = 0.18
 
@@ -56,6 +59,19 @@ export function BackgroundMusic() {
     return () => {
       removeInteractionListeners()
     }
+  }, [isBeatPage])
+
+  useEffect(() => {
+    const audio = audioRef.current
+    if (!audio) return
+
+    const pauseForBeatPlayer = () => {
+      audio.pause()
+      setIsPlaying(false)
+    }
+
+    window.addEventListener("mirai:beat-player-start", pauseForBeatPlayer)
+    return () => window.removeEventListener("mirai:beat-player-start", pauseForBeatPlayer)
   }, [])
 
   const toggle = async () => {
@@ -74,6 +90,8 @@ export function BackgroundMusic() {
       setIsPlaying(false)
     }
   }
+
+  if (isBeatPage) return null
 
   return (
     <>

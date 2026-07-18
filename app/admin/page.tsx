@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation"
+import { isAdminEmail } from "@/lib/admin"
 import { getServerUserWithProfile, createUserClient } from "@/lib/supabase/server"
 import { AdminDashboard } from "@/components/admin-dashboard"
 
@@ -13,7 +14,7 @@ export default async function AdminPage() {
   const { user, profile } = userResult
 
   if (!user) redirect("/auth/login?redirectTo=/admin")
-  if (profile?.role !== "admin") redirect("/account")
+  if (profile?.role !== "admin" && !isAdminEmail(user.email)) redirect("/account")
 
   const supabase = await createUserClient()
   if (!supabase) redirect("/auth/login?redirectTo=/admin")

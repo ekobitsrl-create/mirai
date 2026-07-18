@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react"
 import Link from "next/link"
 import dynamic from "next/dynamic"
-import { Search, Menu, X, User, ShoppingBag, ChevronDown, ChevronRight, WandSparkles } from "lucide-react"
+import { Disc3, Search, Menu, X, User, ShoppingBag, ChevronDown, ChevronRight, UsersRound, WandSparkles } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 import { useCart } from "@/lib/cart-context"
 import { useLanguage } from "@/lib/language-context"
@@ -108,6 +108,20 @@ export function Navbar() {
     de: "Store",
     fr: "Boutique",
   }[locale]
+  const beatsLabel = {
+    it: "I Nostri Beat",
+    en: "Our Beats",
+    es: "Nuestros Beats",
+    de: "Unsere Beats",
+    fr: "Nos Beats",
+  }[locale]
+  const communityLabel = {
+    it: "Community",
+    en: "Community",
+    es: "Comunidad",
+    de: "Community",
+    fr: "Communaute",
+  }[locale]
   const categories = useCategories()
 
   useEffect(() => {
@@ -179,6 +193,22 @@ export function Navbar() {
                 <WandSparkles className="h-3.5 w-3.5" />
                 Personalizza
               </Link>
+              <Link
+                href="/i-nostri-beat"
+                className="inline-flex items-center gap-1.5 text-sm tracking-widest uppercase text-white/55 transition-colors hover:text-white"
+              >
+                <Disc3 className="h-3.5 w-3.5" />
+                {beatsLabel}
+              </Link>
+              {isLoggedIn && (
+                <Link
+                  href="/community"
+                  className="inline-flex items-center gap-1.5 text-sm tracking-widest uppercase text-white/55 transition-colors hover:text-white"
+                >
+                  <UsersRound className="h-3.5 w-3.5" />
+                  {communityLabel}
+                </Link>
+              )}
               <Link
                 href="/#prodotti"
                 className="text-sm tracking-widest uppercase text-white/55 hover:text-white transition-colors"
@@ -311,6 +341,22 @@ export function Navbar() {
             >
               <WandSparkles className="h-4 w-4" /> Personalizza
             </Link>
+            <Link
+              href="/i-nostri-beat"
+              className="flex items-center justify-center gap-2 rounded-sm border border-white/15 bg-white/[0.03] px-4 py-3 text-xs font-bold uppercase tracking-[0.2em] text-white/70"
+              onClick={() => setMobileOpen(false)}
+            >
+              <Disc3 className="h-4 w-4" /> {beatsLabel}
+            </Link>
+            {isLoggedIn && (
+              <Link
+                href="/community"
+                className="flex items-center justify-center gap-2 rounded-sm border border-white/15 bg-white/[0.03] px-4 py-3 text-xs font-bold uppercase tracking-[0.2em] text-white/70"
+                onClick={() => setMobileOpen(false)}
+              >
+                <UsersRound className="h-4 w-4" /> {communityLabel}
+              </Link>
+            )}
             <Link
               href="/#prodotti"
               className="text-sm tracking-widest uppercase text-white/55 hover:text-white transition-colors"
