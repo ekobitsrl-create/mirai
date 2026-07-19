@@ -7,10 +7,10 @@ import { ChevronLeft, ChevronRight } from "lucide-react"
 import { useLanguage } from "@/lib/language-context"
 
 const slideImages = [
-  { src: "/images/hero-mirai-logo.png", isPortrait: true, scale: "scale-90", position: "object-center" },
-  { src: "/images/hero-storefront.png", isPortrait: false, scale: "scale-75", position: "object-center" },
-  { src: "/images/hero-model-black.png", isPortrait: true, scale: "scale-[0.70]", position: "object-center" },
-  { src: "/images/hero-model-white.png", isPortrait: true, scale: "scale-[0.70]", position: "object-center" },
+  { src: "/images/hero-mirai-logo.png", isPortrait: true, scale: "scale-90", scaleNum: 0.9, position: "object-center" },
+  { src: "/images/hero-storefront.png", isPortrait: false, scale: "scale-75", scaleNum: 0.75, position: "object-center" },
+  { src: "/images/hero-model-black.png", isPortrait: true, scale: "scale-[0.70]", scaleNum: 0.7, position: "object-center" },
+  { src: "/images/hero-model-white.png", isPortrait: true, scale: "scale-[0.70]", scaleNum: 0.7, position: "object-center" },
 ]
 
 const slideHrefs = [
@@ -69,7 +69,17 @@ export function Hero() {
             src={image.src}
             alt={slides[i]?.title.replace("\n", " ") || ""}
             fill
-            className={`object-contain drop-shadow-[0_0_48px_rgba(159,134,255,0.16)] ${image.position} ${image.scale}`}
+            className={`mirai-hero-base object-contain drop-shadow-[0_0_48px_rgba(159,134,255,0.16)] ${image.position} ${image.scale}`}
+            priority={i === 0}
+            sizes="100vw"
+          />
+          <Image
+            src={image.src}
+            alt=""
+            aria-hidden
+            fill
+            className={`mirai-hero-edge-blur object-contain ${image.position}`}
+            style={{ transform: `scale(${image.scaleNum * 1.06})` }}
             priority={i === 0}
             sizes="100vw"
           />
