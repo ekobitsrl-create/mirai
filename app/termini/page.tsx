@@ -73,7 +73,7 @@ export default function TerminiPage() {
 
             <section className="flex flex-col gap-3">
               <h2 className="font-[family-name:var(--font-space-grotesk)] text-xl font-bold text-foreground">10. Contatti</h2>
-              <p>Per comunicazioni formali o reclami puoi scrivere a <span className="text-primary">mirailabstore@pec.it</span>. Per assistenza ordinaria puoi usare la pagina <Link href="/contatti" className="text-primary hover:underline">Contatti</Link> o scrivere a <span className="text-muted-foreground">mirailabstore@gmail.com</span>.</p>
+              <p>Per comunicazioni formali o reclami puoi scrivere a <span className="text-primary">mirailabstore@pec.it</span>. Per assistenza ordinaria puoi usare la pagina <Link href="/contatti" className="text-primary hover:underline">Contatti</Link> o scrivere a <span className="text-muted-foreground">info@mirailabstore.com</span>.</p>
             </section>
           </div>
         </section>

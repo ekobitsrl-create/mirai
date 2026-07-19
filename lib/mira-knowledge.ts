@@ -196,9 +196,9 @@ function contextualFollowUp(message: string, context: MiraKnowledgeContext) {
 
   if (context.lastIntent === "returns" || context.lastIntent === "refund") {
     if (hasAny(message, ["gratis", "gratuito", "costa"])) {
-      return answer("returns", "Per gli ordini spediti in Italia il reso è gratuito. Per i resi internazionali il costo può variare.", "/resi", "Dettagli reso")
+      return answer("returns", "MIRAI sostiene le spese di spedizione per ogni reso approvato e invia un'etichetta prepagata.", "/resi", "Dettagli reso")
     }
-    return answer("refund", "Dopo la ricezione e la verifica del reso, il rimborso viene elaborato entro 7 giorni lavorativi sul metodo di pagamento originale.", "/resi", "Dettagli rimborso")
+    return answer("refund", "Dopo la ricezione e la verifica del reso, il rimborso viene elaborato entro 14 giorni sul metodo di pagamento usato dal cliente al checkout.", "/resi", "Dettagli rimborso")
   }
 
   if (context.lastIntent === "customization") {
@@ -286,15 +286,15 @@ export function getMiraLocalReply(rawMessage: string, context: MiraKnowledgeCont
   }
 
   if (hasAny(message, ["annullare", "cancellare ordine", "modificare ordine", "cambiare ordine", "ordine sbagliato"])) {
-    return answer("order", "Puoi chiedere modifica o annullamento entro 2 ore dall’ordine scrivendo a mirailabstore@gmail.com. Se è già stato spedito, non può essere annullato ma puoi richiedere un reso.", "/contatti", "Contatta MIRAI")
+    return answer("order", "Puoi chiedere modifica o annullamento entro 2 ore dall’ordine scrivendo a info@mirailabstore.com. Se è già stato spedito, non può essere annullato ma puoi richiedere un reso.", "/contatti", "Contatta MIRAI")
   }
 
   if (hasAny(message, ["conferma ordine", "email ordine", "non ho ricevuto", "ricevuta", "numero ordine"])) {
-    return answer("order", "Dopo l’acquisto ricevi un’email con riepilogo e numero d’ordine. Controlla anche spam e promozioni; se manca, scrivi a mirailabstore@gmail.com.", "/contatti", "Contatta MIRAI")
+    return answer("order", "Dopo l’acquisto ricevi un’email con riepilogo e numero d’ordine. Controlla anche spam e promozioni; se manca, scrivi a info@mirailabstore.com.", "/contatti", "Contatta MIRAI")
   }
 
   if (hasAny(message, ["dov e il mio ordine", "dove e il mio ordine", "stato ordine", "tracciare", "tracciamento", "tracking", "pacco"])) {
-    return answer("tracking", "Il codice di tracking arriva via email dopo la spedizione e può impiegare fino a 24 ore per attivarsi. Io non posso vedere i dati del tuo ordine: se serve assistenza, indica il numero d’ordine a mirailabstore@gmail.com.", "/spedizioni", "Info tracking")
+    return answer("tracking", "Il codice di tracking arriva via email dopo la spedizione e può impiegare fino a 24 ore per attivarsi. Io non posso vedere i dati del tuo ordine: se serve assistenza, indica il numero d’ordine a info@mirailabstore.com.", "/spedizioni", "Info tracking")
   }
 
   if (asksShipping) {
@@ -308,14 +308,14 @@ export function getMiraLocalReply(rawMessage: string, context: MiraKnowledgeCont
   }
 
   if (hasAny(message, ["rimborso", "soldi indietro", "riavere i soldi", "accredito"])) {
-    return answer("refund", "Il rimborso viene elaborato entro 7 giorni lavorativi dalla ricezione e verifica del reso, sullo stesso metodo usato per pagare.", "/resi", "Dettagli rimborso")
+    return answer("refund", "Il rimborso viene elaborato entro 14 giorni dalla ricezione e verifica del reso, sullo stesso metodo di pagamento usato dal cliente al checkout.", "/resi", "Dettagli rimborso")
   }
 
   if (asksReturns) {
     if (hasAny(message, ["personalizzato", "custom", "lavato", "indossato", "senza etichetta"])) {
       return answer("returns", "Non sono accettati prodotti personalizzati, lavati, indossati o senza etichette originali. Se hai un caso particolare, scrivi all’assistenza prima di spedire.", "/resi", "Condizioni del reso")
     }
-    return answer("returns", "Puoi richiedere il reso entro 14 giorni dalla consegna. Il capo deve essere integro, non indossato e con le etichette; per gli ordini spediti in Italia il reso è gratuito.", "/resi", "Come fare il reso")
+    return answer("returns", "Puoi richiedere il reso entro 14 giorni dalla consegna scrivendo a info@mirailabstore.com. Il capo deve essere integro, non indossato e con le etichette; MIRAI sostiene le spese di spedizione del reso approvato.", "/resi", "Come fare il reso")
   }
 
   if (asksPayments) {
@@ -344,7 +344,7 @@ export function getMiraLocalReply(rawMessage: string, context: MiraKnowledgeCont
   }
 
   if (hasAny(message, ["contatto", "contattare", "email", "telefono", "parlare con qualcuno", "operatore", "persona vera", "assistenza"])) {
-    return answer("contact", "Puoi scrivere a mirailabstore@gmail.com oppure usare la pagina Contatti. Per un ordine esistente includi sempre il numero d’ordine.", "/contatti", "Contatta MIRAI")
+    return answer("contact", "Puoi scrivere a info@mirailabstore.com oppure usare la pagina Contatti. Per un ordine esistente includi sempre il numero d’ordine.", "/contatti", "Contatta MIRAI")
   }
 
   if (hasAny(message, ["account", "accedere", "login", "registrazione", "registrarmi", "password"])) {

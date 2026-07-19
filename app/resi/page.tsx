@@ -11,11 +11,11 @@ export const metadata: Metadata = {
 }
 
 const returnSteps = [
-  "Scrivi entro 14 giorni dalla consegna a mirailabstore@gmail.com indicando numero ordine, email usata per l'acquisto e motivo del reso.",
-  "Riceverai le istruzioni di rientro. Per gli ordini spediti in Italia inviamo un'etichetta prepagata quando il reso e approvato.",
+  "Scrivi entro 14 giorni dalla consegna a info@mirailabstore.com indicando numero ordine, email usata per l'acquisto e motivo del reso.",
+  "Quando il reso e approvato, MIRAI sostiene le spese di spedizione e invia un'etichetta prepagata con le istruzioni di rientro.",
   "Imballa il prodotto in modo sicuro, preferibilmente nella confezione originale, con cartellini ed eventuali accessori.",
   "Consegna il pacco al corriere o al punto indicato nelle istruzioni di reso.",
-  "Dopo ricezione e verifica, il rimborso viene emesso sullo stesso metodo di pagamento usato per l'ordine.",
+  "Dopo ricezione e verifica, il rimborso viene emesso entro 14 giorni sullo stesso metodo di pagamento usato dal cliente al checkout.",
 ]
 
 const accepted = [
@@ -54,8 +54,8 @@ export default function ResiPage() {
           <div className="mb-16 grid grid-cols-1 gap-4 md:grid-cols-3">
             {[
               { icon: Clock, title: "14 giorni", desc: "Puoi richiedere il reso dalla data di consegna." },
-              { icon: RotateCcw, title: "Italia gratuita", desc: "Etichetta prepagata per i resi approvati in Italia." },
-              { icon: CheckCircle, title: "7 giorni lavorativi", desc: "Tempo di emissione rimborso dopo verifica del reso." },
+              { icon: RotateCcw, title: "Spese a carico MIRAI", desc: "Etichetta prepagata per ogni reso approvato." },
+              { icon: CheckCircle, title: "Rimborso entro 14 giorni", desc: "Sullo stesso metodo di pagamento usato al checkout." },
             ].map((item) => (
               <div key={item.title} className="rounded-lg border border-border bg-card p-6 text-center">
                 <div className="mx-auto mb-4 flex h-11 w-11 items-center justify-center rounded-full bg-primary/10 text-primary">
@@ -123,7 +123,7 @@ export default function ResiPage() {
                 Costi di restituzione
               </h2>
               <p className="leading-relaxed">
-                Per ordini consegnati in Italia, il primo reso approvato e gratuito. Per ordini fuori dall'Italia, eventuali costi di spedizione del reso sono comunicati prima dell'invio delle istruzioni e restano a carico del cliente, salvo prodotto difettoso o non conforme.
+                Per ogni reso approvato, MIRAI sostiene le spese di spedizione del reso e invia un'etichetta prepagata. Non spedire il prodotto prima di aver ricevuto le istruzioni via email.
               </p>
               <p className="leading-relaxed">
                 MIRAI non applica costi di reintegro magazzino.
@@ -135,7 +135,7 @@ export default function ResiPage() {
                 Rimborsi
               </h2>
               <p className="leading-relaxed">
-                Dopo aver ricevuto e controllato il prodotto, emettiamo il rimborso entro 7 giorni lavorativi sullo stesso metodo di pagamento usato per l'acquisto. I tempi di accredito effettivi dipendono dal circuito di pagamento o dalla banca.
+                Dopo aver ricevuto e controllato il prodotto, emettiamo il rimborso entro 14 giorni sullo stesso metodo di pagamento usato dal cliente al checkout. I tempi di accredito effettivi dipendono dal circuito di pagamento o dalla banca.
               </p>
             </section>
 
@@ -145,7 +145,7 @@ export default function ResiPage() {
                 <div>
                   <h2 className="text-sm font-bold uppercase tracking-widest text-foreground">Contatto resi</h2>
                   <p className="mt-2 text-sm leading-6">
-                    Email: <a href="mailto:mirailabstore@gmail.com" className="text-primary hover:underline">mirailabstore@gmail.com</a>. In alternativa puoi usare la pagina <Link href="/contatti" className="text-primary hover:underline">Contatti</Link>.
+                    Email: <a href="mailto:info@mirailabstore.com" className="text-primary hover:underline">info@mirailabstore.com</a>. Indica sempre il numero d'ordine, l'email usata al checkout e il motivo della richiesta.
                   </p>
                 </div>
               </div>

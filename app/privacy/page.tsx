@@ -28,7 +28,7 @@ export default function PrivacyPage() {
           <div className="flex flex-col gap-10 text-muted-foreground leading-relaxed">
             <div className="flex flex-col gap-3">
               <h2 className="font-[family-name:var(--font-space-grotesk)] text-xl font-bold text-foreground">1. Titolare del Trattamento</h2>
-              <p>Il titolare del trattamento dei dati personali e MIRAI di Christian Scrivano, con sede a Catania (CT), Italia. Per qualsiasi comunicazione relativa al trattamento dei tuoi dati personali, puoi contattarci a: <span className="text-primary">mirailabstore@gmail.com</span></p>
+              <p>Il titolare del trattamento dei dati personali e MIRAI di Christian Scrivano, con sede a Catania (CT), Italia. Per qualsiasi comunicazione relativa al trattamento dei tuoi dati personali, puoi contattarci a: <span className="text-primary">info@mirailabstore.com</span></p>
             </div>
 
             <div className="flex flex-col gap-3">
@@ -83,7 +83,7 @@ export default function PrivacyPage() {
                   </li>
                 ))}
               </ul>
-              <p>Per esercitare i tuoi diritti, scrivi a <span className="text-primary">mirailabstore@gmail.com</span>. Puoi inoltre presentare reclamo al Garante per la Protezione dei Dati Personali.</p>
+              <p>Per esercitare i tuoi diritti, scrivi a <span className="text-primary">info@mirailabstore.com</span>. Puoi inoltre presentare reclamo al Garante per la Protezione dei Dati Personali.</p>
             </div>
 
             <div className="flex flex-col gap-3">

@@ -130,7 +130,7 @@ gtag('config', '${GOOGLE_ANALYTICS_ID}');`}
               name: "MIRAI",
               url: SITE_URL,
               logo: getAbsoluteUrl("/icon.svg"),
-              email: "mirailabstore@gmail.com",
+              email: "info@mirailabstore.com",
               description: "Streetwear esclusivo e cappelli custom New Era con cristalli e borchie. Pezzi unici fatti a mano. Made in Italy.",
               address: {
                 "@type": "PostalAddress",
@@ -143,7 +143,7 @@ gtag('config', '${GOOGLE_ANALYTICS_ID}');`}
               contactPoint: {
                 "@type": "ContactPoint",
                 contactType: "customer service",
-                email: "mirailabstore@gmail.com",
+                email: "info@mirailabstore.com",
                 availableLanguage: "Italian",
               },
             }),

@@ -29,9 +29,9 @@ export default function ContattiPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-16">
             {[
-              { icon: Mail, title: "Email", value: "mirailabstore@gmail.com", desc: "Rispondiamo entro 24 ore lavorative" },
+              { icon: Mail, title: "Email", value: "info@mirailabstore.com", desc: "Rispondiamo entro 24 ore lavorative" },
               { icon: Phone, title: "WhatsApp", value: "+39 349 866 3584", desc: "Lun - Ven, 10:00 - 18:00" },
-              { icon: MapPin, title: "Indirizzo", value: "Catania, Sicilia", desc: "Il nostro MIRAI LAB STORE aprirà presto" },
+              { icon: MapPin, title: "Indirizzo", value: "Via Umberto 95, 95129 Catania (CT)", desc: "Il nostro MIRAI LAB STORE aprirà presto" },
               { icon: Clock, title: "Orari Supporto", value: "Lun - Ven", desc: "10:00 - 13:00 / 15:00 - 18:00" },
             ].map((item) => (
               <div key={item.title} className="border border-border rounded-lg p-6 bg-card flex gap-4">

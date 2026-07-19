@@ -36,6 +36,13 @@ export function Footer() {
     de: "Ladenadresse",
     fr: "Adresse de la boutique",
   }[locale]
+  const supportEmailLabel = {
+    it: "Email assistenza",
+    en: "Support email",
+    es: "Email de asistencia",
+    de: "Support-E-Mail",
+    fr: "E-mail assistance",
+  }[locale]
   const communityLabel = {
     it: "Community",
     en: "Community",
@@ -141,7 +148,7 @@ export function Footer() {
                 </div>
               </div>
             </div>
-            <div className="grid divide-y divide-border text-xs text-muted-foreground sm:grid-cols-2 sm:divide-x sm:divide-y-0 lg:max-w-xl">
+            <div className="grid divide-y divide-border text-xs text-muted-foreground sm:grid-cols-3 sm:divide-x sm:divide-y-0 lg:max-w-3xl">
               <a
                 href="https://www.google.com/maps/search/?api=1&query=Via+Umberto+95%2C+95129+Catania+CT"
                 target="_blank"
@@ -152,6 +159,13 @@ export function Footer() {
                 <span>
                   <span className="mb-1 block text-[9px] font-bold uppercase tracking-[0.2em] text-primary">{storeAddressLabel}</span>
                   Via Umberto 95, 95129 Catania (CT)
+                </span>
+              </a>
+              <a href="mailto:info@mirailabstore.com" className="flex items-start gap-2.5 py-3 transition-colors hover:text-foreground sm:px-5 sm:py-0">
+                <Mail className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                <span>
+                  <span className="mb-1 block text-[9px] font-bold uppercase tracking-[0.2em] text-primary">{supportEmailLabel}</span>
+                  info@mirailabstore.com
                 </span>
               </a>
               <a href="mailto:mirailabstore@pec.it" className="flex items-start gap-2.5 py-3 transition-colors hover:text-foreground sm:py-0 sm:pl-5">
