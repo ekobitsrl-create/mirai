@@ -394,7 +394,7 @@ export function ProductDetail({
 
           <div className="mt-4 flex items-center gap-2 text-[10px] text-white/60">
             <PackageCheck className="h-4 w-4 text-emerald-400" />
-            {product.in_stock ? "Disponibile — spedizione in 1–2 giorni lavorativi" : "Momentaneamente non disponibile"}
+            {product.in_stock ? "Disponibile — preparazione 1–2 giorni, consegna standard 3–5 giorni lavorativi" : "Momentaneamente non disponibile"}
           </div>
 
           <div className="mt-8 grid grid-cols-3 border-y border-white/15 bg-white/[0.025] py-5">
