@@ -181,6 +181,10 @@ function ProductsTab({ products, categories, onRefresh }: { products: any[]; cat
     e.preventDefault()
     setSaving(true)
     const fd = new FormData(e.currentTarget)
+    const detailItems = ((fd.get("detail_items") as string) || "")
+      .split("\n")
+      .map((line) => line.trim())
+      .filter(Boolean)
     const data = {
       name: fd.get("name") as string,
       price: parseFloat(fd.get("price") as string),
@@ -188,6 +192,13 @@ function ProductsTab({ products, categories, onRefresh }: { products: any[]; cat
       image_url: fd.get("image_url") as string || null,
       sizes: (fd.get("sizes") as string)?.split(",").map(s => s.trim()).filter(Boolean) || [],
       description: fd.get("description") as string || null,
+      brand: (fd.get("brand") as string)?.trim() || null,
+      color_name: (fd.get("color_name") as string)?.trim() || null,
+      color_hex: (fd.get("color_hex") as string)?.trim() || null,
+      fit_note: (fd.get("fit_note") as string)?.trim() || null,
+      composition: (fd.get("composition") as string)?.trim() || null,
+      care: (fd.get("care") as string)?.trim() || null,
+      detail_items: detailItems.length ? detailItems : null,
       in_stock: fd.get("in_stock") === "on",
       is_new: fd.get("is_new") === "on",
     }
@@ -313,9 +324,61 @@ function ProductForm({ product, categories, onSubmit, saving }: {
         <Label className="text-[10px] uppercase tracking-widest text-muted-foreground">Taglie (separate da virgola)</Label>
         <Input name="sizes" defaultValue={product?.sizes?.join(", ") || ""} placeholder="S, M, L, XL" className="bg-secondary" />
       </div>
-      <div className="flex flex-col gap-1.5">
+      <div className="flex flex-col gap-1.5 md:col-span-2">
         <Label className="text-[10px] uppercase tracking-widest text-muted-foreground">Descrizione</Label>
-        <Input name="description" defaultValue={product?.description || ""} placeholder="Descrizione breve" className="bg-secondary" />
+        <textarea
+          name="description"
+          defaultValue={product?.description || ""}
+          placeholder="Descrizione del prodotto"
+          rows={3}
+          className="px-3 py-2 bg-secondary border border-border rounded-md text-foreground text-sm resize-y"
+        />
+      </div>
+      <div className="flex flex-col gap-1.5">
+        <Label className="text-[10px] uppercase tracking-widest text-muted-foreground">Brand</Label>
+        <Input name="brand" defaultValue={product?.brand || ""} placeholder="Es. Minimal Couture" className="bg-secondary" />
+      </div>
+      <div className="flex flex-col gap-1.5">
+        <Label className="text-[10px] uppercase tracking-widest text-muted-foreground">Nome colore</Label>
+        <Input name="color_name" defaultValue={product?.color_name || ""} placeholder="Es. Nero / Viola" className="bg-secondary" />
+      </div>
+      <div className="flex flex-col gap-1.5">
+        <Label className="text-[10px] uppercase tracking-widest text-muted-foreground">Colore (hex)</Label>
+        <div className="flex items-center gap-2">
+          <input
+            type="color"
+            aria-label="Selettore colore"
+            defaultValue={product?.color_hex || "#000000"}
+            onChange={(e) => {
+              const hexInput = e.currentTarget.parentElement?.querySelector<HTMLInputElement>('input[name="color_hex"]')
+              if (hexInput) hexInput.value = e.currentTarget.value
+            }}
+            className="h-10 w-12 rounded-md border border-border bg-secondary p-1"
+          />
+          <Input name="color_hex" defaultValue={product?.color_hex || ""} placeholder="#000000" className="bg-secondary" />
+        </div>
+      </div>
+      <div className="flex flex-col gap-1.5">
+        <Label className="text-[10px] uppercase tracking-widest text-muted-foreground">Nota vestibilità</Label>
+        <Input name="fit_note" defaultValue={product?.fit_note || ""} placeholder="Es. Vestibilità oversize..." className="bg-secondary" />
+      </div>
+      <div className="flex flex-col gap-1.5">
+        <Label className="text-[10px] uppercase tracking-widest text-muted-foreground">Composizione</Label>
+        <Input name="composition" defaultValue={product?.composition || ""} placeholder="Es. 100% cotone" className="bg-secondary" />
+      </div>
+      <div className="flex flex-col gap-1.5">
+        <Label className="text-[10px] uppercase tracking-widest text-muted-foreground">Lavaggio / cura</Label>
+        <Input name="care" defaultValue={product?.care || ""} placeholder="Es. Lavare al rovescio a 30°C" className="bg-secondary" />
+      </div>
+      <div className="flex flex-col gap-1.5 md:col-span-2">
+        <Label className="text-[10px] uppercase tracking-widest text-muted-foreground">Dettagli (uno per riga)</Label>
+        <textarea
+          name="detail_items"
+          defaultValue={Array.isArray(product?.detail_items) ? product.detail_items.join("\n") : ""}
+          placeholder={"Cotone heavyweight premium\nFit oversize con spalla scesa\nStampa frontale"}
+          rows={4}
+          className="px-3 py-2 bg-secondary border border-border rounded-md text-foreground text-sm resize-y"
+        />
       </div>
       <div className="flex items-center gap-6 md:col-span-2">
         <label className="flex items-center gap-2 text-sm text-foreground cursor-pointer">

@@ -32,6 +32,27 @@ function parseProductInventory(formData: FormData) {
   return { sizes, stock_by_size, in_stock }
 }
 
+function parseProductDetails(formData: FormData) {
+  const text = (value: FormDataEntryValue | null) => {
+    const trimmed = typeof value === "string" ? value.trim() : ""
+    return trimmed ? trimmed : null
+  }
+  const detailItems = ((formData.get("detail_items") as string) || "")
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean)
+
+  return {
+    brand: text(formData.get("brand")),
+    color_name: text(formData.get("color_name")),
+    color_hex: text(formData.get("color_hex")),
+    fit_note: text(formData.get("fit_note")),
+    composition: text(formData.get("composition")),
+    care: text(formData.get("care")),
+    detail_items: detailItems.length ? detailItems : null,
+  }
+}
+
 function revalidateCatalog(productId?: string) {
   revalidatePath("/admin")
   revalidatePath("/")
@@ -73,6 +94,7 @@ export async function createProduct(formData: FormData) {
     stock_by_size,
     in_stock,
     is_new,
+    ...parseProductDetails(formData),
   })
 
   if (error) throw new Error(error.message)
@@ -104,6 +126,7 @@ export async function updateProduct(formData: FormData) {
       stock_by_size,
       in_stock,
       is_new,
+      ...parseProductDetails(formData),
       updated_at: new Date().toISOString(),
     })
     .eq("id", id)

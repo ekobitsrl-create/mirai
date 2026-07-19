@@ -12,7 +12,8 @@ import {
   useRef,
   useState,
 } from "react"
-import { getMiraLocalReply, type MiraIntent } from "@/lib/mira-knowledge"
+import { getMiraLocalReply, setMiraCatalog, type MiraIntent } from "@/lib/mira-knowledge"
+import type { StoreProduct } from "@/lib/products"
 
 type MiraVariant = "male" | "female"
 type MiraAssetPose = "idle" | "listening" | "speaking"
@@ -238,6 +239,21 @@ export function MiraGuide() {
     offsetY: 0,
     dragging: false,
   })
+
+  useEffect(() => {
+    let active = true
+    fetch("/api/mira")
+      .then((response) => (response.ok ? response.json() : null))
+      .then((payload: { products?: StoreProduct[] } | null) => {
+        if (active && payload?.products) setMiraCatalog(payload.products)
+      })
+      .catch(() => {
+        // Offline product answers stay disabled if the catalog can't be loaded.
+      })
+    return () => {
+      active = false
+    }
+  }, [])
 
   useEffect(() => {
     let savedVariant: MiraVariant | null = null

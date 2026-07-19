@@ -1,4 +1,4 @@
-import { DEMO_PRODUCTS, isPrivateCheckoutProduct, type StoreProduct } from "@/lib/products"
+import { type StoreProduct } from "@/lib/products"
 import { formatShippingPrice, SHIPPING_CONFIG } from "@/lib/shipping"
 
 export type MiraIntent =
@@ -45,7 +45,15 @@ export type MiraKnowledgeReply = {
 }
 
 const EXPRESS_PRICE = formatShippingPrice(SHIPPING_CONFIG.expressPriceCents)
-const MIRA_PRODUCTS = DEMO_PRODUCTS.filter((product) => !isPrivateCheckoutProduct(product))
+
+// The offline fallback catalog is populated at runtime from the database
+// (see setMiraCatalog, called client-side by the MIRA guide widget). When the
+// live /api/mira endpoint answers, product data comes from the DB catalog instead.
+let miraCatalog: StoreProduct[] = []
+
+export function setMiraCatalog(products: StoreProduct[]) {
+  miraCatalog = products
+}
 
 function normalize(value: string) {
   return value
@@ -114,7 +122,7 @@ function productFromContext(message: string, context: MiraKnowledgeContext) {
   const productIdFromPath = context.pathname?.match(/^\/prodotto\/([^/?#]+)/)?.[1]
   const contextualId = productIdFromPath || context.lastProductId
 
-  return MIRA_PRODUCTS.find((product) => {
+  return miraCatalog.find((product) => {
     const productName = normalize(product.name)
     const words = productName.split(" ").filter((word) => word.length >= 4)
     return product.id === contextualId
@@ -153,7 +161,7 @@ function budgetReply(message: string) {
     )
   }
 
-  const matching = MIRA_PRODUCTS
+  const matching = miraCatalog
     .filter((product) => product.in_stock && Number(product.price) <= budget)
     .sort((left, right) => Number(right.price) - Number(left.price))
 

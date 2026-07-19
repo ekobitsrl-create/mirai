@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
-import { DEMO_PRODUCTS, isPrivateCheckoutProduct, withDemoProducts, type StoreProduct } from "@/lib/products"
+import { isPrivateCheckoutProduct, withDemoProducts, type StoreProduct } from "@/lib/products"
 import { formatShippingPrice, SHIPPING_CONFIG } from "@/lib/shipping"
 
 export const runtime = "nodejs"
@@ -73,14 +73,37 @@ async function getCatalog() {
     const supabase = await createClient()
     const { data } = await supabase
       .from("products")
-      .select("id, name, description, price, category, image_url, sizes, in_stock, is_new, created_at")
+      .select("*")
       .order("created_at", { ascending: false })
       .limit(40)
 
     return withDemoProducts((data || []) as StoreProduct[]).filter((product) => !isPrivateCheckoutProduct(product))
   } catch {
-    return DEMO_PRODUCTS.filter((product) => !isPrivateCheckoutProduct(product))
+    return []
   }
+}
+
+// Lightweight catalog endpoint consumed client-side by the MIRA guide widget to
+// power its offline fallback answers (product names, sizes, fit, care, colors).
+export async function GET() {
+  const products = await getCatalog()
+  return NextResponse.json({
+    products: products.map((product) => ({
+      id: product.id,
+      name: product.name,
+      description: product.description,
+      price: Number(product.price),
+      category: product.category,
+      image_url: product.image_url,
+      sizes: product.sizes || [],
+      in_stock: Boolean(product.in_stock),
+      is_new: Boolean(product.is_new),
+      created_at: product.created_at,
+      fit_note: product.fit_note,
+      color_name: product.color_name,
+      care: product.care,
+    })),
+  })
 }
 
 function catalogForPrompt(products: StoreProduct[]) {
