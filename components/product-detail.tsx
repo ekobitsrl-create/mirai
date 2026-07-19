@@ -254,7 +254,7 @@ export function ProductDetail({
           </button>
         </section>
 
-        <section className="mirai-neon-card relative overflow-hidden rounded-[1.75rem] p-5 sm:p-7 lg:sticky lg:top-32 lg:self-start lg:p-8">
+        <section className="mirai-neon-card relative overflow-hidden rounded-[1.75rem] p-5 sm:p-7 lg:!sticky lg:top-32 lg:self-start lg:p-8">
           <div className="flex items-start justify-between gap-6">
             <div>
               <p className="text-[9px] font-semibold uppercase tracking-[0.3em] text-[#9f86ff]">MIRAI LAB / {product.brand || formatCategory(product.category)}</p>
