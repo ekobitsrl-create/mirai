@@ -114,8 +114,8 @@ export const translations = {
     },
     // Features
     features: {
-      globalShipping: "Spedizione Globale",
-      globalShippingDesc: "Consegna standard gratuita in tutta Europa.",
+      globalShipping: "Spedizione Gratuita",
+      globalShippingDesc: "Spedizione gratuita in Italia e in Europa.",
       securePayment: "Pagamento Sicuro",
       securePaymentDesc: "Transazioni protette con crittografia di livello bancario.",
       easyReturns: "Resi Facili",
