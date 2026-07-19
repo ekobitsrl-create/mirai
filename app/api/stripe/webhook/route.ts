@@ -28,9 +28,6 @@ function shippingAddress(session: Stripe.Checkout.Session) {
 
 async function saveOrder(session: Stripe.Checkout.Session) {
   const userId = session.client_reference_id || session.metadata?.user_id
-  if (!userId) {
-    throw new Error('Sessione Stripe priva dell utente MIRAI PASS')
-  }
 
   if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
     throw new Error('SUPABASE_SERVICE_ROLE_KEY non configurata')
@@ -54,7 +51,7 @@ async function saveOrder(session: Stripe.Checkout.Session) {
   const { data: order, error: orderError } = await supabase
     .from('orders')
     .insert({
-      user_id: userId,
+      user_id: userId || null,
       email: session.customer_details?.email || session.customer_email || '',
       status: 'confirmed',
       total: (session.amount_total || 0) / 100,

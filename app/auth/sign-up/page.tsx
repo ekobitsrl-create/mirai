@@ -14,16 +14,16 @@ function safeNextPath(value: string | null) {
 }
 
 function SignUpForm() {
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const nextPath = safeNextPath(searchParams.get("next"))
   const [firstName, setFirstName] = useState("")
   const [lastName, setLastName] = useState("")
-  const [email, setEmail] = useState("")
+  const [email, setEmail] = useState(() => searchParams.get("email") || "")
   const [password, setPassword] = useState("")
   const [repeatPassword, setRepeatPassword] = useState("")
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
-  const router = useRouter()
-  const searchParams = useSearchParams()
-  const nextPath = safeNextPath(searchParams.get("next"))
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault()

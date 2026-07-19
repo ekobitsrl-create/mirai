@@ -19,11 +19,17 @@ type CartLineItem = {
   customization?: unknown
 }
 
-export async function createCheckoutSession(cartItems: CartLineItem[]) {
+function validEmail(value?: string) {
+  const email = value?.trim().toLowerCase() || ''
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ? email : null
+}
+
+export async function createCheckoutSession(cartItems: CartLineItem[], guestEmail?: string) {
   assertStripeConfigured()
   const user = await getServerUser()
-  if (!user?.email) {
-    throw new Error('Accedi o crea il tuo MIRAI PASS per completare il pagamento')
+  const customerEmail = validEmail(user?.email || guestEmail)
+  if (!customerEmail) {
+    throw new Error('Inserisci un indirizzo email valido per ricevere la conferma ordine')
   }
 
   if (!cartItems.length) {
@@ -123,16 +129,16 @@ export async function createCheckoutSession(cartItems: CartLineItem[]) {
     return_url: `${baseUrl}/success?session_id={CHECKOUT_SESSION_ID}`,
     line_items: lineItems,
     mode: 'payment',
-    customer_creation: 'always',
-    customer_email: user.email,
-    client_reference_id: user.id,
+    customer_creation: 'if_required',
+    customer_email: customerEmail,
+    ...(user ? { client_reference_id: user.id } : {}),
     metadata: {
-      user_id: user.id,
       order_item_count: String(cartItems.length),
+      ...(user ? { user_id: user.id } : {}),
     },
     payment_intent_data: {
-      receipt_email: user.email,
-      metadata: { user_id: user.id },
+      receipt_email: customerEmail,
+      metadata: user ? { user_id: user.id } : {},
     },
     shipping_address_collection: {
       allowed_countries: [...SHIPPING_CONFIG.allowedCountries],

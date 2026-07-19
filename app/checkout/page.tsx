@@ -4,18 +4,26 @@ import { useCallback, useEffect, useRef, useState } from "react"
 import { loadStripe } from "@stripe/stripe-js"
 import { EmbeddedCheckoutProvider, EmbeddedCheckout } from "@stripe/react-stripe-js"
 import Link from "next/link"
-import { ArrowLeft, LogIn, ShoppingBag } from "lucide-react"
+import { ArrowLeft, Mail, ShoppingBag, UserPlus } from "lucide-react"
 import { useCart } from "@/lib/cart-context"
 import { useLanguage } from "@/lib/language-context"
 import { createCheckoutSession } from "@/app/actions/stripe"
 import { createClient } from "@/lib/supabase/client"
+import { Checkbox } from "@/components/ui/checkbox"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!)
+const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 export default function CheckoutPage() {
   const { items, getTotal, clearCart, hydrated } = useCart()
   const { t } = useLanguage()
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null)
+  const [guestEmail, setGuestEmail] = useState("")
+  const [guestCheckoutReady, setGuestCheckoutReady] = useState(false)
+  const [createAccount, setCreateAccount] = useState(false)
+  const [guestError, setGuestError] = useState<string | null>(null)
   const sessionIdRef = useRef<string | null>(null)
 
   useEffect(() => {
@@ -37,14 +45,24 @@ export default function CheckoutPage() {
       lineId: item.lineId,
       customization: item.customization,
     }))
-    const session = await createCheckoutSession(cartLineItems)
+    const session = await createCheckoutSession(cartLineItems, isAuthenticated ? undefined : guestEmail)
     if (!session?.clientSecret) {
       throw new Error(t.checkout.error)
     }
 
     sessionIdRef.current = session.sessionId
     return session.clientSecret
-  }, [items, t.checkout.error])
+  }, [guestEmail, isAuthenticated, items, t.checkout.error])
+
+  const beginGuestCheckout = () => {
+    if (!emailPattern.test(guestEmail.trim())) {
+      setGuestError("Inserisci un indirizzo email valido per ricevere la conferma ordine.")
+      return
+    }
+
+    setGuestError(null)
+    setGuestCheckoutReady(true)
+  }
 
   if (!hydrated || isAuthenticated === null) {
     return (
@@ -60,10 +78,7 @@ export default function CheckoutPage() {
         <ShoppingBag className="h-16 w-16 text-muted-foreground/30 mb-6" />
         <h1 className="text-2xl font-bold text-foreground mb-2">{t.checkout.emptyCart}</h1>
         <p className="text-muted-foreground mb-8">{t.checkout.emptyCartDesc}</p>
-        <Link
-          href="/"
-          className="inline-flex items-center gap-2 bg-primary px-8 py-3 text-xs font-bold uppercase tracking-widest text-primary-foreground transition-colors hover:bg-primary/90"
-        >
+        <Link href="/" className="inline-flex items-center gap-2 bg-primary px-8 py-3 text-xs font-bold uppercase tracking-widest text-primary-foreground transition-colors hover:bg-primary/90">
           <ArrowLeft className="h-4 w-4" />
           {t.checkout.backToShop}
         </Link>
@@ -71,37 +86,14 @@ export default function CheckoutPage() {
     )
   }
 
-  if (!isAuthenticated) {
-    return (
-      <main className="flex min-h-screen items-center justify-center bg-background px-6">
-        <section className="w-full max-w-md border border-border bg-card p-8 text-center">
-          <LogIn className="mx-auto mb-5 h-11 w-11 text-primary" />
-          <h1 className="text-2xl font-bold text-foreground">Completa con il tuo MIRAI PASS</h1>
-          <p className="mt-3 text-sm leading-6 text-muted-foreground">
-            Crea un account o accedi per pagare e ritrovare ogni ordine nel tuo pannello personale.
-          </p>
-          <div className="mt-7 grid gap-3">
-            <Link href="/auth/sign-up?next=/checkout" className="bg-primary px-5 py-3 text-xs font-bold uppercase tracking-widest text-primary-foreground">
-              Crea MIRAI PASS
-            </Link>
-            <Link href="/auth/login?redirectTo=/checkout" className="border border-border px-5 py-3 text-xs font-bold uppercase tracking-widest text-foreground">
-              Accedi
-            </Link>
-          </div>
-        </section>
-      </main>
-    )
-  }
+  const accountSignUpHref = `/auth/sign-up?next=/checkout&email=${encodeURIComponent(guestEmail.trim())}`
 
   return (
     <main className="min-h-screen bg-background">
-      <div className="max-w-4xl mx-auto px-6 pt-28 pb-16">
-        <div className="flex items-center justify-between mb-10">
+      <div className="mx-auto max-w-4xl px-6 pb-16 pt-28">
+        <div className="mb-10 flex items-center justify-between">
           <div>
-            <Link
-              href="/"
-              className="mb-4 inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
-            >
+            <Link href="/" className="mb-4 inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground">
               <ArrowLeft className="h-4 w-4" />
               {t.checkout.backToShop}
             </Link>
@@ -115,21 +107,84 @@ export default function CheckoutPage() {
           </div>
         </div>
 
-        <div className="min-h-[400px] border border-border bg-card p-1">
-          <EmbeddedCheckoutProvider
-            stripe={stripePromise}
-            options={{
-              fetchClientSecret,
-              onComplete: () => {
-                clearCart()
-                const sessionId = sessionIdRef.current
-                window.location.assign(sessionId ? `/success?session_id=${encodeURIComponent(sessionId)}` : "/success")
-              },
-            }}
-          >
-            <EmbeddedCheckout />
-          </EmbeddedCheckoutProvider>
-        </div>
+        {!isAuthenticated && !guestCheckoutReady ? (
+          <section className="mx-auto max-w-xl border border-border bg-card p-6 sm:p-8">
+            <div className="flex items-start gap-3">
+              <Mail className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
+              <div>
+                <h2 className="font-semibold text-foreground">Acquisto come ospite</h2>
+                <p className="mt-1 text-sm leading-6 text-muted-foreground">Riceverai qui la conferma e gli aggiornamenti del tuo ordine.</p>
+              </div>
+            </div>
+
+            <div className="mt-6">
+              <Label htmlFor="guest-email" className="text-xs uppercase tracking-widest text-muted-foreground">Email</Label>
+              <Input
+                id="guest-email"
+                type="email"
+                autoComplete="email"
+                value={guestEmail}
+                onChange={(event) => {
+                  setGuestEmail(event.target.value)
+                  setGuestError(null)
+                }}
+                placeholder="nome@esempio.com"
+                className="mt-2 bg-secondary"
+              />
+            </div>
+
+            <div className="mt-5 flex items-start gap-3">
+              <Checkbox id="create-account" checked={createAccount} onCheckedChange={(checked) => setCreateAccount(checked === true)} />
+              <Label htmlFor="create-account" className="cursor-pointer text-sm leading-5 text-foreground">
+                Vuoi creare un account per vedere gli ordini dal tuo pannello?
+              </Label>
+            </div>
+
+            {guestError && <p className="mt-4 text-sm text-destructive">{guestError}</p>}
+
+            {createAccount ? (
+              <div className="mt-6 border-t border-border pt-6">
+                <p className="text-sm text-muted-foreground">Crea il MIRAI PASS prima del pagamento: al ritorno troverai il carrello pronto.</p>
+                <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                  <Link href={accountSignUpHref} className="inline-flex items-center justify-center gap-2 bg-primary px-5 py-3 text-xs font-bold uppercase tracking-widest text-primary-foreground">
+                    <UserPlus className="h-4 w-4" /> Crea account
+                  </Link>
+                  <Link href="/auth/login?redirectTo=/checkout" className="inline-flex items-center justify-center border border-border px-5 py-3 text-xs font-bold uppercase tracking-widest text-foreground">
+                    Ho gia un account
+                  </Link>
+                </div>
+              </div>
+            ) : (
+              <button type="button" onClick={beginGuestCheckout} className="mt-6 w-full bg-primary px-5 py-3 text-xs font-bold uppercase tracking-widest text-primary-foreground transition-colors hover:bg-primary/90">
+                Continua come ospite
+              </button>
+            )}
+          </section>
+        ) : (
+          <>
+            {!isAuthenticated && (
+              <div className="mb-4 flex items-center justify-between border border-border bg-card px-4 py-3 text-sm text-muted-foreground">
+                <span>Acquisto come ospite: {guestEmail.trim()}</span>
+                <button type="button" onClick={() => setGuestCheckoutReady(false)} className="text-xs font-bold uppercase tracking-widest text-primary">Modifica</button>
+              </div>
+            )}
+            <div className="min-h-[400px] border border-border bg-card p-1">
+              <EmbeddedCheckoutProvider
+                stripe={stripePromise}
+                options={{
+                  fetchClientSecret,
+                  onComplete: () => {
+                    clearCart()
+                    const sessionId = sessionIdRef.current
+                    window.location.assign(sessionId ? `/success?session_id=${encodeURIComponent(sessionId)}` : "/success")
+                  },
+                }}
+              >
+                <EmbeddedCheckout />
+              </EmbeddedCheckoutProvider>
+            </div>
+          </>
+        )}
       </div>
     </main>
   )

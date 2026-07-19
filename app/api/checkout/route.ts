@@ -19,6 +19,11 @@ type CheckoutCartItem = {
   customization?: unknown
 }
 
+function validEmail(value: unknown) {
+  const email = typeof value === 'string' ? value.trim().toLowerCase() : ''
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ? email : null
+}
+
 /**
  * POST /api/checkout
  * Crea una Stripe Checkout Session e restituisce l'URL per il redirect
@@ -31,15 +36,24 @@ export async function POST(request: NextRequest) {
   try {
     assertStripeConfigured()
     const user = await getServerUser()
-    if (!user?.email) {
-      return NextResponse.json(
-        { error: 'Accedi o crea il tuo MIRAI PASS per completare il pagamento', authRequired: true },
-        { status: 401 }
-      )
-    }
-
     const body = await request.json()
-    const { items, priceId, paymentMethod, cancelPath } = body
+    const { items, priceId, paymentMethod, cancelPath, customerEmail: requestedEmail } = body
+    const customerEmail = validEmail(user?.email || requestedEmail)
+    const accountMetadata: Stripe.MetadataParam = user ? { user_id: user.id } : {}
+    const customerParams: Pick<
+      Stripe.Checkout.SessionCreateParams,
+      'customer_creation' | 'customer_email' | 'client_reference_id' | 'payment_intent_data'
+    > = {
+      customer_creation: 'if_required' as const,
+    }
+    if (customerEmail) {
+      customerParams.customer_email = customerEmail
+      customerParams.payment_intent_data = {
+        receipt_email: customerEmail,
+        metadata: accountMetadata,
+      }
+    }
+    if (user) customerParams.client_reference_id = user.id
 
     const quickPaymentMethod =
       paymentMethod === 'paypal' || paymentMethod === 'klarna' || paymentMethod === 'scalapay'
@@ -72,6 +86,7 @@ export async function POST(request: NextRequest) {
         throw new Error('Prezzo Stripe non valido')
       }
 
+      const priceMetadata: Stripe.MetadataParam = { ...accountMetadata, order_item_count: '1' }
       const session = await stripe.checkout.sessions.create({
         mode: 'payment',
         ...paymentMethodParams,
@@ -87,14 +102,8 @@ export async function POST(request: NextRequest) {
         shipping_options: getStripeShippingOptions(price.unit_amount),
         success_url: `${baseUrl}/success?session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${baseUrl}${safeCancelPath}`,
-        customer_creation: 'always',
-        customer_email: user.email,
-        client_reference_id: user.id,
-        metadata: { user_id: user.id, order_item_count: '1' },
-        payment_intent_data: {
-          receipt_email: user.email,
-          metadata: { user_id: user.id },
-        },
+        ...customerParams,
+        metadata: priceMetadata,
       })
 
       return NextResponse.json({ url: session.url })
@@ -210,6 +219,14 @@ export async function POST(request: NextRequest) {
     })))
 
     // Crea la sessione Stripe Checkout
+    const sessionMetadata: Stripe.MetadataParam = {
+      ...accountMetadata,
+      ...(compactOrderItems.length <= 500
+        ? { order_items: compactOrderItems }
+        : { order_item_count: String(items.length) }),
+      ...(quickPaymentMethod ? { requested_payment_method: quickPaymentMethod } : {}),
+    }
+
     const session = await stripe.checkout.sessions.create({
       mode: 'payment',
       ...paymentMethodParams,
@@ -223,20 +240,8 @@ export async function POST(request: NextRequest) {
       success_url: `${baseUrl}/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${baseUrl}${safeCancelPath}`,
       // Metadata per tracciamento ordine
-      metadata: {
-        user_id: user.id,
-        ...(compactOrderItems.length <= 500
-          ? { order_items: compactOrderItems }
-          : { order_item_count: String(items.length) }),
-        ...(quickPaymentMethod ? { requested_payment_method: quickPaymentMethod } : {}),
-      },
-      customer_creation: 'always',
-      customer_email: user.email,
-      client_reference_id: user.id,
-      payment_intent_data: {
-        receipt_email: user.email,
-        metadata: { user_id: user.id },
-      },
+      metadata: sessionMetadata,
+      ...customerParams,
     })
 
     return NextResponse.json({ url: session.url })

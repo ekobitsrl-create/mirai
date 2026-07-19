@@ -13,9 +13,6 @@ export async function GET(request: NextRequest) {
   try {
     assertStripeConfigured()
     const user = await getServerUser()
-    if (!user) {
-      return NextResponse.json({ error: 'Accesso richiesto' }, { status: 401 })
-    }
 
     const sessionId = request.nextUrl.searchParams.get('session_id')
     if (!sessionId || !sessionId.startsWith('cs_')) {
@@ -24,7 +21,7 @@ export async function GET(request: NextRequest) {
 
     const session = await stripe.checkout.sessions.retrieve(sessionId)
     const orderUserId = session.client_reference_id || session.metadata?.user_id
-    if (!orderUserId || orderUserId !== user.id) {
+    if (orderUserId && orderUserId !== user?.id) {
       return NextResponse.json({ error: 'Ordine non disponibile' }, { status: 404 })
     }
 
@@ -41,7 +38,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({
       id: session.id,
-      email: session.customer_details?.email || session.customer_email || user.email,
+      email: session.customer_details?.email || session.customer_email || user?.email || '',
       amountTotal: (session.amount_total || 0) / 100,
       currency: session.currency || 'eur',
       shipping: shippingDetails
