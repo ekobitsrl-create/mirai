@@ -261,19 +261,19 @@
 }
 
 /* Blurred duplicate of the hero image, enlarged so its soft halo overhangs
-   the frame border, masked so only the outer edges show. */
+   the frame border, masked so only the outer edges show. Strong, wide blur. */
 .mirai-hero-edge-blur {
-  filter: blur(30px);
-  transform: scale(1.08);
-  -webkit-mask-image: radial-gradient(ellipse 82% 82% at center, transparent 40%, #000 70%);
-  mask-image: radial-gradient(ellipse 82% 82% at center, transparent 40%, #000 70%);
+  filter: blur(70px);
+  transform: scale(1.16);
+  -webkit-mask-image: radial-gradient(ellipse 90% 90% at center, transparent 12%, #000 58%);
+  mask-image: radial-gradient(ellipse 90% 90% at center, transparent 12%, #000 58%);
 }
 
-/* Fade the sharp base image out before its own hard rectangular edge, so the
-   crisp boundary never peeks through beneath the blurred edge layer. */
+/* Fade the sharp base image out well before its own hard rectangular edge, so
+   a wide, heavily-blurred band replaces the crisp boundary. */
 .mirai-hero-base {
-  -webkit-mask-image: radial-gradient(ellipse 82% 82% at center, #000 46%, transparent 82%);
-  mask-image: radial-gradient(ellipse 82% 82% at center, #000 46%, transparent 82%);
+  -webkit-mask-image: radial-gradient(ellipse 90% 90% at center, #000 16%, transparent 60%);
+  mask-image: radial-gradient(ellipse 90% 90% at center, #000 16%, transparent 60%);
 }
 
 .mirai-soft-float {
