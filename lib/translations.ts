@@ -126,7 +126,7 @@ export const translations = {
     // Newsletter
     newsletter: {
       title: "Unisciti a Noi",
-      description: "Sii il primo a scoprire tutte le offerte e le sorprese!",
+      description: "Ricevi accesso anticipato ai drop, aggiornamenti sull'apertura dello store, inviti agli eventi e contenuti riservati.",
       placeholder: "Il tuo indirizzo email",
       subscribe: "Iscriviti",
       success: "Ti sei iscritto con successo!",
