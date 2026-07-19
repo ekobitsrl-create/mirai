@@ -31,7 +31,7 @@ export default function SpedizioniPage() {
           <div className="mb-16 grid grid-cols-1 gap-4 md:grid-cols-2">
             {[
               { icon: Truck, title: "Standard", value: "3-5 giorni lavorativi", desc: "Sempre gratuita, senza importo minimo" },
-              { icon: Globe, title: "Destinazioni", value: "Italia, UE, Regno Unito e Svizzera", desc: "Eventuali dazi extra UE restano a carico del destinatario" },
+              { icon: Globe, title: "Destinazioni", value: "Italia e UE", desc: "Spedizione gratuita in Italia e in Europa" },
               { icon: MapPin, title: "Origine ordine", value: "Catania, Italia", desc: "Preparazione e dispatch dal team MIRAI" },
             ].map((item) => (
               <div key={item.title} className="flex gap-4 rounded-lg border border-border bg-card p-6">
@@ -70,10 +70,10 @@ export default function SpedizioniPage() {
 
             <section className="flex flex-col gap-4">
               <h2 className="font-[family-name:var(--font-space-grotesk)] text-2xl font-bold tracking-tight text-foreground">
-                Dazi, indirizzi e mancata consegna
+                Indirizzi e mancata consegna
               </h2>
               <p className="leading-relaxed">
-                Per Regno Unito, Svizzera e altre spedizioni extra UE possono essere applicati dazi o oneri doganali a carico del destinatario. Verifica sempre l'indirizzo prima del pagamento: eventuali costi per giacenza, riconsegna o rientro causati da dati errati possono essere addebitati al cliente.
+                Verifica sempre l'indirizzo prima del pagamento: eventuali costi per giacenza, riconsegna o rientro causati da dati errati possono essere addebitati al cliente.
               </p>
             </section>
 
