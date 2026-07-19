@@ -8,7 +8,7 @@ import { useLanguage } from "@/lib/language-context"
 
 const slideImages = [
   { src: "/images/hero-mirai-logo.png", ratio: 738 / 1600, heightPct: 90 },
-  { src: "/images/hero-storefront.png", ratio: 1536 / 1024, heightPct: 72 },
+  { src: "/images/hero-storefront.png", ratio: 1536 / 1024, heightPct: 72, strongBottomFade: true },
   { src: "/images/hero-model-black.png", ratio: 1024 / 1536, heightPct: 70 },
   { src: "/images/hero-model-white.png", ratio: 1024 / 1536, heightPct: 70 },
 ]
@@ -90,7 +90,11 @@ export function Hero() {
                 priority={i === 0}
                 sizes="100vw"
               />
-              <div className="mirai-image-edge-fade absolute inset-0" />
+              <div
+                className={`mirai-image-edge-fade absolute inset-0 ${
+                  image.strongBottomFade ? "mirai-image-edge-fade--bottom" : ""
+                }`}
+              />
             </div>
           </div>
         </div>
