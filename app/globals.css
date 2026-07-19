@@ -252,12 +252,22 @@
   pointer-events: none;
   background: radial-gradient(ellipse at center, transparent 74%, rgba(8, 5, 12, 0.06) 86%, rgba(7, 4, 11, 0.55) 100%);
   box-shadow: inset 0 0 34px rgba(159, 134, 255, 0.05);
-  /* Blur ONLY the borders of the image, keeping the center sharp.
-     The backdrop blur is masked so it fades in toward the outer edges. */
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  -webkit-mask-image: radial-gradient(ellipse 72% 72% at center, transparent 58%, rgba(0, 0, 0, 0.6) 80%, #000 100%);
-  mask-image: radial-gradient(ellipse 72% 72% at center, transparent 58%, rgba(0, 0, 0, 0.6) 80%, #000 100%);
+}
+
+/* Blurred duplicate of the hero image, masked so only the outer edges show.
+   The sharp base image stays crisp in the center while its borders are
+   softened/blurred and blend into the background. */
+.mirai-hero-edge-blur {
+  filter: blur(26px);
+  -webkit-mask-image: radial-gradient(ellipse 74% 74% at center, transparent 42%, #000 72%);
+  mask-image: radial-gradient(ellipse 74% 74% at center, transparent 42%, #000 72%);
+}
+
+/* Fade the sharp base image out before its own hard rectangular edge, so the
+   crisp boundary never peeks through beneath the blurred edge layer. */
+.mirai-hero-base {
+  -webkit-mask-image: radial-gradient(ellipse 74% 74% at center, #000 40%, transparent 74%);
+  mask-image: radial-gradient(ellipse 74% 74% at center, #000 40%, transparent 74%);
 }
 
 .mirai-soft-float {
