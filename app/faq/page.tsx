@@ -54,11 +54,11 @@ const faqs = [
       },
       {
         q: "Il reso e gratuito?",
-        a: "Si, il primo reso approvato e gratuito per ordini consegnati in Italia. Per resi fuori dall'Italia, eventuali costi sono comunicati prima dell'invio delle istruzioni e restano a carico del cliente, salvo prodotto difettoso o non conforme.",
+        a: "Si. Per ogni reso approvato, MIRAI invia un'etichetta prepagata e sostiene le spese di restituzione, secondo le condizioni indicate nella pagina Resi e Rimborsi.",
       },
       {
         q: "Quanto tempo ci vuole per il rimborso?",
-        a: "Il rimborso viene emesso entro 7 giorni lavorativi dalla ricezione e verifica del reso, sullo stesso metodo di pagamento utilizzato per l'acquisto.",
+        a: "Il rimborso viene emesso entro 14 giorni dalla ricezione e verifica del prodotto, sullo stesso metodo di pagamento utilizzato per l'acquisto.",
       },
     ],
   },
