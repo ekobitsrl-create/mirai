@@ -8,7 +8,7 @@ import { useLanguage } from "@/lib/language-context"
 
 const slideImages = [
   { src: "/images/hero-mirai-logo.png", ratio: 738 / 1600, heightPct: 90 },
-  { src: "/images/hero-storefront.png", ratio: 1536 / 1024, heightPct: 72 },
+  { src: "/images/hero-storefront.png", ratio: 1536 / 1024, heightPct: 68, heightPctMobile: 54, strongBottomFade: true },
   { src: "/images/hero-model-black.png", ratio: 1024 / 1536, heightPct: 70 },
   { src: "/images/hero-model-white.png", ratio: 1024 / 1536, heightPct: 70 },
 ]
@@ -68,7 +68,13 @@ export function Hero() {
           <div className="absolute inset-0 flex items-center justify-center">
             <div
               className="mirai-hero-frame relative drop-shadow-[0_0_48px_rgba(159,134,255,0.16)]"
-              style={{ height: `${image.heightPct}%`, aspectRatio: image.ratio }}
+              style={
+                {
+                  "--hero-h": `${image.heightPct}%`,
+                  "--hero-h-mobile": `${image.heightPctMobile ?? image.heightPct}%`,
+                  aspectRatio: image.ratio,
+                } as React.CSSProperties
+              }
             >
               {/* Blurred, slightly enlarged copy sits behind so its soft halo
                   hides the sharp rectangular border of the base image. */}
@@ -90,7 +96,11 @@ export function Hero() {
                 priority={i === 0}
                 sizes="100vw"
               />
-              <div className="mirai-image-edge-fade absolute inset-0" />
+              <div
+                className={`mirai-image-edge-fade absolute inset-0 ${
+                  image.strongBottomFade ? "mirai-image-edge-fade--bottom" : ""
+                }`}
+              />
             </div>
           </div>
         </div>

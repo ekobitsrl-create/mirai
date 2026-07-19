@@ -254,10 +254,34 @@
   box-shadow: inset 0 0 34px rgba(159, 134, 255, 0.05);
 }
 
+/* Some slides (e.g. the wide storefront shot) have a bright band along the
+   bottom edge that the symmetric radial fade can't fully dissolve. Layer an
+   extra bottom-weighted gradient so that edge melts into the dark page. */
+.mirai-image-edge-fade--bottom {
+  background:
+    linear-gradient(
+      to top,
+      rgba(7, 4, 11, 0.95) 0%,
+      rgba(7, 4, 11, 0.7) 8%,
+      rgba(7, 4, 11, 0.32) 18%,
+      transparent 34%
+    ),
+    radial-gradient(ellipse at center, transparent 74%, rgba(8, 5, 12, 0.06) 86%, rgba(7, 4, 11, 0.55) 100%);
+}
+
 /* The frame matches each image's aspect ratio, so its edges line up exactly
    with the rendered image edges regardless of portrait/landscape. */
 .mirai-hero-frame {
   overflow: visible;
+  /* Smaller on mobile, full size from the md breakpoint up. Falls back to
+     --hero-h when a slide doesn't define a separate mobile height. */
+  height: var(--hero-h-mobile, var(--hero-h));
+}
+
+@media (min-width: 768px) {
+  .mirai-hero-frame {
+    height: var(--hero-h);
+  }
 }
 
 /* Blurred duplicate of the hero image, enlarged so its soft halo overhangs
