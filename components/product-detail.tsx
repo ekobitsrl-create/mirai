@@ -400,7 +400,7 @@ export function ProductDetail({
           <div className="mt-8 grid grid-cols-3 border-y border-white/15 bg-white/[0.025] py-5">
             <TrustItem icon={Truck} title="Spedizione gratuita" detail="Sempre" />
             <TrustItem icon={RotateCcw} title="Reso facile" detail="Entro 14 giorni" bordered />
-            <TrustItem icon={ShieldCheck} title="Pagamento" detail="100% sicuro" />
+            <TrustItem icon={ShieldCheck} title="Pagamento" detail="Protetto da Stripe" />
           </div>
 
           <div className="mt-1">
