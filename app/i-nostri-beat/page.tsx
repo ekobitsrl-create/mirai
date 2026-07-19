@@ -5,6 +5,7 @@ import { BeatTurntable } from "@/components/beat-turntable"
 
 export const metadata: Metadata = {
   title: "I Nostri Beat - MIRAI",
+  alternates: { canonical: "/i-nostri-beat" },
   description: "Ascolta le tracce MIRAI con giradischi animato, player e tracklist.",
 }
 

@@ -7,6 +7,7 @@ import { Footer } from "@/components/footer"
 
 export const metadata: Metadata = {
   title: "Chi Siamo - MIRAI",
+  alternates: { canonical: "/chi-siamo" },
   description:
     "MIRAI: il futuro dello streetwear. Un progetto innovativo nato a Catania che fonde moda, tecnologia e cultura urbana.",
 }

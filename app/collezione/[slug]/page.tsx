@@ -6,9 +6,8 @@ import { Footer } from "@/components/footer"
 import { CollectionProducts } from "@/components/collection-products"
 import { notFound } from "next/navigation"
 import { withDemoProducts, type StoreProduct } from "@/lib/products"
+import { getAbsoluteUrl } from "@/lib/site-url"
 import type { SupabaseClient } from "@supabase/supabase-js"
-
-const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://mirai-clothing.vercel.app"
 
 const STATIC_CATEGORY_NAMES: Record<string, string> = {
   "t-shirt": "T-Shirt",
@@ -42,9 +41,9 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug: rawSlug } = await params
   const slug = decodeURIComponent(rawSlug).trim().toLowerCase().replace(/\s+/g, '-')
   const supabase = await createClient()
-  let { data: category } = await supabase.from("categories").select("name, description").eq("slug", slug).single()
+  let { data: category } = await supabase.from("categories").select("name, description, image_url").eq("slug", slug).single()
   if (!category) {
-    const { data: categoryByIlike } = await supabase.from("categories").select("name, description").ilike("slug", slug).single()
+    const { data: categoryByIlike } = await supabase.from("categories").select("name, description, image_url").ilike("slug", slug).single()
     category = categoryByIlike
   }
 
@@ -55,9 +54,11 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   return {
     title: `${category.name} - Collezione`,
     description: category.description || `Scopri la collezione ${category.name} su MIRAI. Pezzi esclusivi di streetwear e accessori custom.`,
+    alternates: { canonical: `/collezione/${encodeURIComponent(slug)}` },
     openGraph: {
       title: `${category.name} - Collezione MIRAI`,
       description: category.description || `Collezione ${category.name} di MIRAI.`,
+      images: category.image_url ? [{ url: getAbsoluteUrl(category.image_url), alt: category.name }] : undefined,
     },
   }
 }

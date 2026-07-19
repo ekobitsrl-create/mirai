@@ -6,6 +6,7 @@ import { Footer } from "@/components/footer"
 
 export const metadata: Metadata = {
   title: "Negozio fisico - Coming soon",
+  alternates: { canonical: "/negozio" },
   description: "Il primo spazio fisico MIRAI LAB STORE è in arrivo. Scopri in anteprima il progetto e unisciti alla community.",
 }
 

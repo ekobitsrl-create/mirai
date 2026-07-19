@@ -1,36 +1,42 @@
 import type { MetadataRoute } from "next"
 import { createClient } from "@/lib/supabase/server"
 import { isPrivateCheckoutProduct, withoutBlackIslandProducts } from "@/lib/products"
+import { SITE_URL } from "@/lib/site-url"
 
-const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://mirai-clothing.vercel.app"
+export const dynamic = "force-dynamic"
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const supabase = await createClient()
+  let products: Array<{ id: string; name: string | null; image_url: string | null; updated_at: string | null }> = []
+  let categories: Array<{ slug: string; updated_at: string | null }> = []
 
-  // Fetch all products
-  const { data: products } = await supabase
-    .from("products")
-    .select("id, name, image_url, updated_at")
-    .eq("in_stock", true)
+  try {
+    const supabase = await createClient()
+    const [productsResult, categoriesResult] = await Promise.all([
+      supabase
+        .from("products")
+        .select("id, name, image_url, updated_at")
+        .eq("in_stock", true),
+      supabase.from("categories").select("slug, updated_at"),
+    ])
+    products = productsResult.data || []
+    categories = categoriesResult.data || []
+  } catch (error) {
+    console.error("Sitemap: catalogo Supabase non disponibile.", error)
+  }
 
-  // Fetch all categories
-  const { data: categories } = await supabase
-    .from("categories")
-    .select("slug, updated_at")
-
-  const visibleDatabaseProducts = withoutBlackIslandProducts(products || []).filter(
+  const visibleDatabaseProducts = withoutBlackIslandProducts(products).filter(
     (product) => !isPrivateCheckoutProduct(product),
   )
 
   const productUrls: MetadataRoute.Sitemap = visibleDatabaseProducts.map((p) => ({
-    url: `${BASE_URL}/prodotto/${p.id}`,
+    url: `${SITE_URL}/prodotto/${encodeURIComponent(p.id)}`,
     lastModified: p.updated_at || new Date().toISOString(),
     changeFrequency: "weekly" as const,
     priority: 0.8,
   }))
 
-  const categoryUrls: MetadataRoute.Sitemap = (categories || []).map((c) => ({
-    url: `${BASE_URL}/collezione/${c.slug}`,
+  const categoryUrls: MetadataRoute.Sitemap = categories.map((c) => ({
+    url: `${SITE_URL}/collezione/${encodeURIComponent(c.slug)}`,
     lastModified: c.updated_at || new Date().toISOString(),
     changeFrequency: "weekly" as const,
     priority: 0.7,
@@ -38,74 +44,62 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const staticPages: MetadataRoute.Sitemap = [
     {
-      url: BASE_URL,
-      lastModified: new Date().toISOString(),
+      url: SITE_URL,
       changeFrequency: "daily",
       priority: 1.0,
     },
     {
-      url: `${BASE_URL}/collezioni`,
-      lastModified: new Date().toISOString(),
+      url: `${SITE_URL}/collezioni`,
       changeFrequency: "weekly",
       priority: 0.9,
     },
     {
-      url: `${BASE_URL}/custom-lab`,
-      lastModified: new Date().toISOString(),
+      url: `${SITE_URL}/custom-lab`,
       changeFrequency: "weekly",
       priority: 0.9,
     },
     {
-      url: `${BASE_URL}/negozio`,
-      lastModified: new Date().toISOString(),
+      url: `${SITE_URL}/negozio`,
       changeFrequency: "monthly",
       priority: 0.7,
     },
     {
-      url: `${BASE_URL}/i-nostri-beat`,
-      lastModified: new Date().toISOString(),
+      url: `${SITE_URL}/i-nostri-beat`,
       changeFrequency: "monthly",
       priority: 0.6,
     },
     {
-      url: `${BASE_URL}/chi-siamo`,
-      lastModified: new Date().toISOString(),
+      url: `${SITE_URL}/chi-siamo`,
       changeFrequency: "monthly",
       priority: 0.6,
     },
     {
-      url: `${BASE_URL}/contatti`,
-      lastModified: new Date().toISOString(),
+      url: `${SITE_URL}/contatti`,
       changeFrequency: "monthly",
       priority: 0.5,
     },
     {
-      url: `${BASE_URL}/faq`,
-      lastModified: new Date().toISOString(),
+      url: `${SITE_URL}/faq`,
       changeFrequency: "monthly",
       priority: 0.4,
     },
     {
-      url: `${BASE_URL}/spedizioni`,
-      lastModified: new Date().toISOString(),
+      url: `${SITE_URL}/spedizioni`,
       changeFrequency: "monthly",
       priority: 0.3,
     },
     {
-      url: `${BASE_URL}/resi`,
-      lastModified: new Date().toISOString(),
+      url: `${SITE_URL}/resi`,
       changeFrequency: "monthly",
       priority: 0.3,
     },
     {
-      url: `${BASE_URL}/privacy`,
-      lastModified: new Date().toISOString(),
+      url: `${SITE_URL}/privacy`,
       changeFrequency: "yearly",
       priority: 0.2,
     },
     {
-      url: `${BASE_URL}/termini`,
-      lastModified: new Date().toISOString(),
+      url: `${SITE_URL}/termini`,
       changeFrequency: "yearly",
       priority: 0.2,
     },

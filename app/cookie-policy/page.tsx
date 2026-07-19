@@ -6,6 +6,8 @@ import { Footer } from "@/components/footer"
 
 export const metadata: Metadata = {
   title: "Cookie Policy - MIRAI",
+  alternates: { canonical: "/cookie-policy" },
+  robots: { index: false, follow: true },
   description: "Informativa sui cookie utilizzati dal sito web MIRAI.",
 }
 

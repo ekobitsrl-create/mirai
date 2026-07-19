@@ -19,6 +19,7 @@ export const metadata: Metadata = {
     title: "MIRAI - Streetwear & Cappelli Custom",
     description: "Streetwear esclusivo e cappelli custom New Era. Pezzi unici fatti a mano. Made in Italy.",
   },
+  alternates: { canonical: "/" },
 }
 
 export default async function Home() {

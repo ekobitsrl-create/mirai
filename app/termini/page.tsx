@@ -6,6 +6,7 @@ import { Footer } from "@/components/footer"
 
 export const metadata: Metadata = {
   title: "Termini e Condizioni - MIRAI",
+  alternates: { canonical: "/termini" },
   description: "Termini e condizioni generali di vendita per gli acquisti su MIRAI.",
 }
 

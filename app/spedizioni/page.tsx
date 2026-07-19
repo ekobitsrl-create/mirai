@@ -7,6 +7,7 @@ import { formatShippingPrice, SHIPPING_CONFIG } from "@/lib/shipping"
 
 export const metadata: Metadata = {
   title: "Spedizioni - MIRAI",
+  alternates: { canonical: "/spedizioni" },
   description: "Informazioni su spedizioni, tempi di consegna e costi per gli ordini MIRAI.",
 }
 

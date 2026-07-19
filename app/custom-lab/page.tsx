@@ -7,6 +7,7 @@ import { CustomTeeEditor } from "@/components/custom-tee-editor"
 
 export const metadata: Metadata = {
   title: "Custom Lab - Personalizza la tua T-shirt",
+  alternates: { canonical: "/custom-lab" },
   description: "Crea la tua T-shirt MIRAI personalizzata: scegli colore, taglia, lato di stampa, testo o grafica e visualizza il risultato in tempo reale.",
   openGraph: {
     title: "MIRAI Custom Lab - Crea la tua T-shirt",

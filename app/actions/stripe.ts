@@ -4,6 +4,7 @@ import { assertStripeConfigured, stripe } from '@/lib/stripe'
 import { createClient, getServerUser } from '@/lib/supabase/server'
 import { getDemoProduct, isBlackIslandProduct, type StoreProduct } from '@/lib/products'
 import { getStripeShippingOptions, SHIPPING_CONFIG } from '@/lib/shipping'
+import { SITE_URL } from '@/lib/site-url'
 import {
   CUSTOM_TEE_PRODUCT_ID,
   customizationMetadata,
@@ -53,8 +54,7 @@ export async function createCheckoutSession(cartItems: CartLineItem[], guestEmai
     error = legacyResult.error
   }
 
-  const configuredBaseUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_SITE_URL || 'https://mirai-clothing.vercel.app'
-  const baseUrl = configuredBaseUrl.replace(/\/$/, '')
+  const baseUrl = SITE_URL
 
   const demoProducts = productIds
     .map(getDemoProduct)

@@ -14,6 +14,7 @@ export const metadata: Metadata = {
     title: "Collezioni MIRAI - Streetwear & Cappelli Custom",
     description: "Esplora tutte le collezioni MIRAI. Streetwear esclusivo e cappelli custom.",
   },
+  alternates: { canonical: "/collezioni" },
 }
 
 export default async function CollezioniPage() {

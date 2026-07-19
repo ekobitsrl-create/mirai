@@ -8,6 +8,7 @@ import { formatShippingPrice, SHIPPING_CONFIG } from "@/lib/shipping"
 export const metadata: Metadata = {
   title: "FAQ - MIRAI",
   description: "Domande frequenti sugli acquisti, spedizioni, resi e molto altro su MIRAI.",
+  alternates: { canonical: "/faq" },
 }
 
 const faqs = [
@@ -82,8 +83,22 @@ const faqs = [
 ]
 
 export default function FaqPage() {
+  const faqJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: faqs.flatMap((section) => section.questions).map((faq) => ({
+      "@type": "Question",
+      name: faq.q,
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: faq.a,
+      },
+    })),
+  }
+
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       <Navbar />
       <main className="pt-20">
         <section className="mx-auto max-w-4xl px-6 py-16 md:py-24">

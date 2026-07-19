@@ -6,6 +6,7 @@ import { Footer } from "@/components/footer"
 
 export const metadata: Metadata = {
   title: "Resi e Rimborsi - MIRAI",
+  alternates: { canonical: "/resi" },
   description: "Politica di reso e rimborso per gli acquisti effettuati su MIRAI.",
 }
 

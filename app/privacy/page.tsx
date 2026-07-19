@@ -6,6 +6,7 @@ import { Footer } from "@/components/footer"
 
 export const metadata: Metadata = {
   title: "Privacy Policy - MIRAI",
+  alternates: { canonical: "/privacy" },
   description: "Informativa sulla privacy e trattamento dei dati personali di MIRAI.",
 }
 

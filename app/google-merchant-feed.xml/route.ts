@@ -1,12 +1,15 @@
 import type { NextRequest } from "next/server"
+import { createHash } from "node:crypto"
 import { isPrivateCheckoutProduct, withDemoProducts, type StoreProduct } from "@/lib/products"
 import { createClient } from "@/lib/supabase/server"
+import { SITE_URL } from "@/lib/site-url"
 
 export const runtime = "nodejs"
 export const dynamic = "force-dynamic"
 
-const FALLBACK_SITE_URL = "https://mirai-clothing.vercel.app"
 const RETURN_POLICY_PATH = "/resi"
+const CATALOG_SELECT = "id, name, description, price, category, image_url, sizes, stock_by_size, in_stock, is_new, created_at, updated_at, brand, supplier_sku, color_name, color_hex, image_gallery, detail_items, composition"
+const LEGACY_CATALOG_SELECT = "id, name, description, price, category, image_url, sizes, stock_by_size, in_stock, is_new, created_at, updated_at"
 
 const GOOGLE_CATEGORY_BY_STORE_CATEGORY: Record<string, string> = {
   "t-shirt": "212",
@@ -71,15 +74,11 @@ function cleanBaseUrl(value: string) {
 
 function getBaseUrl(request: NextRequest) {
   const requestOrigin = cleanBaseUrl(request.nextUrl.origin)
-  if (!requestOrigin.includes("localhost") && !requestOrigin.includes("127.0.0.1")) {
+  if (requestOrigin.includes("localhost") || requestOrigin.includes("127.0.0.1")) {
     return requestOrigin
   }
 
-  return cleanBaseUrl(
-    process.env.NEXT_PUBLIC_SITE_URL
-      || process.env.NEXT_PUBLIC_APP_URL
-      || FALLBACK_SITE_URL,
-  )
+  return SITE_URL
 }
 
 function absoluteUrl(path: string, baseUrl: string) {
@@ -185,13 +184,13 @@ async function getCatalogProducts() {
     const supabase = await createClient()
     let { data, error } = await supabase
       .from("products")
-      .select("id, name, description, price, category, image_url, sizes, stock_by_size, in_stock, is_new, created_at")
+      .select(CATALOG_SELECT)
       .order("created_at", { ascending: false })
 
     if (error?.message.includes("stock_by_size")) {
       const legacyResult = await supabase
         .from("products")
-        .select("id, name, description, price, category, image_url, sizes, in_stock, is_new, created_at")
+        .select(LEGACY_CATALOG_SELECT)
         .order("created_at", { ascending: false })
       data = legacyResult.data as typeof data
       error = legacyResult.error
@@ -288,11 +287,28 @@ export async function GET(request: NextRequest) {
     "",
   ].join("\n")
 
+  const etag = `"${createHash("sha256").update(xml).digest("hex")}"`
+  const latestProductUpdate = catalogProducts
+    .map((product) => Date.parse((product as StoreProduct & { updated_at?: string }).updated_at || product.created_at))
+    .filter(Number.isFinite)
+    .reduce((latest, timestamp) => Math.max(latest, timestamp), 0)
+  const lastModified = latestProductUpdate > 0
+    ? new Date(latestProductUpdate).toUTCString()
+    : new Date().toUTCString()
+  const headers = {
+    "Content-Type": "application/xml; charset=utf-8",
+    "Cache-Control": "public, max-age=0, s-maxage=60, stale-while-revalidate=300, must-revalidate",
+    "ETag": etag,
+    "Last-Modified": lastModified,
+    "X-Robots-Tag": "noindex",
+  }
+
+  if (request.headers.get("if-none-match") === etag) {
+    return new Response(null, { status: 304, headers })
+  }
+
   return new Response(xml, {
     status: 200,
-    headers: {
-      "Content-Type": "application/xml; charset=utf-8",
-      "Cache-Control": "public, s-maxage=300, stale-while-revalidate=3600",
-    },
+    headers,
   })
 }

@@ -6,6 +6,7 @@ import { Footer } from "@/components/footer"
 
 export const metadata: Metadata = {
   title: "Contatti - MIRAI",
+  alternates: { canonical: "/contatti" },
   description: "Contattaci per qualsiasi informazione. Il team MIRAI e sempre disponibile.",
 }
 

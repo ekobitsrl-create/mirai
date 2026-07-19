@@ -10,16 +10,17 @@ import { BackgroundMusic } from '@/components/background-music'
 import { SiteIntro } from '@/components/site-intro'
 import { MiraGuide } from '@/components/mira-guide'
 import { MarketingPixels } from '@/components/marketing-pixels'
+import { getAbsoluteUrl, SITE_URL } from '@/lib/site-url'
 import './globals.css'
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
 const spaceGrotesk = Space_Grotesk({ subsets: ['latin'], variable: '--font-space-grotesk' })
 
-const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://mirai-clothing.vercel.app"
 const GOOGLE_ANALYTICS_ID = "G-CY0KQKG7VG"
 
 export const metadata: Metadata = {
-  metadataBase: new URL(BASE_URL),
+  metadataBase: new URL(SITE_URL),
+  applicationName: "MIRAI LAB STORE",
   title: {
     default: "MIRAI - Streetwear & Cappelli Custom | Moda Urbana Made in Italy",
     template: "%s | MIRAI",
@@ -34,6 +35,7 @@ export const metadata: Metadata = {
   authors: [{ name: "MIRAI" }],
   creator: "MIRAI",
   publisher: "MIRAI",
+  category: "fashion",
   formatDetection: {
     email: false,
     address: false,
@@ -42,16 +44,16 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "it_IT",
-    url: BASE_URL,
+    url: SITE_URL,
     siteName: "MIRAI",
     title: "MIRAI - Streetwear & Cappelli Custom | Moda Urbana",
     description: "Streetwear esclusivo e cappelli custom New Era con cristalli e borchie. Pezzi unici fatti a mano. Made in Italy.",
     images: [
       {
-        url: "/og-image.jpg",
+        url: getAbsoluteUrl("/images/hero-storefront.jpg"),
         width: 1200,
         height: 630,
-        alt: "MIRAI - Future of Fashion",
+        alt: "MIRAI LAB STORE - Streetwear Made in Italy",
       },
     ],
   },
@@ -59,7 +61,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "MIRAI - Streetwear & Cappelli Custom",
     description: "Streetwear esclusivo e cappelli custom. Pezzi unici fatti a mano. Made in Italy.",
-    images: ["/og-image.jpg"],
+    images: [getAbsoluteUrl("/images/hero-storefront.jpg")],
   },
   robots: {
     index: true,
@@ -73,10 +75,12 @@ export const metadata: Metadata = {
     },
   },
   alternates: {
-    canonical: BASE_URL,
     types: {
-      "application/rss+xml": `${BASE_URL}/google-merchant-feed.xml`,
+      "application/xml": getAbsoluteUrl("/google-merchant-feed.xml"),
     },
+  },
+  verification: {
+    google: process.env.GOOGLE_SITE_VERIFICATION || undefined,
   },
   icons: {
     icon: [
@@ -137,16 +141,40 @@ gtag('config', '${GOOGLE_ANALYTICS_ID}');`}
             __html: JSON.stringify({
               "@context": "https://schema.org",
               "@type": "Organization",
+              "@id": `${SITE_URL}/#organization`,
               name: "MIRAI",
-              url: BASE_URL,
-              logo: `${BASE_URL}/icon.svg`,
+              url: SITE_URL,
+              logo: getAbsoluteUrl("/icon.svg"),
+              email: "mirailabstore@gmail.com",
               description: "Streetwear esclusivo e cappelli custom New Era con cristalli e borchie. Pezzi unici fatti a mano. Made in Italy.",
-              sameAs: [],
+              address: {
+                "@type": "PostalAddress",
+                streetAddress: "Via Umberto 95",
+                postalCode: "95129",
+                addressLocality: "Catania",
+                addressRegion: "CT",
+                addressCountry: "IT",
+              },
               contactPoint: {
                 "@type": "ContactPoint",
                 contactType: "customer service",
+                email: "mirailabstore@gmail.com",
                 availableLanguage: "Italian",
               },
+            }),
+          }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "WebSite",
+              "@id": `${SITE_URL}/#website`,
+              name: "MIRAI LAB STORE",
+              url: SITE_URL,
+              inLanguage: "it-IT",
+              publisher: { "@id": `${SITE_URL}/#organization` },
             }),
           }}
         />
