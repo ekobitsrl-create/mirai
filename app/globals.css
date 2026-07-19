@@ -273,6 +273,15 @@
    with the rendered image edges regardless of portrait/landscape. */
 .mirai-hero-frame {
   overflow: visible;
+  /* Smaller on mobile, full size from the md breakpoint up. Falls back to
+     --hero-h when a slide doesn't define a separate mobile height. */
+  height: var(--hero-h-mobile, var(--hero-h));
+}
+
+@media (min-width: 768px) {
+  .mirai-hero-frame {
+    height: var(--hero-h);
+  }
 }
 
 /* Blurred duplicate of the hero image, enlarged so its soft halo overhangs
