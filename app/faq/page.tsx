@@ -3,7 +3,6 @@ import Link from "next/link"
 import { ArrowLeft } from "lucide-react"
 import { Navbar } from "@/components/navbar"
 import { Footer } from "@/components/footer"
-import { formatShippingPrice, SHIPPING_CONFIG } from "@/lib/shipping"
 
 export const metadata: Metadata = {
   title: "FAQ - MIRAI",
@@ -34,11 +33,11 @@ const faqs = [
     questions: [
       {
         q: "Quanto costa la spedizione?",
-        a: `La spedizione standard e sempre gratuita, senza importo minimo. La spedizione express costa ${formatShippingPrice(SHIPPING_CONFIG.expressPriceCents)}.`,
+        a: "La spedizione standard e sempre gratuita, senza importo minimo.",
       },
       {
         q: "In quanto tempo ricevero il mio ordine?",
-        a: "In tutte le destinazioni supportate, la spedizione standard richiede 3-5 giorni lavorativi e quella express 1-2 giorni lavorativi dalla presa in carico del corriere.",
+        a: "In tutte le destinazioni supportate, la spedizione richiede normalmente 3-5 giorni lavorativi dalla presa in carico del corriere.",
       },
       {
         q: "Spedite all'estero?",

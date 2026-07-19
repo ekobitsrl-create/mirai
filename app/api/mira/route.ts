@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
 import { isPrivateCheckoutProduct, withDemoProducts, type StoreProduct } from "@/lib/products"
-import { formatShippingPrice, SHIPPING_CONFIG } from "@/lib/shipping"
+import { SHIPPING_CONFIG } from "@/lib/shipping"
 
 export const runtime = "nodejs"
 export const maxDuration = 20
@@ -225,7 +225,7 @@ PAGINA ATTUALE: ${pathname}
 
 INFORMAZIONI NEGOZIO:
 - Spedizione standard gratuita, senza importo minimo: ${SHIPPING_CONFIG.standardDeliveryDays.minimum}-${SHIPPING_CONFIG.standardDeliveryDays.maximum} giorni lavorativi.
-- Spedizione express: ${formatShippingPrice(SHIPPING_CONFIG.expressPriceCents)}, ${SHIPPING_CONFIG.expressDeliveryDays.minimum}-${SHIPPING_CONFIG.expressDeliveryDays.maximum} giorni lavorativi.
+- Contrassegno disponibile per consegne in Italia.
 - Reso richiedibile entro 14 giorni dalla consegna; rimborso entro 7 giorni lavorativi dalla verifica.
 - Pagamenti gestiti tramite Stripe. I metodi effettivamente mostrati al checkout dipendono dalla configurazione attiva.
 - Custom Lab online: T-shirt heavyweight oversize personalizzabile con colore, taglia, stampa fronte o retro, testo o grafica. Prezzo 79 euro con una stampa inclusa. I prodotti personalizzati non sono restituibili salvo difetti.

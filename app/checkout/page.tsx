@@ -1,13 +1,13 @@
 "use client"
 
-import { useCallback, useEffect, useRef, useState } from "react"
+import { useCallback, useEffect, useRef, useState, type FormEvent } from "react"
 import { loadStripe } from "@stripe/stripe-js"
 import { EmbeddedCheckoutProvider, EmbeddedCheckout } from "@stripe/react-stripe-js"
 import Link from "next/link"
-import { ArrowLeft, Mail, ShoppingBag, UserPlus } from "lucide-react"
+import { ArrowLeft, Banknote, CreditCard, Mail, ShoppingBag, UserPlus } from "lucide-react"
 import { useCart } from "@/lib/cart-context"
 import { useLanguage } from "@/lib/language-context"
-import { createCheckoutSession } from "@/app/actions/stripe"
+import { createCashOnDeliveryOrder, createCheckoutSession } from "@/app/actions/stripe"
 import { createClient } from "@/lib/supabase/client"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
@@ -24,6 +24,10 @@ export default function CheckoutPage() {
   const [guestCheckoutReady, setGuestCheckoutReady] = useState(false)
   const [createAccount, setCreateAccount] = useState(false)
   const [guestError, setGuestError] = useState<string | null>(null)
+  const [paymentMethod, setPaymentMethod] = useState<"card" | "cash_on_delivery">("card")
+  const [cashDetails, setCashDetails] = useState({ name: "", address: "", city: "", postalCode: "" })
+  const [cashError, setCashError] = useState<string | null>(null)
+  const [cashSubmitting, setCashSubmitting] = useState(false)
   const sessionIdRef = useRef<string | null>(null)
 
   useEffect(() => {
@@ -62,6 +66,35 @@ export default function CheckoutPage() {
 
     setGuestError(null)
     setGuestCheckoutReady(true)
+  }
+
+  const completeCashOnDelivery = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    setCashError(null)
+    setCashSubmitting(true)
+
+    try {
+      const order = await createCashOnDeliveryOrder(
+        items.map((item) => ({
+          productId: item.productId,
+          quantity: item.quantity,
+          size: item.size,
+          lineId: item.lineId,
+          customization: item.customization,
+        })),
+        {
+          guestEmail: isAuthenticated ? undefined : guestEmail,
+          ...cashDetails,
+          country: "IT",
+        }
+      )
+
+      clearCart()
+      window.location.assign(`/success?payment_method=cash_on_delivery&order_id=${encodeURIComponent(order.orderId)}`)
+    } catch (error) {
+      setCashError(error instanceof Error ? error.message : "Non e stato possibile registrare l ordine")
+      setCashSubmitting(false)
+    }
   }
 
   if (!hydrated || isAuthenticated === null) {
@@ -168,21 +201,82 @@ export default function CheckoutPage() {
                 <button type="button" onClick={() => setGuestCheckoutReady(false)} className="text-xs font-bold uppercase tracking-widest text-primary">Modifica</button>
               </div>
             )}
-            <div className="min-h-[400px] border border-border bg-card p-1">
-              <EmbeddedCheckoutProvider
-                stripe={stripePromise}
-                options={{
-                  fetchClientSecret,
-                  onComplete: () => {
-                    clearCart()
-                    const sessionId = sessionIdRef.current
-                    window.location.assign(sessionId ? `/success?session_id=${encodeURIComponent(sessionId)}` : "/success")
-                  },
-                }}
-              >
-                <EmbeddedCheckout />
-              </EmbeddedCheckoutProvider>
-            </div>
+            <section className="mb-4 border border-border bg-card p-4 sm:p-5">
+              <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Metodo di pagamento</p>
+              <div className="mt-3 grid grid-cols-2 border border-border" role="radiogroup" aria-label="Metodo di pagamento">
+                <button
+                  type="button"
+                  role="radio"
+                  aria-checked={paymentMethod === "card"}
+                  onClick={() => setPaymentMethod("card")}
+                  className={`flex min-h-12 items-center justify-center gap-2 px-3 text-xs font-bold uppercase tracking-widest transition-colors ${paymentMethod === "card" ? "bg-primary text-primary-foreground" : "text-foreground hover:bg-secondary"}`}
+                >
+                  <CreditCard className="h-4 w-4" /> Carta
+                </button>
+                <button
+                  type="button"
+                  role="radio"
+                  aria-checked={paymentMethod === "cash_on_delivery"}
+                  onClick={() => setPaymentMethod("cash_on_delivery")}
+                  className={`flex min-h-12 items-center justify-center gap-2 border-l border-border px-3 text-xs font-bold uppercase tracking-widest transition-colors ${paymentMethod === "cash_on_delivery" ? "bg-primary text-primary-foreground" : "text-foreground hover:bg-secondary"}`}
+                >
+                  <Banknote className="h-4 w-4" /> Contrassegno
+                </button>
+              </div>
+            </section>
+
+            {paymentMethod === "card" ? (
+              <div className="min-h-[400px] border border-border bg-card p-1">
+                <EmbeddedCheckoutProvider
+                  stripe={stripePromise}
+                  options={{
+                    fetchClientSecret,
+                    onComplete: () => {
+                      clearCart()
+                      const sessionId = sessionIdRef.current
+                      window.location.assign(sessionId ? `/success?session_id=${encodeURIComponent(sessionId)}` : "/success")
+                    },
+                  }}
+                >
+                  <EmbeddedCheckout />
+                </EmbeddedCheckoutProvider>
+              </div>
+            ) : (
+              <form onSubmit={completeCashOnDelivery} className="border border-border bg-card p-6 sm:p-8">
+                <div className="flex items-start gap-3">
+                  <Banknote className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
+                  <div>
+                    <h2 className="font-semibold text-foreground">Pagamento alla consegna</h2>
+                    <p className="mt-1 text-sm leading-6 text-muted-foreground">Pagherai al corriere quando riceverai il tuo ordine. Disponibile solo in Italia.</p>
+                  </div>
+                </div>
+
+                <div className="mt-6 grid gap-5 sm:grid-cols-2">
+                  <div className="sm:col-span-2">
+                    <Label htmlFor="cash-name" className="text-xs uppercase tracking-widest text-muted-foreground">Nome e cognome</Label>
+                    <Input id="cash-name" required autoComplete="name" value={cashDetails.name} onChange={(event) => setCashDetails((current) => ({ ...current, name: event.target.value }))} className="mt-2 bg-secondary" />
+                  </div>
+                  <div className="sm:col-span-2">
+                    <Label htmlFor="cash-address" className="text-xs uppercase tracking-widest text-muted-foreground">Indirizzo</Label>
+                    <Input id="cash-address" required autoComplete="street-address" value={cashDetails.address} onChange={(event) => setCashDetails((current) => ({ ...current, address: event.target.value }))} className="mt-2 bg-secondary" />
+                  </div>
+                  <div>
+                    <Label htmlFor="cash-city" className="text-xs uppercase tracking-widest text-muted-foreground">Citta</Label>
+                    <Input id="cash-city" required autoComplete="address-level2" value={cashDetails.city} onChange={(event) => setCashDetails((current) => ({ ...current, city: event.target.value }))} className="mt-2 bg-secondary" />
+                  </div>
+                  <div>
+                    <Label htmlFor="cash-postal-code" className="text-xs uppercase tracking-widest text-muted-foreground">CAP</Label>
+                    <Input id="cash-postal-code" required inputMode="numeric" pattern="[0-9]{5}" maxLength={5} autoComplete="postal-code" value={cashDetails.postalCode} onChange={(event) => setCashDetails((current) => ({ ...current, postalCode: event.target.value.replace(/\D/g, "") }))} className="mt-2 bg-secondary" />
+                  </div>
+                </div>
+
+                {cashError && <p className="mt-5 text-sm text-destructive" role="alert">{cashError}</p>}
+
+                <button type="submit" disabled={cashSubmitting} className="mt-7 flex min-h-12 w-full items-center justify-center gap-2 bg-primary px-5 py-3 text-xs font-bold uppercase tracking-widest text-primary-foreground transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-60">
+                  <Banknote className="h-4 w-4" /> {cashSubmitting ? "Invio ordine..." : "Conferma ordine in contrassegno"}
+                </button>
+              </form>
+            )}
           </>
         )}
       </div>

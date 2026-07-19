@@ -126,7 +126,7 @@ export default function ResiPage() {
                 Per ordini consegnati in Italia, il primo reso approvato e gratuito. Per ordini fuori dall'Italia, eventuali costi di spedizione del reso sono comunicati prima dell'invio delle istruzioni e restano a carico del cliente, salvo prodotto difettoso o non conforme.
               </p>
               <p className="leading-relaxed">
-                MIRAI non applica costi di reintegro magazzino. Le spese di spedizione express pagate al momento dell'ordine non sono rimborsate se il servizio e gia stato eseguito, salvo diverso obbligo di legge.
+                MIRAI non applica costi di reintegro magazzino.
               </p>
             </section>
 

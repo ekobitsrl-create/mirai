@@ -33,11 +33,20 @@ function formatPrice(value: number, currency: string) {
 function SuccessContent() {
   const searchParams = useSearchParams()
   const sessionId = searchParams.get("session_id")
+  const paymentMethod = searchParams.get("payment_method")
+  const orderId = searchParams.get("order_id")
+  const isCashOnDelivery = paymentMethod === "cash_on_delivery"
   const { clearCart } = useCart()
   const [order, setOrder] = useState<OrderSummary | null>(null)
-  const [status, setStatus] = useState<"loading" | "pending" | "error" | "success">("loading")
+  const [status, setStatus] = useState<"loading" | "pending" | "error" | "success" | "cash_on_delivery">("loading")
 
   useEffect(() => {
+    if (isCashOnDelivery) {
+      clearCart()
+      setStatus("cash_on_delivery")
+      return
+    }
+
     if (!sessionId) {
       setStatus("error")
       return
@@ -63,7 +72,7 @@ function SuccessContent() {
     return () => {
       active = false
     }
-  }, [clearCart, sessionId])
+  }, [clearCart, isCashOnDelivery, sessionId])
 
   if (status === "loading") {
     return (
@@ -85,6 +94,31 @@ function SuccessContent() {
           <Button className="mt-7 w-full" onClick={() => window.location.reload()}>
             Aggiorna stato
           </Button>
+        </section>
+      </main>
+    )
+  }
+
+  if (status === "cash_on_delivery") {
+    return (
+      <main className="flex min-h-screen items-center justify-center bg-background px-6">
+        <section className="w-full max-w-md border border-border bg-card p-8 text-center">
+          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-green-500/10 text-green-500">
+            <CheckCircle2 className="h-9 w-9" />
+          </div>
+          <h1 className="mt-6 text-2xl font-bold text-foreground">Ordine ricevuto</h1>
+          <p className="mt-3 text-sm leading-6 text-muted-foreground">
+            Pagherai al corriere al momento della consegna. Il tuo ordine e ora in attesa di conferma.
+          </p>
+          {orderId && <p className="mt-5 font-mono text-sm text-foreground">#{orderId.slice(-8).toUpperCase()}</p>}
+          <div className="mt-7 grid gap-3 sm:grid-cols-2">
+            <Link href="/account" className="inline-flex">
+              <Button className="w-full">I miei ordini</Button>
+            </Link>
+            <Link href="/collezioni" className="inline-flex">
+              <Button variant="outline" className="w-full">Continua</Button>
+            </Link>
+          </div>
         </section>
       </main>
     )

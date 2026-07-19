@@ -28,7 +28,7 @@ export default function TerminiPage() {
           <div className="flex flex-col gap-10 text-muted-foreground leading-relaxed">
             <section className="flex flex-col gap-3">
               <h2 className="font-[family-name:var(--font-space-grotesk)] text-xl font-bold text-foreground">1. Venditore</h2>
-              <p>Le presenti condizioni regolano gli acquisti su mirai.store, gestito da MIRAI LAB STORE DI SCRIVANO CHRISTIAN, P. IVA 06287920877, CF SCRCRS99C11C351W, REA CT - 486994, con sede operativa in Via Umberto 95, 95129 Catania (CT), Italia.</p>
+              <p>Le presenti condizioni regolano gli acquisti su mirailabstore.com, gestito da MIRAI LAB STORE DI SCRIVANO CHRISTIAN, P. IVA 06287920877, CF SCRCRS99C11C351W, REA CT - 486994, con sede operativa in Via Umberto 95, 95129 Catania (CT), Italia.</p>
             </section>
 
             <section className="flex flex-col gap-3">
@@ -38,7 +38,7 @@ export default function TerminiPage() {
 
             <section className="flex flex-col gap-3">
               <h2 className="font-[family-name:var(--font-space-grotesk)] text-xl font-bold text-foreground">3. Ordini e pagamenti</h2>
-              <p>L'ordine inviato dal cliente costituisce proposta di acquisto. Il contratto si conclude con la conferma dell'ordine. I pagamenti sono gestiti tramite Stripe e possono includere carte, PayPal, Apple Pay, Google Pay, Klarna o Scalapay quando disponibili per l'ordine. Il checkout avviene su connessione sicura.</p>
+              <p>L'ordine inviato dal cliente costituisce proposta di acquisto. Il contratto si conclude con la conferma dell'ordine. I pagamenti online sono gestiti tramite Stripe e possono includere carte, PayPal, Apple Pay, Google Pay, Klarna o Scalapay quando disponibili per l'ordine. Per le consegne in Italia puo essere disponibile il pagamento in contrassegno. Il checkout avviene su connessione sicura.</p>
             </section>
 
             <section className="flex flex-col gap-3">
@@ -73,7 +73,7 @@ export default function TerminiPage() {
 
             <section className="flex flex-col gap-3">
               <h2 className="font-[family-name:var(--font-space-grotesk)] text-xl font-bold text-foreground">10. Contatti</h2>
-              <p>Per informazioni, assistenza o reclami puoi scrivere a <span className="text-primary">mirailabstore@gmail.com</span>, a <span className="text-primary">mirailabstore@pec.it</span> oppure usare la pagina <Link href="/contatti" className="text-primary hover:underline">Contatti</Link>.</p>
+              <p>Per comunicazioni formali o reclami puoi scrivere a <span className="text-primary">mirailabstore@pec.it</span>. Per assistenza ordinaria puoi usare la pagina <Link href="/contatti" className="text-primary hover:underline">Contatti</Link> o scrivere a <span className="text-muted-foreground">mirailabstore@gmail.com</span>.</p>
             </section>
           </div>
         </section>

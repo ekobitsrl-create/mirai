@@ -83,24 +83,9 @@ export const metadata: Metadata = {
     google: process.env.GOOGLE_SITE_VERIFICATION || undefined,
   },
   icons: {
-    icon: [
-      {
-        url: '/favicon-32x32.png',
-        sizes: '32x32',
-        media: '(prefers-color-scheme: light)',
-      },
-      {
-        url: '/favicon-32x32.png',
-        sizes: '32x32',
-        media: '(prefers-color-scheme: dark)',
-      },
-      {
-        url: '/favicon.svg',
-        type: 'image/svg+xml',
-      },
-    ],
-    shortcut: '/favicon.ico',
-    apple: '/apple-icon.png',
+    icon: [{ url: '/favicon.svg', type: 'image/svg+xml' }],
+    shortcut: '/favicon.svg',
+    apple: '/favicon.svg',
   },
 }
 

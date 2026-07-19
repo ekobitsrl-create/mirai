@@ -4,6 +4,7 @@ import Image from "next/image"
 import Link from "next/link"
 import { useScrollAnimation } from "@/hooks/use-scroll-animation"
 import { useLanguage } from "@/lib/language-context"
+import { getCategoryImage } from "@/lib/category-images"
 import { ArrowRight } from "lucide-react"
 
 type Category = {
@@ -13,46 +14,6 @@ type Category = {
   description: string | null
   image_url: string | null
   sort_order: number
-}
-
-// Mapping immagini locali per slug categoria
-const categoryImages: Record<string, string> = {
-  // T-shirts
-  "t-shirt": "/images/collection-tshirt.jpg",
-  "tshirt": "/images/collection-tshirt.jpg",
-  "t-shirts": "/images/collection-tshirt.jpg",
-  "magliette": "/images/collection-tshirt.jpg",
-  // Caps / Hats / Headwear - usando le foto reali dei cappelli
-  "cappelli": "/images/cap-ny-red-crystal.jpg",
-  "caps": "/images/cap-ny-red-crystal.jpg",
-  "hats": "/images/cap-ny-red-crystal.jpg",
-  "cappellini": "/images/cap-ny-red-crystal.jpg",
-  "headwear": "/images/cap-ny-red-crystal.jpg",
-  // Hoodies / Sweatshirts
-  "felpe": "/images/collection-apparel.jpg",
-  "hoodies": "/images/collection-apparel.jpg",
-  "sweatshirts": "/images/collection-apparel.jpg",
-  // Accessories
-  "accessori": "/images/collection-accessories.jpg",
-  "accessories": "/images/collection-accessories.jpg",
-  // Apparel / Abbigliamento
-  "apparel": "/images/collection-apparel.jpg",
-  "abbigliamento": "/images/collection-apparel.jpg",
-  "clothing": "/images/collection-apparel.jpg",
-  // Pantaloni / Pants
-  "pantaloni": "/images/collection-apparel.jpg",
-  "pants": "/images/collection-apparel.jpg",
-  "jeans": "/images/collection-apparel.jpg",
-  // New arrivals
-  "nuovi-arrivi": "/images/collection-tshirt.jpg",
-  "new-arrivals": "/images/collection-tshirt.jpg",
-}
-
-const defaultImage = "/images/collection-tshirt.jpg"
-
-function getCategoryImage(slug: string, dbImage: string | null): string {
-  if (dbImage && dbImage.startsWith("http")) return dbImage
-  return categoryImages[slug.toLowerCase()] || defaultImage
 }
 
 export function Collections({ categories = [] }: { categories?: Category[] }) {
@@ -89,7 +50,7 @@ export function Collections({ categories = [] }: { categories?: Category[] }) {
                 src={getCategoryImage(cat.slug, cat.image_url)}
                 alt={cat.name}
                 fill
-                className="object-contain p-4 transition-transform duration-500 ease-out group-hover:scale-105"
+                className="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
                 sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                 priority={i < 2}
                 loading={i < 2 ? "eager" : "lazy"}

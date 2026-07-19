@@ -1,9 +1,8 @@
 import type { Metadata } from "next"
 import Link from "next/link"
-import { ArrowLeft, Clock, Globe, MapPin, Package, Truck } from "lucide-react"
+import { ArrowLeft, Globe, MapPin, Package, Truck } from "lucide-react"
 import { Navbar } from "@/components/navbar"
 import { Footer } from "@/components/footer"
-import { formatShippingPrice, SHIPPING_CONFIG } from "@/lib/shipping"
 
 export const metadata: Metadata = {
   title: "Spedizioni - MIRAI",
@@ -26,13 +25,12 @@ export default function SpedizioniPage() {
             Spedizioni
           </h1>
           <p className="mb-12 max-w-2xl text-lg text-muted-foreground text-pretty">
-            Gli ordini vengono preparati in Italia e spediti con corriere tracciato. I costi mostrati qui devono corrispondere a checkout e Merchant Center.
+            Gli ordini vengono preparati in Italia e spediti con corriere tracciato. I costi e i tempi di spedizione sono indicati chiaramente prima del pagamento.
           </p>
 
           <div className="mb-16 grid grid-cols-1 gap-4 md:grid-cols-2">
             {[
               { icon: Truck, title: "Standard", value: "3-5 giorni lavorativi", desc: "Sempre gratuita, senza importo minimo" },
-              { icon: Clock, title: "Express", value: "1-2 giorni lavorativi", desc: `Costo di ${formatShippingPrice(SHIPPING_CONFIG.expressPriceCents)}` },
               { icon: Globe, title: "Destinazioni", value: "Italia, UE, Regno Unito e Svizzera", desc: "Eventuali dazi extra UE restano a carico del destinatario" },
               { icon: MapPin, title: "Origine ordine", value: "Catania, Italia", desc: "Preparazione e dispatch dal team MIRAI" },
             ].map((item) => (

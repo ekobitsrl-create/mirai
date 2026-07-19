@@ -1,5 +1,4 @@
 import { type StoreProduct } from "@/lib/products"
-import { formatShippingPrice, SHIPPING_CONFIG } from "@/lib/shipping"
 
 export type MiraIntent =
   | "greeting"
@@ -43,8 +42,6 @@ export type MiraKnowledgeReply = {
   label?: string
   productId?: string
 }
-
-const EXPRESS_PRICE = formatShippingPrice(SHIPPING_CONFIG.expressPriceCents)
 
 // The offline fallback catalog is populated at runtime from the database
 // (see setMiraCatalog, called client-side by the MIRA guide widget). When the
@@ -191,10 +188,10 @@ function contextualFollowUp(message: string, context: MiraKnowledgeContext) {
   if (!isShortFollowUp || !context.lastIntent) return null
 
   if (context.lastIntent === "shipping" || context.lastIntent === "tracking") {
-    if (hasAny(message, ["costa", "prezzo", "gratis", "gratuita", "express"])) {
-      return answer("shipping", `La standard è gratuita. L’express costa ${EXPRESS_PRICE}.`, "/spedizioni", "Dettagli spedizioni")
+    if (hasAny(message, ["costa", "prezzo", "gratis", "gratuita"])) {
+      return answer("shipping", "La spedizione standard e gratuita.", "/spedizioni", "Dettagli spedizioni")
     }
-    return answer("shipping", "La standard richiede 3–5 giorni lavorativi; l’express 1–2. Il tracking arriva via email dopo la spedizione.", "/spedizioni", "Dettagli spedizioni")
+    return answer("shipping", "La spedizione richiede normalmente 3-5 giorni lavorativi. Il tracking arriva via email dopo la spedizione.", "/spedizioni", "Dettagli spedizioni")
   }
 
   if (context.lastIntent === "returns" || context.lastIntent === "refund") {
@@ -223,7 +220,7 @@ export function getMiraLocalReply(rawMessage: string, context: MiraKnowledgeCont
     return answer("unknown", "Dimmi pure: posso aiutarti con capi, taglie, ordini, spedizioni, resi e pagamenti.")
   }
 
-  const asksShipping = hasAny(message, ["spedizione", "spedire", "consegna", "corriere", "express", "estero"])
+  const asksShipping = hasAny(message, ["spedizione", "spedire", "consegna", "corriere", "estero"])
   const asksReturns = hasAny(message, ["reso", "restituire", "restituzione", "rimandare indietro", "rimborso"])
   const asksPayments = hasAny(message, ["pagamento", "pagare", "paypal", "klarna", "scalapay", "visa", "mastercard", "postepay", "carta", "apple pay", "google pay", "stripe"])
 
@@ -239,7 +236,7 @@ export function getMiraLocalReply(rawMessage: string, context: MiraKnowledgeCont
   if (asksShipping && asksPayments) {
     return answer(
       "shipping",
-      "La spedizione standard è gratuita. Il pagamento passa da Stripe e puoi usare carta, PayPal, Apple Pay, Google Pay, Klarna e Scalapay quando disponibili al checkout.",
+      "La spedizione standard e gratuita. Al checkout puoi pagare con i metodi Stripe disponibili oppure scegliere il contrassegno per consegne in Italia.",
       "/faq",
       "FAQ acquisto",
     )
@@ -305,9 +302,9 @@ export function getMiraLocalReply(rawMessage: string, context: MiraKnowledgeCont
       return answer("shipping", "MIRAI spedisce nell’Unione Europea, nel Regno Unito e in Svizzera con le tempistiche indicate sul sito. Per altre destinazioni, chiedi conferma all’assistenza.", "/spedizioni", "Destinazioni servite")
     }
     if (hasAny(message, ["quanto costa", "costo", "prezzo", "gratis", "gratuita"])) {
-      return answer("shipping", `La spedizione standard è sempre gratuita, senza minimo d’ordine. L’express costa ${EXPRESS_PRICE}.`, "/spedizioni", "Dettagli spedizioni")
+      return answer("shipping", "La spedizione standard e sempre gratuita, senza minimo d ordine.", "/spedizioni", "Dettagli spedizioni")
     }
-    return answer("shipping", `La standard è gratuita e richiede 3–5 giorni lavorativi. L’express richiede 1–2 giorni e costa ${EXPRESS_PRICE}.`, "/spedizioni", "Dettagli spedizioni")
+    return answer("shipping", "La spedizione standard e gratuita e richiede normalmente 3-5 giorni lavorativi.", "/spedizioni", "Dettagli spedizioni")
   }
 
   if (hasAny(message, ["rimborso", "soldi indietro", "riavere i soldi", "accredito"])) {

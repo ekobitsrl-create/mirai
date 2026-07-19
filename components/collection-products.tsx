@@ -7,46 +7,7 @@ import { useSearchParams } from "next/navigation"
 import { Heart, ArrowLeft } from "lucide-react"
 import { useCart } from "@/lib/cart-context"
 import { useLanguage } from "@/lib/language-context"
-
-// Mapping immagini locali per slug categoria
-const categoryImages: Record<string, string> = {
-  // T-shirts
-  "t-shirt": "/images/collection-tshirt.jpg",
-  "tshirt": "/images/collection-tshirt.jpg",
-  "t-shirts": "/images/collection-tshirt.jpg",
-  "magliette": "/images/collection-tshirt.jpg",
-  // Caps / Hats / Headwear - usando le foto reali dei cappelli
-  "cappelli": "/images/cap-ny-red-crystal.jpg",
-  "caps": "/images/cap-ny-red-crystal.jpg",
-  "hats": "/images/cap-ny-red-crystal.jpg",
-  "cappellini": "/images/cap-ny-red-crystal.jpg",
-  "headwear": "/images/cap-ny-red-crystal.jpg",
-  // Hoodies / Sweatshirts
-  "felpe": "/images/collection-apparel.jpg",
-  "hoodies": "/images/collection-apparel.jpg",
-  "sweatshirts": "/images/collection-apparel.jpg",
-  // Accessories
-  "accessori": "/images/collection-accessories.jpg",
-  "accessories": "/images/collection-accessories.jpg",
-  // Apparel / Abbigliamento
-  "apparel": "/images/collection-apparel.jpg",
-  "abbigliamento": "/images/collection-apparel.jpg",
-  "clothing": "/images/collection-apparel.jpg",
-  // Pantaloni / Pants
-  "pantaloni": "/images/collection-apparel.jpg",
-  "pants": "/images/collection-apparel.jpg",
-  "jeans": "/images/collection-apparel.jpg",
-  // New arrivals
-  "nuovi-arrivi": "/images/collection-tshirt.jpg",
-  "new-arrivals": "/images/collection-tshirt.jpg",
-}
-
-const defaultImage = "/images/collection-tshirt.jpg"
-
-function getCategoryImage(slug: string, dbImage: string | null): string {
-  if (dbImage) return dbImage
-  return categoryImages[slug.toLowerCase()] || defaultImage
-}
+import { getCategoryImage } from "@/lib/category-images"
 
 type Product = {
   id: string
@@ -127,7 +88,7 @@ export function CollectionProducts({
             src={getCategoryImage(category.slug, category.image_url)}
             alt={category.name}
             fill
-            className="object-contain p-8"
+            className="object-cover"
             priority
           />
         </div>

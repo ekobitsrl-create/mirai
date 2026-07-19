@@ -11,7 +11,7 @@ const TRACKS = [
   },
   {
     title: "Mirai Beat 2",
-    src: "/audio/mirai-beat.wav",
+    src: "/audio/mirai-beat-2.mpeg",
   },
 ] as const
 

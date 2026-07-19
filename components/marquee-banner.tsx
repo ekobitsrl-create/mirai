@@ -25,7 +25,7 @@ export function MarqueeBanner() {
     <div className="relative z-50">
       {/* Top info bar - subtle */}
       <InfiniteMarquee speed="normal" className="bg-secondary border-b border-border py-2">
-        {["Spedizione Gratuita", "Resi Gratuiti entro 30 Giorni", "Pagamento Sicuro e Protetto", "Spedizione Express Disponibile"].map((msg, i) => (
+        {["Spedizione Gratuita", "Resi Gratuiti entro 30 Giorni", "Pagamento Sicuro e Protetto"].map((msg, i) => (
           <span key={i} className="mx-8 text-[11px] tracking-[0.2em] uppercase text-muted-foreground">
             {msg}
           </span>
