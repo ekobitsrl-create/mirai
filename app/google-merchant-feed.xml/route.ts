@@ -1,5 +1,5 @@
 import type { NextRequest } from "next/server"
-import { DEMO_PRODUCTS, isPrivateCheckoutProduct, withDemoProducts, type StoreProduct } from "@/lib/products"
+import { isPrivateCheckoutProduct, withDemoProducts, type StoreProduct } from "@/lib/products"
 import { createClient } from "@/lib/supabase/server"
 
 export const runtime = "nodejs"
@@ -201,8 +201,8 @@ async function getCatalogProducts() {
 
     return withDemoProducts((data || []) as StoreProduct[])
   } catch (error) {
-    console.error("Google Merchant feed: catalogo Supabase non disponibile, uso il fallback locale.", error)
-    return DEMO_PRODUCTS
+    console.error("Google Merchant feed: catalogo Supabase non disponibile.", error)
+    return []
   }
 }
 
