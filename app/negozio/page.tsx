@@ -62,13 +62,13 @@ export default function NegozioPage() {
             <div className="mirai-neon-frame mirai-neon-breathe relative mx-auto w-full max-w-3xl overflow-hidden rounded-[1.75rem] bg-[#100c16] p-2 sm:p-3">
               <div className="pointer-events-none absolute inset-x-12 top-0 z-10 h-px bg-gradient-to-r from-transparent via-primary to-transparent shadow-[0_0_18px_rgba(159,134,255,0.9)]" />
               <video
-                className="max-h-[70svh] w-full rounded-[1.25rem] bg-black object-contain"
+                className="max-h-[70svh] w-full transform-gpu rounded-[1.25rem] bg-black object-contain"
                 src="/videos/physical-store-coming-soon.mp4"
                 autoPlay
                 muted
                 loop
                 playsInline
-                preload="metadata"
+                preload="auto"
                 aria-label="Anteprima del futuro negozio fisico MIRAI LAB STORE"
               />
               <div className="pointer-events-none absolute bottom-6 left-6 right-6 flex items-center justify-between rounded-full border border-white/10 bg-black/80 px-4 py-2.5 sm:bottom-8 sm:left-8 sm:right-8">
