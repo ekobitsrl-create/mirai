@@ -200,7 +200,7 @@ export function MiraGuide() {
   const pathname = usePathname()
   const contextualPrompt = useMemo(() => getContextPrompt(pathname), [pathname])
   const [hydrated, setHydrated] = useState(false)
-  const [variant, setVariant] = useState<MiraVariant | null>(null)
+  const [variant, setVariant] = useState<MiraVariant>("male")
   const [pendingVariant, setPendingVariant] = useState<MiraVariant>("male")
   const [showSelector, setShowSelector] = useState(false)
   const [showNudge, setShowNudge] = useState(false)
@@ -296,15 +296,22 @@ export function MiraGuide() {
     setPosition(safePosition)
     setViewportWidth(window.innerWidth)
     setViewportHeight(window.innerHeight)
+    const initialVariant = savedVariant ?? "male"
+
     setPositionReady(true)
-    setVariant(savedVariant)
-    if (savedVariant) setPendingVariant(savedVariant)
+    setVariant(initialVariant)
+    setPendingVariant(initialVariant)
     setSpeechSupported(Boolean(window.SpeechRecognition || window.webkitSpeechRecognition))
     setHydrated(true)
 
-    const selectorTimer = !savedVariant
-      ? window.setTimeout(() => setShowSelector(true), 1100)
-      : null
+    if (!savedVariant) {
+      try {
+        // A cleared or unavailable preference must never make MIRA disappear.
+        window.localStorage.setItem(VARIANT_STORAGE_KEY, initialVariant)
+      } catch {
+        // The default avatar remains available for the current visit.
+      }
+    }
 
     const handleResize = () => {
       setViewportWidth(window.innerWidth)
@@ -316,7 +323,6 @@ export function MiraGuide() {
 
     window.addEventListener("resize", handleResize)
     return () => {
-      if (selectorTimer) window.clearTimeout(selectorTimer)
       window.removeEventListener("resize", handleResize)
     }
   }, [])
@@ -657,7 +663,7 @@ export function MiraGuide() {
 
   if (!hydrated) return null
 
-  const activeVariant = variant || pendingVariant
+  const activeVariant = variant
   const stageSize = getStageSize()
   const bubbleOnLeft = position.x + stageSize.width / 2 > viewportWidth / 2
   const bubbleWidth = Math.min(expanded ? 320 : 232, viewportWidth - 24)
