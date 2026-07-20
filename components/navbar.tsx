@@ -191,7 +191,7 @@ export function Navbar() {
                 className="inline-flex items-center gap-1.5 rounded-full border border-primary/45 bg-primary/5 px-3 py-2 text-[10px] font-bold uppercase tracking-[0.16em] text-primary transition-all hover:border-primary hover:bg-primary/15 hover:text-white hover:shadow-[0_0_24px_rgba(159,134,255,0.2)]"
               >
                 <WandSparkles className="h-3.5 w-3.5" />
-                Personalizza
+                Mirai Custom Lab
               </Link>
               <Link
                 href="/i-nostri-beat"
@@ -339,7 +339,7 @@ export function Navbar() {
               className="flex items-center justify-center gap-2 rounded-sm border border-primary/45 bg-primary/10 px-4 py-3 text-xs font-bold uppercase tracking-[0.2em] text-primary"
               onClick={() => setMobileOpen(false)}
             >
-              <WandSparkles className="h-4 w-4" /> Personalizza
+              <WandSparkles className="h-4 w-4" /> Mirai Custom Lab
             </Link>
             <Link
               href="/i-nostri-beat"

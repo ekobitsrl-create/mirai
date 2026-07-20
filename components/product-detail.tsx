@@ -254,7 +254,7 @@ export function ProductDetail({
           </button>
         </section>
 
-        <section className="mirai-neon-card relative overflow-hidden rounded-[1.75rem] p-5 sm:p-7 lg:sticky lg:top-32 lg:self-start lg:p-8">
+        <section className="mirai-neon-card relative overflow-hidden rounded-[1.75rem] p-5 sm:p-7 lg:!sticky lg:top-32 lg:self-start lg:p-8">
           <div className="flex items-start justify-between gap-6">
             <div>
               <p className="text-[9px] font-semibold uppercase tracking-[0.3em] text-[#9f86ff]">MIRAI LAB / {product.brand || formatCategory(product.category)}</p>
@@ -394,13 +394,13 @@ export function ProductDetail({
 
           <div className="mt-4 flex items-center gap-2 text-[10px] text-white/60">
             <PackageCheck className="h-4 w-4 text-emerald-400" />
-            {product.in_stock ? "Disponibile — spedizione in 1–2 giorni lavorativi" : "Momentaneamente non disponibile"}
+            {product.in_stock ? "Disponibile — preparazione 1–2 giorni, consegna standard 3–5 giorni lavorativi" : "Momentaneamente non disponibile"}
           </div>
 
           <div className="mt-8 grid grid-cols-3 border-y border-white/15 bg-white/[0.025] py-5">
             <TrustItem icon={Truck} title="Spedizione gratuita" detail="Sempre" />
             <TrustItem icon={RotateCcw} title="Reso facile" detail="Entro 14 giorni" bordered />
-            <TrustItem icon={ShieldCheck} title="Pagamento" detail="100% sicuro" />
+            <TrustItem icon={ShieldCheck} title="Pagamento" detail="Protetto da Stripe" />
           </div>
 
           <div className="mt-1">

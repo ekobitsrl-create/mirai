@@ -78,6 +78,10 @@ export function CollectionProducts({
     ? products.filter((p) => p.category === activeSubcategory)
     : products
 
+  // Fragrance/parfum product shots are full-bottle photos that get cropped by
+  // object-cover, so display them fully contained within the frame instead.
+  const isParfumCollection = /parfum/i.test(category.slug)
+
   return (
     <div className="pt-24">
       {/* Hero banner */}
@@ -212,7 +216,11 @@ export function CollectionProducts({
                           src={product.image_url || "/placeholder.jpg"}
                           alt={product.name}
                           fill
-                          className="object-cover object-top transition-all duration-[1s] ease-out group-hover:scale-110"
+                          className={
+                            isParfumCollection
+                              ? "object-contain p-4 transition-all duration-[1s] ease-out group-hover:scale-105"
+                              : "object-cover object-top transition-all duration-[1s] ease-out group-hover:scale-110"
+                          }
                         />
                         {product.is_new && (
                           <span className="absolute top-4 left-4 px-3 py-1 bg-primary text-primary-foreground text-[10px] font-bold tracking-widest uppercase rounded-sm">

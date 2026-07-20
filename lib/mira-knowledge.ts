@@ -227,7 +227,7 @@ export function getMiraLocalReply(rawMessage: string, context: MiraKnowledgeCont
   if (asksShipping && asksReturns) {
     return answer(
       "shipping",
-      "La spedizione standard è gratuita e richiede 3–5 giorni lavorativi. Se il capo non va bene, puoi chiedere il reso entro 14 giorni; in Italia il reso è gratuito.",
+      "La spedizione standard è gratuita e richiede 3–5 giorni lavorativi. Se il capo non va bene, puoi chiedere il reso entro 14 giorni: per ogni reso approvato MIRAI invia un'etichetta prepagata e sostiene le spese di restituzione.",
       "/faq",
       "Vedi tutte le FAQ",
     )

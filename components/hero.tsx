@@ -7,10 +7,10 @@ import { ChevronLeft, ChevronRight } from "lucide-react"
 import { useLanguage } from "@/lib/language-context"
 
 const slideImages = [
-  { src: "/images/hero-mirai-logo.png", isPortrait: true, scale: "scale-90", position: "object-center" },
-  { src: "/images/hero-storefront.png", isPortrait: false, scale: "scale-75", position: "object-center" },
-  { src: "/images/hero-model-black.png", isPortrait: true, scale: "scale-[0.70]", position: "object-center" },
-  { src: "/images/hero-model-white.png", isPortrait: true, scale: "scale-[0.70]", position: "object-center" },
+  { src: "/images/hero-mirai-logo.png", ratio: 738 / 1600, heightPct: 90 },
+  { src: "/images/hero-storefront.png", ratio: 1536 / 1024, heightPct: 68, heightPctMobile: 54, strongBottomFade: true },
+  { src: "/images/hero-model-black.png", ratio: 1024 / 1536, heightPct: 70 },
+  { src: "/images/hero-model-white.png", ratio: 1024 / 1536, heightPct: 70 },
 ]
 
 const slideHrefs = [
@@ -65,15 +65,44 @@ export function Hero() {
             i === current ? "mirai-hero-slide-active opacity-100 z-10" : "opacity-0 scale-105 z-0"
           }`}
         >
-          <Image
-            src={image.src}
-            alt={slides[i]?.title.replace("\n", " ") || ""}
-            fill
-            className={`object-contain drop-shadow-[0_0_48px_rgba(159,134,255,0.16)] ${image.position} ${image.scale}`}
-            priority={i === 0}
-            sizes="100vw"
-          />
-          <div className="mirai-image-edge-fade absolute inset-0" />
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div
+              className="mirai-hero-frame relative drop-shadow-[0_0_48px_rgba(159,134,255,0.16)]"
+              style={
+                {
+                  "--hero-h": `${image.heightPct}%`,
+                  "--hero-h-mobile": `${image.heightPctMobile ?? image.heightPct}%`,
+                  aspectRatio: image.ratio,
+                } as React.CSSProperties
+              }
+            >
+              {/* Blurred, slightly enlarged copy sits behind so its soft halo
+                  hides the sharp rectangular border of the base image. */}
+              <Image
+                src={image.src}
+                alt=""
+                aria-hidden
+                fill
+                className="mirai-hero-edge-blur object-cover"
+                priority={i === 0}
+                sizes="100vw"
+              />
+              {/* Sharp base image, faded out just before its own hard edge. */}
+              <Image
+                src={image.src}
+                alt={slides[i]?.title.replace("\n", " ") || ""}
+                fill
+                className="mirai-hero-base object-cover"
+                priority={i === 0}
+                sizes="100vw"
+              />
+              <div
+                className={`mirai-image-edge-fade absolute inset-0 ${
+                  image.strongBottomFade ? "mirai-image-edge-fade--bottom" : ""
+                }`}
+              />
+            </div>
+          </div>
         </div>
       ))}
 

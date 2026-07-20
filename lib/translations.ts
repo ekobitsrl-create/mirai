@@ -114,8 +114,8 @@ export const translations = {
     },
     // Features
     features: {
-      globalShipping: "Spedizione Globale",
-      globalShippingDesc: "Consegna standard gratuita in tutta Europa.",
+      globalShipping: "Spedizione Gratuita",
+      globalShippingDesc: "Spedizione gratuita in Italia e in Europa.",
       securePayment: "Pagamento Sicuro",
       securePaymentDesc: "Transazioni protette con crittografia di livello bancario.",
       easyReturns: "Resi Facili",
@@ -126,7 +126,7 @@ export const translations = {
     // Newsletter
     newsletter: {
       title: "Unisciti a Noi",
-      description: "Sii il primo a scoprire tutte le offerte e le sorprese!",
+      description: "Ricevi accesso anticipato ai drop, aggiornamenti sull'apertura dello store, inviti agli eventi e contenuti riservati.",
       placeholder: "Il tuo indirizzo email",
       subscribe: "Iscriviti",
       success: "Ti sei iscritto con successo!",

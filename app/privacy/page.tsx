@@ -69,7 +69,7 @@ export default function PrivacyPage() {
 
             <div className="flex flex-col gap-3">
               <h2 className="font-[family-name:var(--font-space-grotesk)] text-xl font-bold text-foreground">6. Condivisione con Terze Parti</h2>
-              <p>I tuoi dati possono essere condivisi con: Stripe (elaborazione pagamenti), corrieri (spedizioni), Supabase (hosting database), Vercel (hosting sito web). Non vendiamo o cediamo i tuoi dati a terzi per finalita di marketing.</p>
+              <p>I tuoi dati possono essere condivisi con: Stripe (elaborazione pagamenti), corrieri (spedizioni), Supabase (hosting database), Vercel (hosting sito web) e strumenti di analytics e advertising come Google Analytics/Google Tag Manager/Google Ads, TikTok Pixel e Meta Pixel, ove attivi e previo consenso ove richiesto. Non vendiamo o cediamo i tuoi dati a terzi per finalita di marketing.</p>
             </div>
 
             <div className="flex flex-col gap-3">

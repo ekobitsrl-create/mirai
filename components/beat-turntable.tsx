@@ -120,7 +120,7 @@ export function BeatTurntable() {
             I Nostri<br /><span className="text-[#5eead4]">Beat</span>
           </h1>
           <p className="mt-7 max-w-xl text-sm leading-7 text-white/55 sm:text-base">
-            Il nostro studio di produzione. Acquistando i nostri capi puoi ottenerne uno.
+            Ogni acquisto MIRAI puo sbloccare contenuti digitali esclusivi del nostro Lab: beat, visual e materiali creativi legati alla community.
           </p>
 
           <div className="mt-10 flex items-center gap-4">
