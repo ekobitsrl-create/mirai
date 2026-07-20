@@ -34,6 +34,26 @@ const CATEGORY_IMAGES: Record<string, string> = {
 
 const DEFAULT_CATEGORY_IMAGE = "/images/collection-tshirt.jpg"
 
+const CONTAINED_CATEGORY_SLUGS = new Set([
+  "profumi",
+  "profumo",
+  "fragrance",
+  "fragrances",
+  "mirai-parfum-exlusive",
+  "mirai-parfum-exclusive",
+  "shorts",
+  "short",
+  "bermuda",
+  "t-shirt",
+  "t-shirts",
+  "tshirt",
+  "magliette",
+])
+
 export function getCategoryImage(slug: string, databaseImage: string | null) {
   return CATEGORY_IMAGES[slug.toLowerCase()] || databaseImage || DEFAULT_CATEGORY_IMAGE
+}
+
+export function shouldContainCategoryImage(slug: string) {
+  return CONTAINED_CATEGORY_SLUGS.has(slug.toLowerCase())
 }
