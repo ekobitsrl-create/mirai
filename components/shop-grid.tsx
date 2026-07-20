@@ -570,13 +570,13 @@ function ProductCard({
           </button>
         </div>
         {product.in_stock && (
-          <div className="absolute inset-x-0 bottom-0 p-3 md:translate-y-full md:transition-transform md:duration-300 md:group-hover:translate-y-0">
+          <div className="absolute inset-x-0 bottom-0 p-2.5 md:translate-y-full md:p-3 md:transition-transform md:duration-300 md:group-hover:translate-y-0">
             <button
               type="button"
               onClick={onQuickAdd}
-              className="mirai-neon-primary flex w-full items-center justify-center gap-2 rounded-xl bg-white px-3 py-3 text-[9px] font-bold uppercase tracking-[0.22em] text-black transition-all hover:bg-primary hover:text-primary-foreground md:py-3.5 md:text-[10px]"
+              className="mirai-neon-primary flex w-full items-center justify-center gap-1.5 rounded-lg bg-white px-2 py-2 text-[8px] font-bold uppercase tracking-[0.16em] text-black transition-all hover:bg-primary hover:text-primary-foreground md:gap-2 md:rounded-xl md:px-3 md:py-3.5 md:text-[10px] md:tracking-[0.22em]"
             >
-              <ShoppingBag className="h-3.5 w-3.5" />
+              <ShoppingBag className="h-3 w-3 md:h-3.5 md:w-3.5" />
               {labels.quickAdd}
             </button>
           </div>

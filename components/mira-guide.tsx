@@ -546,11 +546,15 @@ export function MiraGuide() {
   }
 
   function handlePointerDown(event: ReactPointerEvent<HTMLButtonElement>) {
-    if (event.button !== 0) return
+    if (event.pointerType === "mouse" && event.button !== 0) return
     const rect = stageRef.current?.getBoundingClientRect()
     if (!rect) return
 
-    event.currentTarget.setPointerCapture(event.pointerId)
+    try {
+      event.currentTarget.setPointerCapture(event.pointerId)
+    } catch {
+      // Safari can still deliver pointer events without explicit capture.
+    }
     dragRef.current = {
       pointerId: event.pointerId,
       startX: event.clientX,
@@ -561,15 +565,20 @@ export function MiraGuide() {
     }
 
     if (holdTimerRef.current) window.clearTimeout(holdTimerRef.current)
-    holdTimerRef.current = window.setTimeout(() => {
-      dragRef.current.dragging = true
-      suppressClickRef.current = true
-      setIsDragging(true)
-      setLookOffset({ x: 0, y: 0 })
-      setExpanded(false)
-      setShowNudge(false)
-      navigator.vibrate?.(18)
-    }, 360)
+    holdTimerRef.current = window.setTimeout(beginDragging, 360)
+  }
+
+  function beginDragging() {
+    if (dragRef.current.pointerId === -1 || dragRef.current.dragging) return
+    if (holdTimerRef.current) window.clearTimeout(holdTimerRef.current)
+    holdTimerRef.current = null
+    dragRef.current.dragging = true
+    suppressClickRef.current = true
+    setIsDragging(true)
+    setLookOffset({ x: 0, y: 0 })
+    setExpanded(false)
+    setShowNudge(false)
+    navigator.vibrate?.(18)
   }
 
   function handlePointerMove(event: ReactPointerEvent<HTMLButtonElement>) {
@@ -586,11 +595,15 @@ export function MiraGuide() {
       }
 
       const distance = Math.hypot(event.clientX - drag.startX, event.clientY - drag.startY)
-      if (distance > 10 && holdTimerRef.current) {
-        window.clearTimeout(holdTimerRef.current)
-        holdTimerRef.current = null
+      if (distance > 6) {
+        if (event.pointerType === "touch" || event.pointerType === "pen") {
+          beginDragging()
+        } else if (holdTimerRef.current) {
+          window.clearTimeout(holdTimerRef.current)
+          holdTimerRef.current = null
+        }
       }
-      return
+      if (!drag.dragging) return
     }
 
     event.preventDefault()
@@ -616,8 +629,10 @@ export function MiraGuide() {
     dragRef.current.dragging = false
     dragRef.current.pointerId = -1
     setIsDragging(false)
-    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
-      event.currentTarget.releasePointerCapture(event.pointerId)
+    try {
+      if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId)
+    } catch {
+      // No-op when iOS Safari has already released the pointer.
     }
   }
 
@@ -853,6 +868,8 @@ export function MiraGuide() {
             onPointerMove={handlePointerMove}
             onPointerUp={finishPointer}
             onPointerCancel={finishPointer}
+            onLostPointerCapture={finishPointer}
+            onContextMenu={(event) => event.preventDefault()}
             onPointerEnter={() => setIsHovering(true)}
             onPointerLeave={() => {
               setIsHovering(false)

@@ -642,7 +642,11 @@
 
 .mira-character-button {
   cursor: pointer;
+  touch-action: none;
   -webkit-user-drag: none;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 .mira-is-dragging {
