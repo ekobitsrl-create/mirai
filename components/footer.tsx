@@ -57,8 +57,9 @@ export function Footer() {
       links: [
         { label: t.footer.newArrivals, href: "/#nuovi-arrivi" },
         { label: t.footer.collections, href: "/collezioni" },
+        { label: "T-shirt oversize", href: "/collezione/t-shirt" },
+        { label: "Cappelli custom", href: "/collezione/cappelli" },
         { label: "T-shirt personalizzate", href: "/custom-lab" },
-        { label: beatsLabel, href: "/i-nostri-beat" },
       ],
     },
     info: {
@@ -70,6 +71,8 @@ export function Footer() {
         { label: t.footer.shipping, href: "/spedizioni" },
         { label: t.footer.returnsRefunds, href: "/resi" },
         { label: t.footer.faq, href: "/faq" },
+        { label: "Guide streetwear", href: "/guide" },
+        { label: beatsLabel, href: "/i-nostri-beat" },
         { label: communityLabel, href: "/community" },
       ],
     },

@@ -16,7 +16,7 @@ export const localeFlags: Record<Locale, string> = {
   fr: "🇫🇷",
 }
 
-export type Translations = typeof translations.it
+export type Translations = (typeof translations)[Locale]
 
 export const translations = {
   it: {
@@ -40,9 +40,9 @@ export const translations = {
     hero: {
       slides: [
         {
-          subtitle: "Nuova Stagione",
-          title: "Nuovi Prodotti\nSS26",
-          cta: "Acquista Ora",
+          subtitle: "MIRAI LAB STORE",
+          title: "Streetwear\nCatania",
+          cta: "Scopri lo Shop",
         },
         {
           subtitle: "Streetwear",

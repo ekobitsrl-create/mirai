@@ -1,16 +1,25 @@
-import type { Metadata } from "next"
 import Image from "next/image"
 import Link from "next/link"
 import { ArrowLeft } from "lucide-react"
 import { Navbar } from "@/components/navbar"
 import { Footer } from "@/components/footer"
+import { buildSeoMetadata, createBreadcrumbJsonLd, createWebPageJsonLd } from "@/lib/seo"
 
-export const metadata: Metadata = {
-  title: "Chi Siamo - MIRAI",
-  alternates: { canonical: "/chi-siamo" },
-  description:
-    "MIRAI: il futuro dello streetwear. Un progetto innovativo nato a Catania che fonde moda, tecnologia e cultura urbana.",
-}
+const ABOUT_DESCRIPTION =
+  "MIRAI è un concept store streetwear nato a Catania: moda urban, custom culture e tecnologia si incontrano online e nel futuro MIRAI LAB STORE."
+
+export const metadata = buildSeoMetadata({
+  title: "Concept store streetwear Catania | Chi siamo",
+  description: ABOUT_DESCRIPTION,
+  path: "/chi-siamo",
+  keywords: [
+    "concept store streetwear Catania",
+    "concept store Catania",
+    "MIRAI Concept Store",
+    "MIRAI Lab Store",
+    "MIRAI streetwear",
+  ],
+})
 
 export default function ChiSiamoPage() {
   return (
@@ -18,6 +27,26 @@ export default function ChiSiamoPage() {
       <Navbar />
 
       <main className="pt-20">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(createWebPageJsonLd({
+              type: "AboutPage",
+              name: "MIRAI - Concept store streetwear Catania",
+              description: ABOUT_DESCRIPTION,
+              path: "/chi-siamo",
+            })),
+          }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(createBreadcrumbJsonLd([
+              { name: "Home", path: "/" },
+              { name: "Chi siamo", path: "/chi-siamo" },
+            ])),
+          }}
+        />
         {/* Hero Section */}
         <section className="relative flex flex-col items-center">
           <div className="relative w-full max-w-4xl mx-auto">
@@ -40,7 +69,7 @@ export default function ChiSiamoPage() {
               Torna alla Home
             </Link>
             <h1 className="font-[family-name:var(--font-space-grotesk)] text-3xl font-bold tracking-tight text-foreground text-balance md:text-4xl">
-              Chi Siamo
+              MIRAI: concept store streetwear a Catania
             </h1>
           </div>
         </section>
