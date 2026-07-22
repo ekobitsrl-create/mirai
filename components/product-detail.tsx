@@ -62,9 +62,6 @@ export function ProductDetail({
   const supplierSettings = getProductSupplierSettings(product)
   const isMiraiSupplierCatalogProduct = supplierSettings.profile === "mirai"
     && /^MIRAI-/i.test(product.supplier_sku || "")
-  const shippingTimeLabel = supplierSettings.shippingMinDays !== undefined && supplierSettings.shippingMaxDays !== undefined
-    ? `${supplierSettings.shippingMinDays}–${supplierSettings.shippingMaxDays} giorni lavorativi`
-    : "3–5 giorni lavorativi"
   const shippingEstimate = supplierSettings.shippingMinDays !== undefined && supplierSettings.shippingMaxDays !== undefined
     ? `consegna stimata in ${supplierSettings.shippingMinDays}–${supplierSettings.shippingMaxDays} giorni lavorativi`
     : "preparazione 1–2 giorni, consegna standard 3–5 giorni lavorativi"
@@ -403,11 +400,9 @@ export function ProductDetail({
 
           <div className="mt-4 flex items-center gap-2 text-[10px] text-white/60">
             <PackageCheck className="h-4 w-4 text-emerald-400" />
-            {product.in_stock ? "Disponibile" : "Momentaneamente non disponibile"}
-          </div>
-          <div className="mt-3 flex items-center gap-2 border border-[#9f86ff]/35 bg-[#9f86ff]/10 px-4 py-3 text-xs font-semibold text-white">
-            <Truck className="h-4 w-4 shrink-0 text-[#b7a6ff]" />
-            <span>Tempi di spedizione: {shippingTimeLabel}</span>
+            {product.in_stock
+              ? `Disponibile — ${shippingEstimate}`
+              : `Momentaneamente non disponibile — ${shippingEstimate}`}
           </div>
 
           <div className="mt-8 grid grid-cols-3 border-y border-white/15 bg-white/[0.025] py-5">
