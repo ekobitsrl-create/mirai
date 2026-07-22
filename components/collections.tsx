@@ -4,7 +4,11 @@ import Image from "next/image"
 import Link from "next/link"
 import { useScrollAnimation } from "@/hooks/use-scroll-animation"
 import { useLanguage } from "@/lib/language-context"
-import { getCategoryImage, shouldContainCategoryImage } from "@/lib/category-images"
+import {
+  getCategoryImage,
+  shouldContainCategoryImage,
+  shouldTopAlignCategoryCardImage,
+} from "@/lib/category-images"
 import { ArrowRight } from "lucide-react"
 
 type Category = {
@@ -50,7 +54,13 @@ export function Collections({ categories = [] }: { categories?: Category[] }) {
                 src={getCategoryImage(cat.slug, cat.image_url)}
                 alt={cat.name}
                 fill
-                className={`${shouldContainCategoryImage(cat.slug) ? "object-contain p-3" : "object-cover"} transition-transform duration-500 ease-out group-hover:scale-105`}
+                className={`${
+                  shouldTopAlignCategoryCardImage(cat.slug)
+                    ? "object-contain object-top"
+                    : shouldContainCategoryImage(cat.slug)
+                      ? "object-contain p-3"
+                      : "object-cover"
+                } transition-transform duration-500 ease-out group-hover:scale-105`}
                 sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                 priority={i < 2}
                 loading={i < 2 ? "eager" : "lazy"}

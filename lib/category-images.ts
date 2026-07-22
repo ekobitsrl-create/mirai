@@ -60,10 +60,21 @@ const CONTAINED_CATEGORY_SLUGS = new Set([
   "hats",
 ])
 
+const TOP_ALIGNED_CATEGORY_CARD_SLUGS = new Set([
+  "t-shirt",
+  "t-shirts",
+  "tshirt",
+  "magliette",
+])
+
 export function getCategoryImage(slug: string, databaseImage: string | null) {
   return CATEGORY_IMAGES[slug.toLowerCase()] || databaseImage || DEFAULT_CATEGORY_IMAGE
 }
 
 export function shouldContainCategoryImage(slug: string) {
   return CONTAINED_CATEGORY_SLUGS.has(slug.toLowerCase())
+}
+
+export function shouldTopAlignCategoryCardImage(slug: string) {
+  return TOP_ALIGNED_CATEGORY_CARD_SLUGS.has(slug.toLowerCase())
 }
