@@ -2,7 +2,7 @@ export type MiraiSupplierCatalogProduct = {
   name: string
   description: string
   price: number
-  category: "t-shirt" | "canotte"
+  category: "t-shirt" | "canotte" | "pantaloni" | "shorts"
   image_url: string
   image_gallery: string[]
   sizes: string[]
@@ -802,18 +802,148 @@ const MIRAI_SUPPLIER_CATALOG_BASE = [
     "composition": null,
     "care": null
   }
+  ,
+  {
+    "name": "MIRAI Night Spark Crystal Shorts - Black",
+    "description": "Shorts neri dal taglio ampio con lavaggio sfumato e una fitta applicazione di cristalli su tutta la superficie. La costruzione essenziale lascia spazio alla texture luminosa, mentre i lacci lunghi completano un capo streetwear deciso ma facile da abbinare.",
+    "price": 140,
+    "category": "shorts",
+    "image_url": "/products/mirai-supplier/night-spark-crystal-shorts-black-01.webp",
+    "image_gallery": ["/products/mirai-supplier/night-spark-crystal-shorts-black-01.webp"],
+    "sizes": ["44", "46", "48", "50", "52", "54", "56"],
+    "stock_by_size": { "44": 10, "46": 10, "48": 10, "50": 10, "52": 10, "54": 10, "56": 10 },
+    "in_stock": true,
+    "is_new": true,
+    "brand": "MIRAI",
+    "supplier_sku": "MIRAI-NIGHT-SPARK-027",
+    "color_name": "Nero",
+    "color_hex": "#111111",
+    "fit_note": "Vestibilita baggy. Taglie disponibili dalla 44 alla 56.",
+    "detail_items": ["Applicazioni crystal all-over", "Lavaggio nero con sfumature grigie", "Lacci lunghi a contrasto", "Taglio ampio sotto il ginocchio", "Vista fronte e retro"],
+    "composition": null,
+    "care": "Seguire le istruzioni riportate sull'etichetta interna."
+  },
+  {
+    "name": "MIRAI Shadow Script Distressed Jeans - Black",
+    "description": "Jeans lunghi neri con costruzione a pannelli, lavaggio vissuto e dettagli distressed distribuiti sulla gamba. La maxi applicazione script sul fronte aggiunge luce e carattere a una silhouette ampia di ispirazione urban.",
+    "price": 180,
+    "category": "pantaloni",
+    "image_url": "/products/mirai-supplier/shadow-script-distressed-jeans-black-01.webp",
+    "image_gallery": ["/products/mirai-supplier/shadow-script-distressed-jeans-black-01.webp"],
+    "sizes": ["44", "46", "48", "50", "52", "54", "56"],
+    "stock_by_size": { "44": 10, "46": 10, "48": 10, "50": 10, "52": 10, "54": 10, "56": 10 },
+    "in_stock": true,
+    "is_new": true,
+    "brand": "MIRAI",
+    "supplier_sku": "MIRAI-SHADOW-SCRIPT-028",
+    "color_name": "Nero washed",
+    "color_hex": "#1b1d1d",
+    "fit_note": "Vestibilita baggy a gamba ampia. Taglie disponibili dalla 44 alla 56.",
+    "detail_items": ["Denim nero con lavaggio distressed", "Maxi applicazione script con dettagli crystal", "Costruzione frontale a pannelli", "Gamba lunga e ampia", "Vista fronte e retro"],
+    "composition": null,
+    "care": "Seguire le istruzioni riportate sull'etichetta interna."
+  },
+  {
+    "name": "MIRAI Valley Patchwork Jeans - Blue",
+    "description": "Jeans lunghi in denim blu washed con una composizione ricca di patch colorate e maxi lettering applicato. La gamba ampia e i lacci extra long costruiscono una presenza forte, pensata per outfit streetwear ad alto impatto.",
+    "price": 180,
+    "category": "pantaloni",
+    "image_url": "/products/mirai-supplier/valley-patchwork-jeans-blue-01.webp",
+    "image_gallery": ["/products/mirai-supplier/valley-patchwork-jeans-blue-01.webp"],
+    "sizes": ["44", "46", "48", "50", "52", "54", "56"],
+    "stock_by_size": { "44": 10, "46": 10, "48": 10, "50": 10, "52": 10, "54": 10, "56": 10 },
+    "in_stock": true,
+    "is_new": true,
+    "brand": "MIRAI",
+    "supplier_sku": "MIRAI-VALLEY-JEANS-BLU-029",
+    "color_name": "Blu washed",
+    "color_hex": "#344755",
+    "fit_note": "Vestibilita baggy a gamba ampia. Taglie disponibili dalla 44 alla 56.",
+    "detail_items": ["Denim blu effetto washed", "Patch ricamate multicolore", "Maxi lettering frontale applicato", "Lacci lunghi a contrasto", "Gamba ampia con costruzione a pannelli"],
+    "composition": null,
+    "care": "Seguire le istruzioni riportate sull'etichetta interna."
+  },
+  {
+    "name": "MIRAI Valley Patchwork Shorts - Brown",
+    "description": "Shorts in denim marrone washed con patch multicolore, maxi lettering applicato e dettagli crystal. Il taglio lungo e rilassato bilancia la ricchezza grafica, creando un capo centrale per look urban e oversize.",
+    "price": 140,
+    "category": "shorts",
+    "image_url": "/products/mirai-supplier/valley-patchwork-shorts-brown-01.webp",
+    "image_gallery": ["/products/mirai-supplier/valley-patchwork-shorts-brown-01.webp"],
+    "sizes": ["44", "46", "48", "50", "52", "54", "56"],
+    "stock_by_size": { "44": 10, "46": 10, "48": 10, "50": 10, "52": 10, "54": 10, "56": 10 },
+    "in_stock": true,
+    "is_new": true,
+    "brand": "MIRAI",
+    "supplier_sku": "MIRAI-VALLEY-SHORT-BRN-030",
+    "color_name": "Marrone washed",
+    "color_hex": "#6b4c3c",
+    "fit_note": "Vestibilita baggy con lunghezza sotto il ginocchio. Taglie disponibili dalla 44 alla 56.",
+    "detail_items": ["Denim marrone effetto washed", "Patch ricamate multicolore", "Maxi lettering con dettagli crystal", "Lacci lunghi a contrasto", "Taglio ampio sotto il ginocchio"],
+    "composition": null,
+    "care": "Seguire le istruzioni riportate sull'etichetta interna."
+  },
+  {
+    "name": "MIRAI Valley Patchwork Shorts - Black",
+    "description": "Shorts in denim nero washed costruiti attorno a patch multicolore e maxi lettering con applicazioni luminose. La silhouette baggy e i lacci lunghi amplificano l'attitudine streetwear del modello.",
+    "price": 140,
+    "category": "shorts",
+    "image_url": "/products/mirai-supplier/valley-patchwork-shorts-black-01.webp",
+    "image_gallery": ["/products/mirai-supplier/valley-patchwork-shorts-black-01.webp"],
+    "sizes": ["44", "46", "48", "50", "52", "54", "56"],
+    "stock_by_size": { "44": 10, "46": 10, "48": 10, "50": 10, "52": 10, "54": 10, "56": 10 },
+    "in_stock": true,
+    "is_new": true,
+    "brand": "MIRAI",
+    "supplier_sku": "MIRAI-VALLEY-SHORT-BLK-031",
+    "color_name": "Nero washed",
+    "color_hex": "#202020",
+    "fit_note": "Vestibilita baggy con lunghezza sotto il ginocchio. Taglie disponibili dalla 44 alla 56.",
+    "detail_items": ["Denim nero effetto washed", "Patch ricamate multicolore", "Maxi lettering con dettagli crystal", "Lacci lunghi a contrasto", "Taglio ampio sotto il ginocchio"],
+    "composition": null,
+    "care": "Seguire le istruzioni riportate sull'etichetta interna."
+  },
+  {
+    "name": "MIRAI Valley Patchwork Shorts - Blue",
+    "description": "Shorts in denim blu washed con patch ricamate, maxi lettering applicato e dettagli crystal. Una variante energica dal volume ampio, rifinita con lacci extra long per un'estetica urban riconoscibile.",
+    "price": 140,
+    "category": "shorts",
+    "image_url": "/products/mirai-supplier/valley-patchwork-shorts-blue-01.webp",
+    "image_gallery": ["/products/mirai-supplier/valley-patchwork-shorts-blue-01.webp"],
+    "sizes": ["44", "46", "48", "50", "52", "54", "56"],
+    "stock_by_size": { "44": 10, "46": 10, "48": 10, "50": 10, "52": 10, "54": 10, "56": 10 },
+    "in_stock": true,
+    "is_new": true,
+    "brand": "MIRAI",
+    "supplier_sku": "MIRAI-VALLEY-SHORT-BLU-032",
+    "color_name": "Blu washed",
+    "color_hex": "#344f68",
+    "fit_note": "Vestibilita baggy con lunghezza sotto il ginocchio. Taglie disponibili dalla 44 alla 56.",
+    "detail_items": ["Denim blu effetto washed", "Patch ricamate multicolore", "Maxi lettering con dettagli crystal", "Lacci lunghi a contrasto", "Taglio ampio sotto il ginocchio"],
+    "composition": null,
+    "care": "Seguire le istruzioni riportate sull'etichetta interna."
+  }
 ] as const satisfies readonly MiraiSupplierCatalogProduct[]
 
-// MIRAI supplier apparel follows the full Minimal size run, with 10 units
-// available for each size.
+const DEFAULT_MIRAI_SIZES = ["S", "M", "L", "XL", "XXL"]
+const DEFAULT_MIRAI_STOCK = { S: 10, M: 10, L: 10, XL: 10, XXL: 10 }
+
+// Products with a supplier-specific size run keep it; the rest use the
+// standard MIRAI apparel sizes. Stock is always tracked per size.
 export const MIRAI_SUPPLIER_CATALOG: readonly MiraiSupplierCatalogProduct[] =
   MIRAI_SUPPLIER_CATALOG_BASE.map((product) => ({
     ...product,
     name: product.name.replace(/^MIRAI\s+/i, ""),
     image_gallery: [...product.image_gallery],
-    sizes: ["S", "M", "L", "XL", "XXL"],
-    stock_by_size: { S: 10, M: 10, L: 10, XL: 10, XXL: 10 },
+    sizes: product.sizes.length > 0 ? [...product.sizes] : [...DEFAULT_MIRAI_SIZES],
+    stock_by_size: Object.keys(product.stock_by_size).length > 0
+      ? { ...product.stock_by_size }
+      : { ...DEFAULT_MIRAI_STOCK },
     in_stock: true,
     detail_items: [...product.detail_items],
+    supplier_profile: "mirai" as const,
+    gtin: null,
+    shipping_min_days: 7,
+    shipping_max_days: 12,
   }))
 

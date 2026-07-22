@@ -116,8 +116,8 @@ export function AdminProductTable({ products, categories = [] }: { products: Pro
       const result = await importMiraiSupplierCatalog()
       const categoryMessage = result.categoryCreated ? " Categoria Canotte creata." : ""
       setFeedback(
-        `${result.inserted} prodotti MIRAI importati, ${result.skipped} già presenti.${categoryMessage} `
-        + "Taglie e quantità restano da confermare: i nuovi prodotti non sono acquistabili finché non imposti lo stock.",
+        `${result.inserted} prodotti MIRAI importati, ${result.skipped} già presenti su ${result.total}.${categoryMessage} `
+        + "Taglie e quantità sono state applicate dal catalogo fornitore.",
       )
     } catch (err) {
       console.error(err)
@@ -146,7 +146,7 @@ export function AdminProductTable({ products, categories = [] }: { products: Pro
           className="h-10 gap-2 border-primary/40 text-xs uppercase tracking-widest text-primary hover:bg-primary/10 hover:text-primary"
         >
           <Download className="h-4 w-4" />
-          {isSubmitting ? "Importazione..." : "Importa catalogo MIRAI (26)"}
+          {isSubmitting ? "Importazione..." : "Importa catalogo MIRAI"}
         </Button>
         {blackIslandCount > 0 && (
           <Button
