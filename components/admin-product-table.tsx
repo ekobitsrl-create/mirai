@@ -1,12 +1,18 @@
 "use client"
 
 import { useState } from "react"
-import { createProduct, updateProduct, deleteProduct, deleteBlackIslandProducts } from "@/app/admin/actions"
+import {
+  createProduct,
+  updateProduct,
+  deleteProduct,
+  deleteBlackIslandProducts,
+  importMiraiSupplierCatalog,
+} from "@/app/admin/actions"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { Plus, Pencil, Trash2, X, Check, Package } from "lucide-react"
+import { Plus, Pencil, Trash2, X, Check, Package, Download } from "lucide-react"
 import { ImageUpload } from "@/components/image-upload"
 
 type Product = {
@@ -20,6 +26,14 @@ type Product = {
   stock_by_size?: Record<string, number>
   in_stock: boolean
   is_new: boolean
+  brand?: string | null
+  supplier_sku?: string | null
+  color_name?: string | null
+  color_hex?: string | null
+  fit_note?: string | null
+  detail_items?: string[] | null
+  composition?: string | null
+  care?: string | null
   created_at: string
   updated_at: string
 }
@@ -95,6 +109,24 @@ export function AdminProductTable({ products, categories = [] }: { products: Pro
     }
   }
 
+  const handleMiraiCatalogImport = async () => {
+    setIsSubmitting(true)
+    setFeedback(null)
+    try {
+      const result = await importMiraiSupplierCatalog()
+      const categoryMessage = result.categoryCreated ? " Categoria Canotte creata." : ""
+      setFeedback(
+        `${result.inserted} prodotti MIRAI importati, ${result.skipped} già presenti.${categoryMessage} `
+        + "Taglie e quantità restano da confermare: i nuovi prodotti non sono acquistabili finché non imposti lo stock.",
+      )
+    } catch (err) {
+      console.error(err)
+      setFeedback(err instanceof Error ? err.message : "Importazione catalogo MIRAI non riuscita.")
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
   return (
     <div>
       {/* Add product button */}
@@ -105,6 +137,16 @@ export function AdminProductTable({ products, categories = [] }: { products: Pro
         >
           <Plus className="w-4 h-4" />
           Nuovo Prodotto
+        </Button>
+        <Button
+          type="button"
+          variant="outline"
+          disabled={isSubmitting}
+          onClick={handleMiraiCatalogImport}
+          className="h-10 gap-2 border-primary/40 text-xs uppercase tracking-widest text-primary hover:bg-primary/10 hover:text-primary"
+        >
+          <Download className="h-4 w-4" />
+          {isSubmitting ? "Importazione..." : "Importa catalogo MIRAI (26)"}
         </Button>
         {blackIslandCount > 0 && (
           <Button
@@ -385,6 +427,54 @@ function ProductForm({ product, categories = [] }: { product?: Product; categori
           <span className="text-xs uppercase tracking-widest text-muted-foreground">Nuovo</span>
         </label>
       </div>
+      <div className="flex flex-col gap-2">
+        <Label htmlFor="brand" className="text-xs uppercase tracking-widest text-muted-foreground">
+          Brand
+        </Label>
+        <Input
+          id="brand"
+          name="brand"
+          defaultValue={product?.brand || "MIRAI"}
+          placeholder="MIRAI"
+          className="bg-secondary border-border text-foreground"
+        />
+      </div>
+      <div className="flex flex-col gap-2">
+        <Label htmlFor="supplier_sku" className="text-xs uppercase tracking-widest text-muted-foreground">
+          SKU fornitore
+        </Label>
+        <Input
+          id="supplier_sku"
+          name="supplier_sku"
+          defaultValue={product?.supplier_sku || ""}
+          placeholder="MIRAI-..."
+          className="bg-secondary border-border text-foreground"
+        />
+      </div>
+      <div className="flex flex-col gap-2">
+        <Label htmlFor="color_name" className="text-xs uppercase tracking-widest text-muted-foreground">
+          Colore
+        </Label>
+        <Input
+          id="color_name"
+          name="color_name"
+          defaultValue={product?.color_name || ""}
+          placeholder="Nero"
+          className="bg-secondary border-border text-foreground"
+        />
+      </div>
+      <div className="flex flex-col gap-2">
+        <Label htmlFor="color_hex" className="text-xs uppercase tracking-widest text-muted-foreground">
+          Colore HEX
+        </Label>
+        <Input
+          id="color_hex"
+          name="color_hex"
+          defaultValue={product?.color_hex || ""}
+          placeholder="#000000"
+          className="bg-secondary border-border text-foreground"
+        />
+      </div>
       <div className="flex flex-col gap-2 md:col-span-2">
         <input type="hidden" name="stock_by_size" value={JSON.stringify(normalizedStock)} />
         <Label className="text-xs uppercase tracking-widest text-muted-foreground">
@@ -429,6 +519,57 @@ function ProductForm({ product, categories = [] }: { product?: Product; categori
           defaultValue={product?.description || ""}
           placeholder="Descrizione del prodotto..."
           className="bg-secondary border-border text-foreground resize-none"
+        />
+      </div>
+      <div className="flex flex-col gap-2 md:col-span-2">
+        <Label htmlFor="fit_note" className="text-xs uppercase tracking-widest text-muted-foreground">
+          Nota vestibilità
+        </Label>
+        <Input
+          id="fit_note"
+          name="fit_note"
+          defaultValue={product?.fit_note || ""}
+          placeholder="Vestibilità oversize..."
+          className="bg-secondary border-border text-foreground"
+        />
+      </div>
+      <div className="flex flex-col gap-2 md:col-span-2">
+        <Label htmlFor="detail_items" className="text-xs uppercase tracking-widest text-muted-foreground">
+          Scheda tecnica (una voce per riga)
+        </Label>
+        <Textarea
+          id="detail_items"
+          name="detail_items"
+          rows={5}
+          defaultValue={product?.detail_items?.join("\n") || ""}
+          placeholder={"Maxi grafica frontale\nGirocollo e manica corta\nDestinazione: Unisex"}
+          className="bg-secondary border-border text-foreground resize-y"
+        />
+      </div>
+      <div className="flex flex-col gap-2">
+        <Label htmlFor="composition" className="text-xs uppercase tracking-widest text-muted-foreground">
+          Composizione
+        </Label>
+        <Textarea
+          id="composition"
+          name="composition"
+          rows={3}
+          defaultValue={product?.composition || ""}
+          placeholder="Da confermare con il fornitore"
+          className="bg-secondary border-border text-foreground resize-y"
+        />
+      </div>
+      <div className="flex flex-col gap-2">
+        <Label htmlFor="care" className="text-xs uppercase tracking-widest text-muted-foreground">
+          Cura del capo
+        </Label>
+        <Textarea
+          id="care"
+          name="care"
+          rows={3}
+          defaultValue={product?.care || ""}
+          placeholder="Da confermare con il fornitore"
+          className="bg-secondary border-border text-foreground resize-y"
         />
       </div>
     </div>

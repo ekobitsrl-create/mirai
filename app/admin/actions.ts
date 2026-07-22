@@ -3,6 +3,7 @@
 import { createUserClient, getServerUserWithProfile } from "@/lib/supabase/server"
 import { revalidatePath } from "next/cache"
 import { isBlackIslandProduct } from "@/lib/products"
+import { MIRAI_SUPPLIER_CATALOG } from "@/lib/mirai-supplier-catalog"
 
 function parseProductInventory(formData: FormData) {
   const sizesRaw = formData.get("sizes") as string
@@ -44,6 +45,7 @@ function parseProductDetails(formData: FormData) {
 
   return {
     brand: text(formData.get("brand")),
+    supplier_sku: text(formData.get("supplier_sku")),
     color_name: text(formData.get("color_name")),
     color_hex: text(formData.get("color_hex")),
     fit_note: text(formData.get("fit_note")),
@@ -57,6 +59,7 @@ function revalidateCatalog(productId?: string) {
   revalidatePath("/admin")
   revalidatePath("/")
   revalidatePath("/collezioni")
+  revalidatePath("/collezione/[slug]", "page")
   revalidatePath("/google-merchant-feed.xml")
   revalidatePath("/sitemap.xml")
   if (productId) revalidatePath(`/prodotto/${productId}`)
@@ -171,6 +174,72 @@ export async function deleteBlackIslandProducts() {
 
   revalidateCatalog()
   return { deleted: ids.length }
+}
+
+export async function importMiraiSupplierCatalog() {
+  const { supabase } = await assertAdmin()
+  const catalogSkus = MIRAI_SUPPLIER_CATALOG.map((product) => product.supplier_sku)
+
+  const { data: existingProducts, error: existingProductsError } = await supabase
+    .from("products")
+    .select("supplier_sku")
+    .in("supplier_sku", catalogSkus)
+
+  if (existingProductsError) throw new Error(existingProductsError.message)
+
+  const existingSkus = new Set(
+    (existingProducts || [])
+      .map((product) => product.supplier_sku)
+      .filter((sku): sku is string => Boolean(sku)),
+  )
+  const missingProducts = MIRAI_SUPPLIER_CATALOG.filter(
+    (product) => !existingSkus.has(product.supplier_sku),
+  )
+
+  let categoryCreated = false
+  if (missingProducts.some((product) => product.category === "canotte")) {
+    const { data: canotteCategory, error: canotteCategoryError } = await supabase
+      .from("categories")
+      .select("id")
+      .eq("slug", "canotte")
+      .maybeSingle()
+
+    if (canotteCategoryError) throw new Error(canotteCategoryError.message)
+
+    if (!canotteCategory) {
+      const { error: createCategoryError } = await supabase.from("categories").insert({
+        name: "Canotte",
+        slug: "canotte",
+        description: "Canotte e smanicati streetwear MIRAI.",
+        sort_order: 35,
+      })
+
+      if (createCategoryError) throw new Error(createCategoryError.message)
+      categoryCreated = true
+    }
+  }
+
+  if (missingProducts.length > 0) {
+    const rows = missingProducts.map((product) => ({
+      ...product,
+      image_gallery: [...product.image_gallery],
+      sizes: [...product.sizes],
+      stock_by_size: { ...product.stock_by_size },
+      detail_items: [...product.detail_items],
+    }))
+    const { error: insertError } = await supabase.from("products").insert(rows)
+
+    if (insertError) throw new Error(insertError.message)
+  }
+
+  revalidateCatalog()
+
+  return {
+    inserted: missingProducts.length,
+    skipped: existingSkus.size,
+    total: MIRAI_SUPPLIER_CATALOG.length,
+    categoryCreated,
+  }
 }
 
 // --- Orders ---
