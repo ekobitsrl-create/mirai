@@ -255,6 +255,9 @@ function renderProductVariant(product: StoreProduct, size: string, baseUrl: stri
     `      <g:price>${Number(product.price).toFixed(2)} EUR</g:price>`,
     "      <g:condition>new</g:condition>",
     `      <g:brand>${escapeXml(brand)}</g:brand>`,
+    ...(supplierSettings.shippingLabel
+      ? [`      <g:shipping_label>${escapeXml(supplierSettings.shippingLabel)}</g:shipping_label>`]
+      : []),
     ...(supplierSettings.gtin ? [`      <g:gtin>${escapeXml(supplierSettings.gtin)}</g:gtin>`] : []),
     ...(supplierSettings.mpn ? [`      <g:mpn>${escapeXml(supplierSettings.mpn)}</g:mpn>`] : []),
     `      <g:identifier_exists>${supplierSettings.gtin || supplierSettings.mpn ? "yes" : "no"}</g:identifier_exists>`,

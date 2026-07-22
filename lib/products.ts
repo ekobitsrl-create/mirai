@@ -20,6 +20,7 @@ export const SUPPLIER_PROFILE_OPTIONS: Record<SupplierProfile, {
   label: string
   brand: string
   hasGtin: boolean
+  shippingLabel?: string
   shippingMinDays?: number
   shippingMaxDays?: number
 }> = {
@@ -32,6 +33,7 @@ export const SUPPLIER_PROFILE_OPTIONS: Record<SupplierProfile, {
     label: "MIRAI / altro fornitore",
     brand: "MIRAI",
     hasGtin: false,
+    shippingLabel: "spedizione_7_12",
     shippingMinDays: 7,
     shippingMaxDays: 12,
   },
@@ -66,6 +68,7 @@ export function getProductSupplierSettings(product: SupplierProduct) {
     brand: profile === "mirai" ? "MIRAI" : product.brand?.trim() || defaults.brand,
     gtin,
     mpn: supplierSku,
+    shippingLabel: defaults.shippingLabel,
     shippingMinDays,
     shippingMaxDays,
   }
