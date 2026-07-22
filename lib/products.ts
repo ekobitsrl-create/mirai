@@ -31,6 +31,7 @@ export const SUPPLIER_PROFILE_OPTIONS: Record<SupplierProfile, {
     brand: "Minimal",
     hasGtin: true,
     merchantCustomLabel3: "catalogo_2",
+    shippingLabel: "spedizione_3_5",
   },
   mirai: {
     label: "MIRAI / altro fornitore",
