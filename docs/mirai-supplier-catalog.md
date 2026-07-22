@@ -1,16 +1,19 @@
 # Catalogo MIRAI — fornitore esterno
 
-> Bozza editoriale pronta per l’import. Prezzi, taglie, stock, composizione e istruzioni del produttore sono ancora da confermare.
+> Bozza editoriale con prezzi assegnati. Taglie, stock, composizione e istruzioni del produttore sono ancora da confermare.
 
 Prodotti unici: **26** · T-shirt: **25** · Canotte/smanicati: **1**
 
 Le immagini 5 e 7 sono state raggruppate come due foto dello stesso prodotto, **MIRAI Guardian Prayer Tee – Black**. L’immagine 9 è correttamente classificata come **canotta/smanicato**, non come T-shirt.
+
+Prezzi applicati: immagini **1–9 = 85 €**, immagine **10 = 70 €**, immagini **11–27 = 120 €**.
 
 ## 1. MIRAI Divine Garden Tee – White
 
 ![MIRAI Divine Garden Tee – White - foto 1](../public/products/mirai-supplier/divine-garden-white-01.jpeg)
 
 - Immagini originali: 1
+- Prezzo: **85,00 €**
 - Categoria: `t-shirt`
 - SKU/MPN: `MIRAI-DIVINE-001`
 - Colore: Bianco
@@ -35,6 +38,7 @@ T-shirt oversize bianca dal carattere barocco, costruita attorno a una maxi graf
 ![MIRAI Hope Angel Tee – White - foto 1](../public/products/mirai-supplier/hope-angel-white-01.jpeg)
 
 - Immagini originali: 2
+- Prezzo: **85,00 €**
 - Categoria: `t-shirt`
 - SKU/MPN: `MIRAI-HOPE-002`
 - Colore: Bianco
@@ -59,6 +63,7 @@ T-shirt oversize bianca con una composizione angelica dall’estetica vintage e 
 ![MIRAI Blind Cupid Tee – Black - foto 1](../public/products/mirai-supplier/blind-cupid-black-01.jpeg)
 
 - Immagini originali: 3
+- Prezzo: **85,00 €**
 - Categoria: `t-shirt`
 - SKU/MPN: `MIRAI-CUPID-BLK-003`
 - Colore: Nero
@@ -83,6 +88,7 @@ T-shirt oversize nera con Cupido bendato, arco centrale e ali scolpite in una gr
 ![MIRAI Blind Cupid Tee – Pink - foto 1](../public/products/mirai-supplier/blind-cupid-pink-01.jpeg)
 
 - Immagini originali: 4
+- Prezzo: **85,00 €**
 - Categoria: `t-shirt`
 - SKU/MPN: `MIRAI-CUPID-PNK-004`
 - Colore: Rosa
@@ -109,6 +115,7 @@ Variante rosa della Blind Cupid Tee, con maxi stampa scultorea e lettering argen
 ![MIRAI Guardian Prayer Tee – Black - foto 2](../public/products/mirai-supplier/guardian-prayer-black-02.jpeg)
 
 - Immagini originali: 5, 7
+- Prezzo: **85,00 €**
 - Categoria: `t-shirt`
 - SKU/MPN: `MIRAI-GUARDIAN-BLK-005`
 - Colore: Nero
@@ -133,6 +140,7 @@ T-shirt oversize nera con angelo bendato in preghiera, ali dorate e dettagli pit
 ![MIRAI Celestial Rider Tee – Black - foto 1](../public/products/mirai-supplier/celestial-rider-black-01.jpeg)
 
 - Immagini originali: 6
+- Prezzo: **85,00 €**
 - Categoria: `t-shirt`
 - SKU/MPN: `MIRAI-RIDER-006`
 - Colore: Nero
@@ -157,6 +165,7 @@ T-shirt oversize nera con un giovane angelo a cavallo, raccontato attraverso una
 ![MIRAI Mixed Emotion Tee – Black - foto 1](../public/products/mirai-supplier/mixed-emotion-black-01.jpeg)
 
 - Immagini originali: 8
+- Prezzo: **85,00 €**
 - Categoria: `t-shirt`
 - SKU/MPN: `MIRAI-MIXED-007`
 - Colore: Nero
@@ -181,6 +190,7 @@ T-shirt oversize nera con scena frontale dal tono cinematico e lettering Mixed E
 ![MIRAI Liberty Speed Sleeveless – Washed Black - foto 1](../public/products/mirai-supplier/liberty-speed-sleeveless-black-01.jpeg)
 
 - Immagini originali: 9
+- Prezzo: **85,00 €**
 - Categoria: `canotte`
 - SKU/MPN: `MIRAI-LIBERTY-008`
 - Colore: Nero slavato
@@ -205,6 +215,7 @@ Canotta oversize nera slavata con taglio smanicato e grafiche urban dedicate all
 ![MIRAI Astro Riders Tee – Black - foto 1](../public/products/mirai-supplier/astro-riders-black-01.jpeg)
 
 - Immagini originali: 10
+- Prezzo: **70,00 €**
 - Categoria: `t-shirt`
 - SKU/MPN: `MIRAI-ASTRO-BLK-009`
 - Colore: Nero
@@ -229,6 +240,7 @@ T-shirt oversize nera con grafica spaziale multicolore, tra razzi, personaggi e 
 ![MIRAI Astro Riders Tee – White - foto 1](../public/products/mirai-supplier/astro-riders-white-01.jpeg)
 
 - Immagini originali: 11
+- Prezzo: **120,00 €**
 - Categoria: `t-shirt`
 - SKU/MPN: `MIRAI-ASTRO-WHT-010`
 - Colore: Bianco
@@ -253,6 +265,7 @@ Variante bianca della Astro Riders Tee, caratterizzata da una maxi grafica retro
 ![MIRAI Guardian Prayer Tee – Sand - foto 1](../public/products/mirai-supplier/guardian-prayer-sand-01.jpeg)
 
 - Immagini originali: 12
+- Prezzo: **120,00 €**
 - Categoria: `t-shirt`
 - SKU/MPN: `MIRAI-GUARDIAN-SND-011`
 - Colore: Sabbia
@@ -277,6 +290,7 @@ Variante sabbia della Guardian Prayer Tee, con maxi stampa tono su tono ispirata
 ![MIRAI Liberty Dreams Tee – Vintage Black - foto 1](../public/products/mirai-supplier/liberty-dreams-black-01.jpeg)
 
 - Immagini originali: 13
+- Prezzo: **120,00 €**
 - Categoria: `t-shirt`
 - SKU/MPN: `MIRAI-DREAMS-LIB-012`
 - Colore: Nero vintage
@@ -301,6 +315,7 @@ T-shirt oversize nera dall’effetto vintage con ritratto pop e richiami alla St
 ![MIRAI Wild Valley Tiger Tee – White - foto 1](../public/products/mirai-supplier/wild-valley-tiger-white-01.jpeg)
 
 - Immagini originali: 14
+- Prezzo: **120,00 €**
 - Categoria: `t-shirt`
 - SKU/MPN: `MIRAI-TIGER-013`
 - Colore: Bianco
@@ -325,6 +340,7 @@ T-shirt oversize bianca con tigre centrale, lettering college e dettagli grafici
 ![MIRAI Court Bulldog Tee – Black - foto 1](../public/products/mirai-supplier/court-bulldog-black-01.jpeg)
 
 - Immagini originali: 15
+- Prezzo: **120,00 €**
 - Categoria: `t-shirt`
 - SKU/MPN: `MIRAI-BULLDOG-014`
 - Colore: Nero
@@ -349,6 +365,7 @@ T-shirt oversize nera con bulldog da playground, pallone da basket e lettering c
 ![MIRAI Night Panther Tee – Black - foto 1](../public/products/mirai-supplier/night-panther-black-01.jpeg)
 
 - Immagini originali: 16
+- Prezzo: **120,00 €**
 - Categoria: `t-shirt`
 - SKU/MPN: `MIRAI-PANTHER-015`
 - Colore: Nero
@@ -373,6 +390,7 @@ T-shirt oversize nera con pantera blu elettrico, dettagli metallici e lettering 
 ![MIRAI Target Practice Tee – Washed Red - foto 1](../public/products/mirai-supplier/target-practice-red-01.jpeg)
 
 - Immagini originali: 17
+- Prezzo: **120,00 €**
 - Categoria: `t-shirt`
 - SKU/MPN: `MIRAI-TARGET-016`
 - Colore: Rosso slavato
@@ -397,6 +415,7 @@ T-shirt oversize rossa con trattamento washed e grafica frontale ispirata ai ber
 ![MIRAI Court Clash Tee – Black - foto 1](../public/products/mirai-supplier/court-clash-black-01.jpeg)
 
 - Immagini originali: 18
+- Prezzo: **120,00 €**
 - Categoria: `t-shirt`
 - SKU/MPN: `MIRAI-COURT-017`
 - Colore: Nero
@@ -421,6 +440,7 @@ T-shirt oversize nera con una scena da playground in movimento, sviluppata in un
 ![MIRAI Grit & Dreams Tee – White - foto 1](../public/products/mirai-supplier/grit-dreams-white-01.jpeg)
 
 - Immagini originali: 19
+- Prezzo: **120,00 €**
 - Categoria: `t-shirt`
 - SKU/MPN: `MIRAI-GRIT-018`
 - Colore: Bianco sporco
@@ -445,6 +465,7 @@ T-shirt oversize bianco sporco con grafica fotografica e lettering varsity dai t
 ![MIRAI Neon Racing Tee – White - foto 1](../public/products/mirai-supplier/neon-racing-white-01.jpeg)
 
 - Immagini originali: 20
+- Prezzo: **120,00 €**
 - Categoria: `t-shirt`
 - SKU/MPN: `MIRAI-RACING-WHT-019`
 - Colore: Bianco
@@ -469,6 +490,7 @@ T-shirt oversize bianca con grafiche racing in stile arcade, auto sportive e det
 ![MIRAI Valley Athletic Bulldog Tee – White - foto 1](../public/products/mirai-supplier/valley-athletic-bulldog-white-01.jpeg)
 
 - Immagini originali: 21
+- Prezzo: **120,00 €**
 - Categoria: `t-shirt`
 - SKU/MPN: `MIRAI-ATHLETIC-020`
 - Colore: Bianco sporco
@@ -493,6 +515,7 @@ T-shirt oversize bianco sporco con bulldog atletico e lettering college effetto 
 ![MIRAI Jamaica Crew Tee – Black - foto 1](../public/products/mirai-supplier/jamaica-crew-black-01.jpeg)
 
 - Immagini originali: 22
+- Prezzo: **120,00 €**
 - Categoria: `t-shirt`
 - SKU/MPN: `MIRAI-JAMAICA-BLK-021`
 - Colore: Nero
@@ -517,6 +540,7 @@ T-shirt oversize nera con bandiera giamaicana, gruppo in silhouette e dettagli g
 ![MIRAI Sacred Static Tee – Black - foto 1](../public/products/mirai-supplier/sacred-static-black-01.jpeg)
 
 - Immagini originali: 23
+- Prezzo: **120,00 €**
 - Categoria: `t-shirt`
 - SKU/MPN: `MIRAI-STATIC-022`
 - Colore: Nero
@@ -541,6 +565,7 @@ T-shirt oversize nera con volto monocromatico, croce centrale e lettering gotico
 ![MIRAI Golden Machine Tee – Black - foto 1](../public/products/mirai-supplier/golden-machine-black-01.jpeg)
 
 - Immagini originali: 24
+- Prezzo: **120,00 €**
 - Categoria: `t-shirt`
 - SKU/MPN: `MIRAI-MACHINE-023`
 - Colore: Nero
@@ -565,6 +590,7 @@ T-shirt oversize nera con composizione meccanica in giallo metallico e lettering
 ![MIRAI Electric Reaper Tee – Black - foto 1](../public/products/mirai-supplier/electric-reaper-black-01.jpeg)
 
 - Immagini originali: 25
+- Prezzo: **120,00 €**
 - Categoria: `t-shirt`
 - SKU/MPN: `MIRAI-REAPER-024`
 - Colore: Nero
@@ -589,6 +615,7 @@ T-shirt oversize nera con scheletro attraversato da scariche blu elettrico. La g
 ![MIRAI Neon Racing Tee – Black - foto 1](../public/products/mirai-supplier/neon-racing-black-01.jpeg)
 
 - Immagini originali: 26
+- Prezzo: **120,00 €**
 - Categoria: `t-shirt`
 - SKU/MPN: `MIRAI-RACING-BLK-025`
 - Colore: Nero
@@ -613,6 +640,7 @@ Variante nera della Neon Racing Tee, con auto sportive, fiamme e dettagli cromat
 ![MIRAI Jamaica Crew Tee – White - foto 1](../public/products/mirai-supplier/jamaica-crew-white-01.jpeg)
 
 - Immagini originali: 27
+- Prezzo: **120,00 €**
 - Categoria: `t-shirt`
 - SKU/MPN: `MIRAI-JAMAICA-WHT-026`
 - Colore: Bianco
