@@ -5,6 +5,7 @@ import { createClient, getServerUser } from '@/lib/supabase/server'
 import { getDemoProduct, isBlackIslandProduct, type StoreProduct } from '@/lib/products'
 import { getStripeShippingOptions, SHIPPING_CONFIG } from '@/lib/shipping'
 import { SITE_URL } from '@/lib/site-url'
+import { applyOrderInventory } from '@/lib/orders/apply-order-inventory'
 import {
   CUSTOM_TEE_PRODUCT_ID,
   customizationMetadata,
@@ -289,6 +290,13 @@ export async function createCashOnDeliveryOrder(cartItems: CartLineItem[], detai
   if (itemsError) {
     await supabase.from('orders').delete().eq('id', order.id)
     throw new Error('Non e stato possibile registrare gli articoli dell ordine')
+  }
+
+  try {
+    await applyOrderInventory(supabase, order.id, { allowLegacyFallback: true })
+  } catch (inventoryError) {
+    console.error('Impossibile aggiornare le quantita del catalogo', inventoryError)
+    throw new Error('Ordine registrato, ma la disponibilita del catalogo non e stata aggiornata')
   }
 
   return { orderId: order.id }

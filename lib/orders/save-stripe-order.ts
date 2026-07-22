@@ -1,6 +1,7 @@
 import type Stripe from 'stripe'
 import { createClient } from '@/lib/supabase/server'
 import { stripe } from '@/lib/stripe'
+import { applyOrderInventory } from '@/lib/orders/apply-order-inventory'
 
 function activeProduct(product: string | Stripe.Product | Stripe.DeletedProduct | null): Stripe.Product | null {
   if (!product || typeof product === 'string' || ('deleted' in product && product.deleted)) return null
@@ -33,7 +34,10 @@ export async function saveStripeOrder(session: Stripe.Checkout.Session) {
     .maybeSingle()
 
   if (existingOrderError) throw existingOrderError
-  if (existingOrder) return existingOrder.id
+  if (existingOrder) {
+    await applyOrderInventory(supabase, existingOrder.id)
+    return existingOrder.id
+  }
 
   const lineItems = await stripe.checkout.sessions.listLineItems(session.id, {
     limit: 100,
@@ -59,7 +63,17 @@ export async function saveStripeOrder(session: Stripe.Checkout.Session) {
     .single()
 
   if (orderError) {
-    if (orderError.code === '23505') return null
+    if (orderError.code === '23505') {
+      const { data: concurrentOrder, error: concurrentOrderError } = await supabase
+        .from('orders')
+        .select('id')
+        .eq('stripe_session_id', session.id)
+        .single()
+
+      if (concurrentOrderError) throw concurrentOrderError
+      await applyOrderInventory(supabase, concurrentOrder.id)
+      return concurrentOrder.id
+    }
     throw orderError
   }
 
@@ -86,6 +100,8 @@ export async function saveStripeOrder(session: Stripe.Checkout.Session) {
       throw itemsError
     }
   }
+
+  await applyOrderInventory(supabase, order.id, { allowLegacyFallback: true })
 
   return order.id
 }
