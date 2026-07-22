@@ -275,6 +275,9 @@ function renderProductVariant(product: StoreProduct, size: string, baseUrl: stri
     "      <g:excluded_destination>Local_inventory_ads</g:excluded_destination>",
     "      <g:excluded_destination>Free_local_listings</g:excluded_destination>",
     product.is_new ? "      <g:custom_label_0>Nuovi arrivi</g:custom_label_0>" : "",
+    ...(supplierSettings.merchantCustomLabel4
+      ? [`      <g:custom_label_4>${escapeXml(supplierSettings.merchantCustomLabel4)}</g:custom_label_4>`]
+      : []),
     "      <g:shipping>",
     "        <g:country>IT</g:country>",
     "        <g:service>Standard</g:service>",
