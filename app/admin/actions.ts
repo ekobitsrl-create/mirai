@@ -224,7 +224,11 @@ export async function importMiraiSupplierCatalog() {
   if (missingProducts.length > 0) {
     const rows = missingProducts.map((product) => ({
       ...product,
-      image_gallery: [...product.image_gallery],
+      image_gallery: product.image_gallery.map((src) => ({
+        src,
+        alt: product.name,
+        fit: "contain",
+      })),
       sizes: [...product.sizes],
       stock_by_size: { ...product.stock_by_size },
       detail_items: [...product.detail_items],
