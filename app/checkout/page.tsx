@@ -8,6 +8,7 @@ import { AlertCircle, ArrowLeft, Banknote, CreditCard, LoaderCircle, LockKeyhole
 import { useCart } from "@/lib/cart-context"
 import { useLanguage } from "@/lib/language-context"
 import { createCashOnDeliveryOrder, createCheckoutSession } from "@/app/actions/stripe"
+import { getGoogleReviewStorageKey } from "@/lib/google-customer-reviews"
 import { createClient } from "@/lib/supabase/client"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
@@ -30,7 +31,6 @@ export default function CheckoutPage() {
   const [cashError, setCashError] = useState<string | null>(null)
   const [cashSubmitting, setCashSubmitting] = useState(false)
   const [cardError, setCardError] = useState<string | null>(null)
-const [cardSubmitting, setCardSubmitting] = useState(false)
 const [cardLoading, setCardLoading] = useState(false)
 const [cardAttempt, setCardAttempt] = useState(0)
 const sessionIdRef = useRef<string | null>(null)
@@ -102,33 +102,6 @@ const cartLineItems = useMemo(() => items.map((item) => ({
     setGuestCheckoutReady(true)
   }
 
-  const beginCardCheckout = async () => {
-    setCardError(null)
-    setCardSubmitting(true)
-
-    try {
-      const session = await createCheckoutSession(
-        items.map((item) => ({
-          productId: item.productId,
-          quantity: item.quantity,
-          size: item.size,
-          lineId: item.lineId,
-          customization: item.customization,
-        })),
-        isAuthenticated ? undefined : guestEmail
-      )
-
-      if (!session?.checkoutUrl) {
-        throw new Error(t.checkout.error)
-      }
-
-      window.location.assign(session.checkoutUrl)
-    } catch (error) {
-      setCardError(error instanceof Error ? error.message : t.checkout.error)
-      setCardSubmitting(false)
-    }
-  }
-
   const completeCashOnDelivery = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     setCashError(null)
@@ -149,6 +122,15 @@ const cartLineItems = useMemo(() => items.map((item) => ({
           country: "IT",
         }
       )
+
+      try {
+        window.sessionStorage.setItem(
+          getGoogleReviewStorageKey(order.orderId),
+          JSON.stringify(order.review),
+        )
+      } catch {
+        // L'ordine resta valido anche se il browser blocca lo storage.
+      }
 
       clearCart()
       window.location.assign(`/success?payment_method=cash_on_delivery&order_id=${encodeURIComponent(order.orderId)}`)
@@ -349,15 +331,6 @@ const cartLineItems = useMemo(() => items.map((item) => ({
                   )}
                 </div>
 
-                <button
-                  type="button"
-                  onClick={beginCardCheckout}
-                  disabled={cardSubmitting}
-                  className="mt-7 flex min-h-12 w-full items-center justify-center gap-2 bg-primary px-5 py-3 text-xs font-bold uppercase tracking-widest text-primary-foreground transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-60"
-                >
-                  {cardSubmitting ? <LoaderCircle className="h-4 w-4 animate-spin" /> : <LockKeyhole className="h-4 w-4" />}
-                  {cardSubmitting ? "Apertura pagamento..." : "Paga con carta"}
-                </button>
               </section>
             ) : (
               <form onSubmit={completeCashOnDelivery} className="border border-border bg-card p-6 sm:p-8">

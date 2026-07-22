@@ -17,6 +17,7 @@ const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
 const spaceGrotesk = Space_Grotesk({ subsets: ['latin'], variable: '--font-space-grotesk' })
 
 const GOOGLE_ANALYTICS_ID = "G-CY0KQKG7VG"
+const GOOGLE_CUSTOMER_REVIEWS_MERCHANT_ID = 5824924831
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -121,6 +122,32 @@ gtag('consent', 'default', {
 gtag('js', new Date());
 gtag('config', '${GOOGLE_ANALYTICS_ID}');`}
         </Script>
+        <Script id="mirai-google-customer-reviews-language" strategy="beforeInteractive">
+          {`window.___gcfg = { lang: 'it' };`}
+        </Script>
+        <script
+          id="merchantWidgetScript"
+          src="https://www.gstatic.com/shopping/merchant/merchantwidget.js"
+          defer
+        />
+        <script
+          id="mirai-google-customer-reviews-badge"
+          dangerouslySetInnerHTML={{
+            __html: `document.getElementById('merchantWidgetScript').addEventListener('load', function () {
+  if (window.merchantwidget) {
+    window.merchantwidget.start({
+      merchant_id: ${GOOGLE_CUSTOMER_REVIEWS_MERCHANT_ID},
+      position: 'LEFT_BOTTOM',
+      region: 'IT',
+      sideMargin: 24,
+      bottomMargin: 100,
+      mobileSideMargin: 16,
+      mobileBottomMargin: 96
+    });
+  }
+});`,
+          }}
+        />
       </head>
       <body className={`${inter.variable} ${spaceGrotesk.variable} font-sans antialiased`}>
         <script
