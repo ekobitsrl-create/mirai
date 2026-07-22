@@ -1,6 +1,13 @@
 import type { NextRequest } from "next/server"
 import { createHash } from "node:crypto"
-import { getProductSupplierSettings, isPrivateCheckoutProduct, withDemoProducts, type StoreProduct } from "@/lib/products"
+import {
+  getProductSupplierSettings,
+  getSupplierProfile,
+  isPrivateCheckoutProduct,
+  withDemoProducts,
+  type StoreProduct,
+  type SupplierProfile,
+} from "@/lib/products"
 import { createClient } from "@/lib/supabase/server"
 import { SITE_URL } from "@/lib/site-url"
 
@@ -282,9 +289,16 @@ function renderProductVariant(product: StoreProduct, size: string, baseUrl: stri
 
 export async function GET(request: NextRequest) {
   const baseUrl = getBaseUrl(request)
+  const requestedSupplier = request.nextUrl.searchParams.get("supplier")
+  const supplierProfile: SupplierProfile | null = requestedSupplier === "minimal" || requestedSupplier === "mirai"
+    ? requestedSupplier
+    : null
   const catalogProducts = await getCatalogProducts()
   const products = catalogProducts.filter(
-    (product) => product.image_url && Number(product.price) > 0 && !isPrivateCheckoutProduct(product),
+    (product) => product.image_url
+      && Number(product.price) > 0
+      && !isPrivateCheckoutProduct(product)
+      && (!supplierProfile || getSupplierProfile(product) === supplierProfile),
   )
   const items = products.flatMap((product) =>
     getSizes(product).map((size) => renderProductVariant(product, size, baseUrl)),
@@ -294,9 +308,9 @@ export async function GET(request: NextRequest) {
     '<?xml version="1.0" encoding="UTF-8"?>',
     '<rss version="2.0" xmlns:g="http://base.google.com/ns/1.0">',
     "  <channel>",
-    "    <title>MIRAI LAB STORE</title>",
+    `    <title>${supplierProfile ? `MIRAI LAB STORE - ${supplierProfile === "minimal" ? "Minimal" : "MIRAI"}` : "MIRAI LAB STORE"}</title>`,
     `    <link>${escapeXml(baseUrl)}</link>`,
-    "    <description>Catalogo prodotti MIRAI LAB STORE per Google Merchant Center</description>",
+    `    <description>Catalogo prodotti ${supplierProfile === "minimal" ? "Minimal" : supplierProfile === "mirai" ? "MIRAI" : "MIRAI LAB STORE"} per Google Merchant Center</description>`,
     ...items,
     "  </channel>",
     "</rss>",

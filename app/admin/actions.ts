@@ -61,6 +61,8 @@ function revalidateCatalog(productId?: string) {
   revalidatePath("/collezioni")
   revalidatePath("/collezione/[slug]", "page")
   revalidatePath("/google-merchant-feed.xml")
+  revalidatePath("/google-merchant-feed-minimal.xml")
+  revalidatePath("/google-merchant-feed-mirai.xml")
   revalidatePath("/sitemap.xml")
   if (productId) revalidatePath(`/prodotto/${productId}`)
 }
