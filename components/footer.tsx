@@ -192,7 +192,7 @@ export function Footer() {
               {t.footer.manageCookies}
             </button>
           </div>
-          <div className="flex flex-col items-center gap-2 md:items-end">
+          <div className="flex w-full max-w-[344px] flex-col items-center gap-2 md:mr-24 md:items-end xl:mr-28">
             <span className="text-[9px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">
               Pagamenti accettati
             </span>

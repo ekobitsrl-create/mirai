@@ -1,6 +1,6 @@
 'use server'
 
-import { assertStripeConfigured, stripe } from '@/lib/stripe'
+import { assertStripeCheckoutConfigured, stripe } from '@/lib/stripe'
 import { createClient, getServerUser } from '@/lib/supabase/server'
 import { getDemoProduct, isBlackIslandProduct, type StoreProduct } from '@/lib/products'
 import { getStripeShippingOptions, SHIPPING_CONFIG } from '@/lib/shipping'
@@ -35,7 +35,7 @@ function validEmail(value?: string) {
 }
 
 export async function createCheckoutSession(cartItems: CartLineItem[], guestEmail?: string) {
-  assertStripeConfigured()
+  assertStripeCheckoutConfigured()
   const user = await getServerUser()
   const customerEmail = validEmail(user?.email || guestEmail)
   if (!customerEmail) {

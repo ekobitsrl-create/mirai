@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import type Stripe from 'stripe'
 import { assertStripeConfigured, stripe } from '@/lib/stripe'
 import { getServerUser } from '@/lib/supabase/server'
+import { saveStripeOrder } from '@/lib/orders/save-stripe-order'
 
 function formatAddress(address: Stripe.Address | null | undefined) {
   if (!address) return null
@@ -27,6 +28,12 @@ export async function GET(request: NextRequest) {
 
     if (session.status !== 'complete' || session.payment_status !== 'paid') {
       return NextResponse.json({ error: 'Pagamento in verifica' }, { status: 409 })
+    }
+
+    try {
+      await saveStripeOrder(session)
+    } catch (error) {
+      console.error('Ordine pagato, sincronizzazione database rinviata al webhook:', error)
     }
 
     const lineItems = await stripe.checkout.sessions.listLineItems(session.id, {
