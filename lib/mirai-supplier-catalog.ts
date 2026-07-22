@@ -804,14 +804,14 @@ const MIRAI_SUPPLIER_CATALOG_BASE = [
   }
 ] as const satisfies readonly MiraiSupplierCatalogProduct[]
 
-// These supplier products currently use the OS variant, with 10 units available
-// per product. Specific apparel sizes can replace OS later from the admin catalog.
+// MIRAI supplier apparel follows the full Minimal size run, with 10 units
+// available for each size.
 export const MIRAI_SUPPLIER_CATALOG: readonly MiraiSupplierCatalogProduct[] =
   MIRAI_SUPPLIER_CATALOG_BASE.map((product) => ({
     ...product,
     image_gallery: [...product.image_gallery],
-    sizes: [...product.sizes],
-    stock_by_size: { OS: 10 },
+    sizes: ["S", "M", "L", "XL", "XXL"],
+    stock_by_size: { S: 10, M: 10, L: 10, XL: 10, XXL: 10 },
     in_stock: true,
     detail_items: [...product.detail_items],
   }))
