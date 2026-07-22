@@ -40,6 +40,16 @@ const CATEGORY_IMAGES: Record<string, string> = {
 
 const DEFAULT_CATEGORY_IMAGE = "/images/collection-tshirt.jpg"
 
+const CATEGORY_CARD_IMAGES: Record<string, string> = {
+  "t-shirt": "/images/categories/t-shirt-card.jpeg",
+  "t-shirts": "/images/categories/t-shirt-card.jpeg",
+  tshirt: "/images/categories/t-shirt-card.jpeg",
+  magliette: "/images/categories/t-shirt-card.jpeg",
+  shorts: "/images/categories/shorts-card.jpeg",
+  short: "/images/categories/shorts-card.jpeg",
+  bermuda: "/images/categories/shorts-card.jpeg",
+}
+
 const CONTAINED_CATEGORY_SLUGS = new Set([
   "profumi",
   "profumo",
@@ -60,21 +70,18 @@ const CONTAINED_CATEGORY_SLUGS = new Set([
   "hats",
 ])
 
-const TOP_ALIGNED_CATEGORY_CARD_SLUGS = new Set([
-  "t-shirt",
-  "t-shirts",
-  "tshirt",
-  "magliette",
-])
-
 export function getCategoryImage(slug: string, databaseImage: string | null) {
   return CATEGORY_IMAGES[slug.toLowerCase()] || databaseImage || DEFAULT_CATEGORY_IMAGE
+}
+
+export function getCategoryCardImage(slug: string, databaseImage: string | null) {
+  return CATEGORY_CARD_IMAGES[slug.toLowerCase()] || getCategoryImage(slug, databaseImage)
 }
 
 export function shouldContainCategoryImage(slug: string) {
   return CONTAINED_CATEGORY_SLUGS.has(slug.toLowerCase())
 }
 
-export function shouldTopAlignCategoryCardImage(slug: string) {
-  return TOP_ALIGNED_CATEGORY_CARD_SLUGS.has(slug.toLowerCase())
+export function hasFittedCategoryCardImage(slug: string) {
+  return Boolean(CATEGORY_CARD_IMAGES[slug.toLowerCase()])
 }

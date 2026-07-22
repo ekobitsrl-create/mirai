@@ -5,9 +5,9 @@ import Link from "next/link"
 import { useScrollAnimation } from "@/hooks/use-scroll-animation"
 import { useLanguage } from "@/lib/language-context"
 import {
-  getCategoryImage,
+  getCategoryCardImage,
+  hasFittedCategoryCardImage,
   shouldContainCategoryImage,
-  shouldTopAlignCategoryCardImage,
 } from "@/lib/category-images"
 import { ArrowRight } from "lucide-react"
 
@@ -51,12 +51,12 @@ export function Collections({ categories = [] }: { categories?: Category[] }) {
               style={{ transitionDelay: isVisible ? `${i * 0.1}s` : "0s" }}
             >
               <Image
-                src={getCategoryImage(cat.slug, cat.image_url)}
+                src={getCategoryCardImage(cat.slug, cat.image_url)}
                 alt={cat.name}
                 fill
                 className={`${
-                  shouldTopAlignCategoryCardImage(cat.slug)
-                    ? "object-contain object-top"
+                  hasFittedCategoryCardImage(cat.slug)
+                    ? "object-contain object-center"
                     : shouldContainCategoryImage(cat.slug)
                       ? "object-contain p-3"
                       : "object-cover"
