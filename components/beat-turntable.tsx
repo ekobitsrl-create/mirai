@@ -10,10 +10,6 @@ const TRACKS = [
     src: "/audio/mirai-soundtrack.mpeg",
   },
   {
-    title: "Mirai Beat 2",
-    src: "/audio/mirai-beat-2.mpeg",
-  },
-  {
     title: "Emme Effe Miz 1",
     src: "/audio/mirai-emme-effe-miz-1.mp3",
   },
