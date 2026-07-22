@@ -22,7 +22,7 @@ import {
   ZoomIn,
 } from "lucide-react"
 import { useCart } from "@/lib/cart-context"
-import type { StoreProduct } from "@/lib/products"
+import { getProductSupplierSettings, type StoreProduct } from "@/lib/products"
 
 function formatCategory(slug: string) {
   return slug.replace(/-/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase())
@@ -59,6 +59,10 @@ export function ProductDetail({
   const maxQuantity = selectedStock ?? 10
   const colorName = product.color_name || "Multicolor"
   const fitNote = product.fit_note || "Consulta la guida alle taglie prima di scegliere."
+  const supplierSettings = getProductSupplierSettings(product)
+  const shippingEstimate = supplierSettings.shippingMinDays !== undefined && supplierSettings.shippingMaxDays !== undefined
+    ? `consegna stimata in ${supplierSettings.shippingMinDays}–${supplierSettings.shippingMaxDays} giorni lavorativi`
+    : "preparazione 1–2 giorni, consegna standard 3–5 giorni lavorativi"
   const detailItems = product.detail_items || []
   const gallery = product.image_gallery?.length
     ? product.image_gallery
@@ -394,7 +398,7 @@ export function ProductDetail({
 
           <div className="mt-4 flex items-center gap-2 text-[10px] text-white/60">
             <PackageCheck className="h-4 w-4 text-emerald-400" />
-            {product.in_stock ? "Disponibile — preparazione 1–2 giorni, consegna standard 3–5 giorni lavorativi" : "Momentaneamente non disponibile"}
+            {product.in_stock ? `Disponibile — ${shippingEstimate}` : "Momentaneamente non disponibile"}
           </div>
 
           <div className="mt-8 grid grid-cols-3 border-y border-white/15 bg-white/[0.025] py-5">
@@ -418,7 +422,7 @@ export function ProductDetail({
               </Details>
             )}
             <Details title="Spedizioni e resi">
-              Spedizione tracciata in Italia e in Europa. Puoi richiedere il reso entro 14 giorni dalla consegna, purche il capo sia integro e con i cartellini originali. Consulta la pagina <Link href="/resi" className="text-[#9f86ff] underline underline-offset-4">Resi e Rimborsi</Link>.
+              {product.in_stock ? `Tempi previsti: ${shippingEstimate}. ` : ""}Spedizione tracciata in Italia e in Europa. Puoi richiedere il reso entro 14 giorni dalla consegna, purche il capo sia integro e con i cartellini originali. Consulta la pagina <Link href="/resi" className="text-[#9f86ff] underline underline-offset-4">Resi e Rimborsi</Link>.
             </Details>
           </div>
         </section>

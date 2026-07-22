@@ -3,7 +3,7 @@ import { notFound } from "next/navigation"
 import { Navbar } from "@/components/navbar"
 import { Footer } from "@/components/footer"
 import { ProductDetail } from "@/components/product-detail"
-import { getDemoProduct, isBlackIslandProduct, isPrivateCheckoutProduct, withoutBlackIslandProducts } from "@/lib/products"
+import { getDemoProduct, getProductSupplierSettings, isBlackIslandProduct, isPrivateCheckoutProduct, withoutBlackIslandProducts } from "@/lib/products"
 import { getAbsoluteUrl, SITE_URL } from "@/lib/site-url"
 
 function absoluteProductImage(imageUrl: string | null | undefined) {
@@ -117,6 +117,9 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
   const availability = hasAvailableStock(product)
     ? "https://schema.org/InStock"
     : "https://schema.org/OutOfStock"
+  const supplierSettings = getProductSupplierSettings(product)
+  const isSupplierTimedShipping = supplierSettings.shippingMinDays !== undefined
+    && supplierSettings.shippingMaxDays !== undefined
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -126,10 +129,11 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
     description: product.description || `${product.name} - MIRAI`,
     image: productImages.length ? productImages : undefined,
     sku: product.supplier_sku || product.id,
-    mpn: product.supplier_sku || undefined,
+    mpn: supplierSettings.mpn,
+    gtin: supplierSettings.gtin,
     brand: {
       "@type": "Brand",
-      name: product.brand || "MIRAI",
+      name: supplierSettings.brand,
     },
     color: product.color_name || undefined,
     material: product.composition || undefined,
@@ -161,13 +165,13 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
           handlingTime: {
             "@type": "QuantitativeValue",
             minValue: 0,
-            maxValue: 1,
+            maxValue: isSupplierTimedShipping ? 0 : 1,
             unitCode: "d",
           },
           transitTime: {
             "@type": "QuantitativeValue",
-            minValue: 3,
-            maxValue: 5,
+            minValue: isSupplierTimedShipping ? supplierSettings.shippingMinDays : 3,
+            maxValue: isSupplierTimedShipping ? supplierSettings.shippingMaxDays : 5,
             unitCode: "d",
           },
         },

@@ -12,6 +12,7 @@ import {
   Plus, Pencil, Trash2, X, Check, LogOut, ChevronDown
 } from "lucide-react"
 import { ImageUpload } from "@/components/image-upload"
+import { getSupplierProfile, SUPPLIER_PROFILE_OPTIONS, type SupplierProfile } from "@/lib/products"
 
 type Tab = "products" | "categories" | "orders" | "users"
 
@@ -185,6 +186,18 @@ function ProductsTab({ products, categories, onRefresh }: { products: any[]; cat
       .split("\n")
       .map((line) => line.trim())
       .filter(Boolean)
+    const supplierProfile = (fd.get("supplier_profile") as SupplierProfile) || "minimal"
+    const isMiraiProfile = supplierProfile === "mirai"
+    const parseShippingDay = (value: FormDataEntryValue | null, fallback: number) => {
+      const parsed = Number(value)
+      return Number.isInteger(parsed) && parsed >= 0 ? parsed : fallback
+    }
+    const shippingMinDays = isMiraiProfile
+      ? parseShippingDay(fd.get("shipping_min_days"), 7)
+      : null
+    const shippingMaxDays = isMiraiProfile
+      ? Math.max(parseShippingDay(fd.get("shipping_max_days"), 12), shippingMinDays || 0)
+      : null
     const data = {
       name: fd.get("name") as string,
       price: parseFloat(fd.get("price") as string),
@@ -192,7 +205,12 @@ function ProductsTab({ products, categories, onRefresh }: { products: any[]; cat
       image_url: fd.get("image_url") as string || null,
       sizes: (fd.get("sizes") as string)?.split(",").map(s => s.trim()).filter(Boolean) || [],
       description: fd.get("description") as string || null,
-      brand: (fd.get("brand") as string)?.trim() || null,
+      supplier_profile: supplierProfile,
+      brand: isMiraiProfile ? "MIRAI" : (fd.get("brand") as string)?.trim() || "Minimal",
+      supplier_sku: (fd.get("supplier_sku") as string)?.trim() || null,
+      gtin: isMiraiProfile ? null : (fd.get("gtin") as string)?.trim() || null,
+      shipping_min_days: shippingMinDays,
+      shipping_max_days: shippingMaxDays,
       color_name: (fd.get("color_name") as string)?.trim() || null,
       color_hex: (fd.get("color_hex") as string)?.trim() || null,
       fit_note: (fd.get("fit_note") as string)?.trim() || null,
@@ -203,12 +221,16 @@ function ProductsTab({ products, categories, onRefresh }: { products: any[]; cat
       is_new: fd.get("is_new") === "on",
     }
 
-    if (id) {
-      await supabase.from("products").update(data).eq("id", id)
-    } else {
-      await supabase.from("products").insert(data)
-    }
+    const result = id
+      ? await supabase.from("products").update(data).eq("id", id)
+      : await supabase.from("products").insert(data)
+
     setSaving(false)
+    if (result.error) {
+      alert(`Errore durante il salvataggio: ${result.error.message}`)
+      return
+    }
+
     setShowForm(false)
     setEditId(null)
     onRefresh()
@@ -263,6 +285,9 @@ function ProductsTab({ products, categories, onRefresh }: { products: any[]; cat
                     <div className="flex items-center gap-2 mb-1">
                       <h3 className="font-medium text-foreground truncate">{p.name}</h3>
                       {p.is_new && <span className="text-[9px] uppercase tracking-widest px-1.5 py-0.5 bg-primary/20 text-primary rounded">Nuovo</span>}
+                      <span className="text-[9px] uppercase tracking-widest px-1.5 py-0.5 bg-secondary text-muted-foreground rounded">
+                        {getSupplierProfile(p) === "mirai" ? "Fornitore MIRAI" : "Fornitore Minimal"}
+                      </span>
                       {!p.in_stock && <span className="text-[9px] uppercase tracking-widest px-1.5 py-0.5 bg-destructive/20 text-destructive rounded">Esaurito</span>}
                     </div>
                     <div className="flex items-center gap-3 text-xs text-muted-foreground">
@@ -292,6 +317,33 @@ function ProductsTab({ products, categories, onRefresh }: { products: any[]; cat
 function ProductForm({ product, categories, onSubmit, saving }: {
   product?: any; categories: any[]; onSubmit: (e: React.FormEvent<HTMLFormElement>) => void; saving: boolean
 }) {
+  const initialSupplierProfile: SupplierProfile = product ? getSupplierProfile(product) : "minimal"
+  const [supplierProfile, setSupplierProfile] = useState<SupplierProfile>(initialSupplierProfile)
+  const [brand, setBrand] = useState(
+    initialSupplierProfile === "mirai" ? "MIRAI" : product?.brand || "Minimal",
+  )
+  const [gtin, setGtin] = useState(initialSupplierProfile === "mirai" ? "" : product?.gtin || "")
+  const [shippingMinDays, setShippingMinDays] = useState(
+    String(product?.shipping_min_days ?? SUPPLIER_PROFILE_OPTIONS.mirai.shippingMinDays ?? 7),
+  )
+  const [shippingMaxDays, setShippingMaxDays] = useState(
+    String(product?.shipping_max_days ?? SUPPLIER_PROFILE_OPTIONS.mirai.shippingMaxDays ?? 12),
+  )
+  const isMiraiProfile = supplierProfile === "mirai"
+
+  function handleSupplierProfileChange(nextProfile: SupplierProfile) {
+    setSupplierProfile(nextProfile)
+    if (nextProfile === "mirai") {
+      setBrand("MIRAI")
+      setGtin("")
+      if (!shippingMinDays) setShippingMinDays("7")
+      if (!shippingMaxDays) setShippingMaxDays("12")
+      return
+    }
+
+    if (brand === "MIRAI") setBrand("Minimal")
+  }
+
   return (
     <form onSubmit={onSubmit} className="grid gap-4 md:grid-cols-2">
       <div className="flex flex-col gap-1.5">
@@ -334,9 +386,76 @@ function ProductForm({ product, categories, onSubmit, saving }: {
           className="px-3 py-2 bg-secondary border border-border rounded-md text-foreground text-sm resize-y"
         />
       </div>
+      <div className="flex flex-col gap-1.5 md:col-span-2">
+        <Label className="text-[10px] uppercase tracking-widest text-muted-foreground">Profilo fornitore</Label>
+        <select
+          name="supplier_profile"
+          value={supplierProfile}
+          onChange={(event) => handleSupplierProfileChange(event.target.value as SupplierProfile)}
+          className="h-10 px-3 bg-secondary border border-border rounded-md text-foreground text-sm"
+        >
+          {Object.entries(SUPPLIER_PROFILE_OPTIONS).map(([value, profile]) => (
+            <option key={value} value={value}>{profile.label}</option>
+          ))}
+        </select>
+        <p className="text-[10px] leading-4 text-muted-foreground">
+          Minimal conserva l'impostazione attuale. MIRAI forza brand MIRAI, rimuove il GTIN e imposta la consegna in 7–12 giorni lavorativi.
+        </p>
+      </div>
       <div className="flex flex-col gap-1.5">
         <Label className="text-[10px] uppercase tracking-widest text-muted-foreground">Brand</Label>
-        <Input name="brand" defaultValue={product?.brand || ""} placeholder="Es. Minimal Couture" className="bg-secondary" />
+        <Input
+          name="brand"
+          value={brand}
+          onChange={(event) => setBrand(event.target.value)}
+          readOnly={isMiraiProfile}
+          placeholder="Es. Minimal"
+          className={`bg-secondary ${isMiraiProfile ? "cursor-not-allowed opacity-70" : ""}`}
+        />
+      </div>
+      <div className="flex flex-col gap-1.5">
+        <Label className="text-[10px] uppercase tracking-widest text-muted-foreground">SKU / MPN</Label>
+        <Input name="supplier_sku" defaultValue={product?.supplier_sku || ""} placeholder="Es. MIRAI-TEE-001" className="bg-secondary" />
+        <p className="text-[10px] leading-4 text-muted-foreground">Per i prodotti MIRAI viene inviato a Google come MPN, senza inventare un GTIN.</p>
+      </div>
+      <div className="flex flex-col gap-1.5">
+        <Label className="text-[10px] uppercase tracking-widest text-muted-foreground">GTIN</Label>
+        <Input
+          name="gtin"
+          value={gtin}
+          onChange={(event) => setGtin(event.target.value)}
+          readOnly={isMiraiProfile}
+          placeholder={isMiraiProfile ? "Non previsto per prodotti MIRAI" : "EAN / GTIN del fornitore"}
+          className={`bg-secondary ${isMiraiProfile ? "cursor-not-allowed opacity-70" : ""}`}
+        />
+      </div>
+      <div className="flex flex-col gap-1.5">
+        <Label className="text-[10px] uppercase tracking-widest text-muted-foreground">Consegna minima (giorni lavorativi)</Label>
+        <Input
+          name="shipping_min_days"
+          type="number"
+          min="0"
+          step="1"
+          required={isMiraiProfile}
+          disabled={!isMiraiProfile}
+          value={isMiraiProfile ? shippingMinDays : ""}
+          onChange={(event) => setShippingMinDays(event.target.value)}
+          className="bg-secondary disabled:cursor-not-allowed disabled:opacity-50"
+        />
+      </div>
+      <div className="flex flex-col gap-1.5">
+        <Label className="text-[10px] uppercase tracking-widest text-muted-foreground">Consegna massima (giorni lavorativi)</Label>
+        <Input
+          name="shipping_max_days"
+          type="number"
+          min={shippingMinDays || "0"}
+          step="1"
+          required={isMiraiProfile}
+          disabled={!isMiraiProfile}
+          value={isMiraiProfile ? shippingMaxDays : ""}
+          onChange={(event) => setShippingMaxDays(event.target.value)}
+          className="bg-secondary disabled:cursor-not-allowed disabled:opacity-50"
+        />
       </div>
       <div className="flex flex-col gap-1.5">
         <Label className="text-[10px] uppercase tracking-widest text-muted-foreground">Nome colore</Label>

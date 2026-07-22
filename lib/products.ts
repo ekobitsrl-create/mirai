@@ -5,6 +5,72 @@ type ProductIdentity = {
   image_url?: string | null
 }
 
+export type SupplierProfile = "minimal" | "mirai"
+
+type SupplierProduct = {
+  supplier_profile?: SupplierProfile | string | null
+  brand?: string | null
+  gtin?: string | null
+  supplier_sku?: string | null
+  shipping_min_days?: number | null
+  shipping_max_days?: number | null
+}
+
+export const SUPPLIER_PROFILE_OPTIONS: Record<SupplierProfile, {
+  label: string
+  brand: string
+  hasGtin: boolean
+  shippingMinDays?: number
+  shippingMaxDays?: number
+}> = {
+  minimal: {
+    label: "Minimal / impostazione attuale",
+    brand: "Minimal",
+    hasGtin: true,
+  },
+  mirai: {
+    label: "MIRAI / altro fornitore",
+    brand: "MIRAI",
+    hasGtin: false,
+    shippingMinDays: 7,
+    shippingMaxDays: 12,
+  },
+}
+
+export function getSupplierProfile(product: SupplierProduct): SupplierProfile {
+  if (product.supplier_profile === "minimal" || product.supplier_profile === "mirai") {
+    return product.supplier_profile
+  }
+
+  return /^minimal(?:\s|$)/i.test(product.brand?.trim() || "") ? "minimal" : "mirai"
+}
+
+export function getProductSupplierSettings(product: SupplierProduct) {
+  const profile = getSupplierProfile(product)
+  const defaults = SUPPLIER_PROFILE_OPTIONS[profile]
+  const supplierSku = product.supplier_sku?.trim() || undefined
+  const gtin = defaults.hasGtin ? product.gtin?.trim() || undefined : undefined
+  const shippingMinDays = product.shipping_min_days !== null
+    && product.shipping_min_days !== undefined
+    && Number.isFinite(Number(product.shipping_min_days))
+      ? Number(product.shipping_min_days)
+      : defaults.shippingMinDays
+  const shippingMaxDays = product.shipping_max_days !== null
+    && product.shipping_max_days !== undefined
+    && Number.isFinite(Number(product.shipping_max_days))
+      ? Number(product.shipping_max_days)
+      : defaults.shippingMaxDays
+
+  return {
+    profile,
+    brand: profile === "mirai" ? "MIRAI" : product.brand?.trim() || defaults.brand,
+    gtin,
+    mpn: supplierSku,
+    shippingMinDays,
+    shippingMaxDays,
+  }
+}
+
 export type StoreProductImage = {
   src: string
   alt: string
@@ -24,7 +90,11 @@ export type StoreProduct = {
   is_new: boolean
   created_at: string
   brand?: string
+  supplier_profile?: SupplierProfile
   supplier_sku?: string
+  gtin?: string
+  shipping_min_days?: number
+  shipping_max_days?: number
   color_name?: string
   color_hex?: string
   fit_note?: string
@@ -53,6 +123,9 @@ export const CUSTOM_TEE_PRODUCT: StoreProduct = {
   is_new: true,
   created_at: "2026-07-16T12:00:00.000Z",
   brand: "MIRAI",
+  supplier_profile: "mirai",
+  shipping_min_days: 7,
+  shipping_max_days: 12,
   color_name: "Personalizzato",
   color_hex: "#f4f1e9",
   fit_note: "Vestibilità oversize: scegli la tua taglia abituale.",
@@ -94,7 +167,20 @@ export function mapProductRow(row: Record<string, any>): StoreProduct {
     is_new: Boolean(row.is_new),
     created_at: (row.created_at as string) ?? new Date().toISOString(),
     brand: (row.brand as string) ?? undefined,
+    supplier_profile:
+      row.supplier_profile === "minimal" || row.supplier_profile === "mirai"
+        ? row.supplier_profile
+        : undefined,
     supplier_sku: (row.supplier_sku as string) ?? undefined,
+    gtin: (row.gtin as string) ?? undefined,
+    shipping_min_days:
+      row.shipping_min_days === null || row.shipping_min_days === undefined
+        ? undefined
+        : Number(row.shipping_min_days),
+    shipping_max_days:
+      row.shipping_max_days === null || row.shipping_max_days === undefined
+        ? undefined
+        : Number(row.shipping_max_days),
     color_name: (row.color_name as string) ?? undefined,
     color_hex: (row.color_hex as string) ?? undefined,
     fit_note: (row.fit_note as string) ?? undefined,

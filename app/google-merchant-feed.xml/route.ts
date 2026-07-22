@@ -1,6 +1,6 @@
 import type { NextRequest } from "next/server"
 import { createHash } from "node:crypto"
-import { isPrivateCheckoutProduct, withDemoProducts, type StoreProduct } from "@/lib/products"
+import { getProductSupplierSettings, isPrivateCheckoutProduct, withDemoProducts, type StoreProduct } from "@/lib/products"
 import { createClient } from "@/lib/supabase/server"
 import { SITE_URL } from "@/lib/site-url"
 
@@ -8,7 +8,8 @@ export const runtime = "nodejs"
 export const dynamic = "force-dynamic"
 
 const RETURN_POLICY_PATH = "/resi"
-const CATALOG_SELECT = "id, name, description, price, category, image_url, sizes, stock_by_size, in_stock, is_new, created_at, updated_at, brand, supplier_sku, color_name, color_hex, image_gallery, detail_items, composition"
+const CATALOG_SELECT = "id, name, description, price, category, image_url, sizes, stock_by_size, in_stock, is_new, created_at, updated_at, brand, supplier_profile, supplier_sku, gtin, shipping_min_days, shipping_max_days, color_name, color_hex, image_gallery, detail_items, composition"
+const PRE_SUPPLIER_CATALOG_SELECT = "id, name, description, price, category, image_url, sizes, stock_by_size, in_stock, is_new, created_at, updated_at, brand, supplier_sku, color_name, color_hex, image_gallery, detail_items, composition"
 const LEGACY_CATALOG_SELECT = "id, name, description, price, category, image_url, sizes, stock_by_size, in_stock, is_new, created_at, updated_at"
 
 const GOOGLE_CATEGORY_BY_STORE_CATEGORY: Record<string, string> = {
@@ -123,7 +124,7 @@ function getMerchantItemId(product: StoreProduct, size: string) {
 
 function getItemGroupId(product: StoreProduct) {
   if (product.supplier_sku) {
-    return normalizedIdentifier(`${product.brand || "mirai"}-${product.supplier_sku}`)
+    return normalizedIdentifier(`${getProductSupplierSettings(product).brand}-${product.supplier_sku}`)
   }
 
   return normalizedIdentifier(product.id).slice(0, 50)
@@ -187,6 +188,15 @@ async function getCatalogProducts() {
       .select(CATALOG_SELECT)
       .order("created_at", { ascending: false })
 
+    if (error) {
+      const preSupplierResult = await supabase
+        .from("products")
+        .select(PRE_SUPPLIER_CATALOG_SELECT)
+        .order("created_at", { ascending: false })
+      data = preSupplierResult.data as typeof data
+      error = preSupplierResult.error
+    }
+
     if (error?.message.includes("stock_by_size")) {
       const legacyResult = await supabase
         .from("products")
@@ -215,7 +225,8 @@ function renderProductVariant(product: StoreProduct, size: string, baseUrl: stri
   const titleParts = [product.name, color, `Taglia ${size}`].filter(Boolean)
   const title = titleParts.join(" - ")
   const description = product.description || `${product.name} disponibile su MIRAI LAB STORE.`
-  const brand = product.brand || "MIRAI"
+  const supplierSettings = getProductSupplierSettings(product)
+  const brand = supplierSettings.brand
   const itemGroupId = getItemGroupId(product)
   const productType = PRODUCT_TYPE_BY_STORE_CATEGORY[categoryKey] || `Abbigliamento > ${product.category}`
   const googleCategory = GOOGLE_CATEGORY_BY_STORE_CATEGORY[categoryKey] || "166"
@@ -234,12 +245,9 @@ function renderProductVariant(product: StoreProduct, size: string, baseUrl: stri
     `      <g:price>${Number(product.price).toFixed(2)} EUR</g:price>`,
     "      <g:condition>new</g:condition>",
     `      <g:brand>${escapeXml(brand)}</g:brand>`,
-    ...(product.supplier_sku
-      ? [
-          `      <g:mpn>${escapeXml(product.supplier_sku)}</g:mpn>`,
-          "      <g:identifier_exists>yes</g:identifier_exists>",
-        ]
-      : ["      <g:identifier_exists>no</g:identifier_exists>"]),
+    ...(supplierSettings.gtin ? [`      <g:gtin>${escapeXml(supplierSettings.gtin)}</g:gtin>`] : []),
+    ...(supplierSettings.mpn ? [`      <g:mpn>${escapeXml(supplierSettings.mpn)}</g:mpn>`] : []),
+    `      <g:identifier_exists>${supplierSettings.gtin || supplierSettings.mpn ? "yes" : "no"}</g:identifier_exists>`,
     `      <g:google_product_category>${googleCategory}</g:google_product_category>`,
     `      <g:product_type>${escapeXml(productType)}</g:product_type>`,
     `      <g:item_group_id>${escapeXml(itemGroupId)}</g:item_group_id>`,
@@ -258,6 +266,14 @@ function renderProductVariant(product: StoreProduct, size: string, baseUrl: stri
     "        <g:country>IT</g:country>",
     "        <g:service>Standard</g:service>",
     "        <g:price>0.00 EUR</g:price>",
+    ...(supplierSettings.shippingMinDays !== undefined && supplierSettings.shippingMaxDays !== undefined
+      ? [
+          "        <g:min_handling_time>0</g:min_handling_time>",
+          "        <g:max_handling_time>0</g:max_handling_time>",
+          `        <g:min_transit_time>${supplierSettings.shippingMinDays}</g:min_transit_time>`,
+          `        <g:max_transit_time>${supplierSettings.shippingMaxDays}</g:max_transit_time>`,
+        ]
+      : []),
     "      </g:shipping>",
     renderReturnPolicy(baseUrl),
     "    </item>",
