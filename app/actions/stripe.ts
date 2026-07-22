@@ -133,8 +133,9 @@ export async function createCheckoutSession(cartItems: CartLineItem[], guestEmai
   )
 
   const session = await stripe.checkout.sessions.create({
-    success_url: `${baseUrl}/success?session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: `${baseUrl}/checkout`,
+    ui_mode: 'embedded',
+    redirect_on_completion: 'if_required',
+    return_url: `${baseUrl}/success?session_id={CHECKOUT_SESSION_ID}`,
     line_items: lineItems,
     mode: 'payment',
     customer_creation: 'if_required',
@@ -154,11 +155,11 @@ export async function createCheckoutSession(cartItems: CartLineItem[], guestEmai
     shipping_options: getStripeShippingOptions(subtotalCents),
   })
 
-  if (!session.url) {
+  if (!session.client_secret) {
     throw new Error('Impossibile inizializzare il pagamento')
   }
 
-  return { checkoutUrl: session.url, sessionId: session.id }
+  return { clientSecret: session.client_secret, sessionId: session.id }
 }
 
 function cleanDeliveryField(value: string, label: string, maximumLength: number) {

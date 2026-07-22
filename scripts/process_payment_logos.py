@@ -43,9 +43,7 @@ def trim_and_resize(image: Image.Image) -> Image.Image:
         rgba = rgba.crop(bounds)
 
     rgba.thumbnail((360, 128), Image.Resampling.LANCZOS)
-    padded = Image.new("RGBA", (rgba.width + 8, rgba.height + 8), (0, 0, 0, 0))
-    padded.alpha_composite(rgba, (4, 4))
-    return padded
+    return rgba
 
 
 def build_preview(processed: dict[str, Image.Image]) -> None:
