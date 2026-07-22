@@ -19,9 +19,8 @@ export type MiraiSupplierCatalogProduct = {
   care: string | null
 }
 
-// Generated from docs/mirai-supplier-catalog.md. Products remain unavailable
-// until sizes and stock are confirmed in the admin panel.
-export const MIRAI_SUPPLIER_CATALOG = [
+// Generated from docs/mirai-supplier-catalog.md.
+const MIRAI_SUPPLIER_CATALOG_BASE = [
   {
     "name": "MIRAI Divine Garden Tee – White",
     "description": "T-shirt oversize bianca dal carattere barocco, costruita attorno a una maxi grafica con cherubini, ali e dettagli botanici. Il contrasto tra la base pulita e la stampa scura crea un capo streetwear scenografico, pensato per diventare il centro dell’outfit.",
@@ -804,4 +803,16 @@ export const MIRAI_SUPPLIER_CATALOG = [
     "care": null
   }
 ] as const satisfies readonly MiraiSupplierCatalogProduct[]
+
+// These supplier products currently use the OS variant, with 10 units available
+// per product. Specific apparel sizes can replace OS later from the admin catalog.
+export const MIRAI_SUPPLIER_CATALOG: readonly MiraiSupplierCatalogProduct[] =
+  MIRAI_SUPPLIER_CATALOG_BASE.map((product) => ({
+    ...product,
+    image_gallery: [...product.image_gallery],
+    sizes: [...product.sizes],
+    stock_by_size: { OS: 10 },
+    in_stock: true,
+    detail_items: [...product.detail_items],
+  }))
 
