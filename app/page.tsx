@@ -37,7 +37,12 @@ export default async function Home() {
   try {
     const supabase = await createClient()
     const [prodRes, catRes] = await Promise.all([
-      supabase.from("products").select("*").order("created_at", { ascending: false }).limit(32),
+      supabase
+        .from("products")
+        .select("*")
+        .eq("is_new", true)
+        .order("created_at", { ascending: false })
+        .limit(32),
       supabase.from("categories").select("*").is("parent_id", null).order("name", { ascending: true }),
     ])
     products = withDemoProducts(prodRes.data || []).slice(0, 8)
