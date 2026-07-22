@@ -71,7 +71,7 @@ create or replace function public.normalize_product_supplier_profile()
 returns trigger
 language plpgsql
 set search_path = public
-as $
+as $$
 begin
   if new.supplier_profile = 'mirai' then
     new.brand := 'MIRAI';
@@ -85,7 +85,7 @@ begin
 
   return new;
 end;
-$;
+$$;
 
 drop trigger if exists products_normalize_supplier_profile on public.products;
 create trigger products_normalize_supplier_profile
@@ -119,7 +119,7 @@ insert into public.products (
   care
 ) values (
   'a0000000-0000-4000-8000-000000000018',
-  'MIRAI One of One Tee',
+  'One of One Tee',
   'T-shirt MIRAI heavyweight nera con simbolo Lambda viola sul petto. Prodotto prova per il profilo fornitore MIRAI.',
   2.00,
   't-shirt',
