@@ -60,6 +60,11 @@ export function ProductDetail({
   const colorName = product.color_name || "Multicolor"
   const fitNote = product.fit_note || "Consulta la guida alle taglie prima di scegliere."
   const supplierSettings = getProductSupplierSettings(product)
+  const isMiraiSupplierCatalogProduct = supplierSettings.profile === "mirai"
+    && /^MIRAI-/i.test(product.supplier_sku || "")
+  const shippingTimeLabel = supplierSettings.shippingMinDays !== undefined && supplierSettings.shippingMaxDays !== undefined
+    ? `${supplierSettings.shippingMinDays}–${supplierSettings.shippingMaxDays} giorni lavorativi`
+    : "3–5 giorni lavorativi"
   const shippingEstimate = supplierSettings.shippingMinDays !== undefined && supplierSettings.shippingMaxDays !== undefined
     ? `consegna stimata in ${supplierSettings.shippingMinDays}–${supplierSettings.shippingMaxDays} giorni lavorativi`
     : "preparazione 1–2 giorni, consegna standard 3–5 giorni lavorativi"
@@ -217,7 +222,7 @@ export function ProductDetail({
                   src={image.src}
                   alt=""
                   fill
-                  className={image.fit === "cover" ? "object-cover" : "object-contain"}
+                  className={isMiraiSupplierCatalogProduct || image.fit === "cover" ? "object-cover" : "object-contain"}
                   style={{ objectPosition: image.position || "center" }}
                   sizes="72px"
                 />
@@ -241,7 +246,7 @@ export function ProductDetail({
                 src={selectedImage.src}
                 alt={selectedImage.alt}
                 fill
-                className={`${selectedImage.fit === "cover" ? "object-cover" : "object-contain"} transition-transform duration-700 group-hover:scale-[1.025]`}
+                className={`${isMiraiSupplierCatalogProduct || selectedImage.fit === "cover" ? "object-cover" : "object-contain"} transition-transform duration-700 group-hover:scale-[1.025]`}
                 style={{ objectPosition: selectedImage.position || "center" }}
                 sizes="(max-width: 1024px) 100vw, 60vw"
                 priority
@@ -398,7 +403,11 @@ export function ProductDetail({
 
           <div className="mt-4 flex items-center gap-2 text-[10px] text-white/60">
             <PackageCheck className="h-4 w-4 text-emerald-400" />
-            {product.in_stock ? `Disponibile — ${shippingEstimate}` : "Momentaneamente non disponibile"}
+            {product.in_stock ? "Disponibile" : "Momentaneamente non disponibile"}
+          </div>
+          <div className="mt-3 flex items-center gap-2 border border-[#9f86ff]/35 bg-[#9f86ff]/10 px-4 py-3 text-xs font-semibold text-white">
+            <Truck className="h-4 w-4 shrink-0 text-[#b7a6ff]" />
+            <span>Tempi di spedizione: {shippingTimeLabel}</span>
           </div>
 
           <div className="mt-8 grid grid-cols-3 border-y border-white/15 bg-white/[0.025] py-5">
@@ -422,7 +431,7 @@ export function ProductDetail({
               </Details>
             )}
             <Details title="Spedizioni e resi">
-              {product.in_stock ? `Tempi previsti: ${shippingEstimate}. ` : ""}Spedizione tracciata in Italia e in Europa. Puoi richiedere il reso entro 14 giorni dalla consegna, purche il capo sia integro e con i cartellini originali. Consulta la pagina <Link href="/resi" className="text-[#9f86ff] underline underline-offset-4">Resi e Rimborsi</Link>.
+              Tempi previsti: {shippingEstimate}. Spedizione tracciata in Italia e in Europa. Puoi richiedere il reso entro 14 giorni dalla consegna, purche il capo sia integro e con i cartellini originali. Consulta la pagina <Link href="/resi" className="text-[#9f86ff] underline underline-offset-4">Resi e Rimborsi</Link>.
             </Details>
           </div>
         </section>
@@ -454,12 +463,12 @@ export function ProductDetail({
       {zoomOpen && selectedImage && (
         <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/95 p-4 md:p-10">
           <button type="button" onClick={() => setZoomOpen(false)} className="absolute right-5 top-5 z-10 flex h-11 w-11 items-center justify-center rounded-full bg-white text-black" aria-label="Chiudi immagine"><X className="h-5 w-5" /></button>
-          <div className={`relative h-full w-full overflow-hidden ${selectedImage.fit === "cover" ? "max-w-3xl" : "max-w-6xl"}`}>
+          <div className={`relative h-full w-full overflow-hidden ${isMiraiSupplierCatalogProduct || selectedImage.fit === "cover" ? "max-w-3xl" : "max-w-6xl"}`}>
             <Image
               src={selectedImage.src}
               alt={selectedImage.alt}
               fill
-              className={selectedImage.fit === "cover" ? "object-cover" : "object-contain"}
+              className={isMiraiSupplierCatalogProduct || selectedImage.fit === "cover" ? "object-cover" : "object-contain"}
               style={{ objectPosition: selectedImage.position || "center" }}
               sizes="100vw"
               priority
