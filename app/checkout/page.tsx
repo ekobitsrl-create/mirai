@@ -1,10 +1,8 @@
 "use client"
 
-import { useCallback, useEffect, useRef, useState, type FormEvent } from "react"
-import { loadStripe } from "@stripe/stripe-js"
-import { EmbeddedCheckoutProvider, EmbeddedCheckout } from "@stripe/react-stripe-js"
+import { useEffect, useState, type FormEvent } from "react"
 import Link from "next/link"
-import { ArrowLeft, Banknote, CreditCard, Mail, ShoppingBag, UserPlus } from "lucide-react"
+import { ArrowLeft, Banknote, CreditCard, LoaderCircle, LockKeyhole, Mail, ShoppingBag, UserPlus } from "lucide-react"
 import { useCart } from "@/lib/cart-context"
 import { useLanguage } from "@/lib/language-context"
 import { createCashOnDeliveryOrder, createCheckoutSession } from "@/app/actions/stripe"
@@ -13,7 +11,6 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 
-const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!)
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 export default function CheckoutPage() {
@@ -28,7 +25,8 @@ export default function CheckoutPage() {
   const [cashDetails, setCashDetails] = useState({ name: "", address: "", city: "", postalCode: "" })
   const [cashError, setCashError] = useState<string | null>(null)
   const [cashSubmitting, setCashSubmitting] = useState(false)
-  const sessionIdRef = useRef<string | null>(null)
+  const [cardError, setCardError] = useState<string | null>(null)
+  const [cardSubmitting, setCardSubmitting] = useState(false)
 
   useEffect(() => {
     let active = true
@@ -41,23 +39,6 @@ export default function CheckoutPage() {
     }
   }, [])
 
-  const fetchClientSecret = useCallback(async () => {
-    const cartLineItems = items.map((item) => ({
-      productId: item.productId,
-      quantity: item.quantity,
-      size: item.size,
-      lineId: item.lineId,
-      customization: item.customization,
-    }))
-    const session = await createCheckoutSession(cartLineItems, isAuthenticated ? undefined : guestEmail)
-    if (!session?.clientSecret) {
-      throw new Error(t.checkout.error)
-    }
-
-    sessionIdRef.current = session.sessionId
-    return session.clientSecret
-  }, [guestEmail, isAuthenticated, items, t.checkout.error])
-
   const beginGuestCheckout = () => {
     if (!emailPattern.test(guestEmail.trim())) {
       setGuestError("Inserisci un indirizzo email valido per ricevere la conferma ordine.")
@@ -66,6 +47,33 @@ export default function CheckoutPage() {
 
     setGuestError(null)
     setGuestCheckoutReady(true)
+  }
+
+  const beginCardCheckout = async () => {
+    setCardError(null)
+    setCardSubmitting(true)
+
+    try {
+      const session = await createCheckoutSession(
+        items.map((item) => ({
+          productId: item.productId,
+          quantity: item.quantity,
+          size: item.size,
+          lineId: item.lineId,
+          customization: item.customization,
+        })),
+        isAuthenticated ? undefined : guestEmail
+      )
+
+      if (!session?.checkoutUrl) {
+        throw new Error(t.checkout.error)
+      }
+
+      window.location.assign(session.checkoutUrl)
+    } catch (error) {
+      setCardError(error instanceof Error ? error.message : t.checkout.error)
+      setCardSubmitting(false)
+    }
   }
 
   const completeCashOnDelivery = async (event: FormEvent<HTMLFormElement>) => {
@@ -226,21 +234,38 @@ export default function CheckoutPage() {
             </section>
 
             {paymentMethod === "card" ? (
-              <div className="min-h-[400px] border border-border bg-card p-1">
-                <EmbeddedCheckoutProvider
-                  stripe={stripePromise}
-                  options={{
-                    fetchClientSecret,
-                    onComplete: () => {
-                      clearCart()
-                      const sessionId = sessionIdRef.current
-                      window.location.assign(sessionId ? `/success?session_id=${encodeURIComponent(sessionId)}` : "/success")
-                    },
-                  }}
+              <section className="border border-border bg-card p-6 sm:p-8">
+                <div className="flex items-start gap-3">
+                  <CreditCard className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
+                  <div>
+                    <h2 className="font-semibold text-foreground">Pagamento sicuro con carta</h2>
+                    <p className="mt-1 text-sm leading-6 text-muted-foreground">
+                      Continua sul checkout protetto di Stripe per inserire i dati della carta e l'indirizzo di spedizione.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="mt-6 flex items-center gap-3 border border-border bg-secondary/40 px-4 py-3 text-sm text-muted-foreground">
+                  <LockKeyhole className="h-4 w-4 shrink-0 text-primary" />
+                  <span>I dati della carta vengono gestiti direttamente da Stripe e non passano da MIRAI.</span>
+                </div>
+
+                {cardError && (
+                  <div className="mt-5 border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive" role="alert">
+                    {cardError}. Riprova tra qualche istante oppure scegli il contrassegno.
+                  </div>
+                )}
+
+                <button
+                  type="button"
+                  onClick={beginCardCheckout}
+                  disabled={cardSubmitting}
+                  className="mt-7 flex min-h-12 w-full items-center justify-center gap-2 bg-primary px-5 py-3 text-xs font-bold uppercase tracking-widest text-primary-foreground transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-60"
                 >
-                  <EmbeddedCheckout />
-                </EmbeddedCheckoutProvider>
-              </div>
+                  {cardSubmitting ? <LoaderCircle className="h-4 w-4 animate-spin" /> : <LockKeyhole className="h-4 w-4" />}
+                  {cardSubmitting ? "Apertura pagamento..." : "Paga con carta"}
+                </button>
+              </section>
             ) : (
               <form onSubmit={completeCashOnDelivery} className="border border-border bg-card p-6 sm:p-8">
                 <div className="flex items-start gap-3">
