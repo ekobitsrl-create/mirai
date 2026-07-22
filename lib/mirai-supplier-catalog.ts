@@ -809,6 +809,7 @@ const MIRAI_SUPPLIER_CATALOG_BASE = [
 export const MIRAI_SUPPLIER_CATALOG: readonly MiraiSupplierCatalogProduct[] =
   MIRAI_SUPPLIER_CATALOG_BASE.map((product) => ({
     ...product,
+    name: product.name.replace(/^MIRAI\s+/i, ""),
     image_gallery: [...product.image_gallery],
     sizes: ["S", "M", "L", "XL", "XXL"],
     stock_by_size: { S: 10, M: 10, L: 10, XL: 10, XXL: 10 },
