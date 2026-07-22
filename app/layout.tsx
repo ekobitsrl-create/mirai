@@ -103,12 +103,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="it" data-scroll-behavior="smooth">
-      <head>
-        <Script
-          src={`https://www.googletagmanager.com/gtag/js?id=${GOOGLE_ANALYTICS_ID}`}
-          strategy="beforeInteractive"
-        />
-        <Script id="mirai-google-analytics" strategy="beforeInteractive">
+      <body className={`${inter.variable} ${spaceGrotesk.variable} font-sans antialiased`}>
+        <Script id="mirai-google-consent" strategy="afterInteractive">
           {`window.dataLayer = window.dataLayer || [];
 function gtag(){dataLayer.push(arguments);}
 gtag('consent', 'default', {
@@ -121,8 +117,10 @@ gtag('consent', 'default', {
 gtag('js', new Date());
 gtag('config', '${GOOGLE_ANALYTICS_ID}');`}
         </Script>
-      </head>
-      <body className={`${inter.variable} ${spaceGrotesk.variable} font-sans antialiased`}>
+        <Script
+          src={`https://www.googletagmanager.com/gtag/js?id=${GOOGLE_ANALYTICS_ID}`}
+          strategy="afterInteractive"
+        />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
