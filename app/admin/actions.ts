@@ -227,7 +227,8 @@ export async function importMiraiSupplierCatalog() {
       image_gallery: product.image_gallery.map((src) => ({
         src,
         alt: product.name,
-        fit: "contain",
+        fit: "cover",
+        position: "center",
       })),
       sizes: [...product.sizes],
       stock_by_size: { ...product.stock_by_size },

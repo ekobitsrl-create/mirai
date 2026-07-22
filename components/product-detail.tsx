@@ -60,8 +60,8 @@ export function ProductDetail({
   const colorName = product.color_name || "Multicolor"
   const fitNote = product.fit_note || "Consulta la guida alle taglie prima di scegliere."
   const supplierSettings = getProductSupplierSettings(product)
-  const isMiraiSupplierCatalogProduct = supplierSettings.profile === "mirai"
-    && /^MIRAI-/i.test(product.supplier_sku || "")
+  const isMiraiSupplierCatalogProduct = /^MIRAI-/i.test(product.supplier_sku || "")
+    || product.image_url?.includes("/products/mirai-supplier/") === true
   const shippingEstimate = supplierSettings.shippingMinDays !== undefined && supplierSettings.shippingMaxDays !== undefined
     ? `consegna stimata in ${supplierSettings.shippingMinDays}–${supplierSettings.shippingMaxDays} giorni lavorativi`
     : "preparazione 1–2 giorni, consegna standard 3–5 giorni lavorativi"
