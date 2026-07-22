@@ -13,6 +13,22 @@ const TRACKS = [
     title: "Mirai Beat 2",
     src: "/audio/mirai-beat-2.mpeg",
   },
+  {
+    title: "Emme Effe Miz 1",
+    src: "/audio/mirai-emme-effe-miz-1.mp3",
+  },
+  {
+    title: "Emme Effe Rocco Beat 3",
+    src: "/audio/mirai-emme-effe-rocco-beat-3.mp3",
+  },
+  {
+    title: "GI 150 (D# min)",
+    src: "/audio/mirai-gi-150-d-sharp-min.mp3",
+  },
+  {
+    title: "West Coast Club",
+    src: "/audio/mirai-west-coast-club.mp3",
+  },
 ] as const
 
 function formatTime(seconds: number) {
