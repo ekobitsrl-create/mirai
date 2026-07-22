@@ -2,7 +2,7 @@ export type MiraiSupplierCatalogProduct = {
   name: string
   description: string
   price: number
-  category: "t-shirt" | "canotte" | "pantaloni" | "shorts"
+  category: "t-shirt" | "canotte" | "jeans" | "pantaloni" | "shorts"
   image_url: string
   image_gallery: string[]
   sizes: string[]
@@ -827,7 +827,7 @@ const MIRAI_SUPPLIER_CATALOG_BASE = [
     "name": "MIRAI Shadow Script Distressed Jeans - Black",
     "description": "Jeans lunghi neri con costruzione a pannelli, lavaggio vissuto e dettagli distressed distribuiti sulla gamba. La maxi applicazione script sul fronte aggiunge luce e carattere a una silhouette ampia di ispirazione urban.",
     "price": 180,
-    "category": "pantaloni",
+    "category": "jeans",
     "image_url": "/products/mirai-supplier/shadow-script-distressed-jeans-black-01.webp",
     "image_gallery": ["/products/mirai-supplier/shadow-script-distressed-jeans-black-01.webp"],
     "sizes": ["44", "46", "48", "50", "52", "54", "56"],
@@ -847,7 +847,7 @@ const MIRAI_SUPPLIER_CATALOG_BASE = [
     "name": "MIRAI Valley Patchwork Jeans - Blue",
     "description": "Jeans lunghi in denim blu washed con una composizione ricca di patch colorate e maxi lettering applicato. La gamba ampia e i lacci extra long costruiscono una presenza forte, pensata per outfit streetwear ad alto impatto.",
     "price": 180,
-    "category": "pantaloni",
+    "category": "jeans",
     "image_url": "/products/mirai-supplier/valley-patchwork-jeans-blue-01.webp",
     "image_gallery": ["/products/mirai-supplier/valley-patchwork-jeans-blue-01.webp"],
     "sizes": ["44", "46", "48", "50", "52", "54", "56"],
