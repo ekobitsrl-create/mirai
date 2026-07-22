@@ -1,18 +1,65 @@
-import type { Metadata } from "next"
 import Link from "next/link"
 import { ArrowRight, BellRing, ExternalLink, MapPin, Sparkles } from "lucide-react"
 import { Navbar } from "@/components/navbar"
 import { Footer } from "@/components/footer"
+import { buildSeoMetadata, createBreadcrumbJsonLd } from "@/lib/seo"
+import { getAbsoluteUrl, SITE_URL } from "@/lib/site-url"
 
-export const metadata: Metadata = {
-  title: "Negozio fisico - Coming soon",
-  alternates: { canonical: "/negozio" },
-  description: "Il primo spazio fisico MIRAI LAB STORE è in arrivo. Scopri in anteprima il progetto e unisciti alla community.",
+const STORE_DESCRIPTION =
+  "Scopri il negozio streetwear MIRAI a Catania: concept store, cappelli custom e abbigliamento urban in Via Umberto 95. Prossima apertura."
+
+export const metadata = buildSeoMetadata({
+  title: "Negozio streetwear Catania",
+  description: STORE_DESCRIPTION,
+  path: "/negozio",
+  keywords: [
+    "negozio streetwear Catania",
+    "concept store Catania",
+    "abbigliamento streetwear Catania",
+    "MIRAI Store Catania",
+    "MIRAI Concept Store",
+  ],
+})
+
+const storeJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "ClothingStore",
+  "@id": `${SITE_URL}/negozio#store`,
+  name: "MIRAI LAB STORE",
+  alternateName: ["MIRAI Concept Store", "MIRAI Store Catania"],
+  description: STORE_DESCRIPTION,
+  url: getAbsoluteUrl("/negozio"),
+  image: getAbsoluteUrl("/images/store-interior.png"),
+  logo: getAbsoluteUrl("/icon.svg"),
+  telephone: "+39 349 866 3584",
+  email: "info@mirailabstore.com",
+  address: {
+    "@type": "PostalAddress",
+    streetAddress: "Via Umberto 95",
+    postalCode: "95129",
+    addressLocality: "Catania",
+    addressRegion: "CT",
+    addressCountry: "IT",
+  },
+  areaServed: { "@type": "City", name: "Catania" },
+  hasMap: "https://www.google.com/maps/search/?api=1&query=Via+Umberto+95%2C+95129+Catania+CT",
+  sameAs: ["https://www.instagram.com/mirai_labstore/"],
+  parentOrganization: { "@id": `${SITE_URL}/#organization` },
 }
 
 export default function NegozioPage() {
   return (
     <main className="min-h-screen overflow-hidden bg-[#08070b] text-white">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(storeJsonLd) }} />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(createBreadcrumbJsonLd([
+            { name: "Home", path: "/" },
+            { name: "Negozio streetwear Catania", path: "/negozio" },
+          ])),
+        }}
+      />
       <Navbar />
 
       <section className="relative px-5 pb-20 pt-36 sm:px-6 sm:pt-40 lg:min-h-[92svh] lg:pb-24">
@@ -25,10 +72,11 @@ export default function NegozioPage() {
               <MapPin className="h-3.5 w-3.5" /> MIRAI LAB / Spazio fisico
             </div>
 
-            <p className="mt-8 text-[10px] font-semibold uppercase tracking-[0.34em] text-white/40">Prossima apertura</p>
+            <p className="mt-8 text-[10px] font-semibold uppercase tracking-[0.34em] text-white/40">Concept store / Prossima apertura</p>
             <h1 className="mt-3 max-w-xl font-bold uppercase leading-[0.9] tracking-[-0.055em]" style={{ fontFamily: "var(--font-space-grotesk)" }}>
-              <span className="block text-[clamp(2.5rem,6.5vw,5.5rem)]">Coming</span>
-              <span className="block bg-gradient-to-r from-[#c8baff] via-primary to-[#e26cff] bg-clip-text text-[clamp(2.5rem,6.5vw,5.5rem)] text-transparent drop-shadow-[0_0_25px_rgba(159,134,255,0.28)]">soon.</span>
+              <span className="block text-[clamp(2.5rem,6.5vw,5.5rem)]">Negozio </span>
+              <span className="block bg-gradient-to-r from-[#c8baff] via-primary to-[#e26cff] bg-clip-text text-[clamp(2.5rem,6.5vw,5.5rem)] text-transparent drop-shadow-[0_0_25px_rgba(159,134,255,0.28)]">streetwear </span>
+              <span className="block bg-gradient-to-r from-primary to-[#e26cff] bg-clip-text text-[clamp(2.5rem,6.5vw,5.5rem)] text-transparent drop-shadow-[0_0_25px_rgba(159,134,255,0.24)]">a Catania.</span>
             </h1>
 
             <p className="mt-7 max-w-lg text-sm leading-7 text-white/55 sm:text-base">

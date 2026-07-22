@@ -7,7 +7,7 @@ import { useSearchParams } from "next/navigation"
 import { Heart, ArrowLeft } from "lucide-react"
 import { useCart } from "@/lib/cart-context"
 import { useLanguage } from "@/lib/language-context"
-import { getCategoryImage } from "@/lib/category-images"
+import { getCategoryImage, shouldContainCategoryImage } from "@/lib/category-images"
 
 type Product = {
   id: string
@@ -92,7 +92,7 @@ export function CollectionProducts({
             src={getCategoryImage(category.slug, category.image_url)}
             alt={category.name}
             fill
-            className="object-cover"
+            className={shouldContainCategoryImage(category.slug) ? "object-contain p-5" : "object-cover"}
             priority
           />
         </div>

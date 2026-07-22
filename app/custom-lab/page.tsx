@@ -1,19 +1,30 @@
-import type { Metadata } from "next"
 import Link from "next/link"
 import { ArrowDown, CheckCircle2, PackageCheck, ScanLine, Sparkles, WandSparkles } from "lucide-react"
 import { Navbar } from "@/components/navbar"
 import { Footer } from "@/components/footer"
 import { CustomTeeEditor } from "@/components/custom-tee-editor"
+import { buildSeoMetadata, createBreadcrumbJsonLd } from "@/lib/seo"
+import { getAbsoluteUrl, SITE_URL } from "@/lib/site-url"
 
-export const metadata: Metadata = {
-  title: "Custom Lab - Personalizza la tua T-shirt",
-  alternates: { canonical: "/custom-lab" },
-  description: "Crea la tua T-shirt MIRAI personalizzata: scegli colore, taglia, lato di stampa, testo o grafica e visualizza il risultato in tempo reale.",
-  openGraph: {
-    title: "MIRAI Custom Lab - Crea la tua T-shirt",
-    description: "Disegna online la tua T-shirt streetwear personalizzata e ordinala direttamente dal MIRAI Custom Lab.",
-  },
-}
+const CUSTOM_LAB_DESCRIPTION =
+  "Crea t-shirt personalizzate online con MIRAI Custom Lab: scegli colore e taglia, aggiungi una foto, una scritta o una grafica e guarda l'anteprima."
+
+export const metadata = buildSeoMetadata({
+  title: "T-shirt personalizzate online | Custom Lab",
+  description: CUSTOM_LAB_DESCRIPTION,
+  path: "/custom-lab",
+  keywords: [
+    "t-shirt personalizzate online",
+    "crea t-shirt personalizzata online",
+    "maglietta personalizzata con foto",
+    "maglietta personalizzata con scritta",
+    "t-shirt custom premium",
+    "t-shirt personalizzata streetwear",
+    "personalizzare t-shirt online",
+    "t-shirt personalizzate Catania",
+    "MIRAI Custom Lab",
+  ],
+})
 
 const PROCESS = [
   {
@@ -36,9 +47,66 @@ const PROCESS = [
   },
 ]
 
+const FAQS = [
+  {
+    question: "Come posso creare la mia t-shirt online?",
+    answer: "Scegli colore e taglia, seleziona fronte o retro e aggiungi una scritta oppure carica la tua grafica. L'editor mostra un'anteprima prima dell'ordine.",
+  },
+  {
+    question: "Posso usare una foto o una scritta?",
+    answer: "Sì. Puoi creare una maglietta personalizzata con foto, grafica o testo. Usa un file nitido e controlla bene ortografia, contrasto e posizione.",
+  },
+  {
+    question: "Il progetto viene controllato prima della stampa?",
+    answer: "Sì. Il team MIRAI verifica qualità del file, posizione e fattibilità. Se qualcosa non è adatto alla produzione, ti contattiamo prima di procedere.",
+  },
+  {
+    question: "Il servizio è disponibile anche a Catania?",
+    answer: "Puoi ordinare online da tutta Italia. MIRAI nasce a Catania e il futuro MIRAI LAB STORE di Via Umberto 95 ospiterà anche la custom culture del brand.",
+  },
+]
+
+const customLabJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Service",
+  "@id": `${SITE_URL}/custom-lab#service`,
+  name: "MIRAI Custom Lab - T-shirt personalizzate online",
+  description: CUSTOM_LAB_DESCRIPTION,
+  url: getAbsoluteUrl("/custom-lab"),
+  serviceType: "Personalizzazione premium di t-shirt streetwear",
+  provider: { "@id": `${SITE_URL}/#organization` },
+  areaServed: { "@type": "Country", name: "Italia" },
+  availableChannel: {
+    "@type": "ServiceChannel",
+    serviceUrl: getAbsoluteUrl("/custom-lab"),
+    availableLanguage: "Italian",
+  },
+}
+
+const customLabFaqJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: FAQS.map((item) => ({
+    "@type": "Question",
+    name: item.question,
+    acceptedAnswer: { "@type": "Answer", text: item.answer },
+  })),
+}
+
 export default function CustomLabPage() {
   return (
     <main className="min-h-screen overflow-hidden bg-[#09070d] text-white">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(customLabJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(customLabFaqJsonLd) }} />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(createBreadcrumbJsonLd([
+            { name: "Home", path: "/" },
+            { name: "MIRAI Custom Lab", path: "/custom-lab" },
+          ])),
+        }}
+      />
       <Navbar />
 
       <section className="relative px-5 pb-16 pt-36 sm:px-6 sm:pt-40 lg:pb-20">
@@ -52,8 +120,8 @@ export default function CustomLabPage() {
                 <WandSparkles className="h-3.5 w-3.5" /> MIRAI Custom Lab
               </div>
               <h1 className="max-w-2xl font-bold uppercase leading-[0.9] tracking-[-0.055em] text-white" style={{ fontFamily: "var(--font-space-grotesk)" }}>
-                <span className="block text-[clamp(2.45rem,6.5vw,4.75rem)]">Make it</span>
-                <span className="block bg-gradient-to-r from-[#c7b8ff] via-primary to-[#d54dff] bg-clip-text text-[clamp(2.45rem,6.5vw,4.75rem)] text-transparent drop-shadow-[0_0_24px_rgba(145,90,255,0.2)]">yours.</span>
+                <span className="block text-[clamp(2.45rem,6.5vw,4.75rem)]">Crea la tua </span>
+                <span className="block bg-gradient-to-r from-[#c7b8ff] via-primary to-[#d54dff] bg-clip-text text-[clamp(2.45rem,6.5vw,4.75rem)] text-transparent drop-shadow-[0_0_24px_rgba(145,90,255,0.2)]">T-shirt online.</span>
               </h1>
             </div>
             <div className="pb-2 lg:pb-3">
@@ -111,6 +179,31 @@ export default function CustomLabPage() {
               Hai un progetto speciale? Parliamone
             </Link>
           </div>
+        </div>
+      </section>
+
+      <section className="border-b border-white/10 bg-[#0b0910] px-6 py-20">
+        <div className="mx-auto max-w-5xl">
+          <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-primary">MIRAI Custom Lab</p>
+          <h2 className="mt-4 max-w-3xl font-[family-name:var(--font-space-grotesk)] text-2xl font-bold uppercase tracking-[-0.035em] sm:text-4xl">
+            T-shirt personalizzate online: domande frequenti
+          </h2>
+          <p className="mt-5 max-w-3xl text-sm leading-7 text-white/50">
+            Un servizio di customizzazione pensato per creare un pezzo streetwear personale, non una stampa anonima in grandi quantità.
+          </p>
+          <div className="mt-10 divide-y divide-white/10 border-y border-white/10">
+            {FAQS.map((item) => (
+              <details key={item.question} className="group py-5">
+                <summary className="cursor-pointer list-none pr-8 text-sm font-semibold text-white marker:hidden sm:text-base">
+                  {item.question}
+                </summary>
+                <p className="mt-3 max-w-3xl text-sm leading-6 text-white/45">{item.answer}</p>
+              </details>
+            ))}
+          </div>
+          <Link href="/guide/come-personalizzare-t-shirt" className="mt-8 inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.18em] text-primary transition-colors hover:text-white">
+            Leggi la guida alla personalizzazione <Sparkles className="h-4 w-4" />
+          </Link>
         </div>
       </section>
 

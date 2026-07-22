@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } fro
 import { loadStripe } from "@stripe/stripe-js"
 import { EmbeddedCheckoutProvider, EmbeddedCheckout } from "@stripe/react-stripe-js"
 import Link from "next/link"
-import { AlertCircle, ArrowLeft, Banknote, CreditCard, LoaderCircle, Mail, RefreshCw, ShoppingBag, UserPlus } from "lucide-react"
+import { AlertCircle, ArrowLeft, Banknote, CreditCard, LoaderCircle, LockKeyhole, Mail, RefreshCw, ShoppingBag, UserPlus } from "lucide-react"
 import { useCart } from "@/lib/cart-context"
 import { useLanguage } from "@/lib/language-context"
 import { createCashOnDeliveryOrder, createCheckoutSession } from "@/app/actions/stripe"
@@ -30,10 +30,11 @@ export default function CheckoutPage() {
   const [cashError, setCashError] = useState<string | null>(null)
   const [cashSubmitting, setCashSubmitting] = useState(false)
   const [cardError, setCardError] = useState<string | null>(null)
-  const [cardLoading, setCardLoading] = useState(false)
-  const [cardAttempt, setCardAttempt] = useState(0)
-  const sessionIdRef = useRef<string | null>(null)
-  const checkoutSessionRef = useRef<{ key: string; promise: Promise<string> } | null>(null)
+const [cardSubmitting, setCardSubmitting] = useState(false)
+const [cardLoading, setCardLoading] = useState(false)
+const [cardAttempt, setCardAttempt] = useState(0)
+const sessionIdRef = useRef<string | null>(null)
+const checkoutSessionRef = useRef<{ key: string; promise: Promise<string> } | null>(null)
 
   useEffect(() => {
     let active = true
@@ -46,13 +47,13 @@ export default function CheckoutPage() {
     }
   }, [])
 
-  const cartLineItems = useMemo(() => items.map((item) => ({
-      productId: item.productId,
-      quantity: item.quantity,
-      size: item.size,
-      lineId: item.lineId,
-      customization: item.customization,
-    })), [items])
+const cartLineItems = useMemo(() => items.map((item) => ({
+    productId: item.productId,
+    quantity: item.quantity,
+    size: item.size,
+    lineId: item.lineId,
+    customization: item.customization,
+  })), [items])
 
   const checkoutKey = useMemo(
     () => JSON.stringify({ cartLineItems, email: isAuthenticated ? null : guestEmail.trim().toLowerCase() }),
@@ -91,7 +92,6 @@ export default function CheckoutPage() {
     setCardError(null)
     setCardAttempt((attempt) => attempt + 1)
   }
-
   const beginGuestCheckout = () => {
     if (!emailPattern.test(guestEmail.trim())) {
       setGuestError("Inserisci un indirizzo email valido per ricevere la conferma ordine.")
@@ -100,6 +100,33 @@ export default function CheckoutPage() {
 
     setGuestError(null)
     setGuestCheckoutReady(true)
+  }
+
+  const beginCardCheckout = async () => {
+    setCardError(null)
+    setCardSubmitting(true)
+
+    try {
+      const session = await createCheckoutSession(
+        items.map((item) => ({
+          productId: item.productId,
+          quantity: item.quantity,
+          size: item.size,
+          lineId: item.lineId,
+          customization: item.customization,
+        })),
+        isAuthenticated ? undefined : guestEmail
+      )
+
+      if (!session?.checkoutUrl) {
+        throw new Error(t.checkout.error)
+      }
+
+      window.location.assign(session.checkoutUrl)
+    } catch (error) {
+      setCardError(error instanceof Error ? error.message : t.checkout.error)
+      setCardSubmitting(false)
+    }
   }
 
   const completeCashOnDelivery = async (event: FormEvent<HTMLFormElement>) => {
@@ -260,51 +287,78 @@ export default function CheckoutPage() {
             </section>
 
             {paymentMethod === "card" ? (
-              <div className="relative min-h-[400px] border border-border bg-card p-1">
-                {!stripePromise ? (
-                  <div className="flex min-h-[398px] flex-col items-center justify-center px-6 text-center" role="alert">
-                    <AlertCircle className="h-8 w-8 text-destructive" />
-                    <h2 className="mt-4 font-semibold text-foreground">Pagamento con carta non disponibile</h2>
-                    <p className="mt-2 max-w-md text-sm leading-6 text-muted-foreground">La chiave pubblica Stripe non è configurata. Puoi scegliere il contrassegno oppure contattare l'assistenza.</p>
+<section className="border border-border bg-card p-6 sm:p-8">
+                <div className="flex items-start gap-3">
+                  <CreditCard className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
+                  <div>
+                    <h2 className="font-semibold text-foreground">Pagamento sicuro con carta</h2>
+                    <p className="mt-1 text-sm leading-6 text-muted-foreground">
+                      Continua sul checkout protetto di Stripe per inserire i dati della carta e l'indirizzo di spedizione.
+                    </p>
                   </div>
-                ) : (
-                  <EmbeddedCheckoutProvider
-                    key={`${checkoutKey}:${cardAttempt}`}
-                    stripe={stripePromise}
-                    options={{
-                      fetchClientSecret,
-                      onComplete: () => {
-                        clearCart()
-                        const sessionId = sessionIdRef.current
-                        window.location.assign(sessionId ? `/success?session_id=${encodeURIComponent(sessionId)}` : "/success")
-                      },
-                    }}
-                  >
-                    <EmbeddedCheckout />
-                  </EmbeddedCheckoutProvider>
-                )}
+                </div>
 
-                {cardLoading && !cardError && stripePromise && (
-                  <div className="pointer-events-none absolute inset-x-0 top-0 flex items-center justify-center gap-2 bg-card/95 px-4 py-3 text-sm text-muted-foreground" role="status">
-                    <LoaderCircle className="h-4 w-4 animate-spin" /> Preparazione pagamento sicuro...
-                  </div>
-                )}
+                <div className="mt-6 flex items-center gap-3 border border-border bg-secondary/40 px-4 py-3 text-sm text-muted-foreground">
+                  <LockKeyhole className="h-4 w-4 shrink-0 text-primary" />
+                  <span>I dati della carta vengono gestiti direttamente da Stripe e non passano da MIRAI.</span>
+                </div>
 
-                {cardError && (
-                  <div className="absolute inset-x-4 top-4 z-10 border border-destructive/40 bg-background p-4 shadow-lg" role="alert">
-                    <div className="flex items-start gap-3">
-                      <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-destructive" />
-                      <div className="min-w-0 flex-1">
-                        <p className="font-semibold text-foreground">Impossibile caricare il pagamento</p>
-                        <p className="mt-1 text-sm leading-5 text-muted-foreground">{cardError}</p>
-                      </div>
+                <div className="relative min-h-[400px] border border-border bg-card p-1 mt-6">
+                  {!stripePromise ? (
+                    <div className="flex min-h-[398px] flex-col items-center justify-center px-6 text-center" role="alert">
+                      <AlertCircle className="h-8 w-8 text-destructive" />
+                      <h2 className="mt-4 font-semibold text-foreground">Pagamento con carta non disponibile</h2>
+                      <p className="mt-2 max-w-md text-sm leading-6 text-muted-foreground">La chiave pubblica Stripe non è configurata. Puoi scegliere il contrassegno oppure contattare l'assistenza.</p>
                     </div>
-                    <button type="button" onClick={retryCardCheckout} className="mt-4 inline-flex min-h-10 items-center gap-2 bg-primary px-4 text-xs font-bold uppercase tracking-widest text-primary-foreground">
-                      <RefreshCw className="h-4 w-4" /> Riprova
-                    </button>
-                  </div>
-                )}
-              </div>
+                  ) : (
+                    <EmbeddedCheckoutProvider
+                      key={`${checkoutKey}:${cardAttempt}`}
+                      stripe={stripePromise}
+                      options={{
+                        fetchClientSecret,
+                        onComplete: () => {
+                          clearCart()
+                          const sessionId = sessionIdRef.current
+                          window.location.assign(sessionId ? `/success?session_id=${encodeURIComponent(sessionId)}` : "/success")
+                        },
+                      }}
+                    >
+                      <EmbeddedCheckout />
+                    </EmbeddedCheckoutProvider>
+                  )}
+
+                  {cardLoading && !cardError && stripePromise && (
+                    <div className="pointer-events-none absolute inset-x-0 top-0 flex items-center justify-center gap-2 bg-card/95 px-4 py-3 text-sm text-muted-foreground" role="status">
+                      <LoaderCircle className="h-4 w-4 animate-spin" /> Preparazione pagamento sicuro...
+                    </div>
+                  )}
+
+                  {cardError && (
+                    <div className="absolute inset-x-4 top-4 z-10 border border-destructive/40 bg-background p-4 shadow-lg" role="alert">
+                      <div className="flex items-start gap-3">
+                        <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-destructive" />
+                        <div className="min-w-0 flex-1">
+                          <p className="font-semibold text-foreground">Impossibile caricare il pagamento</p>
+                          <p className="mt-1 text-sm leading-5 text-muted-foreground">{cardError}</p>
+                        </div>
+                      </div>
+                      <button type="button" onClick={retryCardCheckout} className="mt-4 inline-flex min-h-10 items-center gap-2 bg-primary px-4 text-xs font-bold uppercase tracking-widest text-primary-foreground">
+                        <RefreshCw className="h-4 w-4" /> Riprova
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+                <button
+                  type="button"
+                  onClick={beginCardCheckout}
+                  disabled={cardSubmitting}
+                  className="mt-7 flex min-h-12 w-full items-center justify-center gap-2 bg-primary px-5 py-3 text-xs font-bold uppercase tracking-widest text-primary-foreground transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  {cardSubmitting ? <LoaderCircle className="h-4 w-4 animate-spin" /> : <LockKeyhole className="h-4 w-4" />}
+                  {cardSubmitting ? "Apertura pagamento..." : "Paga con carta"}
+                </button>
+              </section>
             ) : (
               <form onSubmit={completeCashOnDelivery} className="border border-border bg-card p-6 sm:p-8">
                 <div className="flex items-start gap-3">

@@ -8,11 +8,16 @@ import { notFound } from "next/navigation"
 import { withDemoProducts, type StoreProduct } from "@/lib/products"
 import { getAbsoluteUrl } from "@/lib/site-url"
 import type { SupabaseClient } from "@supabase/supabase-js"
+import { CategorySeoContent } from "@/components/seo-content"
+import { buildSeoMetadata, createBreadcrumbJsonLd, createWebPageJsonLd, getCategorySeo } from "@/lib/seo"
 
 const STATIC_CATEGORY_NAMES: Record<string, string> = {
   "t-shirt": "T-Shirt",
+  cappelli: "Cappelli",
   camicie: "Camicie",
   pantaloni: "Pantaloni e Bermuda",
+  bermuda: "Bermuda",
+  shorts: "Shorts e Bermuda",
 }
 
 // Builds a virtual category for slugs that exist as product categories but don't
@@ -24,14 +29,14 @@ async function getStaticCategory(slug: string, supabase: SupabaseClient) {
     .eq("category", slug)
     .limit(1)
     .maybeSingle()
-  if (!matchingProduct) return null
+  if (!matchingProduct && !STATIC_CATEGORY_NAMES[slug]) return null
 
   return {
     id: `static-${slug}`,
     name: STATIC_CATEGORY_NAMES[slug] || slug.replace(/-/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase()),
     slug,
     description: `Scopri i nuovi capi ${STATIC_CATEGORY_NAMES[slug] || slug} disponibili su MIRAI LAB STORE.`,
-    image_url: matchingProduct.image_url,
+    image_url: matchingProduct?.image_url || null,
     parent_id: null,
     sort_order: 99,
   }
@@ -49,18 +54,23 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
   if (!category) category = await getStaticCategory(slug, supabase)
 
-  if (!category) return { title: "Collezione non trovata" }
+  const seo = getCategorySeo(slug)
 
-  return {
-    title: `${category.name} - Collezione`,
-    description: category.description || `Scopri la collezione ${category.name} su MIRAI. Pezzi esclusivi di streetwear e accessori custom.`,
-    alternates: { canonical: `/collezione/${encodeURIComponent(slug)}` },
-    openGraph: {
-      title: `${category.name} - Collezione MIRAI`,
-      description: category.description || `Collezione ${category.name} di MIRAI.`,
-      images: category.image_url ? [{ url: getAbsoluteUrl(category.image_url), alt: category.name }] : undefined,
-    },
-  }
+  if (!category && !seo) return { title: "Collezione non trovata", robots: { index: false, follow: true } }
+
+  const categoryName = category?.name || STATIC_CATEGORY_NAMES[slug] || slug
+  const description = seo?.description
+    || category?.description
+    || `Scopri la collezione ${categoryName} su MIRAI. Pezzi esclusivi di streetwear e accessori custom.`
+  const title = seo?.title || `${categoryName} - Collezione`
+
+  return buildSeoMetadata({
+    title,
+    description,
+    path: `/collezione/${encodeURIComponent(slug)}`,
+    keywords: seo?.keywords || [categoryName, `${categoryName} streetwear`, "MIRAI streetwear"],
+    image: category?.image_url ? getAbsoluteUrl(category.image_url) : undefined,
+  })
 }
 
 export default async function CollezionePage({ params }: { params: Promise<{ slug: string }> }) {
@@ -92,6 +102,8 @@ export default async function CollezionePage({ params }: { params: Promise<{ slu
   if (!category) {
     notFound()
   }
+
+  const seo = getCategorySeo(slug)
 
   const isParent = category.parent_id === null
 
@@ -135,6 +147,27 @@ export default async function CollezionePage({ params }: { params: Promise<{ slu
 
   return (
     <main className="min-h-screen bg-background">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(createWebPageJsonLd({
+            type: "CollectionPage",
+            name: seo?.title || category.name,
+            description: seo?.description || category.description || `Collezione ${category.name} MIRAI.`,
+            path: `/collezione/${encodeURIComponent(slug)}`,
+          })),
+        }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(createBreadcrumbJsonLd([
+            { name: "Home", path: "/" },
+            { name: "Collezioni", path: "/collezioni" },
+            { name: category.name, path: `/collezione/${encodeURIComponent(slug)}` },
+          ])),
+        }}
+      />
       <Navbar />
       <Suspense fallback={<div className="pt-24 min-h-screen" />}>
         <CollectionProducts
@@ -145,6 +178,7 @@ export default async function CollezionePage({ params }: { params: Promise<{ slu
           isParent={isParent}
         />
       </Suspense>
+      {seo && <CategorySeoContent seo={seo} />}
       <Footer />
     </main>
   )

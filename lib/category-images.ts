@@ -24,6 +24,12 @@ const CATEGORY_IMAGES: Record<string, string> = {
   "t-shirts": "/images/categories/t-shirt.jpeg",
   tshirt: "/images/categories/t-shirt.jpeg",
   magliette: "/images/categories/t-shirt.jpeg",
+  cappelli: "/images/cap-ny-red-crystal.jpg",
+  headwear: "/images/cap-ny-red-crystal.jpg",
+  caps: "/images/cap-ny-red-crystal.jpg",
+  hats: "/images/cap-ny-red-crystal.jpg",
+  camicie: "/images/collection-apparel.jpg",
+  shirts: "/images/collection-apparel.jpg",
   "tee-e-short": "/images/categories/tee-e-short.jpeg",
   "tee-e-shorts": "/images/categories/tee-e-short.jpeg",
   "tee-short": "/images/categories/tee-e-short.jpeg",
@@ -48,6 +54,10 @@ const CONTAINED_CATEGORY_SLUGS = new Set([
   "t-shirts",
   "tshirt",
   "magliette",
+  "cappelli",
+  "headwear",
+  "caps",
+  "hats",
 ])
 
 export function getCategoryImage(slug: string, databaseImage: string | null) {

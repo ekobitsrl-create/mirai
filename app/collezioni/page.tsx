@@ -1,21 +1,29 @@
-import type { Metadata } from "next"
 import { createClient } from "@/lib/supabase/server"
 import { Navbar } from "@/components/navbar"
 import { Footer } from "@/components/footer"
 import { ShopGrid } from "@/components/shop-grid"
 import { withDemoProducts } from "@/lib/products"
+import { CatalogSeoContent } from "@/components/seo-content"
+import { buildSeoMetadata, createWebPageJsonLd } from "@/lib/seo"
 
 export const dynamic = "force-dynamic"
 
-export const metadata: Metadata = {
-  title: "Collezioni",
-  description: "Esplora tutte le collezioni MIRAI: streetwear, cappelli custom New Era, accessori esclusivi. Pezzi unici fatti a mano con cristalli e borchie.",
-  openGraph: {
-    title: "Collezioni MIRAI - Streetwear & Cappelli Custom",
-    description: "Esplora tutte le collezioni MIRAI. Streetwear esclusivo e cappelli custom.",
-  },
-  alternates: { canonical: "/collezioni" },
-}
+const COLLECTIONS_DESCRIPTION =
+  "Acquista abbigliamento streetwear online: t-shirt oversize, camicie, bermuda, cappelli custom e selezioni urban uomo MIRAI."
+
+export const metadata = buildSeoMetadata({
+  title: "Abbigliamento streetwear online",
+  description: COLLECTIONS_DESCRIPTION,
+  path: "/collezioni",
+  keywords: [
+    "abbigliamento streetwear online",
+    "shop streetwear italiano",
+    "abbigliamento urban uomo",
+    "streetwear premium online",
+    "concept store streetwear",
+    "abbigliamento oversize uomo",
+  ],
+})
 
 export default async function CollezioniPage() {
   const supabase = await createClient()
@@ -34,12 +42,24 @@ export default async function CollezioniPage() {
 
   return (
     <main className="min-h-screen bg-background">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(createWebPageJsonLd({
+            type: "CollectionPage",
+            name: "Abbigliamento streetwear online",
+            description: COLLECTIONS_DESCRIPTION,
+            path: "/collezioni",
+          })),
+        }}
+      />
       <Navbar />
       <ShopGrid
         products={products}
         parentCategories={parentCategories}
         subcategories={subcategories}
       />
+      <CatalogSeoContent />
       <Footer />
     </main>
   )

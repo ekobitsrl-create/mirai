@@ -2,6 +2,7 @@ import type { MetadataRoute } from "next"
 import { createClient } from "@/lib/supabase/server"
 import { isPrivateCheckoutProduct, withoutBlackIslandProducts } from "@/lib/products"
 import { SITE_URL } from "@/lib/site-url"
+import { SEO_GUIDES } from "@/lib/seo-guides"
 
 export const dynamic = "force-dynamic"
 
@@ -30,16 +31,29 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const productUrls: MetadataRoute.Sitemap = visibleDatabaseProducts.map((p) => ({
     url: `${SITE_URL}/prodotto/${encodeURIComponent(p.id)}`,
-    lastModified: p.updated_at || new Date().toISOString(),
+    lastModified: p.updated_at || "2026-07-21",
     changeFrequency: "weekly" as const,
     priority: 0.8,
   }))
 
-  const categoryUrls: MetadataRoute.Sitemap = categories.map((c) => ({
-    url: `${SITE_URL}/collezione/${encodeURIComponent(c.slug)}`,
-    lastModified: c.updated_at || new Date().toISOString(),
+  const priorityCategorySlugs = ["abbigliamento", "t-shirt", "cappelli", "camicie", "pantaloni"]
+  const categoryMap = new Map(categories.map((category) => [category.slug, category.updated_at]))
+  priorityCategorySlugs.forEach((slug) => {
+    if (!categoryMap.has(slug)) categoryMap.set(slug, null)
+  })
+
+  const categoryUrls: MetadataRoute.Sitemap = [...categoryMap.entries()].map(([slug, updatedAt]) => ({
+    url: `${SITE_URL}/collezione/${encodeURIComponent(slug)}`,
+    lastModified: updatedAt || "2026-07-21",
     changeFrequency: "weekly" as const,
-    priority: 0.7,
+    priority: priorityCategorySlugs.includes(slug) ? 0.8 : 0.7,
+  }))
+
+  const guideUrls: MetadataRoute.Sitemap = SEO_GUIDES.map((guide) => ({
+    url: `${SITE_URL}/guide/${guide.slug}`,
+    lastModified: guide.updatedAt,
+    changeFrequency: "monthly" as const,
+    priority: 0.65,
   }))
 
   const staticPages: MetadataRoute.Sitemap = [
@@ -57,6 +71,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       url: `${SITE_URL}/custom-lab`,
       changeFrequency: "weekly",
       priority: 0.9,
+    },
+    {
+      url: `${SITE_URL}/guide`,
+      lastModified: "2026-07-21",
+      changeFrequency: "weekly",
+      priority: 0.75,
     },
     {
       url: `${SITE_URL}/negozio`,
@@ -99,11 +119,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.2,
     },
     {
+      url: `${SITE_URL}/cookie-policy`,
+      changeFrequency: "yearly",
+      priority: 0.2,
+    },
+    {
       url: `${SITE_URL}/termini`,
       changeFrequency: "yearly",
       priority: 0.2,
     },
   ]
 
-  return [...staticPages, ...categoryUrls, ...productUrls]
+  return [...staticPages, ...categoryUrls, ...guideUrls, ...productUrls]
 }

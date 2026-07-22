@@ -1,4 +1,3 @@
-import type { Metadata } from "next"
 import { Navbar } from "@/components/navbar"
 
 import { Hero } from "@/components/hero"
@@ -9,18 +8,28 @@ import { Newsletter } from "@/components/newsletter"
 import { Footer } from "@/components/footer"
 import { createClient } from "@/lib/supabase/server"
 import { withDemoProducts } from "@/lib/products"
+import { HomeSeoContent } from "@/components/seo-content"
+import { buildSeoMetadata, createWebPageJsonLd } from "@/lib/seo"
 
 export const dynamic = "force-dynamic"
 
-export const metadata: Metadata = {
-  title: "MIRAI - Streetwear & Cappelli Custom | Moda Urbana Made in Italy",
-  description: "Scopri la collezione MIRAI: streetwear esclusivo, cappelli custom New Era con cristalli e borchie, pezzi unici fatti a mano. Spedizione gratuita.",
-  openGraph: {
-    title: "MIRAI - Streetwear & Cappelli Custom",
-    description: "Streetwear esclusivo e cappelli custom New Era. Pezzi unici fatti a mano. Made in Italy.",
-  },
-  alternates: { canonical: "/" },
-}
+const HOME_DESCRIPTION =
+  "MIRAI LAB STORE: streetwear a Catania e online. Scopri abbigliamento urban uomo, t-shirt oversize, cappelli custom e il Custom Lab."
+
+export const metadata = buildSeoMetadata({
+  title: "Streetwear Catania | MIRAI LAB STORE",
+  description: HOME_DESCRIPTION,
+  path: "/",
+  absoluteTitle: true,
+  keywords: [
+    "streetwear Catania",
+    "abbigliamento streetwear Catania",
+    "MIRAI Lab Store",
+    "MIRAI Concept Store",
+    "MIRAI streetwear",
+    "abbigliamento urban uomo",
+  ],
+})
 
 export default async function Home() {
   let products: any[] = []
@@ -41,11 +50,18 @@ export default async function Home() {
 
   return (
     <main className="min-h-screen bg-background">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(createWebPageJsonLd({ name: "Streetwear Catania - MIRAI LAB STORE", description: HOME_DESCRIPTION, path: "/" })),
+        }}
+      />
       <Navbar />
       <Hero />
       <Collections categories={categories} />
       <ProductGrid products={products} />
       <Features />
+      <HomeSeoContent />
       <Newsletter />
       <Footer />
     </main>
