@@ -229,10 +229,13 @@ function renderProductVariant(product: StoreProduct, size: string, baseUrl: stri
   const additionalImages = getAdditionalImages(product, baseUrl, primaryImage)
   const categoryKey = product.category.toLowerCase()
   const color = getColor(product)
-  const titleParts = [product.name, color, `Taglia ${size}`].filter(Boolean)
-  const title = titleParts.join(" - ")
-  const description = product.description || `${product.name} disponibile su MIRAI LAB STORE.`
   const supplierSettings = getProductSupplierSettings(product)
+  const merchantProductName = supplierSettings.profile === "mirai"
+    ? product.name.replace(/^MIRAI\s+/i, "").trim()
+    : product.name
+  const titleParts = [merchantProductName, color, `Taglia ${size}`].filter(Boolean)
+  const title = titleParts.join(" - ")
+  const description = product.description || `${merchantProductName} disponibile su MIRAI LAB STORE.`
   const brand = supplierSettings.brand
   const itemGroupId = getItemGroupId(product)
   const productType = PRODUCT_TYPE_BY_STORE_CATEGORY[categoryKey] || `Abbigliamento > ${product.category}`
@@ -258,7 +261,7 @@ function renderProductVariant(product: StoreProduct, size: string, baseUrl: stri
     `      <g:google_product_category>${googleCategory}</g:google_product_category>`,
     `      <g:product_type>${escapeXml(productType)}</g:product_type>`,
     `      <g:item_group_id>${escapeXml(itemGroupId)}</g:item_group_id>`,
-    `      <g:item_group_title>${escapeXml(product.name)}</g:item_group_title>`,
+    `      <g:item_group_title>${escapeXml(merchantProductName)}</g:item_group_title>`,
     `      <g:size>${escapeXml(size)}</g:size>`,
     `      <g:size_system>${isHeadwear ? "US" : "EU"}</g:size_system>`,
     isHeadwear ? "" : "      <g:size_type>regular</g:size_type>",
