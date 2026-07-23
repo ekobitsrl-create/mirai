@@ -9,7 +9,7 @@ export type MiraiSupplierCatalogProduct = {
   stock_by_size: Record<string, number>
   in_stock: boolean
   is_new: boolean
-  brand: "MIRAI"
+  brand: "MIRAI" | "Minimal"
   supplier_sku: string
   color_name: string
   color_hex: string | null
@@ -934,7 +934,7 @@ const MIRAI_SUPPLIER_CATALOG_BASE = [
     "stock_by_size": { "XS": 10, "S": 10, "M": 10, "L": 10, "XL": 10, "XXL": 10 },
     "in_stock": true,
     "is_new": true,
-    "brand": "MIRAI",
+    "brand": "Minimal",
     "supplier_sku": "MIRAI-SANTA-MADRE-033",
     "color_name": "Bianco",
     "color_hex": "#f4f2ee",
@@ -986,19 +986,23 @@ const DEFAULT_MIRAI_STOCK = { S: 10, M: 10, L: 10, XL: 10, XXL: 10 }
 // Products with a supplier-specific size run keep it; the rest use the
 // standard MIRAI apparel sizes. Stock is always tracked per size.
 export const MIRAI_SUPPLIER_CATALOG: readonly MiraiSupplierCatalogProduct[] =
-  MIRAI_SUPPLIER_CATALOG_BASE.map((product) => ({
-    ...product,
-    name: product.name.replace(/^MIRAI\s+/i, ""),
-    image_gallery: [...product.image_gallery],
-    sizes: product.sizes.length > 0 ? [...product.sizes] : [...DEFAULT_MIRAI_SIZES],
-    stock_by_size: Object.keys(product.stock_by_size).length > 0
-      ? { ...product.stock_by_size }
-      : { ...DEFAULT_MIRAI_STOCK },
-    in_stock: true,
-    detail_items: [...product.detail_items],
-    supplier_profile: "mirai" as const,
-    gtin: null,
-    shipping_min_days: 7,
-    shipping_max_days: 12,
-  }))
+  MIRAI_SUPPLIER_CATALOG_BASE.map((product) => {
+    const isMinimalProduct = product.brand === "Minimal"
+
+    return {
+      ...product,
+      name: product.name.replace(/^MIRAI\s+/i, ""),
+      image_gallery: [...product.image_gallery],
+      sizes: product.sizes.length > 0 ? [...product.sizes] : [...DEFAULT_MIRAI_SIZES],
+      stock_by_size: Object.keys(product.stock_by_size).length > 0
+        ? { ...product.stock_by_size }
+        : { ...DEFAULT_MIRAI_STOCK },
+      in_stock: true,
+      detail_items: [...product.detail_items],
+      supplier_profile: isMinimalProduct ? "minimal" as const : "mirai" as const,
+      gtin: null,
+      shipping_min_days: isMinimalProduct ? null : 7,
+      shipping_max_days: isMinimalProduct ? null : 12,
+    }
+  })
 
