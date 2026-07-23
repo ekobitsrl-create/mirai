@@ -796,7 +796,7 @@ export function MiraGuide() {
               alt=""
               fill
               sizes="96px"
-              className="scale-[1.45] select-none object-contain object-top"
+              className="origin-top scale-[1.45] select-none object-contain object-top"
               draggable={false}
             />
           </span>
