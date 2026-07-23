@@ -7,6 +7,7 @@ import { getStripeShippingOptions, SHIPPING_CONFIG } from '@/lib/shipping'
 import { SITE_URL } from '@/lib/site-url'
 import { applyOrderInventory } from '@/lib/orders/apply-order-inventory'
 import { getEstimatedDeliveryDate } from '@/lib/google-customer-reviews'
+import { getPremiumProductTitle } from '@/lib/product-titles'
 import {
   CUSTOM_TEE_PRODUCT_ID,
   customizationMetadata,
@@ -70,7 +71,10 @@ export async function createCheckoutSession(cartItems: CartLineItem[], guestEmai
   const demoProducts = productIds
     .map(getDemoProduct)
     .filter((product): product is StoreProduct => product !== null)
-  const checkoutProducts = [...(products || []), ...demoProducts]
+  const checkoutProducts = [...(products || []), ...demoProducts].map((product) => ({
+    ...product,
+    name: getPremiumProductTitle(product),
+  }))
 
   if (error && checkoutProducts.length === 0) throw new Error('Errore nel recupero dei prodotti')
 
@@ -216,7 +220,10 @@ export async function createCashOnDeliveryOrder(cartItems: CartLineItem[], detai
   const demoProducts = productIds
     .map(getDemoProduct)
     .filter((product): product is StoreProduct => product !== null)
-  const checkoutProducts = [...(products || []), ...demoProducts]
+  const checkoutProducts = [...(products || []), ...demoProducts].map((product) => ({
+    ...product,
+    name: getPremiumProductTitle(product),
+  }))
 
   if (error && checkoutProducts.length === 0) throw new Error('Errore nel recupero dei prodotti')
   if (checkoutProducts.some(isBlackIslandProduct)) {

@@ -10,6 +10,7 @@ import {
   customizationSummary,
   sanitizeCustomization,
 } from '@/lib/customization'
+import { getPremiumProductTitle } from '@/lib/product-titles'
 
 type CheckoutCartItem = {
   productId: string
@@ -138,7 +139,10 @@ export async function POST(request: NextRequest) {
     const demoProducts = productIds
       .map(getDemoProduct)
       .filter((product): product is StoreProduct => product !== null)
-    const checkoutProducts = [...(products || []), ...demoProducts]
+    const checkoutProducts = [...(products || []), ...demoProducts].map((product) => ({
+      ...product,
+      name: getPremiumProductTitle(product),
+    }))
 
     if (error && checkoutProducts.length === 0) {
       return NextResponse.json(
