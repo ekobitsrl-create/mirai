@@ -115,7 +115,7 @@ export function AdminProductTable({ products, categories = [] }: { products: Pro
     setFeedback(null)
     try {
       const result = await importMiraiSupplierCatalog()
-      const categoryMessage = result.categoryCreated ? " Categoria Canotte creata." : ""
+      const categoryMessage = result.categoryCreated ? " Categorie mancanti create." : " Immagini categoria aggiornate."
       setFeedback(
         `${result.inserted} prodotti MIRAI importati, ${result.skipped} già presenti su ${result.total}.${categoryMessage} `
         + "Taglie e quantità sono state applicate dal catalogo fornitore.",

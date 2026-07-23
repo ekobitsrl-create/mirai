@@ -1,6 +1,10 @@
 "use server"
 
-import { createUserClient, getServerUserWithProfile } from "@/lib/supabase/server"
+import {
+  createClient as createServerClient,
+  createUserClient,
+  getServerUserWithProfile,
+} from "@/lib/supabase/server"
 import { revalidatePath } from "next/cache"
 import { isBlackIslandProduct } from "@/lib/products"
 import { MIRAI_SUPPLIER_CATALOG } from "@/lib/mirai-supplier-catalog"
@@ -229,7 +233,8 @@ export async function normalizeAllProductTitles() {
 }
 
 export async function importMiraiSupplierCatalog() {
-  const { supabase } = await assertAdmin()
+  await assertAdmin()
+  const supabase = await createServerClient()
   const catalogSkus = MIRAI_SUPPLIER_CATALOG.map((product) => product.supplier_sku)
 
   const { data: existingProducts, error: existingProductsError } = await supabase
@@ -249,25 +254,44 @@ export async function importMiraiSupplierCatalog() {
   )
 
   let categoryCreated = false
-  if (missingProducts.some((product) => product.category === "canotte")) {
-    const { data: canotteCategory, error: canotteCategoryError } = await supabase
+  const catalogCategories = [
+    {
+      name: "Canotte",
+      slug: "canotte",
+      description: "Canotte e smanicati streetwear MIRAI.",
+      image_url: "/images/categories/canotte.webp",
+      sort_order: 35,
+    },
+    {
+      name: "Profumi",
+      slug: "profumi",
+      description: "Fragranze e profumi MIRAI.",
+      image_url: "/images/categories/profumi-genesi.webp",
+      sort_order: 55,
+    },
+  ]
+
+  for (const category of catalogCategories) {
+    const { data: existingCategory, error: existingCategoryError } = await supabase
       .from("categories")
-      .select("id")
-      .eq("slug", "canotte")
+      .select("id, image_url")
+      .eq("slug", category.slug)
       .maybeSingle()
 
-    if (canotteCategoryError) throw new Error(canotteCategoryError.message)
+    if (existingCategoryError) throw new Error(existingCategoryError.message)
 
-    if (!canotteCategory) {
-      const { error: createCategoryError } = await supabase.from("categories").insert({
-        name: "Canotte",
-        slug: "canotte",
-        description: "Canotte e smanicati streetwear MIRAI.",
-        sort_order: 35,
-      })
+    if (!existingCategory) {
+      const { error: createCategoryError } = await supabase.from("categories").insert(category)
 
       if (createCategoryError) throw new Error(createCategoryError.message)
       categoryCreated = true
+    } else if (existingCategory.image_url !== category.image_url) {
+      const { error: updateCategoryError } = await supabase
+        .from("categories")
+        .update({ image_url: category.image_url })
+        .eq("id", existingCategory.id)
+
+      if (updateCategoryError) throw new Error(updateCategoryError.message)
     }
   }
 

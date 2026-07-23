@@ -84,6 +84,7 @@ declare global {
 
 const VARIANT_STORAGE_KEY = "mirai-mira-variant-v1"
 const POSITION_STORAGE_KEY = "mirai-mira-position-v1"
+const MINIMIZED_STORAGE_KEY = "mirai-mira-minimized-v1"
 
 function getContextPrompt(pathname: string) {
   if (pathname.startsWith("/prodotto/")) return "Yo, dubbi su questo capo? Chiedimi pure."
@@ -205,6 +206,7 @@ export function MiraGuide() {
   const [showSelector, setShowSelector] = useState(false)
   const [showNudge, setShowNudge] = useState(false)
   const [expanded, setExpanded] = useState(false)
+  const [minimized, setMinimized] = useState(false)
   const [input, setInput] = useState("")
   const [reply, setReply] = useState<MiraReply>({ text: "Yo, dimmi pure. Che cosa cerchi?" })
   const [isThinking, setIsThinking] = useState(false)
@@ -261,6 +263,7 @@ export function MiraGuide() {
     try {
       const saved = window.localStorage.getItem(VARIANT_STORAGE_KEY)
       if (saved === "male" || saved === "female") savedVariant = saved
+      setMinimized(window.localStorage.getItem(MINIMIZED_STORAGE_KEY) === "true")
     } catch {
       // MIRA remains available when storage is blocked.
     }
@@ -328,7 +331,7 @@ export function MiraGuide() {
   }, [])
 
   useEffect(() => {
-    if (!variant || showSelector || expanded || isDragging) return
+    if (!variant || minimized || showSelector || expanded || isDragging) return
     setShowNudge(false)
     const revealTimer = window.setTimeout(() => setShowNudge(true), 1200)
     const hideTimer = window.setTimeout(() => setShowNudge(false), 7600)
@@ -336,11 +339,12 @@ export function MiraGuide() {
       window.clearTimeout(revealTimer)
       window.clearTimeout(hideTimer)
     }
-  }, [expanded, isDragging, pathname, showSelector, variant])
+  }, [expanded, isDragging, minimized, pathname, showSelector, variant])
 
   useEffect(() => {
     if (
       !variant
+      || minimized
       || showSelector
       || expanded
       || isDragging
@@ -362,7 +366,7 @@ export function MiraGuide() {
       window.clearTimeout(lookTimer)
       if (resetTimer) window.clearTimeout(resetTimer)
     }
-  }, [expanded, isDragging, isListening, isSpeaking, isThinking, pathname, showSelector, variant])
+  }, [expanded, isDragging, isListening, isSpeaking, isThinking, minimized, pathname, showSelector, variant])
 
   useEffect(() => {
     return () => {
@@ -409,6 +413,28 @@ export function MiraGuide() {
     setExpanded(false)
     setShowNudge(false)
     setShowSelector(true)
+  }
+
+  function setMiraMinimized(nextMinimized: boolean) {
+    if (nextMinimized) {
+      recognitionRef.current?.abort()
+      recognitionRef.current = null
+      requestAbortRef.current?.abort()
+      window.speechSynthesis?.cancel()
+      setIsListening(false)
+      setIsThinking(false)
+      setIsSpeaking(false)
+      setExpanded(false)
+      setShowNudge(false)
+      setShowSelector(false)
+    }
+
+    setMinimized(nextMinimized)
+    try {
+      window.localStorage.setItem(MINIMIZED_STORAGE_KEY, String(nextMinimized))
+    } catch {
+      // Keep the preference for the current visit when storage is unavailable.
+    }
   }
 
   function speakReply(text: string) {
@@ -700,6 +726,12 @@ export function MiraGuide() {
         : ambientCurious
           ? "curious"
           : "idle"
+  const peekOnRight = position.x + stageSize.width / 2 > viewportWidth / 2
+  const peekHeight = viewportWidth >= 768 ? 80 : 64
+  const peekTop = Math.min(
+    viewportHeight - peekHeight - 12,
+    Math.max(92, position.y + 8),
+  )
 
   return (
     <div className="mira-guide-root">
@@ -748,7 +780,32 @@ export function MiraGuide() {
         </div>
       )}
 
-      {variant && !showSelector && positionReady && (
+      {variant && !showSelector && positionReady && minimized && (
+        <button
+          type="button"
+          onClick={() => setMiraMinimized(false)}
+          className={`mira-peek ${peekOnRight ? "mira-peek-right" : "mira-peek-left"}`}
+          style={{ top: peekTop }}
+          aria-label="Mostra MIRA"
+          title="Mostra MIRA"
+        >
+          <span className="absolute inset-0 bg-[#120c19]/88 backdrop-blur-md" />
+          <span className="absolute left-1/2 top-0 h-40 w-20 -translate-x-1/2 md:h-48 md:w-24">
+            <Image
+              src={`/mascot/mira-${activeVariant}-speaking.webp`}
+              alt=""
+              fill
+              sizes="96px"
+              className="origin-top scale-[1.45] select-none object-contain object-top"
+              draggable={false}
+            />
+          </span>
+          <span className="absolute inset-x-0 bottom-0 h-4 bg-gradient-to-t from-[#120c19] to-transparent" />
+          <span className="sr-only">Riapri MIRA</span>
+        </button>
+      )}
+
+      {variant && !showSelector && positionReady && !minimized && (
         <aside
           ref={stageRef}
           className={`mira-presence ${isDragging ? "mira-is-dragging" : ""}`}
@@ -903,6 +960,16 @@ export function MiraGuide() {
             aria-label="Cambia avatar MIRA"
           >
             <UserRoundCog className="h-3.5 w-3.5" />
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setMiraMinimized(true)}
+            className="absolute -right-1 top-0 z-20 flex h-8 w-8 items-center justify-center rounded-full border border-white/15 bg-black/80 text-white/70 shadow-[0_0_18px_rgba(0,0,0,0.55)] backdrop-blur-md transition-all hover:border-primary/60 hover:bg-primary hover:text-primary-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+            aria-label="Nascondi MIRA sul bordo"
+            title="Nascondi MIRA"
+          >
+            <X className="h-4 w-4" />
           </button>
         </aside>
       )}
