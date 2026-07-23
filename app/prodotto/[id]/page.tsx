@@ -3,7 +3,14 @@ import { notFound } from "next/navigation"
 import { Navbar } from "@/components/navbar"
 import { Footer } from "@/components/footer"
 import { ProductDetail } from "@/components/product-detail"
-import { getDemoProduct, getProductSupplierSettings, isBlackIslandProduct, isPrivateCheckoutProduct, withoutBlackIslandProducts } from "@/lib/products"
+import {
+  getDemoProduct,
+  getProductSupplierSettings,
+  isBlackIslandProduct,
+  isPrivateCheckoutProduct,
+  mapProductRow,
+  withDemoProducts,
+} from "@/lib/products"
 import { getAbsoluteUrl, SITE_URL } from "@/lib/site-url"
 
 function absoluteProductImage(imageUrl: string | null | undefined) {
@@ -25,10 +32,10 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
     const supabase = await createClient()
     const { data } = await supabase
       .from("products")
-      .select("id, name, description, price, image_url, brand, supplier_sku, in_stock, stock_by_size")
+      .select("id, name, description, price, category, image_url, brand, supplier_sku, in_stock, stock_by_size, color_name")
       .eq("id", id)
       .single()
-    product = data
+    product = data ? mapProductRow(data) : null
   }
 
   if (!product || isBlackIslandProduct(product)) return { title: "Prodotto non trovato" }
@@ -69,7 +76,7 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
       .select("*")
       .eq("id", id)
       .single()
-    product = data
+    product = data ? mapProductRow(data) : null
   }
 
   if (!product || isBlackIslandProduct(product)) notFound()
@@ -83,7 +90,7 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
     .eq("in_stock", true)
     .limit(4)
 
-  const relatedProducts = withoutBlackIslandProducts(related || []).slice(0, 4)
+  const relatedProducts = withDemoProducts(related || []).slice(0, 4)
 
   // Resolve subcategory → parent category for breadcrumb
   const { data: subcat } = await supabase
