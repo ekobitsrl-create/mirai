@@ -86,7 +86,7 @@ export function CollectionProducts({
   return (
     <div className="pt-24">
       {/* Hero banner */}
-      <section className="mirai-neon-divider relative flex h-[48svh] min-h-[360px] max-h-[620px] items-end overflow-hidden bg-secondary/20 md:h-[55vh] md:min-h-[420px]">
+      <section className="mirai-neon-divider relative flex h-[48svh] min-h-[360px] max-h-[620px] items-end overflow-hidden bg-secondary/20 md:h-[65vh] md:min-h-[520px]">
         <div className="mirai-aurora-orb left-1/2 top-1/2 h-[28rem] w-[28rem] -translate-x-1/2 -translate-y-1/2" />
         <div className="absolute inset-0 overflow-hidden bg-black/35">
           <Image
@@ -94,7 +94,7 @@ export function CollectionProducts({
             alt=""
             aria-hidden="true"
             fill
-            className="scale-110 object-cover opacity-35 blur-2xl"
+            className="scale-105 object-cover opacity-45 blur-xl"
             sizes="100vw"
           />
           <Image
@@ -106,7 +106,7 @@ export function CollectionProducts({
             priority
           />
         </div>
-        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/30 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent" />
         <div className="relative z-10 max-w-7xl w-full mx-auto px-6 pb-10">
           <Link
             href="/collezioni"
