@@ -3,6 +3,8 @@ import type Stripe from 'stripe'
 import { assertStripeConfigured, stripe } from '@/lib/stripe'
 import { getServerUser } from '@/lib/supabase/server'
 import { saveStripeOrder } from '@/lib/orders/save-stripe-order'
+import { getEstimatedDeliveryDate } from '@/lib/google-customer-reviews'
+import { SHIPPING_CONFIG } from '@/lib/shipping'
 
 function formatAddress(address: Stripe.Address | null | undefined) {
   if (!address) return null
@@ -48,6 +50,10 @@ export async function GET(request: NextRequest) {
       email: session.customer_details?.email || session.customer_email || user?.email || '',
       amountTotal: (session.amount_total || 0) / 100,
       currency: session.currency || 'eur',
+      estimatedDeliveryDate: getEstimatedDeliveryDate(
+        SHIPPING_CONFIG.standardDeliveryDays.maximum,
+        new Date(session.created * 1000),
+      ),
       shipping: shippingDetails
         ? {
             name: shippingDetails.name || null,

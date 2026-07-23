@@ -7,12 +7,19 @@ import { AlertCircle, ArrowRight, CheckCircle2, Package } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Spinner } from "@/components/ui/spinner"
 import { useCart } from "@/lib/cart-context"
+import { GoogleCustomerReviewsOptIn } from "@/components/google-customer-reviews-opt-in"
+import {
+  getGoogleReviewStorageKey,
+  isGoogleCustomerReviewOrder,
+  type GoogleCustomerReviewOrder,
+} from "@/lib/google-customer-reviews"
 
 type OrderSummary = {
   id: string
   email: string
   amountTotal: number
   currency: string
+  estimatedDeliveryDate: string
   shipping: {
     name: string | null
     address: string | null
@@ -38,10 +45,26 @@ function SuccessContent() {
   const isCashOnDelivery = paymentMethod === "cash_on_delivery"
   const { clearCart } = useCart()
   const [order, setOrder] = useState<OrderSummary | null>(null)
+  const [reviewOrder, setReviewOrder] = useState<GoogleCustomerReviewOrder | null>(null)
   const [status, setStatus] = useState<"loading" | "pending" | "error" | "success" | "cash_on_delivery">("loading")
 
   useEffect(() => {
     if (isCashOnDelivery) {
+      if (orderId) {
+        try {
+          const storageKey = getGoogleReviewStorageKey(orderId)
+          const storedOrder = window.sessionStorage.getItem(storageKey)
+          if (storedOrder) {
+            const parsedOrder: unknown = JSON.parse(storedOrder)
+            if (isGoogleCustomerReviewOrder(parsedOrder) && parsedOrder.orderId === orderId) {
+              setReviewOrder(parsedOrder)
+            }
+            window.sessionStorage.removeItem(storageKey)
+          }
+        } catch {
+          // La conferma resta disponibile se lo storage e bloccato o non valido.
+        }
+      }
       clearCart()
       setStatus("cash_on_delivery")
       return
@@ -111,6 +134,7 @@ function SuccessContent() {
             Pagherai al corriere al momento della consegna. Il tuo ordine e ora in attesa di conferma.
           </p>
           {orderId && <p className="mt-5 font-mono text-sm text-foreground">#{orderId.slice(-8).toUpperCase()}</p>}
+          {reviewOrder && <GoogleCustomerReviewsOptIn order={reviewOrder} />}
           <div className="mt-7 grid gap-3 sm:grid-cols-2">
             <Link href="/account" className="inline-flex">
               <Button className="w-full">I miei ordini</Button>
@@ -147,6 +171,16 @@ function SuccessContent() {
 
   return (
     <main className="min-h-screen bg-background px-6 py-16">
+      {order.email && order.shipping?.country && (
+        <GoogleCustomerReviewsOptIn
+          order={{
+            orderId: order.id,
+            email: order.email,
+            deliveryCountry: order.shipping.country,
+            estimatedDeliveryDate: order.estimatedDeliveryDate,
+          }}
+        />
+      )}
       <section className="mx-auto w-full max-w-2xl">
         <div className="text-center">
           <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-green-500/10 text-green-500">

@@ -6,6 +6,7 @@ import { getDemoProduct, isBlackIslandProduct, type StoreProduct } from '@/lib/p
 import { getStripeShippingOptions, SHIPPING_CONFIG } from '@/lib/shipping'
 import { SITE_URL } from '@/lib/site-url'
 import { applyOrderInventory } from '@/lib/orders/apply-order-inventory'
+import { getEstimatedDeliveryDate } from '@/lib/google-customer-reviews'
 import {
   CUSTOM_TEE_PRODUCT_ID,
   customizationMetadata,
@@ -299,5 +300,13 @@ export async function createCashOnDeliveryOrder(cartItems: CartLineItem[], detai
     throw new Error('Ordine registrato, ma la disponibilita del catalogo non e stata aggiornata')
   }
 
-  return { orderId: order.id }
+  return {
+    orderId: order.id,
+    review: {
+      orderId: order.id,
+      email: customerEmail,
+      deliveryCountry: 'IT',
+      estimatedDeliveryDate: getEstimatedDeliveryDate(SHIPPING_CONFIG.standardDeliveryDays.maximum),
+    },
+  }
 }
