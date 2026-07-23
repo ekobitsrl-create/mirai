@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next'
 import { Inter, Space_Grotesk } from 'next/font/google'
+import Script from 'next/script'
 import { Analytics } from '@vercel/analytics/next'
 import { CartProvider } from '@/lib/cart-context'
 import { LanguageProvider } from '@/lib/language-context'
@@ -101,6 +102,19 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="it" data-scroll-behavior="smooth">
+      <head>
+        <Script id="google-consent-default" strategy="beforeInteractive">
+          {`window.dataLayer = window.dataLayer || [];
+window.gtag = window.gtag || function(){window.dataLayer.push(arguments);};
+window.gtag('consent', 'default', {
+  analytics_storage: 'denied',
+  ad_storage: 'denied',
+  ad_user_data: 'denied',
+  ad_personalization: 'denied',
+  wait_for_update: 500
+});`}
+        </Script>
+      </head>
       <body className={`${inter.variable} ${spaceGrotesk.variable} font-sans antialiased`}>
         <GoogleIntegrations />
         <script
