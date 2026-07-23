@@ -649,6 +649,44 @@
   user-select: none;
 }
 
+.mira-peek {
+  position: fixed;
+  z-index: 61;
+  width: 3rem;
+  height: 4rem;
+  overflow: hidden;
+  border: 1px solid rgba(159, 134, 255, 0.42);
+  color: white;
+  box-shadow:
+    0 0 26px rgba(126, 87, 194, 0.34),
+    inset 0 0 18px rgba(159, 134, 255, 0.08);
+  cursor: pointer;
+  animation: mira-bubble-in 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.mira-peek-left {
+  left: -0.35rem;
+  border-radius: 0 1rem 1rem 0;
+}
+
+.mira-peek-right {
+  right: -0.35rem;
+  border-radius: 1rem 0 0 1rem;
+}
+
+.mira-peek:hover,
+.mira-peek:focus-visible {
+  border-color: rgba(190, 174, 255, 0.88);
+  box-shadow:
+    0 0 34px rgba(126, 87, 194, 0.52),
+    inset 0 0 20px rgba(159, 134, 255, 0.12);
+}
+
+.mira-peek:focus-visible {
+  outline: 2px solid #9f86ff;
+  outline-offset: 3px;
+}
+
 .mira-is-dragging {
   z-index: 85;
 }
@@ -714,6 +752,11 @@
     width: 9rem;
     height: 13rem;
   }
+
+  .mira-peek {
+    width: 3.5rem;
+    height: 5rem;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -728,6 +771,7 @@
   .mira-voice-wave span,
   .mira-selector,
   .mira-selector-backdrop,
+  .mira-peek,
   .mira-is-dragging .mira-character-button {
     animation: none !important;
   }
