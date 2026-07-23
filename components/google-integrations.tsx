@@ -1,11 +1,13 @@
 "use client"
 
 import Script from "next/script"
-import { useCallback, useEffect, useRef, useState } from "react"
+import { usePathname } from "next/navigation"
+import { useCallback, useEffect, useRef } from "react"
 
 const GOOGLE_ANALYTICS_ID = "G-CY0KQKG7VG"
 const GOOGLE_ADS_ID = "AW-18327352851"
 const GOOGLE_CUSTOMER_REVIEWS_MERCHANT_ID = 5824924831
+const COOKIE_CONSENT_EVENT = "mirai:cookie-consent"
 
 declare global {
   interface Window {
@@ -24,13 +26,16 @@ declare global {
   }
 }
 
-export function GoogleIntegrations() {
-  const [mounted, setMounted] = useState(false)
-  const merchantWidgetStarted = useRef(false)
+function hasAnalyticsConsent() {
+  return document.cookie
+    .split("; ")
+    .some((row) => row === "cookie_consent=all")
+}
 
-  useEffect(() => {
-    setMounted(true)
-  }, [])
+export function GoogleIntegrations() {
+  const pathname = usePathname()
+  const merchantWidgetStarted = useRef(false)
+  const lastTrackedPath = useRef<string | null>(null)
 
   const startMerchantWidget = useCallback(() => {
     if (merchantWidgetStarted.current || !window.merchantwidget) return
@@ -47,7 +52,52 @@ export function GoogleIntegrations() {
     })
   }, [])
 
-  if (!mounted) return null
+  const trackPageView = useCallback((force = false) => {
+    if (!hasAnalyticsConsent() || !window.gtag) return
+
+    const pagePath = `${window.location.pathname}${window.location.search}`
+    if (!force && lastTrackedPath.current === pagePath) return
+
+    lastTrackedPath.current = pagePath
+    window.gtag("event", "page_view", {
+      send_to: GOOGLE_ANALYTICS_ID,
+      page_location: window.location.href,
+      page_path: pagePath,
+      page_title: document.title,
+    })
+  }, [])
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      if (!hasAnalyticsConsent() || !window.gtag) return
+
+      // Ensure the saved consent update is queued before the first page view.
+      window.gtag("consent", "update", {
+        analytics_storage: "granted",
+        ad_storage: "granted",
+        ad_user_data: "granted",
+        ad_personalization: "granted",
+      })
+      trackPageView()
+    }, 0)
+
+    return () => window.clearTimeout(timer)
+  }, [pathname, trackPageView])
+
+  useEffect(() => {
+    const handleConsent = (event: Event) => {
+      const consent = (event as CustomEvent<"all" | "necessary">).detail
+
+      if (consent === "all") {
+        window.setTimeout(() => trackPageView(true), 0)
+      } else {
+        lastTrackedPath.current = null
+      }
+    }
+
+    window.addEventListener(COOKIE_CONSENT_EVENT, handleConsent)
+    return () => window.removeEventListener(COOKIE_CONSENT_EVENT, handleConsent)
+  }, [trackPageView])
 
   return (
     <>
@@ -59,7 +109,7 @@ export function GoogleIntegrations() {
         {`window.dataLayer = window.dataLayer || [];
 window.gtag = window.gtag || function(){window.dataLayer.push(arguments);};
 window.gtag('js', new Date());
-window.gtag('config', '${GOOGLE_ANALYTICS_ID}');
+window.gtag('config', '${GOOGLE_ANALYTICS_ID}', { send_page_view: false });
 window.gtag('config', '${GOOGLE_ADS_ID}');`}
       </Script>
       <Script id="mirai-google-customer-reviews-language" strategy="afterInteractive">
