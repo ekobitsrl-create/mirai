@@ -2,7 +2,7 @@ export type MiraiSupplierCatalogProduct = {
   name: string
   description: string
   price: number
-  category: "t-shirt" | "canotte" | "jeans" | "pantaloni" | "shorts"
+  category: "t-shirt" | "canotte" | "jeans" | "pantaloni" | "shorts" | "profumi"
   image_url: string
   image_gallery: string[]
   sizes: string[]
@@ -922,6 +922,61 @@ const MIRAI_SUPPLIER_CATALOG_BASE = [
     "detail_items": ["Denim blu effetto washed", "Patch ricamate multicolore", "Maxi lettering con dettagli crystal", "Lacci lunghi a contrasto", "Taglio ampio sotto il ginocchio"],
     "composition": null,
     "care": "Seguire le istruzioni riportate sull'etichetta interna."
+  },
+  {
+    "name": "MIRAI Santa Madre Studded Canotta - White",
+    "description": "Canotta bianca dal taglio ampio con lettering Santa Madre rosso sul fronte e applicazioni metalliche lungo il girocollo. La linea pulita e le spalle decise incontrano dettagli luminosi per un capo estivo riconoscibile, pensato per outfit streetwear essenziali.",
+    "price": 45,
+    "category": "canotte",
+    "image_url": "/products/mirai-supplier/santa-madre-canotta-white-01.webp",
+    "image_gallery": ["/products/mirai-supplier/santa-madre-canotta-white-01.webp"],
+    "sizes": ["XS", "S", "M", "L", "XL", "XXL"],
+    "stock_by_size": { "XS": 10, "S": 10, "M": 10, "L": 10, "XL": 10, "XXL": 10 },
+    "in_stock": true,
+    "is_new": true,
+    "brand": "MIRAI",
+    "supplier_sku": "MIRAI-SANTA-MADRE-033",
+    "color_name": "Bianco",
+    "color_hex": "#f4f2ee",
+    "fit_note": "Vestibilita ampia e rilassata. Disponibile dalla XS alla XXL.",
+    "detail_items": [
+      "Lettering Santa Madre rosso sul fronte",
+      "Applicazioni metalliche lungo il girocollo",
+      "Costruzione smanicata",
+      "Taglio ampio d'ispirazione streetwear",
+      "Colore bianco",
+      "Destinazione: Unisex"
+    ],
+    "composition": null,
+    "care": "Lavare seguendo le istruzioni riportate sull'etichetta interna e proteggere le applicazioni durante il lavaggio."
+  },
+  {
+    "name": "MIRAI Genesi I Extrait de Parfum 100 ml",
+    "description": "Genesi I e l'atto d'origine della profumeria MIRAI: un extrait de parfum unisex che apre con bergamotto e matcha, evolve in un cuore floreale di rosa, magnolia e gelsomino e si posa su note muschiate, ambra e vaniglia assoluta. Una firma intensa, contemporanea e riconoscibile in flacone da 100 ml.",
+    "price": 59.99,
+    "category": "profumi",
+    "image_url": "/products/mirai-supplier/genesi-i-profumo-100ml-01.webp",
+    "image_gallery": ["/products/mirai-supplier/genesi-i-profumo-100ml-01.webp"],
+    "sizes": ["100 ML"],
+    "stock_by_size": { "100 ML": 10 },
+    "in_stock": true,
+    "is_new": true,
+    "brand": "MIRAI",
+    "supplier_sku": "MIRAI-GENESI-I-034",
+    "color_name": "Viola sfumato",
+    "color_hex": "#5f3b91",
+    "fit_note": "Formato unico da 100 ml.",
+    "detail_items": [
+      "Extrait de Parfum",
+      "Formato 100 ml",
+      "Apertura: bergamotto e matcha",
+      "Cuore: rosa, magnolia e gelsomino",
+      "Fondo: note muschiate, ambra e vaniglia assoluta",
+      "Profumazione unisex",
+      "Flacone in vetro viola sfumato con tappo nero"
+    ],
+    "composition": null,
+    "care": "Conservare in luogo fresco e asciutto, lontano da luce diretta e fonti di calore."
   }
 ] as const satisfies readonly MiraiSupplierCatalogProduct[]
 
