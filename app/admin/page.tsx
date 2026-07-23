@@ -2,6 +2,7 @@ import { redirect } from "next/navigation"
 import { isAdminEmail } from "@/lib/admin"
 import { getServerUserWithProfile, createUserClient } from "@/lib/supabase/server"
 import { AdminDashboard } from "@/components/admin-dashboard"
+import { getPremiumProductTitle } from "@/lib/product-titles"
 
 export default async function AdminPage() {
   let userResult
@@ -26,7 +27,10 @@ export default async function AdminPage() {
     supabase.from("profiles").select("*").order("created_at", { ascending: false }),
   ])
 
-  const products = productsRes.data || []
+  const products = (productsRes.data || []).map((product) => ({
+    ...product,
+    name: getPremiumProductTitle(product),
+  }))
   const categories = categoriesRes.data || []
   const orders = ordersRes.data || []
   const users = usersRes.data || []

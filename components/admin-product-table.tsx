@@ -7,12 +7,13 @@ import {
   deleteProduct,
   deleteBlackIslandProducts,
   importMiraiSupplierCatalog,
+  normalizeAllProductTitles,
 } from "@/app/admin/actions"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { Plus, Pencil, Trash2, X, Check, Package, Download } from "lucide-react"
+import { Plus, Pencil, Trash2, X, Check, Package, Download, Sparkles } from "lucide-react"
 import { ImageUpload } from "@/components/image-upload"
 
 type Product = {
@@ -127,6 +128,20 @@ export function AdminProductTable({ products, categories = [] }: { products: Pro
     }
   }
 
+  const handleTitleNormalization = async () => {
+    setIsSubmitting(true)
+    setFeedback(null)
+    try {
+      const result = await normalizeAllProductTitles()
+      setFeedback(`${result.updated} titoli aggiornati su ${result.total} prodotti.`)
+    } catch (err) {
+      console.error(err)
+      setFeedback(err instanceof Error ? err.message : "Aggiornamento titoli non riuscito.")
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
   return (
     <div>
       {/* Add product button */}
@@ -147,6 +162,16 @@ export function AdminProductTable({ products, categories = [] }: { products: Pro
         >
           <Download className="h-4 w-4" />
           {isSubmitting ? "Importazione..." : "Importa catalogo MIRAI"}
+        </Button>
+        <Button
+          type="button"
+          variant="outline"
+          disabled={isSubmitting}
+          onClick={handleTitleNormalization}
+          className="h-10 gap-2 border-primary/40 text-xs uppercase tracking-widest text-primary hover:bg-primary/10 hover:text-primary"
+        >
+          <Sparkles className="h-4 w-4" />
+          {isSubmitting ? "Aggiornamento..." : "Uniforma titoli premium"}
         </Button>
         {blackIslandCount > 0 && (
           <Button

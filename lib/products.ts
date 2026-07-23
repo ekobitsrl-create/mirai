@@ -1,4 +1,5 @@
 import { CUSTOM_TEE_IMAGE, CUSTOM_TEE_PRICE, CUSTOM_TEE_PRODUCT_ID } from "@/lib/customization"
+import { getPremiumProductTitle } from "@/lib/product-titles"
 
 type ProductIdentity = {
   name?: string | null
@@ -123,7 +124,7 @@ export const PRIVATE_CHECKOUT_PRODUCT_ID = "a0000000-0000-4000-8000-000000000017
 // only product that is NOT stored in the database.
 export const CUSTOM_TEE_PRODUCT: StoreProduct = {
   id: CUSTOM_TEE_PRODUCT_ID,
-  name: "MIRAI Custom Heavy Tee",
+  name: "T-shirt Personalizzata Premium Streetwear Mirai - Custom Heavy",
   description: "T-shirt heavyweight oversize personalizzata nel MIRAI Custom Lab. Una stampa fronte o retro inclusa.",
   price: CUSTOM_TEE_PRICE,
   category: "custom",
@@ -167,7 +168,11 @@ export function mapProductRow(row: Record<string, any>): StoreProduct {
 
   return {
     id: String(row.id),
-    name: (row.name as string) ?? "",
+    name: getPremiumProductTitle({
+      name: (row.name as string) ?? "",
+      category: (row.category as string) ?? "",
+      color_name: (row.color_name as string) ?? undefined,
+    }),
     description: (row.description as string | null) ?? null,
     price: Number(row.price ?? 0),
     category: (row.category as string) ?? "",

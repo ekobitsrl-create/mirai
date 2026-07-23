@@ -4,6 +4,7 @@ import { createUserClient, getServerUserWithProfile } from "@/lib/supabase/serve
 import { revalidatePath } from "next/cache"
 import { isBlackIslandProduct } from "@/lib/products"
 import { MIRAI_SUPPLIER_CATALOG } from "@/lib/mirai-supplier-catalog"
+import { getPremiumProductTitle } from "@/lib/product-titles"
 
 function parseProductInventory(formData: FormData) {
   const sizesRaw = formData.get("sizes") as string
@@ -81,13 +82,19 @@ async function assertAdmin() {
 export async function createProduct(formData: FormData) {
   const { supabase } = await assertAdmin()
 
-  const name = formData.get("name") as string
+  const rawName = formData.get("name") as string
   const description = formData.get("description") as string
   const price = parseFloat(formData.get("price") as string)
   const category = formData.get("category") as string
   const image_url = formData.get("image_url") as string
   const { sizes, stock_by_size, in_stock } = parseProductInventory(formData)
   const is_new = formData.get("is_new") === "on"
+  const productDetails = parseProductDetails(formData)
+  const name = getPremiumProductTitle({
+    name: rawName,
+    category,
+    color_name: productDetails.color_name,
+  })
 
   const { error } = await supabase.from("products").insert({
     name,
@@ -99,7 +106,7 @@ export async function createProduct(formData: FormData) {
     stock_by_size,
     in_stock,
     is_new,
-    ...parseProductDetails(formData),
+    ...productDetails,
   })
 
   if (error) throw new Error(error.message)
@@ -111,13 +118,19 @@ export async function updateProduct(formData: FormData) {
   const { supabase } = await assertAdmin()
 
   const id = formData.get("id") as string
-  const name = formData.get("name") as string
+  const rawName = formData.get("name") as string
   const description = formData.get("description") as string
   const price = parseFloat(formData.get("price") as string)
   const category = formData.get("category") as string
   const image_url = formData.get("image_url") as string
   const { sizes, stock_by_size, in_stock } = parseProductInventory(formData)
   const is_new = formData.get("is_new") === "on"
+  const productDetails = parseProductDetails(formData)
+  const name = getPremiumProductTitle({
+    name: rawName,
+    category,
+    color_name: productDetails.color_name,
+  })
 
   const { error } = await supabase
     .from("products")
@@ -131,7 +144,7 @@ export async function updateProduct(formData: FormData) {
       stock_by_size,
       in_stock,
       is_new,
-      ...parseProductDetails(formData),
+      ...productDetails,
       updated_at: new Date().toISOString(),
     })
     .eq("id", id)
@@ -176,6 +189,43 @@ export async function deleteBlackIslandProducts() {
 
   revalidateCatalog()
   return { deleted: ids.length }
+}
+
+export async function normalizeAllProductTitles() {
+  const { supabase } = await assertAdmin()
+  const { data: products, error: selectError } = await supabase
+    .from("products")
+    .select("id, name, category, color_name")
+
+  if (selectError) throw new Error(selectError.message)
+
+  const updates = (products || [])
+    .map((product) => ({
+      id: product.id,
+      previousName: product.name,
+      name: getPremiumProductTitle(product),
+    }))
+    .filter((product) => product.name !== product.previousName)
+
+  const results = await Promise.all(
+    updates.map((product) =>
+      supabase
+        .from("products")
+        .update({
+          name: product.name,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", product.id),
+    ),
+  )
+  const failedUpdate = results.find((result) => result.error)
+  if (failedUpdate?.error) throw new Error(failedUpdate.error.message)
+
+  revalidateCatalog()
+  return {
+    updated: updates.length,
+    total: products?.length || 0,
+  }
 }
 
 export async function importMiraiSupplierCatalog() {
