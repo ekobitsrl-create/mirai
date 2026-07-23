@@ -17,40 +17,6 @@ type CategoryNode = {
   children: CategoryNode[]
 }
 
-function DiscountMarquee({ onClose, discountText, codeText, closeLabel }: { onClose: () => void; discountText: string; codeText: string; closeLabel: string }) {
-  return (
-    <div className="mirai-neon-divider relative bg-[#17121f]">
-      <div className="overflow-hidden py-2">
-        <div className="animate-marquee-fast flex whitespace-nowrap">
-          {[0, 1, 2].map((copy) => (
-            <div key={copy} className="flex shrink-0">
-              {Array.from({ length: 4 }).map((_, i) => (
-                <span key={i} className="flex items-center mx-6">
-                  <span className="text-[11px] font-extrabold tracking-[0.25em] uppercase text-white">
-                    {discountText}
-                  </span>
-                  <span className="mx-5 text-white/30 text-[8px]">{"\u2726"}</span>
-                  <span className="text-[11px] font-extrabold tracking-[0.25em] uppercase text-white">
-                    {codeText}
-                  </span>
-                  <span className="mx-5 text-white/30 text-[8px]">{"\u2726"}</span>
-                </span>
-              ))}
-            </div>
-          ))}
-        </div>
-      </div>
-      <button
-        onClick={onClose}
-        aria-label={closeLabel}
-        className="absolute right-3 top-1/2 -translate-y-1/2 z-10 p-1 text-white/40 hover:text-white transition-colors"
-      >
-        <X className="h-3 w-3" />
-      </button>
-    </div>
-  )
-}
-
 const CartSidebar = dynamic(
   () => import("@/components/cart-sidebar").then((m) => m.CartSidebar),
   {
@@ -95,7 +61,6 @@ function useCategories() {
 export function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false)
   const [isLoggedIn, setIsLoggedIn] = useState(false)
-  const [showBanner, setShowBanner] = useState(true)
   const [dropdownOpen, setDropdownOpen] = useState(false)
   const [mobileCollezioni, setMobileCollezioni] = useState(false)
   const dropdownTimeout = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -159,14 +124,6 @@ export function Navbar() {
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50">
-      {showBanner && (
-        <DiscountMarquee 
-          onClose={() => setShowBanner(false)} 
-          discountText={t.nav.discountBanner}
-          codeText={t.nav.discountCode}
-          closeLabel={t.nav.closeBanner}
-        />
-      )}
       <nav className="mirai-neon-divider bg-[#0c0c0d]/88 backdrop-blur-2xl">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
           <div className="flex items-center gap-8">

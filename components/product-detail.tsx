@@ -60,6 +60,12 @@ export function ProductDetail({
   const colorName = product.color_name || "Multicolor"
   const fitNote = product.fit_note || "Consulta la guida alle taglie prima di scegliere."
   const supplierSettings = getProductSupplierSettings(product)
+  const isFragrance = ["profumi", "profumo", "fragrance", "fragrances"].includes(
+    product.category.trim().toLowerCase(),
+  )
+  const returnCondition = isFragrance
+    ? "purché il prodotto sia integro e nella confezione originale"
+    : "purché il capo sia integro e con i cartellini originali"
   const isMiraiSupplierCatalogProduct = /^MIRAI-/i.test(product.supplier_sku || "")
     || product.image_url?.includes("/products/mirai-supplier/") === true
   const shippingEstimate = supplierSettings.shippingMinDays !== undefined && supplierSettings.shippingMaxDays !== undefined
@@ -426,7 +432,7 @@ export function ProductDetail({
               </Details>
             )}
             <Details title="Spedizioni e resi">
-              Tempi previsti: {shippingEstimate}. Spedizione tracciata in Italia e in Europa. Puoi richiedere il reso entro 14 giorni dalla consegna, purche il capo sia integro e con i cartellini originali. Consulta la pagina <Link href="/resi" className="text-[#9f86ff] underline underline-offset-4">Resi e Rimborsi</Link>.
+              Tempi previsti: {shippingEstimate}. Spedizione tracciata in Italia e in Europa. Puoi richiedere il reso entro 14 giorni dalla consegna, {returnCondition}. Consulta la pagina <Link href="/resi" className="text-[#9f86ff] underline underline-offset-4">Resi e Rimborsi</Link>.
             </Details>
           </div>
         </section>
