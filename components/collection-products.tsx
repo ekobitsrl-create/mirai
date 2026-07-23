@@ -7,7 +7,7 @@ import { useSearchParams } from "next/navigation"
 import { Heart, ArrowLeft } from "lucide-react"
 import { useCart } from "@/lib/cart-context"
 import { useLanguage } from "@/lib/language-context"
-import { getCategoryImage, shouldContainCategoryImage } from "@/lib/category-images"
+import { getCategoryImage } from "@/lib/category-images"
 
 type Product = {
   id: string
@@ -81,18 +81,28 @@ export function CollectionProducts({
   // Fragrance/parfum product shots are full-bottle photos that get cropped by
   // object-cover, so display them fully contained within the frame instead.
   const isParfumCollection = /parfum/i.test(category.slug)
+  const categoryImage = getCategoryImage(category.slug, category.image_url)
 
   return (
     <div className="pt-24">
       {/* Hero banner */}
-      <section className="mirai-neon-divider relative flex h-[40vh] min-h-[300px] items-end overflow-hidden bg-secondary/20">
+      <section className="mirai-neon-divider relative flex h-[48svh] min-h-[360px] max-h-[620px] items-end overflow-hidden bg-secondary/20 md:h-[55vh] md:min-h-[420px]">
         <div className="mirai-aurora-orb left-1/2 top-1/2 h-[28rem] w-[28rem] -translate-x-1/2 -translate-y-1/2" />
-        <div className="absolute inset-0 flex items-center justify-center">
+        <div className="absolute inset-0 overflow-hidden bg-black/35">
           <Image
-            src={getCategoryImage(category.slug, category.image_url)}
+            src={categoryImage}
+            alt=""
+            aria-hidden="true"
+            fill
+            className="scale-110 object-cover opacity-35 blur-2xl"
+            sizes="100vw"
+          />
+          <Image
+            src={categoryImage}
             alt={category.name}
             fill
-            className={shouldContainCategoryImage(category.slug) ? "object-contain p-5" : "object-cover"}
+            className="object-contain object-center p-1 sm:p-2 md:p-3"
+            sizes="100vw"
             priority
           />
         </div>

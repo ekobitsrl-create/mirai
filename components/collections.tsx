@@ -7,7 +7,6 @@ import { useLanguage } from "@/lib/language-context"
 import {
   getCategoryCardImage,
   hasFittedCategoryCardImage,
-  shouldContainCategoryImage,
 } from "@/lib/category-images"
 import { ArrowRight } from "lucide-react"
 
@@ -43,50 +42,60 @@ export function Collections({ categories = [] }: { categories?: Category[] }) {
 
         {/* Grid categorie stile e-commerce */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
-          {categories.map((cat, i) => (
-            <Link
-              key={cat.id}
-              href={`/collezione/${cat.slug}`}
-              className={`mirai-neon-frame mirai-neon-lift group relative aspect-[3/4] overflow-hidden rounded-2xl bg-secondary/50 transition-all duration-700 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-12"}`}
-              style={{ transitionDelay: isVisible ? `${i * 0.1}s` : "0s" }}
-            >
-              <Image
-                src={getCategoryCardImage(cat.slug, cat.image_url)}
-                alt={cat.name}
-                fill
-                className={`${
-                  hasFittedCategoryCardImage(cat.slug)
-                    ? "object-contain object-center"
-                    : shouldContainCategoryImage(cat.slug)
-                      ? "object-contain p-3"
-                      : "object-cover"
-                } transition-transform duration-500 ease-out group-hover:scale-105`}
-                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                priority={i < 2}
-                loading={i < 2 ? "eager" : "lazy"}
-              />
-              {/* Overlay gradient */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-80 group-hover:opacity-90 transition-opacity duration-300" />
-              
-              {/* Content */}
-              <div className="absolute inset-0 flex flex-col justify-end p-5">
-                <h3
-                  className="text-xl md:text-2xl font-bold text-white mb-1"
-                  style={{ fontFamily: "var(--font-space-grotesk)" }}
-                >
-                  {cat.name}
-                </h3>
-                {cat.description && (
-                  <p className="text-white/70 text-sm mb-3 line-clamp-2">{cat.description}</p>
-                )}
-                <span className="inline-flex items-center gap-2 text-xs font-semibold tracking-widest uppercase text-white group-hover:text-primary transition-colors duration-300">
-                  {t.collections.shopNow}
-                  <ArrowRight className="h-3.5 w-3.5 transition-transform duration-300 group-hover:translate-x-1" />
-                </span>
-              </div>
+          {categories.map((cat, i) => {
+            const cardImage = getCategoryCardImage(cat.slug, cat.image_url)
 
-            </Link>
-          ))}
+            return (
+              <Link
+                key={cat.id}
+                href={`/collezione/${cat.slug}`}
+                className={`mirai-neon-frame mirai-neon-lift group relative aspect-[3/4] overflow-hidden rounded-2xl bg-secondary/50 transition-all duration-700 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-12"}`}
+                style={{ transitionDelay: isVisible ? `${i * 0.1}s` : "0s" }}
+              >
+                <Image
+                  src={cardImage}
+                  alt=""
+                  aria-hidden="true"
+                  fill
+                  className="scale-110 object-cover opacity-35 blur-xl"
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                />
+                <Image
+                  src={cardImage}
+                  alt={cat.name}
+                  fill
+                  className={`${
+                    hasFittedCategoryCardImage(cat.slug)
+                      ? "object-contain object-center"
+                      : "object-contain object-center p-2"
+                  } transition-[filter] duration-500 ease-out group-hover:brightness-110`}
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                  priority={i < 2}
+                  loading={i < 2 ? "eager" : "lazy"}
+                />
+                {/* Overlay gradient */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-80 group-hover:opacity-90 transition-opacity duration-300" />
+
+                {/* Content */}
+                <div className="absolute inset-0 flex flex-col justify-end p-5">
+                  <h3
+                    className="text-xl md:text-2xl font-bold text-white mb-1"
+                    style={{ fontFamily: "var(--font-space-grotesk)" }}
+                  >
+                    {cat.name}
+                  </h3>
+                  {cat.description && (
+                    <p className="text-white/70 text-sm mb-3 line-clamp-2">{cat.description}</p>
+                  )}
+                  <span className="inline-flex items-center gap-2 text-xs font-semibold tracking-widest uppercase text-white group-hover:text-primary transition-colors duration-300">
+                    {t.collections.shopNow}
+                    <ArrowRight className="h-3.5 w-3.5 transition-transform duration-300 group-hover:translate-x-1" />
+                  </span>
+                </div>
+
+              </Link>
+            )
+          })}
         </div>
 
         {/* View all link */}
