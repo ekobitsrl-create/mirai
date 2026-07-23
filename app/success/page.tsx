@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Spinner } from "@/components/ui/spinner"
 import { useCart } from "@/lib/cart-context"
 import { GoogleCustomerReviewsOptIn } from "@/components/google-customer-reviews-opt-in"
+import { GoogleAdsPurchaseConversion } from "@/components/google-ads-purchase-conversion"
 import {
   getGoogleReviewStorageKey,
   isGoogleCustomerReviewOrder,
@@ -125,6 +126,7 @@ function SuccessContent() {
   if (status === "cash_on_delivery") {
     return (
       <main className="flex min-h-screen items-center justify-center bg-background px-6">
+        {reviewOrder && <GoogleAdsPurchaseConversion transactionId={reviewOrder.orderId} />}
         <section className="w-full max-w-md border border-border bg-card p-8 text-center">
           <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-green-500/10 text-green-500">
             <CheckCircle2 className="h-9 w-9" />
@@ -171,6 +173,7 @@ function SuccessContent() {
 
   return (
     <main className="min-h-screen bg-background px-6 py-16">
+      <GoogleAdsPurchaseConversion transactionId={order.id} />
       {order.email && order.shipping?.country && (
         <GoogleCustomerReviewsOptIn
           order={{

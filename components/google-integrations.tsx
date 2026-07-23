@@ -4,10 +4,12 @@ import Script from "next/script"
 import { useCallback, useEffect, useRef, useState } from "react"
 
 const GOOGLE_ANALYTICS_ID = "G-CY0KQKG7VG"
+const GOOGLE_ADS_ID = "AW-18327352851"
 const GOOGLE_CUSTOMER_REVIEWS_MERCHANT_ID = 5824924831
 
 declare global {
   interface Window {
+    gtag?: (...args: unknown[]) => void
     merchantwidget?: {
       start: (config: {
         merchant_id: number
@@ -64,7 +66,8 @@ gtag('consent', 'default', {
   wait_for_update: 500
 });
 gtag('js', new Date());
-gtag('config', '${GOOGLE_ANALYTICS_ID}');`}
+gtag('config', '${GOOGLE_ANALYTICS_ID}');
+gtag('config', '${GOOGLE_ADS_ID}');`}
       </Script>
       <Script id="mirai-google-customer-reviews-language" strategy="afterInteractive">
         {`window.___gcfg = { lang: 'it' };`}
