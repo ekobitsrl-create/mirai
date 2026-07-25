@@ -172,6 +172,51 @@ function getColor(product: StoreProduct) {
   return [...new Set(colors)].join(" / ") || "Multicolore"
 }
 
+function getMaterial(product: StoreProduct) {
+  const composition = product.composition?.trim()
+  if (composition) return composition
+
+  const category = product.category.toLowerCase()
+  const productText = `${product.name} ${(product.detail_items || []).join(" ")}`
+
+  if (/\bdenim\b/i.test(productText)) return "Denim"
+  if (/\bcamouflage\b/i.test(productText)) return "Tessuto camouflage"
+  if (["t-shirt", "tshirt", "magliette", "canotte"].includes(category)) return "Cotone"
+
+  return null
+}
+
+function getPattern(product: StoreProduct) {
+  const patternDetail = (product.detail_items || []).find((detail) =>
+    /\b(grafica|stampa|fantasia|motivo|patchwork|lettering|logo)\b/i.test(detail),
+  )
+
+  if (!patternDetail) return null
+
+  return patternDetail
+    .replace(/^maxi\s+/i, "")
+    .replace(/\s+(sul fronte|frontale|posteriore|coordinata)$/i, "")
+    .trim()
+}
+
+function getMerchantDescription(
+  product: StoreProduct,
+  merchantProductName: string,
+  color: string,
+  pattern: string | null,
+  material: string | null,
+) {
+  const baseDescription = product.description?.trim()
+    || `${merchantProductName} disponibile su MIRAI LAB STORE.`
+  const details: string[] = []
+
+  if (!/\bcolore\s*:/i.test(baseDescription)) details.push(`Colore: ${color}.`)
+  if (pattern && !/\bmotivo\s*:/i.test(baseDescription)) details.push(`Motivo: ${pattern}.`)
+  if (material && !/\bmateriale\s*:/i.test(baseDescription)) details.push(`Materiale: ${material}.`)
+
+  return [baseDescription, ...details].join(" ")
+}
+
 function renderReturnPolicy(baseUrl: string) {
   return [
     "      <g:returns>",
@@ -231,13 +276,15 @@ function renderProductVariant(product: StoreProduct, size: string, baseUrl: stri
   const additionalImages = getAdditionalImages(product, baseUrl, primaryImage)
   const categoryKey = product.category.toLowerCase()
   const color = getColor(product)
+  const material = getMaterial(product)
+  const pattern = getPattern(product)
   const supplierSettings = getProductSupplierSettings(product)
   const merchantProductName = supplierSettings.profile === "mirai"
     ? product.name.replace(/^MIRAI\s+/i, "").trim()
     : product.name
   const titleParts = [merchantProductName, color, `Taglia ${size}`].filter(Boolean)
   const title = titleParts.join(" - ")
-  const description = product.description || `${merchantProductName} disponibile su MIRAI LAB STORE.`
+  const description = getMerchantDescription(product, merchantProductName, color, pattern, material)
   const brand = supplierSettings.brand
   const itemGroupId = getItemGroupId(product)
   const productType = PRODUCT_TYPE_BY_STORE_CATEGORY[categoryKey] || `Abbigliamento > ${product.category}`
@@ -271,6 +318,8 @@ function renderProductVariant(product: StoreProduct, size: string, baseUrl: stri
     `      <g:size_system>${isHeadwear ? "US" : "EU"}</g:size_system>`,
     isHeadwear ? "" : "      <g:size_type>regular</g:size_type>",
     `      <g:color>${escapeXml(color)}</g:color>`,
+    ...(material ? [`      <g:material>${escapeXml(material)}</g:material>`] : []),
+    ...(pattern ? [`      <g:pattern>${escapeXml(pattern)}</g:pattern>`] : []),
     "      <g:gender>unisex</g:gender>",
     "      <g:age_group>adult</g:age_group>",
     "      <g:adult>no</g:adult>",
