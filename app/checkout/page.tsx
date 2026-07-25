@@ -22,6 +22,7 @@ export default function CheckoutPage() {
   const { items, getTotal, clearCart, hydrated } = useCart()
   const { t } = useLanguage()
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null)
+  const [accountEmail, setAccountEmail] = useState("")
   const [guestEmail, setGuestEmail] = useState("")
   const [guestCheckoutReady, setGuestCheckoutReady] = useState(false)
   const [createAccount, setCreateAccount] = useState(false)
@@ -31,15 +32,18 @@ export default function CheckoutPage() {
   const [cashError, setCashError] = useState<string | null>(null)
   const [cashSubmitting, setCashSubmitting] = useState(false)
   const [cardError, setCardError] = useState<string | null>(null)
-const [cardLoading, setCardLoading] = useState(false)
-const [cardAttempt, setCardAttempt] = useState(0)
-const sessionIdRef = useRef<string | null>(null)
-const checkoutSessionRef = useRef<{ key: string; promise: Promise<string> } | null>(null)
+  const [cardLoading, setCardLoading] = useState(false)
+  const [cardAttempt, setCardAttempt] = useState(0)
+  const sessionIdRef = useRef<string | null>(null)
+  const checkoutSessionRef = useRef<{ key: string; promise: Promise<string> } | null>(null)
 
   useEffect(() => {
     let active = true
     void createClient().auth.getSession().then(({ data }) => {
-      if (active) setIsAuthenticated(Boolean(data.session))
+      if (!active) return
+
+      setIsAuthenticated(Boolean(data.session))
+      setAccountEmail(data.session?.user.email?.trim().toLowerCase() || "")
     })
 
     return () => {
@@ -47,7 +51,7 @@ const checkoutSessionRef = useRef<{ key: string; promise: Promise<string> } | nu
     }
   }, [])
 
-const cartLineItems = useMemo(() => items.map((item) => ({
+  const cartLineItems = useMemo(() => items.map((item) => ({
     productId: item.productId,
     quantity: item.quantity,
     size: item.size,
@@ -55,9 +59,13 @@ const cartLineItems = useMemo(() => items.map((item) => ({
     customization: item.customization,
   })), [items])
 
+  const hasAccountEmail = emailPattern.test(accountEmail)
+  const requiresGuestEmail = !isAuthenticated || !hasAccountEmail
+  const checkoutEmail = (requiresGuestEmail ? guestEmail : accountEmail).trim().toLowerCase()
+
   const checkoutKey = useMemo(
-    () => JSON.stringify({ cartLineItems, email: isAuthenticated ? null : guestEmail.trim().toLowerCase() }),
-    [cartLineItems, guestEmail, isAuthenticated]
+    () => JSON.stringify({ cartLineItems, email: checkoutEmail }),
+    [cartLineItems, checkoutEmail]
   )
 
   const fetchClientSecret = useCallback(() => {
@@ -65,9 +73,15 @@ const cartLineItems = useMemo(() => items.map((item) => ({
       return checkoutSessionRef.current.promise
     }
 
+    if (!emailPattern.test(checkoutEmail)) {
+      const error = new Error("Inserisci un indirizzo email valido per ricevere la conferma ordine.")
+      setCardError(error.message)
+      return Promise.reject(error)
+    }
+
     setCardError(null)
     setCardLoading(true)
-    const promise = createCheckoutSession(cartLineItems, isAuthenticated ? undefined : guestEmail)
+    const promise = createCheckoutSession(cartLineItems, checkoutEmail)
       .then((session) => {
         if (!session?.clientSecret) throw new Error(t.checkout.error)
 
@@ -84,7 +98,7 @@ const cartLineItems = useMemo(() => items.map((item) => ({
 
     checkoutSessionRef.current = { key: checkoutKey, promise }
     return promise
-  }, [cartLineItems, checkoutKey, guestEmail, isAuthenticated, t.checkout.error])
+  }, [cartLineItems, checkoutEmail, checkoutKey, t.checkout.error])
 
   const retryCardCheckout = () => {
     checkoutSessionRef.current = null
@@ -117,7 +131,7 @@ const cartLineItems = useMemo(() => items.map((item) => ({
           customization: item.customization,
         })),
         {
-          guestEmail: isAuthenticated ? undefined : guestEmail,
+          guestEmail: checkoutEmail,
           ...cashDetails,
           country: "IT",
         }
@@ -183,7 +197,7 @@ const cartLineItems = useMemo(() => items.map((item) => ({
           </div>
         </div>
 
-        {!isAuthenticated && !guestCheckoutReady ? (
+        {requiresGuestEmail && !guestCheckoutReady ? (
           <section className="mx-auto max-w-xl border border-border bg-card p-6 sm:p-8">
             <div className="flex items-start gap-3">
               <Mail className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
@@ -238,7 +252,7 @@ const cartLineItems = useMemo(() => items.map((item) => ({
           </section>
         ) : (
           <>
-            {!isAuthenticated && (
+            {requiresGuestEmail && (
               <div className="mb-4 flex items-center justify-between border border-border bg-card px-4 py-3 text-sm text-muted-foreground">
                 <span>Acquisto come ospite: {guestEmail.trim()}</span>
                 <button type="button" onClick={() => setGuestCheckoutReady(false)} className="text-xs font-bold uppercase tracking-widest text-primary">Modifica</button>
