@@ -231,10 +231,11 @@ function getGoogleAdsCampaignLabel(product: StoreProduct) {
   const isSelectedSupplierProduct = Boolean(
     product.supplier_sku && GOOGLE_ADS_SELECTED_SUPPLIER_SKUS.has(product.supplier_sku.toUpperCase()),
   )
-  const isOversizeTshirt = TSHIRT_CATEGORIES.has(categoryKey)
+  const isMiraiOversizeTshirt = getSupplierProfile(product) === "mirai"
+    && TSHIRT_CATEGORIES.has(categoryKey)
     && /^\s*t-?shirt\s+oversize\b/i.test(product.name)
 
-  return isSelectedSupplierProduct || isOversizeTshirt
+  return isSelectedSupplierProduct || isMiraiOversizeTshirt
     ? GOOGLE_ADS_CAMPAIGN_LABEL
     : null
 }
