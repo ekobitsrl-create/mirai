@@ -65,8 +65,8 @@ export default async function CommunityChannelPage({ params }: { params: Promise
     <main className="min-h-screen overflow-hidden bg-[#08070b] text-white">
       <Navbar />
       <div className="mx-auto max-w-6xl px-5 pb-24 pt-36 sm:px-6 sm:pt-40">
-        <Link href="/community" className="inline-flex items-center gap-2 text-[9px] font-bold uppercase tracking-[0.2em] text-white/45 hover:text-white">
-          <ArrowLeft className="h-3.5 w-3.5" /> Community Hub
+        <Link href="/community/hub" className="inline-flex items-center gap-2 text-[9px] font-bold uppercase tracking-[0.2em] text-white/45 hover:text-white">
+          <ArrowLeft className="h-3.5 w-3.5" /> Society Hub
         </Link>
 
         <section className="mt-10 grid gap-10 lg:grid-cols-[1fr_.8fr] lg:items-end">
@@ -84,7 +84,7 @@ export default async function CommunityChannelPage({ params }: { params: Promise
             <p className="mt-3 text-sm leading-6 text-white/45">
               {canEnter
                 ? "Il tuo accesso è attivo. I primi contenuti verranno pubblicati direttamente in questa pagina."
-                : "Il tuo MIRAI PASS è valido: questo canale comparirà come aperto appena sarà pronto."}
+                : "Il canale comparirà nel tuo Society Hub appena sarà pronto."}
             </p>
           </div>
         </section>

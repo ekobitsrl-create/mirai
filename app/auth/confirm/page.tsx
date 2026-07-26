@@ -7,12 +7,12 @@ import { useEffect, useRef, useState } from "react"
 import { createClient } from "@/lib/supabase/client"
 
 function safeNextPath(value: string | null) {
-  return value && value.startsWith("/") && !value.startsWith("//") ? value : "/community"
+  return value && value.startsWith("/") && !value.startsWith("//") ? value : "/community/hub"
 }
 
 export default function ConfirmAccountPage() {
   const [status, setStatus] = useState<"loading" | "success" | "error">("loading")
-  const [nextPath, setNextPath] = useState("/community")
+  const [nextPath, setNextPath] = useState("/community/hub")
   const completed = useRef(false)
 
   useEffect(() => {
@@ -73,8 +73,8 @@ export default function ConfirmAccountPage() {
             {status === "error" && <span className="text-xl font-bold">!</span>}
           </div>
           <h1 className="mt-6 text-2xl font-bold tracking-tight">
-            {status === "loading" && "Attivazione MIRAI PASS"}
-            {status === "success" && "MIRAI PASS attivo"}
+            {status === "loading" && "Attivazione MIRAI Society"}
+            {status === "success" && "Account Society attivo"}
             {status === "error" && "Link non valido o scaduto"}
           </h1>
           <p className="mt-3 text-sm leading-6 text-white/50">

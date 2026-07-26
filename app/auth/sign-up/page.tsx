@@ -10,7 +10,7 @@ import { Suspense, useState } from "react"
 import Image from "next/image"
 
 function safeNextPath(value: string | null) {
-  return value && value.startsWith("/") && !value.startsWith("//") ? value : "/community"
+  return value && value.startsWith("/") && !value.startsWith("//") ? value : "/community/hub"
 }
 
 function SignUpForm() {
@@ -58,7 +58,7 @@ function SignUpForm() {
           data: {
             first_name: firstName,
             last_name: lastName,
-            membership: "mirai-pass",
+            membership: "mirai-society",
           },
         },
       })
@@ -74,7 +74,7 @@ function SignUpForm() {
             refresh_token: data.session.refresh_token,
           }),
         })
-        if (!response.ok) throw new Error("Impossibile attivare il MIRAI PASS")
+        if (!response.ok) throw new Error("Impossibile attivare l'account MIRAI Society")
         window.location.href = nextPath
         return
       }
@@ -99,8 +99,8 @@ function SignUpForm() {
 
           <div className="w-full border border-border rounded-lg p-8 bg-card">
             <div className="mb-8 flex flex-col gap-2">
-              <h1 className="font-sans text-2xl font-bold tracking-tight text-foreground">Crea il tuo MIRAI PASS</h1>
-              <p className="text-sm text-muted-foreground">Un solo account per shop, community, anteprime ed eventi.</p>
+              <h1 className="font-sans text-2xl font-bold tracking-tight text-foreground">Entra nella MIRAI Society</h1>
+              <p className="text-sm text-muted-foreground">Crea il tuo account per accedere alla community, alle anteprime e agli eventi.</p>
             </div>
 
             <form onSubmit={handleSignUp}>
@@ -129,7 +129,7 @@ function SignUpForm() {
                 </div>
                 {error && <p className="text-sm text-destructive">{error}</p>}
                 <Button type="submit" className="h-11 w-full bg-primary text-xs uppercase tracking-widest text-primary-foreground hover:bg-primary/90" disabled={isLoading}>
-                  {isLoading ? "Creazione in corso..." : "Crea MIRAI PASS"}
+                  {isLoading ? "Creazione in corso..." : "Crea account Society"}
                 </Button>
               </div>
               <div className="mt-6 text-center text-sm text-muted-foreground">

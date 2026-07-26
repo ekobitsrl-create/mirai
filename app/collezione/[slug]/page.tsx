@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/server"
 import { Navbar } from "@/components/navbar"
 import { Footer } from "@/components/footer"
 import { CollectionProducts } from "@/components/collection-products"
-import { notFound } from "next/navigation"
+import { notFound, redirect } from "next/navigation"
 import { withDemoProducts, type StoreProduct } from "@/lib/products"
 import { getAbsoluteUrl } from "@/lib/site-url"
 import type { SupabaseClient } from "@supabase/supabase-js"
@@ -77,6 +77,7 @@ export default async function CollezionePage({ params }: { params: Promise<{ slu
   const { slug: rawSlug } = await params
   // Normalize the slug: decode URI, trim, lowercase, replace spaces with hyphens
   const slug = decodeURIComponent(rawSlug).trim().toLowerCase().replace(/\s+/g, '-')
+  if (slug === "abbigliamento") redirect("/collezioni")
   
   const supabase = await createClient()
 

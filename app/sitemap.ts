@@ -36,7 +36,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.8,
   }))
 
-  const priorityCategorySlugs = ["abbigliamento", "t-shirt", "cappelli", "camicie", "pantaloni"]
+  const priorityCategorySlugs = ["t-shirt", "cappelli", "camicie", "pantaloni"]
   const categoryMap = new Map(categories.map((category) => [category.slug, category.updated_at]))
   priorityCategorySlugs.forEach((slug) => {
     if (!categoryMap.has(slug)) categoryMap.set(slug, null)

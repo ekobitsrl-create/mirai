@@ -157,15 +157,13 @@ export function Navbar() {
                 <Disc3 className="h-3.5 w-3.5" />
                 {beatsLabel}
               </Link>
-              {isLoggedIn && (
-                <Link
-                  href="/community"
-                  className="inline-flex items-center gap-1.5 text-sm tracking-widest uppercase text-white/55 transition-colors hover:text-white"
-                >
-                  <UsersRound className="h-3.5 w-3.5" />
-                  {communityLabel}
-                </Link>
-              )}
+              <Link
+                href="/community"
+                className="inline-flex items-center gap-1.5 text-sm tracking-widest uppercase text-white/55 transition-colors hover:text-white"
+              >
+                <UsersRound className="h-3.5 w-3.5" />
+                {communityLabel}
+              </Link>
               <Link
                 href="/#prodotti"
                 className="text-sm tracking-widest uppercase text-white/55 hover:text-white transition-colors"
@@ -305,15 +303,13 @@ export function Navbar() {
             >
               <Disc3 className="h-4 w-4" /> {beatsLabel}
             </Link>
-            {isLoggedIn && (
-              <Link
-                href="/community"
-                className="flex items-center justify-center gap-2 rounded-sm border border-white/15 bg-white/[0.03] px-4 py-3 text-xs font-bold uppercase tracking-[0.2em] text-white/70"
-                onClick={() => setMobileOpen(false)}
-              >
-                <UsersRound className="h-4 w-4" /> {communityLabel}
-              </Link>
-            )}
+            <Link
+              href="/community"
+              className="flex items-center justify-center gap-2 rounded-sm border border-white/15 bg-white/[0.03] px-4 py-3 text-xs font-bold uppercase tracking-[0.2em] text-white/70"
+              onClick={() => setMobileOpen(false)}
+            >
+              <UsersRound className="h-4 w-4" /> {communityLabel}
+            </Link>
             <Link
               href="/#prodotti"
               className="text-sm tracking-widest uppercase text-white/55 hover:text-white transition-colors"

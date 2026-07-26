@@ -1,5 +1,4 @@
 const CATEGORY_IMAGES: Record<string, string> = {
-  abbigliamento: "/images/categories/abbigliamento.jpeg",
   apparel: "/images/categories/abbigliamento.jpeg",
   clothing: "/images/categories/abbigliamento.jpeg",
   profumi: "/images/categories/profumi-genesi.webp",

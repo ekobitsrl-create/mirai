@@ -21,8 +21,8 @@ export default function SignUpSuccessPage() {
               Controlla la tua email
             </h1>
             <p className="text-sm text-muted-foreground leading-relaxed">
-              Ti abbiamo inviato il link per attivare il MIRAI PASS. Dopo la conferma entrerai
-              direttamente nel Community Hub.
+              Ti abbiamo inviato il link per attivare il tuo account MIRAI Society. Dopo la
+              conferma entrerai direttamente nel Society Hub.
             </p>
           </div>
 

@@ -54,7 +54,7 @@ export default async function AdminPage() {
             <p className="text-sm text-muted-foreground mt-1">Gestisci prodotti, categorie, ordini e utenti</p>
           </div>
           <div className="flex items-center gap-5">
-            <a href="/community" className="text-xs uppercase tracking-widest text-muted-foreground hover:text-foreground transition-colors">
+            <a href="/community/hub" className="text-xs uppercase tracking-widest text-muted-foreground hover:text-foreground transition-colors">
               Community
             </a>
             <a href="/" className="text-xs uppercase tracking-widest text-muted-foreground hover:text-foreground transition-colors">

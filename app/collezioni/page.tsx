@@ -33,7 +33,9 @@ export default async function CollezioniPage() {
     supabase.from("products").select("*").order("created_at", { ascending: false }),
   ])
 
-  const categories = categoriesRes.data || []
+  const categories = (categoriesRes.data || []).filter(
+    (category) => category.slug?.toLowerCase() !== "abbigliamento"
+  )
   const products = withDemoProducts(productsRes.data || [])
 
   // Separate parents and subcategories
