@@ -125,7 +125,7 @@ export function Navbar() {
   return (
     <header className="fixed top-0 left-0 right-0 z-50">
       <nav className="mirai-neon-divider bg-[#0c0c0d]/88 backdrop-blur-2xl">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
+        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
           <div className="flex items-center gap-8">
             <Link href="/" className="flex items-center shrink-0">
               <span
@@ -136,7 +136,7 @@ export function Navbar() {
               </span>
             </Link>
 
-            <div className="hidden lg:flex items-center gap-8">
+            <div className="hidden items-center gap-5 whitespace-nowrap 2xl:flex">
               <Link
                 href="/collezioni"
                 className="inline-flex items-center rounded-sm bg-primary px-4 py-2 text-[11px] font-bold uppercase tracking-[0.2em] text-primary-foreground transition-all hover:-translate-y-0.5 hover:bg-primary/90 hover:shadow-[0_10px_30px_rgba(168,85,247,0.25)]"
@@ -264,7 +264,7 @@ export function Navbar() {
             <LanguageSwitcher />
             <CartSidebar />
             <button
-              className="text-white lg:hidden"
+              className="text-white 2xl:hidden"
               onClick={() => setMobileOpen(!mobileOpen)}
               aria-label={mobileOpen ? t.nav.closeMenu : t.nav.openMenu}
             >
@@ -280,7 +280,7 @@ export function Navbar() {
 
       {/* Mobile menu */}
       {mobileOpen && (
-        <div className="border-t border-white/10 bg-[#111113] lg:hidden">
+        <div className="border-t border-white/10 bg-[#111113] 2xl:hidden">
           <div className="flex flex-col px-6 py-6 gap-4">
             <Link
               href="/collezioni"

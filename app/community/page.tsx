@@ -41,8 +41,8 @@ export default async function CommunityLandingPage() {
             Scopri i drop prima degli altri, partecipa alle scelte del brand e accedi alle esperienze riservate alla community.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
-            <Link href={primaryHref} className="inline-flex items-center gap-2 bg-white px-6 py-3.5 text-[10px] font-bold uppercase tracking-[0.18em] text-black transition-transform hover:-translate-y-0.5">
-              {primaryLabel} <ArrowRight className="h-4 w-4" />
+            <Link href={primaryHref} className="inline-flex min-h-16 items-center gap-3 bg-white px-9 py-5 text-xs font-bold uppercase tracking-[0.18em] text-black shadow-[0_18px_50px_rgba(0,0,0,0.35)] transition-transform hover:-translate-y-0.5 sm:px-11 sm:text-sm">
+              {primaryLabel} <ArrowRight className="h-5 w-5" />
             </Link>
             {!user && (
               <Link href="/auth/login?redirectTo=/community/hub" className="inline-flex items-center gap-2 border border-white/25 bg-black/25 px-6 py-3.5 text-[10px] font-bold uppercase tracking-[0.18em] text-white backdrop-blur-md hover:border-primary/70">
@@ -102,8 +102,8 @@ export default async function CommunityLandingPage() {
               </p>
             </div>
           </div>
-          <Link href={primaryHref} className="inline-flex shrink-0 items-center gap-2 bg-primary px-5 py-3 text-[9px] font-bold uppercase tracking-[0.18em] text-black">
-            {primaryLabel} <ArrowRight className="h-3.5 w-3.5" />
+          <Link href={primaryHref} className="inline-flex min-h-14 shrink-0 items-center gap-2 bg-primary px-7 py-4 text-[11px] font-bold uppercase tracking-[0.18em] text-black">
+            {primaryLabel} <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
       </section>

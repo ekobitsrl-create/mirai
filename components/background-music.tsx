@@ -97,7 +97,7 @@ export function BackgroundMusic() {
 
   return (
     <>
-      <audio ref={audioRef} src="/audio/mirai-soundtrack.mpeg" loop preload="auto" aria-hidden="true" />
+      <audio ref={audioRef} src="/audio/mirai-beat-site-2026.mpeg" loop preload="auto" aria-hidden="true" />
       {ready && (
         <button
           type="button"

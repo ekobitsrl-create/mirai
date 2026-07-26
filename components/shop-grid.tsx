@@ -339,7 +339,7 @@ export function ShopGrid({
         </div>
       </section>
 
-      <section className="mirai-neon-divider sticky top-[95px] z-30 bg-background/90 backdrop-blur-2xl">
+      <section className="mirai-neon-divider sticky top-16 z-30 bg-background/90 backdrop-blur-2xl">
         <div className="mx-auto flex max-w-[1500px] items-center gap-3 px-5 py-3 md:px-8">
           <div className="relative min-w-0 flex-1 md:max-w-md">
             <Search className="absolute left-0 top-1/2 h-4 w-4 -translate-y-1/2 text-white/40" />
