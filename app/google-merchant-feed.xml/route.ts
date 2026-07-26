@@ -52,6 +52,15 @@ const PRODUCT_TYPE_BY_STORE_CATEGORY: Record<string, string> = {
 }
 
 const HEADWEAR_CATEGORIES = new Set(["headwear", "cappelli", "caps", "hats"])
+const TSHIRT_CATEGORIES = new Set(["t-shirt", "tshirt", "magliette"])
+const GOOGLE_ADS_CAMPAIGN_LABEL = "campagna_selezionati"
+const GOOGLE_ADS_SELECTED_SUPPLIER_SKUS = new Set([
+  "M.0089",
+  "M.0230",
+  "M.0254",
+  "M.0255",
+  "M.0268",
+])
 
 const COLOR_KEYWORDS: Array<[RegExp, string]> = [
   [/\bnavy\b/i, "Blu navy"],
@@ -172,6 +181,18 @@ function getColor(product: StoreProduct) {
   return [...new Set(colors)].join(" / ") || "Multicolore"
 }
 
+function getGoogleAdsCampaignLabel(product: StoreProduct) {
+  const categoryKey = product.category.toLowerCase()
+  const isSelectedSupplierProduct = Boolean(
+    product.supplier_sku && GOOGLE_ADS_SELECTED_SUPPLIER_SKUS.has(product.supplier_sku.toUpperCase()),
+  )
+  const isOversizeTshirt = TSHIRT_CATEGORIES.has(categoryKey) && /\boversize\b/i.test(product.name)
+
+  return isSelectedSupplierProduct || isOversizeTshirt
+    ? GOOGLE_ADS_CAMPAIGN_LABEL
+    : null
+}
+
 function renderReturnPolicy(baseUrl: string) {
   return [
     "      <g:returns>",
@@ -244,6 +265,7 @@ function renderProductVariant(product: StoreProduct, size: string, baseUrl: stri
   const googleCategory = GOOGLE_CATEGORY_BY_STORE_CATEGORY[categoryKey] || "166"
   const availability = getAvailability(product, size)
   const isHeadwear = HEADWEAR_CATEGORIES.has(categoryKey)
+  const googleAdsCampaignLabel = getGoogleAdsCampaignLabel(product)
 
   return [
     "    <item>",
@@ -277,6 +299,9 @@ function renderProductVariant(product: StoreProduct, size: string, baseUrl: stri
     "      <g:excluded_destination>Local_inventory_ads</g:excluded_destination>",
     "      <g:excluded_destination>Free_local_listings</g:excluded_destination>",
     product.is_new ? "      <g:custom_label_0>Nuovi arrivi</g:custom_label_0>" : "",
+    ...(googleAdsCampaignLabel
+      ? [`      <g:custom_label_2>${escapeXml(googleAdsCampaignLabel)}</g:custom_label_2>`]
+      : []),
     ...(supplierSettings.merchantCustomLabel3
       ? [`      <g:custom_label_3>${escapeXml(supplierSettings.merchantCustomLabel3)}</g:custom_label_3>`]
       : []),
