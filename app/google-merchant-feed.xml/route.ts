@@ -231,7 +231,8 @@ function getGoogleAdsCampaignLabel(product: StoreProduct) {
   const isSelectedSupplierProduct = Boolean(
     product.supplier_sku && GOOGLE_ADS_SELECTED_SUPPLIER_SKUS.has(product.supplier_sku.toUpperCase()),
   )
-  const isOversizeTshirt = TSHIRT_CATEGORIES.has(categoryKey) && /\boversize\b/i.test(product.name)
+  const isOversizeTshirt = TSHIRT_CATEGORIES.has(categoryKey)
+    && /^\s*t-?shirt\s+oversize\b/i.test(product.name)
 
   return isSelectedSupplierProduct || isOversizeTshirt
     ? GOOGLE_ADS_CAMPAIGN_LABEL
