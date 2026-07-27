@@ -1,5 +1,6 @@
 'use server'
 
+import type Stripe from 'stripe'
 import { assertStripeCheckoutConfigured, stripe } from '@/lib/stripe'
 import { createClient, getServerUser } from '@/lib/supabase/server'
 import { getDemoProduct, isBlackIslandProduct, type StoreProduct } from '@/lib/products'
@@ -10,6 +11,11 @@ import { getEstimatedDeliveryDate } from '@/lib/google-customer-reviews'
 import { getPremiumProductTitle } from '@/lib/product-titles'
 import { markCheckoutRecovered, saveAbandonedCheckout } from '@/lib/email/abandoned-cart'
 import { sendOrderConfirmationEmail } from '@/lib/email/order-emails'
+import {
+  recordDiscountUsage,
+  validateDiscountCode,
+  type AppliedDiscount,
+} from '@/lib/discounts'
 import {
   CUSTOM_TEE_PRODUCT_ID,
   customizationMetadata,
@@ -27,6 +33,7 @@ type CartLineItem = {
 
 export type CashOnDeliveryDetails = {
   guestEmail?: string
+  discountCode?: string
   name: string
   address: string
   city: string
@@ -39,11 +46,101 @@ function validEmail(value?: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ? email : null
 }
 
+function stripeCouponId(discount: AppliedDiscount) {
+  const safeCode = discount.code.toLowerCase().replace(/[^a-z0-9_-]/g, '_')
+  const safeValue = String(discount.value).replace(/[^0-9]/g, '_')
+  return `mirai_${safeCode}_${discount.type}_${safeValue}`
+}
+
+async function ensureStripeCoupon(discount: AppliedDiscount) {
+  const couponId = stripeCouponId(discount)
+
+  try {
+    const existing = await stripe.coupons.retrieve(couponId)
+    if (!('deleted' in existing && existing.deleted)) return existing.id
+  } catch (error) {
+    const stripeError = error as { code?: string; statusCode?: number }
+    if (stripeError.code !== 'resource_missing' && stripeError.statusCode !== 404) throw error
+  }
+
+  const couponData = discount.type === 'percentage'
+    ? { percent_off: discount.value }
+    : { amount_off: Math.round(discount.value * 100), currency: 'eur' as const }
+
+  try {
+    const created = await stripe.coupons.create({
+      id: couponId,
+      duration: 'once',
+      name: discount.code,
+      metadata: {
+        mirai_discount_code: discount.code,
+        mirai_discount_type: discount.type,
+        mirai_discount_value: String(discount.value),
+      },
+      ...couponData,
+    })
+    return created.id
+  } catch (error) {
+    // Two checkouts may create the same deterministic coupon concurrently.
+    const existing = await stripe.coupons.retrieve(couponId)
+    if (!('deleted' in existing && existing.deleted)) return existing.id
+    throw error
+  }
+}
+
+export async function validateCheckoutDiscount(
+  cartItems: CartLineItem[],
+  guestEmail: string | undefined,
+  discountCode: string,
+) {
+  const user = await getServerUser()
+  const customerEmail = validEmail(user?.email || guestEmail)
+  if (!customerEmail) {
+    throw new Error('Inserisci un indirizzo email valido prima di applicare il codice')
+  }
+  if (!cartItems.length) throw new Error('Il carrello è vuoto')
+
+  const supabase = await createClient()
+  const productIds = [...new Set(cartItems.map((item) => item.productId))]
+  const { data: products, error } = await supabase
+    .from('products')
+    .select('id, price')
+    .in('id', productIds)
+
+  const demoProducts = productIds
+    .map(getDemoProduct)
+    .filter((product): product is StoreProduct => product !== null)
+  const checkoutProducts = [...(products || []), ...demoProducts]
+  if (error && checkoutProducts.length === 0) {
+    throw new Error('Errore nel recupero dei prodotti')
+  }
+
+  const subtotalCents = cartItems.reduce((total, cartItem) => {
+    const product = checkoutProducts.find((candidate) => candidate.id === cartItem.productId)
+    if (!product) throw new Error(`Prodotto ${cartItem.productId} non trovato`)
+
+    const quantity = Number(cartItem.quantity)
+    if (!Number.isInteger(quantity) || quantity < 1) {
+      throw new Error('Quantità non valida nel carrello')
+    }
+
+    return total + Math.round(Number(product.price) * 100) * quantity
+  }, 0)
+
+  return validateDiscountCode({
+    supabase,
+    code: discountCode,
+    customerEmail,
+    subtotalCents,
+  })
+}
+
 export async function createCheckoutSession(
   cartItems: CartLineItem[],
   guestEmail?: string,
   marketingConsent = false,
   previousCheckoutSessionId?: string | null,
+  discountCode?: string,
 ) {
   assertStripeCheckoutConfigured()
   const user = await getServerUser()
@@ -144,8 +241,25 @@ export async function createCheckoutSession(
     (total, item) => total + item.price_data.unit_amount * item.quantity,
     0
   )
+  const appliedDiscount = discountCode
+    ? await validateDiscountCode({
+        supabase,
+        code: discountCode,
+        customerEmail,
+        subtotalCents,
+      })
+    : null
+  const couponId = appliedDiscount ? await ensureStripeCoupon(appliedDiscount) : null
+  const discountMetadata: Record<string, string> = {}
+  if (appliedDiscount) {
+    discountMetadata.discount_code = appliedDiscount.code
+    discountMetadata.discount_type = appliedDiscount.type
+    discountMetadata.discount_value = String(appliedDiscount.value)
+    discountMetadata.discount_amount_cents = String(appliedDiscount.discountCents)
+    discountMetadata.subtotal_cents = String(appliedDiscount.subtotalCents)
+  }
 
-  const session = await stripe.checkout.sessions.create({
+  const sessionParams: Stripe.Checkout.SessionCreateParams = {
     ui_mode: 'embedded',
     redirect_on_completion: 'if_required',
     return_url: `${baseUrl}/success?session_id={CHECKOUT_SESSION_ID}`,
@@ -157,16 +271,26 @@ export async function createCheckoutSession(
     metadata: {
       order_item_count: String(cartItems.length),
       ...(user ? { user_id: user.id } : {}),
+      ...discountMetadata,
     },
     payment_intent_data: {
       receipt_email: customerEmail,
-      metadata: user ? { user_id: user.id } : {},
+      metadata: {
+        ...(user ? { user_id: user.id } : {}),
+        ...discountMetadata,
+      },
     },
     shipping_address_collection: {
       allowed_countries: [...SHIPPING_CONFIG.allowedCountries],
     },
     shipping_options: getStripeShippingOptions(subtotalCents),
-  })
+  }
+
+  if (couponId) {
+    sessionParams.discounts = [{ coupon: couponId }]
+  }
+
+  const session = await stripe.checkout.sessions.create(sessionParams)
 
   if (!session.client_secret) {
     throw new Error('Impossibile inizializzare il pagamento')
@@ -189,13 +313,23 @@ export async function createCheckoutSession(
     })),
   })
 
-  return { clientSecret: session.client_secret, sessionId: session.id }
+  return {
+    clientSecret: session.client_secret,
+    sessionId: session.id,
+    discount: appliedDiscount,
+  }
 }
 
 function cleanDeliveryField(value: string, label: string, maximumLength: number) {
   const cleaned = (typeof value === 'string' ? value : '').replace(/\s+/g, ' ').trim().slice(0, maximumLength)
   if (!cleaned) throw new Error(`${label} obbligatorio`)
   return cleaned
+}
+
+function isMissingDiscountOrderColumns(error: { code?: string; message?: string } | null) {
+  const message = error?.message?.toLowerCase() || ''
+  return error?.code === 'PGRST204'
+    && (message.includes('subtotal') || message.includes('discount_'))
 }
 
 export async function createCashOnDeliveryOrder(cartItems: CartLineItem[], details: CashOnDeliveryDetails) {
@@ -282,29 +416,65 @@ export async function createCashOnDeliveryOrder(cartItems: CartLineItem[], detai
     return { cartItem, product: staticProduct, quantity, customization }
   })
 
-  const total = validatedItems.reduce((amount, item) => amount + Number(item.product.price) * item.quantity, 0)
+  const subtotalCents = validatedItems.reduce(
+    (amount, item) => amount + Math.round(Number(item.product.price) * 100) * item.quantity,
+    0,
+  )
+  const appliedDiscount = details.discountCode
+    ? await validateDiscountCode({
+        supabase,
+        code: details.discountCode,
+        customerEmail,
+        subtotalCents,
+      })
+    : null
+  const totalCents = appliedDiscount?.totalCents ?? subtotalCents
   const customizations = validatedItems
     .filter((item) => item.customization)
     .map((item) => `${item.product.name}: ${customizationSummary(item.customization!)}`)
-  const orderNotes = ['Pagamento in contrassegno alla consegna', ...customizations].join(' | ')
+  const orderNotes = [
+    'Pagamento in contrassegno alla consegna',
+    ...(appliedDiscount
+      ? [`Codice sconto ${appliedDiscount.code}: -€${(appliedDiscount.discountCents / 100).toFixed(2)}`]
+      : []),
+    ...customizations,
+  ].join(' | ')
 
-  const { data: order, error: orderError } = await supabase
+  const baseOrderPayload = {
+    user_id: user?.id || null,
+    email: customerEmail,
+    status: 'pending',
+    total: totalCents / 100,
+    shipping_name: shippingName,
+    shipping_address: shippingAddress,
+    shipping_city: shippingCity,
+    shipping_zip: shippingZip,
+    shipping_country: 'IT',
+    notes: orderNotes,
+  }
+
+  let orderResult = await supabase
     .from('orders')
     .insert({
-      user_id: user?.id || null,
-      email: customerEmail,
-      status: 'pending',
-      total,
-      shipping_name: shippingName,
-      shipping_address: shippingAddress,
-      shipping_city: shippingCity,
-      shipping_zip: shippingZip,
-      shipping_country: 'IT',
-      notes: orderNotes,
+      ...baseOrderPayload,
+      subtotal: subtotalCents / 100,
+      discount_code: appliedDiscount?.code || null,
+      discount_type: appliedDiscount?.type || null,
+      discount_value: appliedDiscount?.value || null,
+      discount_amount: (appliedDiscount?.discountCents || 0) / 100,
     })
     .select('id')
     .single()
 
+  if (orderResult.error && isMissingDiscountOrderColumns(orderResult.error)) {
+    orderResult = await supabase
+      .from('orders')
+      .insert(baseOrderPayload)
+      .select('id')
+      .single()
+  }
+
+  const { data: order, error: orderError } = orderResult
   if (orderError || !order) {
     throw new Error('Non e stato possibile registrare l ordine')
   }
@@ -326,6 +496,7 @@ export async function createCashOnDeliveryOrder(cartItems: CartLineItem[], detai
 
   try {
     await applyOrderInventory(supabase, order.id, { allowLegacyFallback: true })
+    await recordDiscountUsage(supabase, appliedDiscount?.code)
   } catch (inventoryError) {
     console.error('Impossibile aggiornare le quantita del catalogo', inventoryError)
     throw new Error('Ordine registrato, ma la disponibilita del catalogo non e stata aggiornata')

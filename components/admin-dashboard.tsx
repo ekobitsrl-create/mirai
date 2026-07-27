@@ -5,13 +5,16 @@ import { AdminProductTable } from "@/components/admin-product-table"
 import { AdminCategoriesTable } from "@/components/admin-categories-table"
 import { AdminOrdersTable } from "@/components/admin-orders-table"
 import { AdminUsersTable } from "@/components/admin-users-table"
-import { Package, FolderTree, ShoppingCart, Users } from "lucide-react"
+import { AdminDiscountCodesTable } from "@/components/admin-discount-codes-table"
+import { BadgePercent, Package, FolderTree, ShoppingCart, Users } from "lucide-react"
 
 type Props = {
   products: any[]
   categories: any[]
   orders: any[]
   users: any[]
+  discountCodes: any[]
+  discountCodesReadOnly?: boolean
   stats: {
     totalProducts: number
     totalOrders: number
@@ -25,12 +28,21 @@ const TABS = [
   { id: "products", label: "Prodotti", icon: Package },
   { id: "categories", label: "Categorie", icon: FolderTree },
   { id: "orders", label: "Ordini", icon: ShoppingCart },
+  { id: "discounts", label: "Sconti", icon: BadgePercent },
   { id: "users", label: "Utenti", icon: Users },
 ] as const
 
 type TabId = (typeof TABS)[number]["id"]
 
-export function AdminDashboard({ products, categories, orders, users, stats }: Props) {
+export function AdminDashboard({
+  products,
+  categories,
+  orders,
+  users,
+  discountCodes,
+  discountCodesReadOnly = false,
+  stats,
+}: Props) {
   const [activeTab, setActiveTab] = useState<TabId>("products")
 
   return (
@@ -89,6 +101,12 @@ export function AdminDashboard({ products, categories, orders, users, stats }: P
       {activeTab === "products" && <AdminProductTable products={products} categories={categories} />}
       {activeTab === "categories" && <AdminCategoriesTable categories={categories} />}
       {activeTab === "orders" && <AdminOrdersTable orders={orders} />}
+      {activeTab === "discounts" && (
+        <AdminDiscountCodesTable
+          discountCodes={discountCodes}
+          readOnly={discountCodesReadOnly}
+        />
+      )}
       {activeTab === "users" && <AdminUsersTable users={users} />}
     </div>
   )

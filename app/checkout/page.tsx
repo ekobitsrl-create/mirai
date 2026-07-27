@@ -4,10 +4,11 @@ import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } fro
 import { loadStripe } from "@stripe/stripe-js"
 import { EmbeddedCheckoutProvider, EmbeddedCheckout } from "@stripe/react-stripe-js"
 import Link from "next/link"
-import { AlertCircle, ArrowLeft, Banknote, CreditCard, LoaderCircle, LockKeyhole, Mail, RefreshCw, ShoppingBag, UserPlus } from "lucide-react"
+import { AlertCircle, ArrowLeft, BadgePercent, Banknote, Check, CreditCard, LoaderCircle, LockKeyhole, Mail, RefreshCw, ShoppingBag, UserPlus, X } from "lucide-react"
 import { useCart } from "@/lib/cart-context"
 import { useLanguage } from "@/lib/language-context"
-import { createCashOnDeliveryOrder, createCheckoutSession } from "@/app/actions/stripe"
+import { createCashOnDeliveryOrder, createCheckoutSession, validateCheckoutDiscount } from "@/app/actions/stripe"
+import type { AppliedDiscount } from "@/lib/discounts"
 import { getGoogleReviewStorageKey } from "@/lib/google-customer-reviews"
 import { createClient } from "@/lib/supabase/client"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -35,6 +36,10 @@ export default function CheckoutPage() {
   const [cardError, setCardError] = useState<string | null>(null)
   const [cardLoading, setCardLoading] = useState(false)
   const [cardAttempt, setCardAttempt] = useState(0)
+  const [promoCode, setPromoCode] = useState("")
+  const [promoError, setPromoError] = useState<string | null>(null)
+  const [promoLoading, setPromoLoading] = useState(false)
+  const [appliedDiscount, setAppliedDiscount] = useState<AppliedDiscount | null>(null)
   const sessionIdRef = useRef<string | null>(null)
   const checkoutSessionRef = useRef<{ key: string; promise: Promise<string> } | null>(null)
 
@@ -65,8 +70,13 @@ export default function CheckoutPage() {
   const checkoutEmail = (requiresGuestEmail ? guestEmail : accountEmail).trim().toLowerCase()
 
   const checkoutKey = useMemo(
-    () => JSON.stringify({ cartLineItems, email: checkoutEmail, marketingConsent }),
-    [cartLineItems, checkoutEmail, marketingConsent]
+    () => JSON.stringify({
+      cartLineItems,
+      email: checkoutEmail,
+      marketingConsent,
+      discountCode: appliedDiscount?.code || "",
+    }),
+    [appliedDiscount?.code, cartLineItems, checkoutEmail, marketingConsent]
   )
 
   const fetchClientSecret = useCallback(() => {
@@ -87,6 +97,7 @@ export default function CheckoutPage() {
       checkoutEmail,
       marketingConsent,
       sessionIdRef.current,
+      appliedDiscount?.code,
     )
       .then((session) => {
         if (!session?.clientSecret) throw new Error(t.checkout.error)
@@ -104,7 +115,7 @@ export default function CheckoutPage() {
 
     checkoutSessionRef.current = { key: checkoutKey, promise }
     return promise
-  }, [cartLineItems, checkoutEmail, checkoutKey, marketingConsent, t.checkout.error])
+  }, [appliedDiscount?.code, cartLineItems, checkoutEmail, checkoutKey, marketingConsent, t.checkout.error])
 
   const retryCardCheckout = () => {
     checkoutSessionRef.current = null
@@ -112,6 +123,48 @@ export default function CheckoutPage() {
     setCardError(null)
     setCardAttempt((attempt) => attempt + 1)
   }
+
+  const resetCardCheckout = () => {
+    checkoutSessionRef.current = null
+    setCardError(null)
+    setCardAttempt((attempt) => attempt + 1)
+  }
+
+  const applyPromoCode = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    setPromoError(null)
+
+    if (!emailPattern.test(checkoutEmail)) {
+      setPromoError("Inserisci prima un indirizzo email valido.")
+      return
+    }
+
+    setPromoLoading(true)
+    try {
+      const discount = await validateCheckoutDiscount(
+        cartLineItems,
+        checkoutEmail,
+        promoCode,
+      )
+      setAppliedDiscount(discount)
+      setPromoCode(discount.code)
+      resetCardCheckout()
+    } catch (error) {
+      setAppliedDiscount(null)
+      setPromoError(error instanceof Error ? error.message : "Codice sconto non valido")
+      resetCardCheckout()
+    } finally {
+      setPromoLoading(false)
+    }
+  }
+
+  const removePromoCode = () => {
+    setAppliedDiscount(null)
+    setPromoCode("")
+    setPromoError(null)
+    resetCardCheckout()
+  }
+
   const beginGuestCheckout = () => {
     if (!emailPattern.test(guestEmail.trim())) {
       setGuestError("Inserisci un indirizzo email valido per ricevere la conferma ordine.")
@@ -138,6 +191,7 @@ export default function CheckoutPage() {
         })),
         {
           guestEmail: checkoutEmail,
+          discountCode: appliedDiscount?.code,
           ...cashDetails,
           country: "IT",
         }
@@ -198,8 +252,24 @@ export default function CheckoutPage() {
             </h1>
           </div>
           <div className="text-right">
-            <p className="text-sm text-muted-foreground">{t.checkout.total}</p>
-            <p className="text-2xl font-bold text-foreground">{"\u20AC"}{getTotal().toFixed(2)}</p>
+            {appliedDiscount ? (
+              <>
+                <p className="text-xs text-muted-foreground">
+                  Subtotale <span className="line-through">{"\u20AC"}{(appliedDiscount.subtotalCents / 100).toFixed(2)}</span>
+                </p>
+                <p className="mt-1 text-xs font-semibold text-emerald-400">
+                  -{"\u20AC"}{(appliedDiscount.discountCents / 100).toFixed(2)} con {appliedDiscount.code}
+                </p>
+                <p className="mt-1 text-2xl font-bold text-foreground">
+                  {"\u20AC"}{(appliedDiscount.totalCents / 100).toFixed(2)}
+                </p>
+              </>
+            ) : (
+              <>
+                <p className="text-sm text-muted-foreground">{t.checkout.total}</p>
+                <p className="text-2xl font-bold text-foreground">{"\u20AC"}{getTotal().toFixed(2)}</p>
+              </>
+            )}
           </div>
         </div>
 
@@ -223,6 +293,11 @@ export default function CheckoutPage() {
                 onChange={(event) => {
                   setGuestEmail(event.target.value)
                   setGuestError(null)
+                  if (appliedDiscount) {
+                    setAppliedDiscount(null)
+                    setPromoError(null)
+                    resetCardCheckout()
+                  }
                 }}
                 placeholder="nome@esempio.com"
                 className="mt-2 bg-secondary"
@@ -261,9 +336,81 @@ export default function CheckoutPage() {
             {requiresGuestEmail && (
               <div className="mb-4 flex items-center justify-between border border-border bg-card px-4 py-3 text-sm text-muted-foreground">
                 <span>Acquisto come ospite: {guestEmail.trim()}</span>
-                <button type="button" onClick={() => setGuestCheckoutReady(false)} className="text-xs font-bold uppercase tracking-widest text-primary">Modifica</button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setGuestCheckoutReady(false)
+                    if (appliedDiscount) removePromoCode()
+                  }}
+                  className="text-xs font-bold uppercase tracking-widest text-primary"
+                >
+                  Modifica
+                </button>
               </div>
             )}
+            <section className="mb-4 border border-border bg-card p-4 sm:p-5">
+              <div className="flex items-start gap-3">
+                <BadgePercent className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
+                <div className="min-w-0 flex-1">
+                  <p className="font-semibold text-foreground">Hai un codice sconto?</p>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    MIRAI10 ti dà il 10% sul primo ordine.
+                  </p>
+                </div>
+              </div>
+
+              {appliedDiscount ? (
+                <div className="mt-4 flex flex-col gap-3 border border-emerald-400/30 bg-emerald-400/5 p-4 sm:flex-row sm:items-center sm:justify-between">
+                  <div className="flex items-center gap-3">
+                    <span className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-400/15 text-emerald-400">
+                      <Check className="h-4 w-4" />
+                    </span>
+                    <div>
+                      <p className="text-sm font-semibold text-foreground">
+                        Codice {appliedDiscount.code} applicato
+                      </p>
+                      <p className="text-xs text-emerald-400">
+                        Risparmi {"\u20AC"}{(appliedDiscount.discountCents / 100).toFixed(2)}
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={removePromoCode}
+                    className="inline-flex min-h-9 items-center justify-center gap-2 border border-border px-3 text-[10px] font-bold uppercase tracking-widest text-muted-foreground transition-colors hover:text-foreground"
+                  >
+                    <X className="h-3.5 w-3.5" /> Rimuovi
+                  </button>
+                </div>
+              ) : (
+                <form onSubmit={applyPromoCode} className="mt-4 flex flex-col gap-3 sm:flex-row">
+                  <Input
+                    aria-label="Codice sconto"
+                    autoCapitalize="characters"
+                    autoComplete="off"
+                    value={promoCode}
+                    onChange={(event) => {
+                      setPromoCode(event.target.value.toUpperCase())
+                      setPromoError(null)
+                    }}
+                    placeholder="Inserisci il codice"
+                    className="h-11 flex-1 bg-secondary uppercase tracking-widest"
+                  />
+                  <button
+                    type="submit"
+                    disabled={promoLoading || !promoCode.trim()}
+                    className="inline-flex min-h-11 items-center justify-center gap-2 bg-primary px-5 text-xs font-bold uppercase tracking-widest text-primary-foreground transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    {promoLoading && <LoaderCircle className="h-4 w-4 animate-spin" />}
+                    Applica
+                  </button>
+                </form>
+              )}
+
+              {promoError && (
+                <p className="mt-3 text-sm text-destructive" role="alert">{promoError}</p>
+              )}
+            </section>
             <section className="mb-4 border border-border bg-card p-4 sm:p-5">
               <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Metodo di pagamento</p>
               <div className="mt-3 grid grid-cols-2 border border-border" role="radiogroup" aria-label="Metodo di pagamento">

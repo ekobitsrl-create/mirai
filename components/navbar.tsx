@@ -8,6 +8,7 @@ import { createClient } from "@/lib/supabase/client"
 import { useCart } from "@/lib/cart-context"
 import { useLanguage } from "@/lib/language-context"
 import { LanguageSwitcher } from "@/components/language-switcher"
+import { MarqueeBanner } from "@/components/marquee-banner"
 
 type CategoryNode = {
   id: string
@@ -58,7 +59,7 @@ function useCategories() {
   return tree
 }
 
-export function Navbar() {
+export function Navbar({ showPromo = false }: { showPromo?: boolean }) {
   const [mobileOpen, setMobileOpen] = useState(false)
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [dropdownOpen, setDropdownOpen] = useState(false)
@@ -124,6 +125,7 @@ export function Navbar() {
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50">
+      {showPromo && <MarqueeBanner />}
       <nav className="mirai-neon-divider bg-[#0c0c0d]/88 backdrop-blur-2xl">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
           <div className="flex items-center gap-8">

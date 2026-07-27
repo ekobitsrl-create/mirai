@@ -19,6 +19,11 @@ type Order = {
   email: string
   status: string
   total: number
+  subtotal: number | null
+  discount_code: string | null
+  discount_type: string | null
+  discount_value: number | null
+  discount_amount: number | null
   shipping_name: string | null
   shipping_address: string | null
   shipping_city: string | null
@@ -146,6 +151,22 @@ export function AdminOrdersTable({ orders }: { orders: Order[] }) {
                         {order.shipping_zip} {order.shipping_city}, {order.shipping_country}
                       </p>
                     )}
+                  </div>
+                )}
+
+                {order.discount_code && Number(order.discount_amount || 0) > 0 && (
+                  <div className="mb-6 rounded-lg border border-emerald-400/20 bg-emerald-400/5 p-4">
+                    <p className="text-xs uppercase tracking-widest text-emerald-400">Sconto applicato</p>
+                    <div className="mt-2 flex flex-wrap items-center justify-between gap-3 text-sm">
+                      <span className="font-mono font-semibold text-foreground">{order.discount_code}</span>
+                      <span className="text-muted-foreground">
+                        Subtotale {"\u20AC"}{Number(order.subtotal || 0).toFixed(2)}
+                        {" · "}
+                        Sconto -{"\u20AC"}{Number(order.discount_amount).toFixed(2)}
+                        {" · "}
+                        Totale {"\u20AC"}{Number(order.total).toFixed(2)}
+                      </span>
+                    </div>
                   </div>
                 )}
 

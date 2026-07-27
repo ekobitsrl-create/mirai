@@ -61,7 +61,7 @@ export default async function Home() {
           __html: JSON.stringify(createWebPageJsonLd({ name: "Streetwear Catania - MIRAI LAB STORE", description: HOME_DESCRIPTION, path: "/" })),
         }}
       />
-      <Navbar />
+      <Navbar showPromo />
       <Hero />
       <Collections categories={categories} />
       <ProductGrid products={products} />

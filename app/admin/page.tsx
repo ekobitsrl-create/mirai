@@ -1,8 +1,9 @@
 import { redirect } from "next/navigation"
 import { isAdminEmail } from "@/lib/admin"
-import { getServerUserWithProfile, createUserClient } from "@/lib/supabase/server"
+import { getServerUserWithProfile, createClient, createUserClient } from "@/lib/supabase/server"
 import { AdminDashboard } from "@/components/admin-dashboard"
 import { getPremiumProductTitle } from "@/lib/product-titles"
+import { getEnvironmentDiscountCodes } from "@/lib/discounts"
 
 export default async function AdminPage() {
   let userResult
@@ -19,12 +20,14 @@ export default async function AdminPage() {
 
   const supabase = await createUserClient()
   if (!supabase) redirect("/auth/login?redirectTo=/admin")
+  const adminSupabase = await createClient()
 
-  const [productsRes, categoriesRes, ordersRes, usersRes] = await Promise.all([
+  const [productsRes, categoriesRes, ordersRes, usersRes, discountCodesRes] = await Promise.all([
     supabase.from("products").select("*").order("created_at", { ascending: false }),
     supabase.from("categories").select("*").order("sort_order", { ascending: true }),
     supabase.from("orders").select("*, order_items(*)").order("created_at", { ascending: false }),
     supabase.from("profiles").select("*").order("created_at", { ascending: false }),
+    adminSupabase.from("discount_codes").select("*").order("created_at", { ascending: false }),
   ])
 
   const products = (productsRes.data || []).map((product) => ({
@@ -34,6 +37,14 @@ export default async function AdminPage() {
   const categories = categoriesRes.data || []
   const orders = ordersRes.data || []
   const users = usersRes.data || []
+  const discountCodesReadOnly = Boolean(discountCodesRes.error)
+  const discountCodes = discountCodesReadOnly
+    ? getEnvironmentDiscountCodes().map((discount) => ({
+        ...discount,
+        id: `env:${discount.code}`,
+        source: "environment",
+      }))
+    : discountCodesRes.data || []
 
   const stats = {
     totalProducts: products.length,
@@ -67,6 +78,8 @@ export default async function AdminPage() {
           categories={categories}
           orders={orders}
           users={users}
+          discountCodes={discountCodes}
+          discountCodesReadOnly={discountCodesReadOnly}
           stats={stats}
         />
       </div>

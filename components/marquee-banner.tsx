@@ -22,18 +22,8 @@ export function MarqueeBanner() {
   if (!visible) return null
 
   return (
-    <div className="relative z-50">
-      {/* Top info bar - subtle */}
-      <InfiniteMarquee speed="normal" className="bg-secondary border-b border-border py-2">
-        {["Spedizione Gratuita", "Resi Gratuiti entro 30 Giorni", "Pagamento Sicuro e Protetto"].map((msg, i) => (
-          <span key={i} className="mx-8 text-[11px] tracking-[0.2em] uppercase text-muted-foreground">
-            {msg}
-          </span>
-        ))}
-      </InfiniteMarquee>
-
-      {/* Promo discount bar */}
-      <div className="bg-primary relative">
+    <div className="relative z-50 border-b border-primary/25 bg-primary">
+      <div className="relative">
         <InfiniteMarquee speed="fast" className="py-2.5">
           {Array.from({ length: 6 }).map((_, i) => (
             <span key={i} className="flex items-center mx-6">
@@ -51,7 +41,7 @@ export function MarqueeBanner() {
         <button
           onClick={() => setVisible(false)}
           aria-label="Chiudi banner"
-          className="absolute right-3 top-1/2 -translate-y-1/2 z-10 bg-primary/80 p-1 text-primary-foreground/60 hover:text-primary-foreground transition-colors"
+          className="absolute right-3 top-1/2 z-10 -translate-y-1/2 bg-primary/90 p-1 text-primary-foreground/70 transition-colors hover:text-primary-foreground"
         >
           <X className="h-3 w-3" />
         </button>

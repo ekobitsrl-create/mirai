@@ -2,6 +2,7 @@ import type Stripe from 'stripe'
 import { createClient } from '@/lib/supabase/server'
 import { stripe } from '@/lib/stripe'
 import { applyOrderInventory } from '@/lib/orders/apply-order-inventory'
+import { recordDiscountUsage } from '@/lib/discounts'
 
 function activeProduct(product: string | Stripe.Product | Stripe.DeletedProduct | null): Stripe.Product | null {
   if (!product || typeof product === 'string' || ('deleted' in product && product.deleted)) return null
@@ -19,6 +20,12 @@ function shippingAddress(session: Stripe.Checkout.Session) {
     zip: address?.postal_code || null,
     country: address?.country || null,
   }
+}
+
+function isMissingDiscountOrderColumns(error: { code?: string; message?: string } | null) {
+  const message = error?.message?.toLowerCase() || ""
+  return error?.code === "PGRST204"
+    && (message.includes("subtotal") || message.includes("discount_"))
 }
 
 export async function saveStripeOrder(session: Stripe.Checkout.Session) {
@@ -45,23 +52,57 @@ export async function saveStripeOrder(session: Stripe.Checkout.Session) {
   })
   const shipping = shippingAddress(session)
   const userId = session.client_reference_id || session.metadata?.user_id
-  const { data: order, error: orderError } = await supabase
+  const discountCode = session.metadata?.discount_code || null
+  const discountType = session.metadata?.discount_type || null
+  const discountValue = Number(session.metadata?.discount_value || 0)
+  const discountAmountCents = Number(session.metadata?.discount_amount_cents || 0)
+  const subtotalCents = Number(
+    session.metadata?.subtotal_cents
+    || session.amount_subtotal
+    || session.amount_total
+    || 0,
+  )
+  const baseOrderPayload = {
+    user_id: userId || null,
+    email: session.customer_details?.email || session.customer_email || '',
+    status: 'confirmed',
+    total: (session.amount_total || 0) / 100,
+    shipping_name: shipping.name,
+    shipping_address: shipping.address,
+    shipping_city: shipping.city,
+    shipping_zip: shipping.zip,
+    shipping_country: shipping.country,
+    stripe_session_id: session.id,
+  }
+  const discountAuditNote = discountCode
+    ? `Codice sconto ${discountCode}: -€${(discountAmountCents / 100).toFixed(2)}`
+    : null
+
+  let orderResult = await supabase
     .from('orders')
     .insert({
-      user_id: userId || null,
-      email: session.customer_details?.email || session.customer_email || '',
-      status: 'confirmed',
-      total: (session.amount_total || 0) / 100,
-      shipping_name: shipping.name,
-      shipping_address: shipping.address,
-      shipping_city: shipping.city,
-      shipping_zip: shipping.zip,
-      shipping_country: shipping.country,
-      stripe_session_id: session.id,
+      ...baseOrderPayload,
+      subtotal: subtotalCents / 100,
+      discount_code: discountCode,
+      discount_type: discountType,
+      discount_value: discountCode ? discountValue : null,
+      discount_amount: discountAmountCents / 100,
     })
     .select('id')
     .single()
 
+  if (orderResult.error && isMissingDiscountOrderColumns(orderResult.error)) {
+    orderResult = await supabase
+      .from('orders')
+      .insert({
+        ...baseOrderPayload,
+        notes: discountAuditNote,
+      })
+      .select('id')
+      .single()
+  }
+
+  const { data: order, error: orderError } = orderResult
   if (orderError) {
     if (orderError.code === '23505') {
       const { data: concurrentOrder, error: concurrentOrderError } = await supabase
@@ -102,6 +143,7 @@ export async function saveStripeOrder(session: Stripe.Checkout.Session) {
   }
 
   await applyOrderInventory(supabase, order.id, { allowLegacyFallback: true })
+  await recordDiscountUsage(supabase, discountCode)
 
   return order.id
 }

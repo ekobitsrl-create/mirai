@@ -9,6 +9,8 @@ import { revalidatePath } from "next/cache"
 import { isBlackIslandProduct } from "@/lib/products"
 import { MIRAI_SUPPLIER_CATALOG } from "@/lib/mirai-supplier-catalog"
 import { getPremiumProductTitle } from "@/lib/product-titles"
+import { isAdminEmail } from "@/lib/admin"
+import { normalizeDiscountCode, type DiscountType } from "@/lib/discounts"
 
 function parseProductInventory(formData: FormData) {
   const sizesRaw = formData.get("sizes") as string
@@ -75,7 +77,7 @@ function revalidateCatalog(productId?: string) {
 async function assertAdmin() {
   const { user, profile } = await getServerUserWithProfile()
   if (!user) throw new Error("Non autenticato")
-  if (profile?.role !== "admin") throw new Error("Non autorizzato")
+  if (profile?.role !== "admin" && !isAdminEmail(user.email)) throw new Error("Non autorizzato")
 
   // Use the signed-in admin session so product policies work even without a service key.
   const supabase = await createUserClient()
@@ -369,6 +371,98 @@ export async function deleteOrder(formData: FormData) {
 
   if (error) throw new Error(error.message)
 
+  revalidatePath("/admin")
+}
+
+// --- Discount codes ---
+
+function parseDiscountCodeForm(formData: FormData) {
+  const code = normalizeDiscountCode(formData.get("code"))
+  if (!/^[A-Z0-9_-]{3,32}$/.test(code)) {
+    throw new Error("Il codice deve contenere 3-32 caratteri: lettere, numeri, trattino o underscore")
+  }
+
+  const discountType: DiscountType = formData.get("discount_type") === "fixed"
+    ? "fixed"
+    : "percentage"
+  const value = Number(formData.get("value"))
+  if (!Number.isFinite(value) || value <= 0) throw new Error("Inserisci un valore di sconto valido")
+  if (discountType === "percentage" && value > 100) {
+    throw new Error("La percentuale non può superare il 100%")
+  }
+
+  const minimumSubtotal = Number(formData.get("minimum_subtotal") || 0)
+  if (!Number.isFinite(minimumSubtotal) || minimumSubtotal < 0) {
+    throw new Error("Il subtotale minimo non è valido")
+  }
+
+  const rawMaxUses = String(formData.get("max_uses") || "").trim()
+  const maxUses = rawMaxUses ? Number(rawMaxUses) : null
+  if (maxUses !== null && (!Number.isInteger(maxUses) || maxUses < 1)) {
+    throw new Error("Il limite utilizzi deve essere un numero intero positivo")
+  }
+
+  const dateValue = (name: string) => {
+    const raw = String(formData.get(name) || "").trim()
+    if (!raw) return null
+    const parsed = new Date(raw)
+    if (Number.isNaN(parsed.getTime())) throw new Error("Data promozione non valida")
+    return parsed.toISOString()
+  }
+  const startsAt = dateValue("starts_at")
+  const endsAt = dateValue("ends_at")
+  if (startsAt && endsAt && new Date(endsAt) <= new Date(startsAt)) {
+    throw new Error("La scadenza deve essere successiva alla data di inizio")
+  }
+
+  return {
+    code,
+    discount_type: discountType,
+    value,
+    active: formData.get("active") === "on",
+    first_order_only: formData.get("first_order_only") === "on",
+    minimum_subtotal: minimumSubtotal,
+    starts_at: startsAt,
+    ends_at: endsAt,
+    max_uses: maxUses,
+    updated_at: new Date().toISOString(),
+  }
+}
+
+export async function createDiscountCode(formData: FormData) {
+  await assertAdmin()
+  const supabase = await createServerClient()
+  const values = parseDiscountCodeForm(formData)
+  const { error } = await supabase.from("discount_codes").insert(values)
+  if (error?.code === "23505") throw new Error("Esiste già un codice con questo nome")
+  if (error) throw new Error(error.message)
+  revalidatePath("/admin")
+}
+
+export async function updateDiscountCode(formData: FormData) {
+  await assertAdmin()
+  const supabase = await createServerClient()
+  const id = String(formData.get("id") || "")
+  if (!id) throw new Error("Codice sconto non trovato")
+
+  const { error } = await supabase
+    .from("discount_codes")
+    .update(parseDiscountCodeForm(formData))
+    .eq("id", id)
+
+  if (error?.code === "23505") throw new Error("Esiste già un codice con questo nome")
+  if (error) throw new Error(error.message)
+  revalidatePath("/admin")
+}
+
+export async function deleteDiscountCode(formData: FormData) {
+  await assertAdmin()
+  const supabase = await createServerClient()
+  const id = String(formData.get("id") || "")
+  if (!id) throw new Error("Codice sconto non trovato")
+
+  const { error } = await supabase.from("discount_codes").delete().eq("id", id)
+  if (error) throw new Error(error.message)
   revalidatePath("/admin")
 }
 
