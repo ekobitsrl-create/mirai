@@ -5,6 +5,8 @@ import { getServerUser } from '@/lib/supabase/server'
 import { saveStripeOrder } from '@/lib/orders/save-stripe-order'
 import { getEstimatedDeliveryDate } from '@/lib/google-customer-reviews'
 import { SHIPPING_CONFIG } from '@/lib/shipping'
+import { markCheckoutRecovered } from '@/lib/email/abandoned-cart'
+import { sendOrderConfirmationEmail } from '@/lib/email/order-emails'
 
 function formatAddress(address: Stripe.Address | null | undefined) {
   if (!address) return null
@@ -33,7 +35,12 @@ export async function GET(request: NextRequest) {
     }
 
     try {
-      await saveStripeOrder(session)
+      const orderId = await saveStripeOrder(session)
+      await markCheckoutRecovered({
+        checkoutSessionId: session.id,
+        email: session.customer_details?.email || session.customer_email,
+      })
+      await sendOrderConfirmationEmail(orderId, 'stripe')
     } catch (error) {
       console.error('Ordine pagato, sincronizzazione database rinviata al webhook:', error)
     }

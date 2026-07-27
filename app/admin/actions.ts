@@ -330,6 +330,16 @@ export async function updateOrderStatus(formData: FormData) {
 
   const id = formData.get("id") as string
   const status = formData.get("status") as string
+  const allowedStatuses = new Set(["pending", "confirmed", "processing", "shipped", "delivered", "cancelled"])
+  if (!allowedStatuses.has(status)) throw new Error("Stato ordine non valido")
+
+  const { data: existingOrder, error: existingOrderError } = await supabase
+    .from("orders")
+    .select("status")
+    .eq("id", id)
+    .single()
+
+  if (existingOrderError) throw new Error(existingOrderError.message)
 
   const { error } = await supabase
     .from("orders")
@@ -337,6 +347,15 @@ export async function updateOrderStatus(formData: FormData) {
     .eq("id", id)
 
   if (error) throw new Error(error.message)
+
+  if (existingOrder.status !== status) {
+    try {
+      const { sendOrderStatusEmail } = await import("@/lib/email/order-emails")
+      await sendOrderStatusEmail(id, status)
+    } catch (emailError) {
+      console.error("Stato aggiornato, ma email cliente non inviata", emailError)
+    }
+  }
 
   revalidatePath("/admin")
 }

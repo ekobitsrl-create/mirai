@@ -8,6 +8,8 @@ import { SITE_URL } from '@/lib/site-url'
 import { applyOrderInventory } from '@/lib/orders/apply-order-inventory'
 import { getEstimatedDeliveryDate } from '@/lib/google-customer-reviews'
 import { getPremiumProductTitle } from '@/lib/product-titles'
+import { markCheckoutRecovered, saveAbandonedCheckout } from '@/lib/email/abandoned-cart'
+import { sendOrderConfirmationEmail } from '@/lib/email/order-emails'
 import {
   CUSTOM_TEE_PRODUCT_ID,
   customizationMetadata,
@@ -37,7 +39,12 @@ function validEmail(value?: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ? email : null
 }
 
-export async function createCheckoutSession(cartItems: CartLineItem[], guestEmail?: string) {
+export async function createCheckoutSession(
+  cartItems: CartLineItem[],
+  guestEmail?: string,
+  marketingConsent = false,
+  previousCheckoutSessionId?: string | null,
+) {
   assertStripeCheckoutConfigured()
   const user = await getServerUser()
   const customerEmail = validEmail(user?.email || guestEmail)
@@ -164,6 +171,23 @@ export async function createCheckoutSession(cartItems: CartLineItem[], guestEmai
   if (!session.client_secret) {
     throw new Error('Impossibile inizializzare il pagamento')
   }
+
+  if (previousCheckoutSessionId && previousCheckoutSessionId !== session.id) {
+    await markCheckoutRecovered({ checkoutSessionId: previousCheckoutSessionId })
+  }
+
+  await saveAbandonedCheckout({
+    checkoutSessionId: session.id,
+    email: customerEmail,
+    consent: marketingConsent,
+    items: lineItems.map((item) => ({
+      name: item.price_data.product_data.name,
+      quantity: item.quantity,
+      price: item.price_data.unit_amount / 100,
+      image: item.price_data.product_data.images?.[0] || null,
+      size: item.price_data.product_data.metadata.size || null,
+    })),
+  })
 
   return { clientSecret: session.client_secret, sessionId: session.id }
 }
@@ -306,6 +330,9 @@ export async function createCashOnDeliveryOrder(cartItems: CartLineItem[], detai
     console.error('Impossibile aggiornare le quantita del catalogo', inventoryError)
     throw new Error('Ordine registrato, ma la disponibilita del catalogo non e stata aggiornata')
   }
+
+  await markCheckoutRecovered({ email: customerEmail })
+  await sendOrderConfirmationEmail(order.id, 'cash_on_delivery')
 
   return {
     orderId: order.id,
