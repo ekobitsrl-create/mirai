@@ -2,6 +2,12 @@ import { NextRequest, NextResponse } from 'next/server'
 import type Stripe from 'stripe'
 import { assertStripeConfigured, stripe } from '@/lib/stripe'
 import { saveStripeOrder } from '@/lib/orders/save-stripe-order'
+import { markCheckoutRecovered } from '@/lib/email/abandoned-cart'
+import {
+  sendCheckoutPaymentFailedEmail,
+  sendOrderConfirmationEmail,
+  sendPaymentIntentFailedEmail,
+} from '@/lib/email/order-emails'
 
 export const runtime = 'nodejs'
 
@@ -19,8 +25,21 @@ export async function POST(request: NextRequest) {
     if (event.type === 'checkout.session.completed' || event.type === 'checkout.session.async_payment_succeeded') {
       const session = event.data.object as Stripe.Checkout.Session
       if (session.payment_status === 'paid') {
-        await saveStripeOrder(session)
+        const orderId = await saveStripeOrder(session)
+        await markCheckoutRecovered({
+          checkoutSessionId: session.id,
+          email: session.customer_details?.email || session.customer_email,
+        })
+        await sendOrderConfirmationEmail(orderId, 'stripe')
       }
+    }
+
+    if (event.type === 'checkout.session.async_payment_failed') {
+      await sendCheckoutPaymentFailedEmail(event.data.object as Stripe.Checkout.Session)
+    }
+
+    if (event.type === 'payment_intent.payment_failed') {
+      await sendPaymentIntentFailedEmail(event.data.object as Stripe.PaymentIntent)
     }
 
     return NextResponse.json({ received: true })

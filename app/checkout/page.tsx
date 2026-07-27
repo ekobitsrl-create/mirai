@@ -26,6 +26,7 @@ export default function CheckoutPage() {
   const [guestEmail, setGuestEmail] = useState("")
   const [guestCheckoutReady, setGuestCheckoutReady] = useState(false)
   const [createAccount, setCreateAccount] = useState(false)
+  const [marketingConsent, setMarketingConsent] = useState(false)
   const [guestError, setGuestError] = useState<string | null>(null)
   const [paymentMethod, setPaymentMethod] = useState<"card" | "cash_on_delivery">("card")
   const [cashDetails, setCashDetails] = useState({ name: "", address: "", city: "", postalCode: "" })
@@ -64,8 +65,8 @@ export default function CheckoutPage() {
   const checkoutEmail = (requiresGuestEmail ? guestEmail : accountEmail).trim().toLowerCase()
 
   const checkoutKey = useMemo(
-    () => JSON.stringify({ cartLineItems, email: checkoutEmail }),
-    [cartLineItems, checkoutEmail]
+    () => JSON.stringify({ cartLineItems, email: checkoutEmail, marketingConsent }),
+    [cartLineItems, checkoutEmail, marketingConsent]
   )
 
   const fetchClientSecret = useCallback(() => {
@@ -81,7 +82,12 @@ export default function CheckoutPage() {
 
     setCardError(null)
     setCardLoading(true)
-    const promise = createCheckoutSession(cartLineItems, checkoutEmail)
+    const promise = createCheckoutSession(
+      cartLineItems,
+      checkoutEmail,
+      marketingConsent,
+      sessionIdRef.current,
+    )
       .then((session) => {
         if (!session?.clientSecret) throw new Error(t.checkout.error)
 
@@ -98,7 +104,7 @@ export default function CheckoutPage() {
 
     checkoutSessionRef.current = { key: checkoutKey, promise }
     return promise
-  }, [cartLineItems, checkoutEmail, checkoutKey, t.checkout.error])
+  }, [cartLineItems, checkoutEmail, checkoutKey, marketingConsent, t.checkout.error])
 
   const retryCardCheckout = () => {
     checkoutSessionRef.current = null
@@ -279,6 +285,16 @@ export default function CheckoutPage() {
                 >
                   <Banknote className="h-4 w-4" /> Contrassegno
                 </button>
+              </div>
+              <div className="mt-4 flex items-start gap-3 border-t border-border pt-4">
+                <Checkbox
+                  id="marketing-consent"
+                  checked={marketingConsent}
+                  onCheckedChange={(checked) => setMarketingConsent(checked === true)}
+                />
+                <Label htmlFor="marketing-consent" className="cursor-pointer text-sm leading-5 text-muted-foreground">
+                  Desidero ricevere promemoria sul carrello e novita MIRAI. Posso disiscrivermi in qualsiasi momento.
+                </Label>
               </div>
             </section>
 

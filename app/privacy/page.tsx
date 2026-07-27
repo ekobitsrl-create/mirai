@@ -23,7 +23,7 @@ export default function PrivacyPage() {
           <h1 className="mb-2 font-[family-name:var(--font-space-grotesk)] text-3xl font-bold tracking-tight text-foreground text-balance md:text-4xl">
             Privacy Policy
           </h1>
-          <p className="text-sm text-muted-foreground mb-12">Ultimo aggiornamento: 20 febbraio 2026</p>
+          <p className="text-sm text-muted-foreground mb-12">Ultimo aggiornamento: 27 luglio 2026</p>
 
           <div className="flex flex-col gap-10 text-muted-foreground leading-relaxed">
             <div className="flex flex-col gap-3">
@@ -35,7 +35,7 @@ export default function PrivacyPage() {
               <h2 className="font-[family-name:var(--font-space-grotesk)] text-xl font-bold text-foreground">2. Dati Raccolti</h2>
               <p>Raccogliamo i seguenti dati personali:</p>
               <ul className="flex flex-col gap-2 pl-4">
-                {["Dati identificativi: nome, cognome, indirizzo email", "Dati di contatto: indirizzo di spedizione, numero di telefono", "Dati di pagamento: elaborati tramite Stripe (non conserviamo dati delle carte)", "Dati di navigazione: indirizzo IP, tipo di browser, pagine visitate, cookie tecnici", "Dati dell'account: credenziali di accesso (password criptata)"].map((item) => (
+                {["Dati identificativi: nome, cognome, indirizzo email", "Dati di contatto: indirizzo di spedizione, numero di telefono", "Dati di pagamento: elaborati tramite Stripe (non conserviamo dati delle carte)", "Dati di navigazione: indirizzo IP, tipo di browser, pagine visitate, cookie tecnici", "Dati dell'account: credenziali di accesso (password criptata)", "Dati del carrello: articoli, quantita e preferenze, usati per i promemoria solo con consenso"].map((item) => (
                   <li key={item} className="flex items-start gap-2 text-sm">
                     <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-primary shrink-0" />
                     {item}
@@ -48,7 +48,7 @@ export default function PrivacyPage() {
               <h2 className="font-[family-name:var(--font-space-grotesk)] text-xl font-bold text-foreground">3. Finalita del Trattamento</h2>
               <p>I tuoi dati vengono trattati per le seguenti finalita:</p>
               <ul className="flex flex-col gap-2 pl-4">
-                {["Evasione degli ordini e gestione delle spedizioni", "Gestione dell'account utente", "Comunicazioni relative agli ordini (conferme, tracciamento, assistenza)", "Invio di newsletter e comunicazioni commerciali (solo con consenso esplicito)", "Adempimento di obblighi legali e fiscali", "Miglioramento del servizio e analisi statistiche anonimizzate"].map((item) => (
+                {["Evasione degli ordini e gestione delle spedizioni", "Gestione dell'account utente e recupero password", "Comunicazioni relative agli ordini (conferme, pagamenti, stato e assistenza)", "Promemoria del carrello e comunicazioni commerciali (solo con consenso esplicito)", "Adempimento di obblighi legali e fiscali", "Miglioramento del servizio e analisi statistiche anonimizzate"].map((item) => (
                   <li key={item} className="flex items-start gap-2 text-sm">
                     <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-primary shrink-0" />
                     {item}
@@ -64,12 +64,12 @@ export default function PrivacyPage() {
 
             <div className="flex flex-col gap-3">
               <h2 className="font-[family-name:var(--font-space-grotesk)] text-xl font-bold text-foreground">5. Conservazione dei Dati</h2>
-              <p>I dati personali vengono conservati per il tempo necessario alle finalita per cui sono stati raccolti. I dati relativi agli ordini vengono conservati per 10 anni per obblighi fiscali. I dati dell{"'"}account vengono eliminati su richiesta dell{"'"}utente.</p>
+              <p>I dati personali vengono conservati per il tempo necessario alle finalita per cui sono stati raccolti. I dati relativi agli ordini vengono conservati per 10 anni per obblighi fiscali. I dati dell{"'"}account vengono eliminati su richiesta dell{"'"}utente. I promemoria del carrello vengono inviati una sola volta e possono essere disattivati in ogni momento tramite il link presente nell{"'"}email.</p>
             </div>
 
             <div className="flex flex-col gap-3">
               <h2 className="font-[family-name:var(--font-space-grotesk)] text-xl font-bold text-foreground">6. Condivisione con Terze Parti</h2>
-              <p>I tuoi dati possono essere condivisi con: Stripe (elaborazione pagamenti), corrieri (spedizioni), Supabase (hosting database), Vercel (hosting sito web) e strumenti di analytics e advertising come Google Analytics/Google Tag Manager/Google Ads, TikTok Pixel e Meta Pixel, ove attivi e previo consenso ove richiesto. Non vendiamo o cediamo i tuoi dati a terzi per finalita di marketing.</p>
+              <p>I tuoi dati possono essere condivisi con: Stripe (elaborazione pagamenti), corrieri (spedizioni), Supabase (hosting database e autenticazione), Resend (invio delle email transazionali e, con consenso, dei promemoria), Vercel (hosting sito web) e strumenti di analytics e advertising come Google Analytics/Google Tag Manager/Google Ads, TikTok Pixel e Meta Pixel, ove attivi e previo consenso ove richiesto. Non vendiamo o cediamo i tuoi dati a terzi per finalita di marketing.</p>
             </div>
 
             <div className="flex flex-col gap-3">
