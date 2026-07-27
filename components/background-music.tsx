@@ -1,14 +1,11 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useRef } from "react"
 import { usePathname } from "next/navigation"
-import { Volume2, VolumeX } from "lucide-react"
 
 export function BackgroundMusic() {
   const pathname = usePathname()
   const audioRef = useRef<HTMLAudioElement | null>(null)
-  const [isPlaying, setIsPlaying] = useState(false)
-  const [ready, setReady] = useState(false)
   const isBeatPage = pathname?.startsWith("/i-nostri-beat")
 
   // Try to start playback, and if the browser blocks autoplay,
@@ -22,7 +19,6 @@ export function BackgroundMusic() {
     const tryPlay = async () => {
       try {
         await audio.play()
-        setIsPlaying(true)
         removeInteractionListeners()
       } catch {
         // Autoplay blocked — wait for a user gesture.
@@ -52,7 +48,6 @@ export function BackgroundMusic() {
       )
     }
 
-    setReady(true)
     void tryPlay()
     addInteractionListeners()
 
@@ -68,51 +63,13 @@ export function BackgroundMusic() {
     const pauseForBeatPlayer = () => {
       audio.muted = true
       audio.pause()
-      setIsPlaying(false)
     }
 
     window.addEventListener("mirai:beat-player-start", pauseForBeatPlayer)
     return () => window.removeEventListener("mirai:beat-player-start", pauseForBeatPlayer)
   }, [])
 
-  const toggle = async () => {
-    const audio = audioRef.current
-    if (!audio) return
-
-    if (audio.paused) {
-      try {
-        audio.muted = false
-        await audio.play()
-        setIsPlaying(true)
-      } catch {
-        setIsPlaying(false)
-      }
-    } else {
-      audio.pause()
-      setIsPlaying(false)
-    }
-  }
-
   if (isBeatPage) return null
 
-  return (
-    <>
-      <audio ref={audioRef} src="/audio/mirai-beat-site-2026.mpeg" loop preload="auto" aria-hidden="true" />
-      {ready && (
-        <button
-          type="button"
-          onClick={toggle}
-          aria-label={isPlaying ? "Disattiva musica di sottofondo" : "Attiva musica di sottofondo"}
-          aria-pressed={isPlaying}
-          className="fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-foreground text-background shadow-lg transition-all duration-300 hover:scale-110 hover:shadow-[0_0_20px_rgba(0,0,0,0.35)]"
-        >
-          {isPlaying ? (
-            <Volume2 className="h-6 w-6" aria-hidden="true" />
-          ) : (
-            <VolumeX className="h-6 w-6" aria-hidden="true" />
-          )}
-        </button>
-      )}
-    </>
-  )
+  return <audio ref={audioRef} src="/audio/mirai-beat-site-2026.mpeg" loop preload="auto" aria-hidden="true" />
 }
