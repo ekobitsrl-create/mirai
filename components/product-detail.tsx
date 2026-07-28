@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import {
   Check,
   ChevronDown,
@@ -71,7 +72,8 @@ export function ProductDetail({
   product: StoreProduct
   relatedProducts: StoreProduct[]
 }) {
-  const { addItem } = useCart()
+  const { addItem, items: cartItems, updateQuantity } = useCart()
+  const router = useRouter()
   const [selectedSize, setSelectedSize] = useState<string | null>(null)
   const [quantity, setQuantity] = useState(1)
   const [added, setAdded] = useState(false)
@@ -81,7 +83,6 @@ export function ProductDetail({
   const [sizeGuideOpen, setSizeGuideOpen] = useState(false)
   const [selectedImageIndex, setSelectedImageIndex] = useState(0)
   const [quickPaymentLoading, setQuickPaymentLoading] = useState<"paypal" | "klarna" | "scalapay" | null>(null)
-  const [paymentError, setPaymentError] = useState<string | null>(null)
   const purchaseRef = useRef<HTMLDivElement>(null)
 
   const sizes = product.sizes || []
@@ -198,7 +199,7 @@ export function ProductDetail({
     handleAddToCart()
   }
 
-  async function handleQuickPayment(paymentMethod: "paypal" | "klarna" | "scalapay") {
+  function handleQuickPayment(paymentMethod: "paypal" | "klarna" | "scalapay") {
     if (sizes.length > 0 && !selectedSize) {
       setSizeError(true)
       return
@@ -208,45 +209,31 @@ export function ProductDetail({
       return
     }
 
-    setPaymentError(null)
     setQuickPaymentLoading(paymentMethod)
+    const checkoutSize = selectedSize || "OS"
+    const existingCartItem = cartItems.find(
+      (item) => item.productId === product.id && item.size === checkoutSize && !item.lineId,
+    )
 
-    try {
-      const response = await fetch("/api/checkout", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          items: [
-            {
-              productId: product.id,
-              quantity,
-              size: selectedSize || "OS",
-            },
-          ],
-          paymentMethod,
-          cancelPath: `/prodotto/${product.id}`,
-        }),
-      })
-      const result = await response.json()
-
-      if (response.status === 401 && result.authRequired) {
-        window.location.assign(`/auth/sign-up?next=${encodeURIComponent(`/prodotto/${product.id}`)}`)
-        return
-      }
-
-      if (!response.ok || !result.url) {
-        throw new Error(result.error || "Pagamento momentaneamente non disponibile")
-      }
-
-      window.location.assign(result.url)
-    } catch (error) {
-      setPaymentError(
-        error instanceof Error
-          ? error.message
-          : "Pagamento momentaneamente non disponibile"
+    if (existingCartItem) {
+      updateQuantity(
+        product.id,
+        checkoutSize,
+        Math.max(existingCartItem.quantity, quantity),
       )
-      setQuickPaymentLoading(null)
+    } else {
+      addItem({
+        productId: product.id,
+        name: product.name,
+        price: Number(product.price),
+        image_url: product.image_url,
+        size: checkoutSize,
+        quantity,
+        maxQuantity,
+      })
     }
+
+    router.push("/checkout")
   }
 
   async function shareProduct() {
@@ -476,7 +463,7 @@ export function ProductDetail({
               <div className="mb-3 flex items-center gap-3">
                 <span className="h-px flex-1 bg-white/10" />
                 <span className="text-[9px] font-semibold uppercase tracking-[0.2em] text-white/55">
-                  oppure paga subito
+                  scegli il metodo nel checkout
                 </span>
                 <span className="h-px flex-1 bg-white/10" />
               </div>
@@ -510,13 +497,8 @@ export function ProductDetail({
                 </button>
               </div>
               <p className="mt-2 text-center text-[9px] leading-4 text-white/50">
-                Checkout sicuro gestito da Stripe. Spedizione e indirizzo vengono scelti nel passaggio successivo.
+                Prima puoi applicare MIRAI10 o un altro codice sconto, poi scegliere il metodo di pagamento.
               </p>
-              {paymentError && (
-                <p className="mt-2 text-center text-[10px] text-[#ff9b9b]" role="alert">
-                  {paymentError}
-                </p>
-              )}
             </div>
           )}
 
