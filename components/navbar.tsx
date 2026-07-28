@@ -18,6 +18,12 @@ type CategoryNode = {
   children: CategoryNode[]
 }
 
+const PERFUME_CATEGORY_PATTERN = /profum|parfum|fragrance/i
+
+function isPerfumeCategory(category: Pick<CategoryNode, "name" | "slug">) {
+  return PERFUME_CATEGORY_PATTERN.test(`${category.name} ${category.slug}`)
+}
+
 const CartSidebar = dynamic(
   () => import("@/components/cart-sidebar").then((m) => m.CartSidebar),
   {
@@ -46,13 +52,34 @@ function useCategories() {
         if (!data) return
         const rows = data as Array<Omit<CategoryNode, "children"> & { sort_order?: number }>
         const parents = rows.filter((c) => !c.parent_id)
-        const built: CategoryNode[] = parents.map((p) => ({
-          ...p,
-          children: rows
+        const built: CategoryNode[] = parents.map((p) => {
+          const children = rows
             .filter((c) => c.parent_id === p.id)
-            .map((c) => ({ ...c, children: [] })),
-        }))
-        setTree(built)
+            .map((c) => ({ ...c, children: [] }))
+          const perfumeChild = children.find(isPerfumeCategory)
+
+          // "Mirai parfum exlusive" is only the DB container for the actual
+          // "Profumi" category. Expose one canonical navigation entry.
+          if (isPerfumeCategory(p) && perfumeChild) {
+            return {
+              ...perfumeChild,
+              name: "Profumi",
+              parent_id: null,
+              children: [],
+            }
+          }
+
+          return { ...p, children }
+        })
+        const seen = new Set<string>()
+        setTree(
+          built.filter((category) => {
+            const key = isPerfumeCategory(category) ? "profumi" : category.slug.toLowerCase()
+            if (seen.has(key)) return false
+            seen.add(key)
+            return true
+          }),
+        )
       })
   }, [])
 
