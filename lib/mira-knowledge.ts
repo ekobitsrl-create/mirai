@@ -189,9 +189,9 @@ function contextualFollowUp(message: string, context: MiraKnowledgeContext) {
 
   if (context.lastIntent === "shipping" || context.lastIntent === "tracking") {
     if (hasAny(message, ["costa", "prezzo", "gratis", "gratuita"])) {
-      return answer("shipping", "La spedizione standard e gratuita.", "/spedizioni", "Dettagli spedizioni")
+      return answer("shipping", "La spedizione è sempre gratuita, senza importo minimo.", "/spedizioni", "Dettagli spedizioni")
     }
-    return answer("shipping", "La spedizione richiede normalmente 3-5 giorni lavorativi. Il tracking arriva via email dopo la spedizione.", "/spedizioni", "Dettagli spedizioni")
+    return answer("shipping", "La spedizione è sempre gratuita. La consegna stimata varia in base al prodotto: 3–5 oppure 7–12 giorni lavorativi, come indicato nella scheda prodotto. Il tracking arriva via email dopo la spedizione.", "/spedizioni", "Dettagli spedizioni")
   }
 
   if (context.lastIntent === "returns" || context.lastIntent === "refund") {
@@ -227,7 +227,7 @@ export function getMiraLocalReply(rawMessage: string, context: MiraKnowledgeCont
   if (asksShipping && asksReturns) {
     return answer(
       "shipping",
-      "La spedizione standard è gratuita e richiede 3–5 giorni lavorativi. Se il capo non va bene, puoi chiedere il reso entro 14 giorni: per ogni reso approvato MIRAI invia un'etichetta prepagata e sostiene le spese di restituzione.",
+      "La spedizione è sempre gratuita e la consegna stimata varia in base al prodotto: 3–5 oppure 7–12 giorni lavorativi, come indicato nella scheda. Se il capo non va bene, puoi chiedere il reso entro 14 giorni: per ogni reso approvato MIRAI invia un'etichetta prepagata e sostiene le spese di restituzione.",
       "/faq",
       "Vedi tutte le FAQ",
     )
@@ -302,9 +302,9 @@ export function getMiraLocalReply(rawMessage: string, context: MiraKnowledgeCont
       return answer("shipping", "MIRAI spedisce nell’Unione Europea, nel Regno Unito e in Svizzera con le tempistiche indicate sul sito. Per altre destinazioni, chiedi conferma all’assistenza.", "/spedizioni", "Destinazioni servite")
     }
     if (hasAny(message, ["quanto costa", "costo", "prezzo", "gratis", "gratuita"])) {
-      return answer("shipping", "La spedizione standard e sempre gratuita, senza minimo d ordine.", "/spedizioni", "Dettagli spedizioni")
+      return answer("shipping", "La spedizione è sempre gratuita, senza importo minimo.", "/spedizioni", "Dettagli spedizioni")
     }
-    return answer("shipping", "La spedizione standard e gratuita e richiede normalmente 3-5 giorni lavorativi.", "/spedizioni", "Dettagli spedizioni")
+    return answer("shipping", "La spedizione è sempre gratuita, senza importo minimo. La consegna stimata varia in base al prodotto: 3–5 oppure 7–12 giorni lavorativi, come indicato nella scheda prodotto.", "/spedizioni", "Dettagli spedizioni")
   }
 
   if (hasAny(message, ["rimborso", "soldi indietro", "riavere i soldi", "accredito"])) {

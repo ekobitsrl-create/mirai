@@ -33,11 +33,11 @@ const faqs = [
     questions: [
       {
         q: "Quanto costa la spedizione?",
-        a: "La spedizione standard e sempre gratuita, senza importo minimo.",
+        a: "La spedizione è sempre gratuita in tutte le destinazioni supportate, senza importo minimo.",
       },
       {
         q: "In quanto tempo ricevero il mio ordine?",
-        a: "In tutte le destinazioni supportate, la spedizione richiede normalmente 3-5 giorni lavorativi dalla presa in carico del corriere.",
+        a: "Dipende dal prodotto: la consegna stimata è di 3–5 giorni lavorativi per gli articoli standard e di 7–12 giorni lavorativi per gli articoli che riportano questa tempistica nella scheda. Il tempo applicabile è sempre indicato nella pagina prodotto.",
       },
       {
         q: "Spedite all'estero?",

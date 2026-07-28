@@ -68,7 +68,7 @@ export function ProductDetail({
     : "purché il capo sia integro e con i cartellini originali"
   const shippingEstimate = supplierSettings.shippingMinDays !== undefined && supplierSettings.shippingMaxDays !== undefined
     ? `consegna stimata in ${supplierSettings.shippingMinDays}–${supplierSettings.shippingMaxDays} giorni lavorativi`
-    : "preparazione 1–2 giorni, consegna standard 3–5 giorni lavorativi"
+    : "consegna stimata in 3–5 giorni lavorativi"
   const detailItems = product.detail_items || []
   const gallery = product.image_gallery?.length
     ? product.image_gallery

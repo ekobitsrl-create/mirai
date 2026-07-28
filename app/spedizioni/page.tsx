@@ -1,6 +1,6 @@
 import type { Metadata } from "next"
 import Link from "next/link"
-import { ArrowLeft, Globe, MapPin, Package, Truck } from "lucide-react"
+import { ArrowLeft, Clock3, Globe, Package, Truck } from "lucide-react"
 import { Navbar } from "@/components/navbar"
 import { Footer } from "@/components/footer"
 
@@ -25,14 +25,15 @@ export default function SpedizioniPage() {
             Spedizioni
           </h1>
           <p className="mb-12 max-w-2xl text-lg text-muted-foreground text-pretty">
-            Gli ordini vengono preparati in Italia e spediti con corriere tracciato. I costi e i tempi di spedizione sono indicati chiaramente prima del pagamento.
+            La spedizione è sempre gratuita, senza importo minimo. I tempi di consegna variano in base al prodotto e sono indicati chiaramente nella relativa scheda.
           </p>
 
           <div className="mb-16 grid grid-cols-1 gap-4 md:grid-cols-2">
             {[
-              { icon: Truck, title: "Standard", value: "3-5 giorni lavorativi", desc: "Sempre gratuita, senza importo minimo" },
+              { icon: Truck, title: "Spedizione", value: "Sempre gratuita", desc: "Nessun importo minimo richiesto" },
+              { icon: Package, title: "Prodotti standard", value: "3–5 giorni lavorativi", desc: "La tempistica è indicata nella scheda prodotto" },
+              { icon: Clock3, title: "Prodotti a consegna estesa", value: "7–12 giorni lavorativi", desc: "La tempistica è indicata nella scheda prodotto" },
               { icon: Globe, title: "Destinazioni", value: "Italia e UE", desc: "Spedizione gratuita in Italia e in Europa" },
-              { icon: MapPin, title: "Origine ordine", value: "Catania, Italia", desc: "Preparazione e dispatch dal team MIRAI" },
             ].map((item) => (
               <div key={item.title} className="flex gap-4 rounded-lg border border-border bg-card p-6">
                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
@@ -55,7 +56,7 @@ export default function SpedizioniPage() {
                 Preparazione e consegna
               </h2>
               <p className="leading-relaxed">
-                Gli ordini vengono normalmente preparati entro 1-2 giorni lavorativi dalla conferma del pagamento. I tempi di consegna indicati si calcolano dalla presa in carico del corriere e possono variare in periodi di picco, festivita o cause non dipendenti da MIRAI.
+                La consegna stimata è di 3–5 giorni lavorativi per i prodotti standard e di 7–12 giorni lavorativi per i prodotti che riportano questa indicazione nella scheda. La tempistica applicabile compare sempre nella pagina del prodotto e può variare in periodi di picco, festività o per cause non dipendenti da MIRAI.
               </p>
             </section>
 
