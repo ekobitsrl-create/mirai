@@ -238,7 +238,7 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
         <div className="absolute -right-44 top-0 h-[620px] w-[620px] rounded-full bg-fuchsia-500/10 blur-[160px]" />
         <div className="absolute left-1/2 top-[520px] h-64 w-[70%] -translate-x-1/2 rounded-full bg-primary/10 blur-[130px]" />
       </div>
-      <div className="relative pb-24 pt-36">
+      <div className="relative pb-24 pt-24 sm:pt-28 lg:pt-36">
         <ProductDetail product={product} relatedProducts={relatedProducts} />
       </div>
       <div className="relative">

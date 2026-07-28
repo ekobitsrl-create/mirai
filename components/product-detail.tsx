@@ -35,6 +35,8 @@ function formatPrice(price: number) {
   }).format(Number(price))
 }
 
+const FIRST_ORDER_DISCOUNT_PERCENT = 10
+
 export function ProductDetail({
   product,
   relatedProducts,
@@ -76,6 +78,9 @@ export function ProductDetail({
       ? [{ src: product.image_url, alt: product.name, fit: "contain" as const }]
       : []
   const selectedImage = gallery[selectedImageIndex] || gallery[0]
+  const firstOrderPrice = Math.round(
+    Number(product.price) * (1 - FIRST_ORDER_DISCOUNT_PERCENT / 100) * 100,
+  ) / 100
 
   useEffect(() => {
     try {
@@ -265,15 +270,22 @@ export function ProductDetail({
         </section>
 
         <section className="mirai-neon-card relative overflow-hidden rounded-[1.75rem] p-5 sm:p-7 lg:!sticky lg:top-32 lg:self-start lg:p-8">
-          <div className="flex items-start justify-between gap-6">
-            <div>
-              <p className="text-[9px] font-semibold uppercase tracking-[0.3em] text-[#9f86ff]">MIRAI LAB / {product.brand || formatCategory(product.category)}</p>
-              <h1 className="mt-3 max-w-xl text-2xl font-medium leading-tight tracking-[-0.03em] text-white sm:text-3xl md:text-4xl">{product.name}</h1>
+          <div className="relative sm:flex sm:items-start sm:justify-between sm:gap-6">
+            <div className="min-w-0 flex-1">
+              <p className="pr-20 text-[9px] font-semibold uppercase tracking-[0.3em] text-[#9f86ff] sm:pr-0">MIRAI LAB / {product.brand || formatCategory(product.category)}</p>
+              <h1 className="mt-6 max-w-xl text-xl font-medium leading-[1.15] tracking-[-0.03em] text-white sm:mt-3 sm:text-3xl md:text-4xl">{product.name}</h1>
               {product.supplier_sku && <p className="mt-3 text-[9px] uppercase tracking-[0.2em] text-white/40">Codice {product.supplier_sku}</p>}
-              <p className="mt-5 text-lg font-medium">{formatPrice(product.price)}</p>
-              <p className="mt-1 text-[10px] text-white/55">IVA inclusa</p>
+              <div className="mt-5 flex flex-wrap items-center gap-x-3 gap-y-2">
+                <p className="text-lg font-medium">{formatPrice(product.price)}</p>
+                <p className="inline-flex items-center gap-1.5 rounded-full border border-[#9f86ff]/45 bg-[#9f86ff]/10 px-3 py-1.5 text-[10px] text-white/75">
+                  <span>Con MIRAI10</span>
+                  <strong className="text-xs font-semibold text-white">{formatPrice(firstOrderPrice)}</strong>
+                  <span className="font-semibold text-[#bcaeff]">-{FIRST_ORDER_DISCOUNT_PERCENT}%</span>
+                </p>
+              </div>
+              <p className="mt-1 text-[10px] text-white/55">Sconto sul primo ordine · IVA inclusa</p>
             </div>
-            <div className="flex shrink-0 items-center gap-1">
+            <div className="absolute right-0 top-0 flex shrink-0 items-center gap-1 sm:static">
               <button type="button" onClick={shareProduct} className="flex h-10 w-10 items-center justify-center text-white/35 hover:text-white" aria-label="Condividi prodotto"><Share2 className="h-4 w-4" /></button>
               <button type="button" onClick={toggleWishlist} className={`flex h-10 w-10 items-center justify-center border transition-all ${wished ? "border-[#9f86ff] bg-[#9f86ff] text-black shadow-[0_0_24px_rgba(159,134,255,0.45)]" : "border-white/20 bg-white/[0.04] text-white/75 hover:border-primary/70 hover:text-white"}`} aria-label={wished ? "Rimuovi dai preferiti" : "Aggiungi ai preferiti"}>
                 <Heart className={`h-4 w-4 ${wished ? "fill-current" : ""}`} />
@@ -281,9 +293,7 @@ export function ProductDetail({
             </div>
           </div>
 
-          {product.description && <p className="mt-7 max-w-xl text-sm leading-6 text-white/70">{product.description}</p>}
-
-          <div className="mt-8 border-t border-white/15 pt-7">
+          <div className="mt-6 border-t border-white/15 pt-5 sm:mt-8 sm:pt-7">
             <div className="flex items-center justify-between">
               <p className="text-[10px] font-semibold uppercase tracking-[0.22em]">Colore</p>
               <span className="text-xs text-white/65">{colorName}</span>
@@ -291,7 +301,7 @@ export function ProductDetail({
           </div>
 
           {sizes.length > 0 && (
-            <div className="mt-7">
+            <div className="mt-5 sm:mt-7">
               <div className="flex items-center justify-between">
                 <p className="text-[10px] font-semibold uppercase tracking-[0.22em]">Taglia</p>
                 <button type="button" onClick={() => setSizeGuideOpen(true)} className="flex items-center gap-1.5 text-[10px] text-white/60 underline decoration-primary/40 underline-offset-4 hover:text-white">
@@ -334,8 +344,8 @@ export function ProductDetail({
             </div>
           )}
 
-          <div className="mt-6 flex gap-2">
-            <div className="flex h-14 shrink-0 items-center border border-white/20 bg-black/10">
+          <div className="mt-5 grid gap-2 sm:mt-6 sm:grid-cols-[auto_minmax(0,1fr)]">
+            <div className="order-2 flex h-12 w-full items-center justify-center border border-white/20 bg-black/10 sm:order-1 sm:h-14 sm:w-auto">
               <button type="button" onClick={() => setQuantity((value) => Math.max(1, value - 1))} className="flex h-full w-10 items-center justify-center text-white/45 hover:text-white" aria-label="Riduci quantità"><Minus className="h-3.5 w-3.5" /></button>
               <span className="w-8 text-center text-xs font-medium">{quantity}</span>
               <button type="button" onClick={() => setQuantity((value) => Math.min(maxQuantity, value + 1))} className="flex h-full w-10 items-center justify-center text-white/45 hover:text-white" aria-label="Aumenta quantità"><Plus className="h-3.5 w-3.5" /></button>
@@ -344,11 +354,13 @@ export function ProductDetail({
               type="button"
               onClick={handleAddToCart}
               disabled={!product.in_stock}
-              className={`flex h-14 flex-1 items-center justify-center gap-2 px-4 text-[10px] font-bold uppercase tracking-[0.22em] transition-all ${added ? "bg-emerald-400 text-black" : product.in_stock ? "bg-primary text-primary-foreground shadow-[0_0_30px_rgba(159,134,255,0.38)] hover:-translate-y-0.5 hover:brightness-110 hover:shadow-[0_0_42px_rgba(159,134,255,0.55)]" : "cursor-not-allowed bg-white/10 text-white/30"}`}
+              className={`order-1 flex min-h-16 w-full items-center justify-center gap-2 px-5 text-xs font-bold uppercase tracking-[0.2em] transition-all sm:order-2 sm:min-h-14 sm:text-[10px] sm:tracking-[0.22em] ${added ? "bg-emerald-400 text-black" : product.in_stock ? "bg-primary text-primary-foreground shadow-[0_0_34px_rgba(159,134,255,0.46)] hover:-translate-y-0.5 hover:brightness-110 hover:shadow-[0_0_42px_rgba(159,134,255,0.55)]" : "cursor-not-allowed bg-white/10 text-white/30"}`}
             >
               {added ? <><Check className="h-4 w-4" /> Aggiunto</> : product.in_stock ? <><ShoppingBag className="h-4 w-4" /> Aggiungi al carrello</> : "Esaurito"}
             </button>
           </div>
+
+          {product.description && <p className="mt-6 max-w-xl text-sm leading-6 text-white/70">{product.description}</p>}
 
           {product.in_stock && (
             <div className="mt-5 rounded-xl border border-white/10 bg-black/10 p-4">
