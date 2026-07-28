@@ -3,6 +3,7 @@ import Link from "next/link"
 import { ArrowLeft } from "lucide-react"
 import { Navbar } from "@/components/navbar"
 import { Footer } from "@/components/footer"
+import { COMPANY_INFO } from "@/lib/company-info"
 
 export const metadata: Metadata = {
   title: "FAQ - MIRAI",
@@ -20,7 +21,7 @@ const faqs = [
       },
       {
         q: "Posso modificare o annullare un ordine?",
-        a: "Puoi richiedere la modifica o l'annullamento entro 2 ore dall'ordine scrivendo a info@mirailabstore.com. Una volta spedito, l'ordine non puo essere annullato ma puoi effettuare un reso.",
+        a: `Puoi richiedere la modifica o l'annullamento entro 2 ore dall'ordine scrivendo a ${COMPANY_INFO.email}. Una volta spedito, l'ordine non puo essere annullato ma puoi effettuare un reso.`,
       },
       {
         q: "Ricevero una conferma dell'ordine?",

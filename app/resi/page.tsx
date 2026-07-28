@@ -3,6 +3,7 @@ import Link from "next/link"
 import { ArrowLeft, CheckCircle, Clock, Mail, RotateCcw, XCircle } from "lucide-react"
 import { Navbar } from "@/components/navbar"
 import { Footer } from "@/components/footer"
+import { COMPANY_INFO } from "@/lib/company-info"
 
 export const metadata: Metadata = {
   title: "Resi e Rimborsi - MIRAI",
@@ -11,7 +12,7 @@ export const metadata: Metadata = {
 }
 
 const returnSteps = [
-  "Scrivi entro 14 giorni dalla consegna a info@mirailabstore.com indicando numero ordine, email usata per l'acquisto e motivo del reso.",
+  `Scrivi entro 14 giorni dalla consegna a ${COMPANY_INFO.email} indicando numero ordine, email usata per l'acquisto e motivo del reso.`,
   "Quando il reso e approvato, MIRAI sostiene le spese di spedizione e invia un'etichetta prepagata con le istruzioni di rientro.",
   "Imballa il prodotto in modo sicuro, preferibilmente nella confezione originale, con cartellini ed eventuali accessori.",
   "Consegna il pacco al corriere o al punto indicato nelle istruzioni di reso.",
@@ -145,7 +146,7 @@ export default function ResiPage() {
                 <div>
                   <h2 className="text-sm font-bold uppercase tracking-widest text-foreground">Contatto resi</h2>
                   <p className="mt-2 text-sm leading-6">
-                    Email: <a href="mailto:info@mirailabstore.com" className="text-primary hover:underline">info@mirailabstore.com</a>. Indica sempre il numero d'ordine, l'email usata al checkout e il motivo della richiesta.
+                    Email: <a href={`mailto:${COMPANY_INFO.email}`} className="text-primary hover:underline">{COMPANY_INFO.email}</a>. Indica sempre il numero d'ordine, l'email usata al checkout e il motivo della richiesta.
                   </p>
                 </div>
               </div>

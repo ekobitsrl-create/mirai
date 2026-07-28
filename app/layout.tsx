@@ -12,6 +12,7 @@ import { SiteIntro } from '@/components/site-intro'
 import { MiraGuide } from '@/components/mira-guide'
 import { MarketingPixels } from '@/components/marketing-pixels'
 import { GoogleIntegrations } from '@/components/google-integrations'
+import { COMPANY_INFO } from '@/lib/company-info'
 import { getAbsoluteUrl, SITE_URL } from '@/lib/site-url'
 import './globals.css'
 
@@ -126,11 +127,11 @@ window.gtag('consent', 'default', {
               "@type": "Organization",
               "@id": `${SITE_URL}/#organization`,
               name: "MIRAI LAB STORE",
-              legalName: "MIRAI LAB STORE DI SCRIVANO CHRISTIAN",
+              legalName: COMPANY_INFO.legalName,
               alternateName: ["MIRAI", "MIRAI Concept Store", "MIRAI Store Catania"],
               url: SITE_URL,
               logo: getAbsoluteUrl("/icon.svg"),
-              email: "info@mirailabstore.com",
+              email: COMPANY_INFO.email,
               telephone: "+39 349 866 3584",
               description: "Concept store streetwear nato a Catania: abbigliamento urban, cappelli custom e t-shirt personalizzate online.",
               sameAs: ["https://www.instagram.com/mirai_labstore/"],
@@ -145,7 +146,7 @@ window.gtag('consent', 'default', {
               contactPoint: {
                 "@type": "ContactPoint",
                 contactType: "customer service",
-                email: "info@mirailabstore.com",
+                email: COMPANY_INFO.email,
                 telephone: "+39 349 866 3584",
                 availableLanguage: "Italian",
               },

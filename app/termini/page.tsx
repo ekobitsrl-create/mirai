@@ -3,6 +3,7 @@ import Link from "next/link"
 import { ArrowLeft } from "lucide-react"
 import { Navbar } from "@/components/navbar"
 import { Footer } from "@/components/footer"
+import { COMPANY_INFO } from "@/lib/company-info"
 
 export const metadata: Metadata = {
   title: "Termini e Condizioni - MIRAI",
@@ -28,7 +29,7 @@ export default function TerminiPage() {
           <div className="flex flex-col gap-10 text-muted-foreground leading-relaxed">
             <section className="flex flex-col gap-3">
               <h2 className="font-[family-name:var(--font-space-grotesk)] text-xl font-bold text-foreground">1. Venditore</h2>
-              <p>Le presenti condizioni regolano gli acquisti su mirailabstore.com, gestito da MIRAI LAB STORE DI SCRIVANO CHRISTIAN, P. IVA 06287920877, CF SCRCRS99C11C351W, REA CT - 486994, con sede operativa in Via Umberto 95, 95129 Catania (CT), Italia.</p>
+              <p>Le presenti condizioni regolano gli acquisti su <a href={COMPANY_INFO.websiteUrl} className="text-primary hover:underline">{COMPANY_INFO.website}</a>, gestito da {COMPANY_INFO.legalName}, P. IVA {COMPANY_INFO.vatNumber}, CF {COMPANY_INFO.taxCode}, REA {COMPANY_INFO.rea}, con sede operativa in {COMPANY_INFO.address}.</p>
             </section>
 
             <section className="flex flex-col gap-3">
@@ -73,7 +74,7 @@ export default function TerminiPage() {
 
             <section className="flex flex-col gap-3">
               <h2 className="font-[family-name:var(--font-space-grotesk)] text-xl font-bold text-foreground">10. Contatti</h2>
-              <p>Per comunicazioni formali o reclami puoi scrivere a <span className="text-primary">mirailabstore@pec.it</span>. Per assistenza ordinaria puoi usare la pagina <Link href="/contatti" className="text-primary hover:underline">Contatti</Link> o scrivere a <span className="text-muted-foreground">info@mirailabstore.com</span>.</p>
+              <p>Per comunicazioni formali o reclami puoi scrivere a <a href={`mailto:${COMPANY_INFO.pec}`} className="text-primary hover:underline">{COMPANY_INFO.pec}</a>. Per assistenza ordinaria puoi usare la pagina <Link href="/contatti" className="text-primary hover:underline">Contatti</Link> o scrivere a <a href={`mailto:${COMPANY_INFO.email}`} className="text-primary hover:underline">{COMPANY_INFO.email}</a>.</p>
             </section>
           </div>
         </section>

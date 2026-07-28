@@ -2,6 +2,7 @@
 
 import Link from "next/link"
 import { useLanguage } from "@/lib/language-context"
+import { COMPANY_INFO } from "@/lib/company-info"
 import { PaymentBadges } from "@/components/payment-badges"
 import { Building2, Mail, MapPin } from "lucide-react"
 
@@ -143,11 +144,17 @@ export function Footer() {
               </span>
               <div>
                 <p className="text-[9px] font-bold uppercase tracking-[0.25em] text-primary">{companyLabel}</p>
-                <p className="mt-2 text-sm font-semibold text-foreground">MIRAI LAB STORE DI SCRIVANO CHRISTIAN</p>
+                <p className="mt-2 text-sm font-semibold text-foreground">{COMPANY_INFO.legalName}</p>
+                <a
+                  href={COMPANY_INFO.websiteUrl}
+                  className="mt-1 inline-block text-xs text-primary transition-colors hover:text-primary/80"
+                >
+                  {COMPANY_INFO.website}
+                </a>
                 <div className="mt-3 flex flex-wrap gap-x-5 gap-y-2 text-[11px] text-muted-foreground">
-                  <span>P. IVA 06287920877</span>
-                  <span>CF SCRCRS99C11C351W</span>
-                  <span>REA CT - 486994</span>
+                  <span>P. IVA {COMPANY_INFO.vatNumber}</span>
+                  <span>CF {COMPANY_INFO.taxCode}</span>
+                  <span>REA {COMPANY_INFO.rea}</span>
                 </div>
               </div>
             </div>
@@ -161,21 +168,21 @@ export function Footer() {
                 <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
                 <span>
                   <span className="mb-1 block text-[9px] font-bold uppercase tracking-[0.2em] text-primary">{storeAddressLabel}</span>
-                  Via Umberto 95, 95129 Catania (CT)
+                  {COMPANY_INFO.address.replace(", Italia", "")}
                 </span>
               </a>
-              <a href="mailto:info@mirailabstore.com" className="flex items-start gap-2.5 py-3 transition-colors hover:text-foreground sm:px-5 sm:py-0">
+              <a href={`mailto:${COMPANY_INFO.email}`} className="flex items-start gap-2.5 py-3 transition-colors hover:text-foreground sm:px-5 sm:py-0">
                 <Mail className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
                 <span>
                   <span className="mb-1 block text-[9px] font-bold uppercase tracking-[0.2em] text-primary">{supportEmailLabel}</span>
-                  info@mirailabstore.com
+                  {COMPANY_INFO.email}
                 </span>
               </a>
-              <a href="mailto:mirailabstore@pec.it" className="flex items-start gap-2.5 py-3 transition-colors hover:text-foreground sm:py-0 sm:pl-5">
+              <a href={`mailto:${COMPANY_INFO.pec}`} className="flex items-start gap-2.5 py-3 transition-colors hover:text-foreground sm:py-0 sm:pl-5">
                 <Mail className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
                 <span>
                   <span className="mb-1 block text-[9px] font-bold uppercase tracking-[0.2em] text-primary">PEC</span>
-                  mirailabstore@pec.it
+                  {COMPANY_INFO.pec}
                 </span>
               </a>
             </div>
@@ -185,7 +192,7 @@ export function Footer() {
         <div className="mirai-neon-divider mt-12 flex flex-col items-center justify-between gap-6 pt-8 md:flex-row">
           <div className="flex flex-col items-center gap-2 md:items-start">
             <p className="text-xs text-muted-foreground">
-              &copy; 2026 MIRAI. {t.footer.allRightsReserved}
+              &copy; 2026 {COMPANY_INFO.legalName}. {t.footer.allRightsReserved}
             </p>
             <button
               type="button"

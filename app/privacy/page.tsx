@@ -3,6 +3,7 @@ import Link from "next/link"
 import { ArrowLeft } from "lucide-react"
 import { Navbar } from "@/components/navbar"
 import { Footer } from "@/components/footer"
+import { COMPANY_INFO } from "@/lib/company-info"
 
 export const metadata: Metadata = {
   title: "Privacy Policy - MIRAI",
@@ -28,7 +29,7 @@ export default function PrivacyPage() {
           <div className="flex flex-col gap-10 text-muted-foreground leading-relaxed">
             <div className="flex flex-col gap-3">
               <h2 className="font-[family-name:var(--font-space-grotesk)] text-xl font-bold text-foreground">1. Titolare del Trattamento</h2>
-              <p>Il titolare del trattamento dei dati personali e MIRAI di Christian Scrivano, con sede a Catania (CT), Italia. Per qualsiasi comunicazione relativa al trattamento dei tuoi dati personali, puoi contattarci a: <span className="text-primary">info@mirailabstore.com</span></p>
+              <p>Il titolare del trattamento dei dati personali è {COMPANY_INFO.legalName}, con sede operativa in {COMPANY_INFO.address}. Il sito ufficiale è <a href={COMPANY_INFO.websiteUrl} className="text-primary hover:underline">{COMPANY_INFO.website}</a>. Per qualsiasi comunicazione relativa al trattamento dei tuoi dati personali, puoi contattarci a <a href={`mailto:${COMPANY_INFO.email}`} className="text-primary hover:underline">{COMPANY_INFO.email}</a>.</p>
             </div>
 
             <div className="flex flex-col gap-3">
@@ -83,7 +84,7 @@ export default function PrivacyPage() {
                   </li>
                 ))}
               </ul>
-              <p>Per esercitare i tuoi diritti, scrivi a <span className="text-primary">info@mirailabstore.com</span>. Puoi inoltre presentare reclamo al Garante per la Protezione dei Dati Personali.</p>
+              <p>Per esercitare i tuoi diritti, scrivi a <a href={`mailto:${COMPANY_INFO.email}`} className="text-primary hover:underline">{COMPANY_INFO.email}</a>. Puoi inoltre presentare reclamo al Garante per la Protezione dei Dati Personali.</p>
             </div>
 
             <div className="flex flex-col gap-3">
