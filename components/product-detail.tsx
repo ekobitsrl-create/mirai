@@ -47,7 +47,6 @@ const FIRST_ORDER_DISCOUNT_PERCENT = 10
 
 type ProductGalleryView = StoreProductImage & {
   label: string
-  scale?: number
 }
 
 function getGalleryViews(product: StoreProduct): ProductGalleryView[] {
@@ -59,25 +58,11 @@ function getGalleryViews(product: StoreProduct): ProductGalleryView[] {
 
   if (!originalGallery.length) return []
 
-  const realViewLabels = ["Fronte", "Retro", "Dettaglio", "Indossata", "Finiture"]
-  const views: ProductGalleryView[] = originalGallery.map((image, index) => ({
+  const realViewLabels = ["Vista completa", "Retro", "Dettaglio", "Indossata", "Finiture"]
+  return originalGallery.map((image, index) => ({
     ...image,
     label: realViewLabels[index] || `Vista ${index + 1}`,
   }))
-  const primary = originalGallery[0]
-  const detailViews: ProductGalleryView[] = [
-    { ...primary, label: "Dettaglio stampa", position: primary.position || "center 42%", scale: 1.55 },
-    { ...primary, label: "Dettaglio tessuto", position: primary.position || "center 28%", scale: 2.05 },
-    { ...primary, label: "Vestibilità", position: primary.position || "center", scale: 1.2 },
-    { ...primary, label: "Finiture", position: primary.position || "center 65%", scale: 1.8 },
-  ]
-
-  for (const detailView of detailViews) {
-    if (views.length >= 5) break
-    views.push(detailView)
-  }
-
-  return views
 }
 
 export function ProductDetail({
@@ -306,10 +291,7 @@ export function ProductDetail({
                   alt=""
                   fill
                   className="object-cover"
-                  style={{
-                    objectPosition: image.position || "center",
-                    transform: image.scale ? `scale(${image.scale})` : undefined,
-                  }}
+                  style={{ objectPosition: image.position || "center" }}
                   sizes="72px"
                 />
                 <span className="absolute inset-x-1 bottom-1 truncate rounded bg-black/65 px-1 py-0.5 text-[7px] font-semibold uppercase tracking-[0.08em] text-white/80">
@@ -336,10 +318,7 @@ export function ProductDetail({
                 alt={selectedImage.alt}
                 fill
                 className="object-cover transition-transform duration-700 group-hover:scale-[1.025]"
-                style={{
-                  objectPosition: selectedImage.position || "center",
-                  transform: selectedImage.scale ? `scale(${selectedImage.scale})` : undefined,
-                }}
+                style={{ objectPosition: selectedImage.position || "center" }}
                 sizes="(max-width: 1024px) 100vw, 60vw"
                 priority
               />
@@ -643,10 +622,7 @@ export function ProductDetail({
               alt={selectedImage.alt}
               fill
               className="object-cover"
-              style={{
-                objectPosition: selectedImage.position || "center",
-                transform: selectedImage.scale ? `scale(${selectedImage.scale})` : undefined,
-              }}
+              style={{ objectPosition: selectedImage.position || "center" }}
               sizes="100vw"
               priority
             />
