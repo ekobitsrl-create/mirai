@@ -218,9 +218,10 @@ export function ShopGrid({
   const filteredProducts = useMemo(() => {
     const normalizedQuery = query.trim().toLocaleLowerCase("it")
     const result = products.filter((product) => {
+      const categoryName = categoryLabels.get(product.category) || formatCategory(product.category)
       const matchesQuery =
         !normalizedQuery ||
-        `${product.name} ${product.description || ""} ${product.category}`
+        `${product.name} ${product.description || ""} ${product.category} ${categoryName}`
           .toLocaleLowerCase("it")
           .includes(normalizedQuery)
       const matchesCategory =
@@ -242,7 +243,7 @@ export function ShopGrid({
       if (sort === "name") return a.name.localeCompare(b.name, "it")
       return new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
     })
-  }, [availability, maxPrice, products, query, selectedCategories, selectedSizes, sort])
+  }, [availability, categoryLabels, maxPrice, products, query, selectedCategories, selectedSizes, sort])
 
   const catalogMaxPrice = useMemo(
     () => Math.ceil(Math.max(100, ...products.map((product) => Number(product.price))) / 10) * 10,
