@@ -59,11 +59,13 @@ function useCategories() {
           const perfumeChild = children.find(isPerfumeCategory)
 
           // "Mirai parfum exlusive" is only the DB container for the actual
-          // "Profumi" category. Expose one canonical navigation entry.
-          if (isPerfumeCategory(p) && perfumeChild) {
+          // "Profumi" category. The child can be hidden by category RLS in
+          // anonymous sessions, so always expose the canonical public route.
+          if (isPerfumeCategory(p)) {
             return {
-              ...perfumeChild,
+              ...(perfumeChild ?? p),
               name: "Profumi",
+              slug: "profumi",
               parent_id: null,
               children: [],
             }
