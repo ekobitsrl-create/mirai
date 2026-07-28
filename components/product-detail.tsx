@@ -43,7 +43,6 @@ function formatPrice(price: number) {
   }).format(Number(price))
 }
 
-const FIRST_ORDER_DISCOUNT_PERCENT = 10
 
 type ProductGalleryView = StoreProductImage & {
   label: string
@@ -131,10 +130,6 @@ export function ProductDetail({
       )
       .slice(0, 4)
   }, [currentVariantKey, product.id, relatedProducts])
-  const firstOrderPrice = Math.round(
-    Number(product.price) * (1 - FIRST_ORDER_DISCOUNT_PERCENT / 100) * 100,
-  ) / 100
-
   useEffect(() => {
     try {
       const wishlist = JSON.parse(window.localStorage.getItem("mirai-wishlist") || "[]")
@@ -348,11 +343,10 @@ export function ProductDetail({
                 <p className="text-xl font-semibold">{formatPrice(product.price)}</p>
                 <p className="inline-flex items-center gap-1.5 rounded-full border border-[#9f86ff]/45 bg-[#9f86ff]/10 px-3 py-1.5 text-[10px] text-white/75">
                   <span>Primo ordine</span>
-                  <strong className="text-xs font-semibold text-white">{formatPrice(firstOrderPrice)}</strong>
-                  <span className="font-semibold text-[#bcaeff]">con MIRAI10</span>
+                  <strong className="text-xs font-semibold text-[#bcaeff]">MIRAI10</strong>
                 </p>
               </div>
-              <p className="mt-1 text-[10px] text-white/55">IVA inclusa · risparmi {formatPrice(Number(product.price) - firstOrderPrice)}</p>
+              <p className="mt-1 text-[10px] text-white/55">IVA inclusa · applica il codice nel checkout</p>
             </div>
             <div className="absolute right-0 top-0 flex shrink-0 items-center gap-1 sm:static">
               <button type="button" onClick={shareProduct} className="flex h-10 w-10 items-center justify-center text-white/35 hover:text-white" aria-label="Condividi prodotto"><Share2 className="h-4 w-4" /></button>
@@ -587,7 +581,7 @@ export function ProductDetail({
         <div className="mx-auto flex max-w-lg items-center gap-3">
           <div className="min-w-0 shrink-0">
             <p className="text-base font-semibold leading-none text-white">{formatPrice(product.price)}</p>
-            <p className="mt-1 text-[9px] text-[#bcaeff]">{formatPrice(firstOrderPrice)} con MIRAI10</p>
+            <p className="mt-1 text-[9px] text-[#bcaeff]">Primo ordine · MIRAI10</p>
           </div>
           <button
             type="button"
