@@ -331,17 +331,6 @@ export function MiraGuide() {
   }, [])
 
   useEffect(() => {
-    if (!variant || minimized || showSelector || expanded || isDragging) return
-    setShowNudge(false)
-    const revealTimer = window.setTimeout(() => setShowNudge(true), 1200)
-    const hideTimer = window.setTimeout(() => setShowNudge(false), 7600)
-    return () => {
-      window.clearTimeout(revealTimer)
-      window.clearTimeout(hideTimer)
-    }
-  }, [expanded, isDragging, minimized, pathname, showSelector, variant])
-
-  useEffect(() => {
     if (
       !variant
       || minimized
