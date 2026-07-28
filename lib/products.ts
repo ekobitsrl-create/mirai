@@ -1,4 +1,5 @@
 import { CUSTOM_TEE_IMAGE, CUSTOM_TEE_PRICE, CUSTOM_TEE_PRODUCT_ID } from "@/lib/customization"
+import { HEADWEAR_GENERATED_GALLERIES } from "@/lib/headwear-generated-galleries"
 import { getPremiumProductTitle } from "@/lib/product-titles"
 
 type ProductIdentity = {
@@ -165,14 +166,37 @@ export function mapProductRow(row: Record<string, any>): StoreProduct {
   const rawGallery = row.image_gallery
   const rawStock = row.stock_by_size
   const rawDetails = row.detail_items
+  const productId = String(row.id)
+  const productName = getPremiumProductTitle({
+    name: (row.name as string) ?? "",
+    category: (row.category as string) ?? "",
+    color_name: (row.color_name as string) ?? undefined,
+  })
+  const databaseGallery = Array.isArray(rawGallery)
+    ? (rawGallery as StoreProductImage[])
+    : []
+  const generatedGallery = HEADWEAR_GENERATED_GALLERIES[productId] || []
+  const galleryWithOriginalPrimary = generatedGallery.length
+    ? [
+        ...(row.image_url
+          ? [{
+              src: row.image_url as string,
+              alt: productName,
+              fit: "cover" as const,
+              position: "center",
+            }]
+          : []),
+        ...databaseGallery,
+        ...generatedGallery,
+      ].filter(
+        (image, index, gallery) =>
+          image?.src && gallery.findIndex((candidate) => candidate?.src === image.src) === index,
+      )
+    : databaseGallery
 
   return {
-    id: String(row.id),
-    name: getPremiumProductTitle({
-      name: (row.name as string) ?? "",
-      category: (row.category as string) ?? "",
-      color_name: (row.color_name as string) ?? undefined,
-    }),
+    id: productId,
+    name: productName,
     description: (row.description as string | null) ?? null,
     price: Number(row.price ?? 0),
     category: (row.category as string) ?? "",
@@ -206,7 +230,7 @@ export function mapProductRow(row: Record<string, any>): StoreProduct {
       rawStock && typeof rawStock === "object" && !Array.isArray(rawStock)
         ? (rawStock as Record<string, number>)
         : undefined,
-    image_gallery: Array.isArray(rawGallery) ? (rawGallery as StoreProductImage[]) : undefined,
+    image_gallery: galleryWithOriginalPrimary.length ? galleryWithOriginalPrimary : undefined,
   }
 }
 
