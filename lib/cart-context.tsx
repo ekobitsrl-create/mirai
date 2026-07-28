@@ -28,6 +28,46 @@ type CartContextType = {
 
 const CartContext = createContext<CartContextType | undefined>(undefined)
 
+function normalizeStoredCartItem(value: unknown): CartItem | null {
+  if (!value || typeof value !== "object") return null
+
+  const candidate = value as Record<string, unknown>
+  const productId = typeof candidate.productId === "string" ? candidate.productId.trim() : ""
+  const price = Number(candidate.price)
+  const rawQuantity = Number(candidate.quantity)
+  const rawMaxQuantity = Number(candidate.maxQuantity)
+
+  if (!productId || !Number.isFinite(price) || price < 0) return null
+  if (!Number.isFinite(rawQuantity) || rawQuantity <= 0) return null
+
+  const maxQuantity = Number.isFinite(rawMaxQuantity) && rawMaxQuantity > 0
+    ? Math.max(1, Math.floor(rawMaxQuantity))
+    : undefined
+  const quantity = Math.min(
+    maxQuantity ?? 10,
+    Math.max(1, Math.floor(rawQuantity)),
+  )
+
+  return {
+    productId,
+    name: typeof candidate.name === "string" && candidate.name.trim()
+      ? candidate.name
+      : "Prodotto MIRAI",
+    price,
+    image_url: typeof candidate.image_url === "string" ? candidate.image_url : null,
+    quantity,
+    size: typeof candidate.size === "string" && candidate.size.trim()
+      ? candidate.size
+      : "Unica",
+    lineId: typeof candidate.lineId === "string" ? candidate.lineId : undefined,
+    customization:
+      candidate.customization && typeof candidate.customization === "object"
+        ? candidate.customization as CustomizationDetails
+        : undefined,
+    maxQuantity,
+  }
+}
+
 export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([])
   const [hydrated, setHydrated] = useState(false)
@@ -36,8 +76,13 @@ export function CartProvider({ children }: { children: ReactNode }) {
     try {
       const savedCart = window.localStorage.getItem("mirai-cart")
       if (savedCart) {
-        const parsed = JSON.parse(savedCart)
-        if (Array.isArray(parsed)) setItems(parsed)
+        const parsed: unknown = JSON.parse(savedCart)
+        if (Array.isArray(parsed)) {
+          setItems(parsed.flatMap((item) => {
+            const normalizedItem = normalizeStoredCartItem(item)
+            return normalizedItem ? [normalizedItem] : []
+          }))
+        }
       }
     } catch {
       // The cart still works for the current session if storage is unavailable.

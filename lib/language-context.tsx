@@ -17,8 +17,14 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     setMounted(true)
-    // Get saved locale from localStorage or browser preference
-    const savedLocale = localStorage.getItem("mirai-locale") as Locale | null
+    let savedLocale: Locale | null = null
+
+    try {
+      savedLocale = window.localStorage.getItem("mirai-locale") as Locale | null
+    } catch {
+      // Privacy settings can disable browser storage. Language detection still works.
+    }
+
     if (savedLocale && translations[savedLocale]) {
       setLocaleState(savedLocale)
     } else {
@@ -32,7 +38,11 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
 
   const setLocale = (newLocale: Locale) => {
     setLocaleState(newLocale)
-    localStorage.setItem("mirai-locale", newLocale)
+    try {
+      window.localStorage.setItem("mirai-locale", newLocale)
+    } catch {
+      // Keep the selected language for the current session when storage is blocked.
+    }
     // Update HTML lang attribute
     document.documentElement.lang = newLocale
   }

@@ -45,12 +45,26 @@ export default function CheckoutPage() {
 
   useEffect(() => {
     let active = true
-    void createClient().auth.getSession().then(({ data }) => {
-      if (!active) return
 
-      setIsAuthenticated(Boolean(data.session))
-      setAccountEmail(data.session?.user.email?.trim().toLowerCase() || "")
-    })
+    const hydrateAuthentication = async () => {
+      try {
+        const { data, error } = await createClient().auth.getSession()
+        if (error) throw error
+        if (!active) return
+
+        setIsAuthenticated(Boolean(data.session))
+        setAccountEmail(data.session?.user.email?.trim().toLowerCase() || "")
+      } catch (error) {
+        console.error("Impossibile ripristinare la sessione utente nel checkout", error)
+        if (!active) return
+
+        // Authentication is optional: always leave guest checkout available.
+        setIsAuthenticated(false)
+        setAccountEmail("")
+      }
+    }
+
+    void hydrateAuthentication()
 
     return () => {
       active = false
