@@ -3,7 +3,6 @@ import { notFound } from "next/navigation"
 import { Navbar } from "@/components/navbar"
 import { Footer } from "@/components/footer"
 import { ProductDetail } from "@/components/product-detail"
-import { FirstProductDiscountModal } from "@/components/first-product-discount-modal"
 import {
   getDemoProduct,
   getProductSupplierSettings,
@@ -82,16 +81,17 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
 
   if (!product || isBlackIslandProduct(product)) notFound()
 
-  // Fetch related products from same subcategory
+  // Fetch enough products to connect colour variants while still providing
+  // a separate set of related recommendations.
   const { data: related } = await supabase
     .from("products")
     .select("*")
     .eq("category", product.category)
     .neq("id", product.id)
     .eq("in_stock", true)
-    .limit(4)
+    .limit(32)
 
-  const relatedProducts = withDemoProducts(related || []).slice(0, 4)
+  const relatedProducts = withDemoProducts(related || []).slice(0, 32)
 
   // Resolve subcategory → parent category for breadcrumb
   const { data: subcat } = await supabase
@@ -232,13 +232,12 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
       <Navbar />
-      <FirstProductDiscountModal />
       <div className="pointer-events-none absolute inset-x-0 top-20 h-[950px] overflow-hidden" aria-hidden="true">
         <div className="absolute -left-40 top-40 h-[520px] w-[520px] rounded-full bg-primary/20 blur-[135px]" />
         <div className="absolute -right-44 top-0 h-[620px] w-[620px] rounded-full bg-fuchsia-500/10 blur-[160px]" />
         <div className="absolute left-1/2 top-[520px] h-64 w-[70%] -translate-x-1/2 rounded-full bg-primary/10 blur-[130px]" />
       </div>
-      <div className="relative pb-24 pt-24 sm:pt-28 lg:pt-36">
+      <div className="relative pb-40 pt-24 sm:pb-24 sm:pt-28 lg:pt-32">
         <ProductDetail product={product} relatedProducts={relatedProducts} />
       </div>
       <div className="relative">

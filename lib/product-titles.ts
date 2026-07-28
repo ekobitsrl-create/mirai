@@ -46,6 +46,28 @@ const TITLE_PREFIXES: Record<ProductKind, string> = {
 const KNOWN_COLOR_SUFFIX =
   /(?:washed\s+|vintage\s+|light\s+)?(?:black|white|pink|sand|red|blue|brown|green|purple|yellow|orange|grey|gray|beige|nero|nera|bianco|bianca|rosa|rosso|rossa|blu|marrone|verde|viola|giallo|gialla|arancio|grigio|grigia|panna|sabbia|bordeaux)$/i
 
+const DISPLAY_COLOR_NAMES: Record<string, string> = {
+  nero: "Black",
+  nera: "Black",
+  bianco: "White",
+  bianca: "White",
+  rosa: "Pink",
+  sabbia: "Sand",
+  rosso: "Red",
+  rossa: "Red",
+  blu: "Blue",
+  marrone: "Brown",
+  verde: "Green",
+  viola: "Purple",
+  giallo: "Yellow",
+  gialla: "Yellow",
+  arancio: "Orange",
+  grigio: "Grey",
+  grigia: "Grey",
+  panna: "Cream",
+  bordeaux: "Burgundy",
+}
+
 function normalizedText(value: string | null | undefined) {
   return (value || "")
     .replace(/â€“|â€”|–|—/g, " - ")
@@ -188,4 +210,32 @@ export function getPremiumProductTitle(input: ProductTitleInput) {
   const kind = inferProductKind(input)
   const design = getDesignName(input, kind)
   return `${TITLE_PREFIXES[kind]} - ${design}`
+}
+
+/**
+ * Short, commercial title for product cards and product detail pages.
+ * The longer SEO title remains available through `getPremiumProductTitle`.
+ */
+export function getProductDisplayTitle(input: ProductTitleInput) {
+  const kind = inferProductKind(input)
+  const design = getDesignName(input, kind)
+  const color = normalizedText(input.color_name)
+  const displayColor = DISPLAY_COLOR_NAMES[color.toLocaleLowerCase("it-IT")] || color
+
+  return displayColor ? `${design} — ${displayColor}` : design
+}
+
+/**
+ * Stable key used to connect colour variants without changing product IDs.
+ */
+export function getProductVariantKey(input: ProductTitleInput) {
+  const kind = inferProductKind(input)
+  const design = getDesignName(input, kind)
+    .toLocaleLowerCase("it-IT")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+
+  return `${kind}:${design}`
 }

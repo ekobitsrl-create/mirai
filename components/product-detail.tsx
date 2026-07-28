@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import {
@@ -22,7 +22,15 @@ import {
   ZoomIn,
 } from "lucide-react"
 import { useCart } from "@/lib/cart-context"
-import { getProductSupplierSettings, type StoreProduct } from "@/lib/products"
+import {
+  getProductSupplierSettings,
+  type StoreProduct,
+  type StoreProductImage,
+} from "@/lib/products"
+import {
+  getProductDisplayTitle,
+  getProductVariantKey,
+} from "@/lib/product-titles"
 
 function formatCategory(slug: string) {
   return slug.replace(/-/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase())
@@ -36,6 +44,41 @@ function formatPrice(price: number) {
 }
 
 const FIRST_ORDER_DISCOUNT_PERCENT = 10
+
+type ProductGalleryView = StoreProductImage & {
+  label: string
+  scale?: number
+}
+
+function getGalleryViews(product: StoreProduct): ProductGalleryView[] {
+  const originalGallery = product.image_gallery?.length
+    ? product.image_gallery
+    : product.image_url
+      ? [{ src: product.image_url, alt: product.name, fit: "contain" as const }]
+      : []
+
+  if (!originalGallery.length) return []
+
+  const realViewLabels = ["Fronte", "Retro", "Dettaglio", "Indossata", "Finiture"]
+  const views: ProductGalleryView[] = originalGallery.map((image, index) => ({
+    ...image,
+    label: realViewLabels[index] || `Vista ${index + 1}`,
+  }))
+  const primary = originalGallery[0]
+  const detailViews: ProductGalleryView[] = [
+    { ...primary, label: "Dettaglio stampa", position: primary.position || "center 42%", scale: 1.55 },
+    { ...primary, label: "Dettaglio tessuto", position: primary.position || "center 28%", scale: 2.05 },
+    { ...primary, label: "Vestibilità", position: primary.position || "center", scale: 1.2 },
+    { ...primary, label: "Finiture", position: primary.position || "center 65%", scale: 1.8 },
+  ]
+
+  for (const detailView of detailViews) {
+    if (views.length >= 5) break
+    views.push(detailView)
+  }
+
+  return views
+}
 
 export function ProductDetail({
   product,
@@ -55,6 +98,7 @@ export function ProductDetail({
   const [selectedImageIndex, setSelectedImageIndex] = useState(0)
   const [quickPaymentLoading, setQuickPaymentLoading] = useState<"paypal" | "klarna" | "scalapay" | null>(null)
   const [paymentError, setPaymentError] = useState<string | null>(null)
+  const purchaseRef = useRef<HTMLDivElement>(null)
 
   const sizes = product.sizes || []
   const selectedStock = selectedSize ? product.stock_by_size?.[selectedSize] : undefined
@@ -72,12 +116,36 @@ export function ProductDetail({
     ? `consegna stimata in ${supplierSettings.shippingMinDays}–${supplierSettings.shippingMaxDays} giorni lavorativi`
     : "consegna stimata in 3–5 giorni lavorativi"
   const detailItems = product.detail_items || []
-  const gallery = product.image_gallery?.length
-    ? product.image_gallery
-    : product.image_url
-      ? [{ src: product.image_url, alt: product.name, fit: "contain" as const }]
-      : []
+  const gallery = useMemo(() => getGalleryViews(product), [product])
   const selectedImage = gallery[selectedImageIndex] || gallery[0]
+  const displayTitle = getProductDisplayTitle(product)
+  const currentVariantKey = getProductVariantKey(product)
+  const variants = useMemo(
+    () => [product, ...relatedProducts]
+      .filter(
+        (item, index, products) =>
+          getProductVariantKey(item) === currentVariantKey
+          && products.findIndex((candidate) => candidate.id === item.id) === index,
+      )
+      .sort((left, right) => {
+        if (left.id === product.id) return -1
+        if (right.id === product.id) return 1
+        return (left.color_name || left.name).localeCompare(right.color_name || right.name, "it")
+      }),
+    [currentVariantKey, product, relatedProducts],
+  )
+  const suggestedProducts = useMemo(() => {
+    const nonVariants = relatedProducts.filter(
+      (item) => getProductVariantKey(item) !== currentVariantKey,
+    )
+    return (nonVariants.length ? nonVariants : relatedProducts)
+      .filter(
+        (item, index, products) =>
+          item.id !== product.id
+          && products.findIndex((candidate) => candidate.id === item.id) === index,
+      )
+      .slice(0, 4)
+  }, [currentVariantKey, product.id, relatedProducts])
   const firstOrderPrice = Math.round(
     Number(product.price) * (1 - FIRST_ORDER_DISCOUNT_PERCENT / 100) * 100,
   ) / 100
@@ -139,6 +207,15 @@ export function ProductDetail({
     })
     setAdded(true)
     window.setTimeout(() => setAdded(false), 2200)
+  }
+
+  function handleMobilePurchase() {
+    if (sizes.length > 0 && !selectedSize) {
+      setSizeError(true)
+      purchaseRef.current?.scrollIntoView({ behavior: "smooth", block: "center" })
+      return
+    }
+    handleAddToCart()
   }
 
   async function handleQuickPayment(paymentMethod: "paypal" | "klarna" | "scalapay") {
@@ -209,7 +286,7 @@ export function ProductDetail({
         <ChevronRight className="h-3 w-3 shrink-0" />
         <Link href={`/collezione/${product.category}`} className="shrink-0 hover:text-white">{formatCategory(product.category)}</Link>
         <ChevronRight className="h-3 w-3 shrink-0" />
-        <span className="truncate text-white/85">{product.name}</span>
+        <span className="truncate text-white/85">{displayTitle}</span>
       </nav>
 
       <div className="grid grid-cols-1 gap-10 lg:grid-cols-[minmax(0,1.25fr)_minmax(400px,.75fr)] lg:gap-12 xl:gap-20">
@@ -229,9 +306,15 @@ export function ProductDetail({
                   alt=""
                   fill
                   className="object-cover"
-                  style={{ objectPosition: image.position || "center" }}
+                  style={{
+                    objectPosition: image.position || "center",
+                    transform: image.scale ? `scale(${image.scale})` : undefined,
+                  }}
                   sizes="72px"
                 />
+                <span className="absolute inset-x-1 bottom-1 truncate rounded bg-black/65 px-1 py-0.5 text-[7px] font-semibold uppercase tracking-[0.08em] text-white/80">
+                  {image.label}
+                </span>
               </button>
             ))}
             {gallery.length > 0 && (
@@ -253,7 +336,10 @@ export function ProductDetail({
                 alt={selectedImage.alt}
                 fill
                 className="object-cover transition-transform duration-700 group-hover:scale-[1.025]"
-                style={{ objectPosition: selectedImage.position || "center" }}
+                style={{
+                  objectPosition: selectedImage.position || "center",
+                  transform: selectedImage.scale ? `scale(${selectedImage.scale})` : undefined,
+                }}
                 sizes="(max-width: 1024px) 100vw, 60vw"
                 priority
               />
@@ -266,24 +352,28 @@ export function ProductDetail({
             {product.is_new && (
               <span className="absolute left-4 top-4 bg-[#9f86ff] px-3 py-1.5 text-[9px] font-bold uppercase tracking-[0.2em] text-black">Novità</span>
             )}
+            {selectedImage && (
+              <span className="absolute bottom-4 left-4 rounded-full border border-white/15 bg-black/65 px-3 py-1.5 text-[8px] font-semibold uppercase tracking-[0.16em] text-white/75 backdrop-blur-md">
+                {selectedImage.label}
+              </span>
+            )}
           </button>
         </section>
 
-        <section className="mirai-neon-card relative overflow-hidden rounded-[1.75rem] p-5 sm:p-7 lg:!sticky lg:top-32 lg:self-start lg:p-8">
+        <section className="mirai-neon-card relative overflow-hidden rounded-[1.75rem] p-5 sm:p-7 lg:!sticky lg:top-28 lg:self-start lg:p-7">
           <div className="relative sm:flex sm:items-start sm:justify-between sm:gap-6">
             <div className="min-w-0 flex-1">
               <p className="pr-20 text-[9px] font-semibold uppercase tracking-[0.3em] text-[#9f86ff] sm:pr-0">MIRAI LAB / {product.brand || formatCategory(product.category)}</p>
-              <h1 className="mt-6 max-w-xl text-xl font-medium leading-[1.15] tracking-[-0.03em] text-white sm:mt-3 sm:text-3xl md:text-4xl">{product.name}</h1>
-              {product.supplier_sku && <p className="mt-3 text-[9px] uppercase tracking-[0.2em] text-white/40">Codice {product.supplier_sku}</p>}
-              <div className="mt-5 flex flex-wrap items-center gap-x-3 gap-y-2">
-                <p className="text-lg font-medium">{formatPrice(product.price)}</p>
+              <h1 className="mt-5 max-w-xl text-xl font-medium leading-[1.08] tracking-[-0.035em] text-white sm:mt-3 sm:text-3xl lg:text-[2rem]">{displayTitle}</h1>
+              <div className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-2">
+                <p className="text-xl font-semibold">{formatPrice(product.price)}</p>
                 <p className="inline-flex items-center gap-1.5 rounded-full border border-[#9f86ff]/45 bg-[#9f86ff]/10 px-3 py-1.5 text-[10px] text-white/75">
-                  <span>Con MIRAI10</span>
+                  <span>Primo ordine</span>
                   <strong className="text-xs font-semibold text-white">{formatPrice(firstOrderPrice)}</strong>
-                  <span className="font-semibold text-[#bcaeff]">-{FIRST_ORDER_DISCOUNT_PERCENT}%</span>
+                  <span className="font-semibold text-[#bcaeff]">con MIRAI10</span>
                 </p>
               </div>
-              <p className="mt-1 text-[10px] text-white/55">Sconto sul primo ordine · IVA inclusa</p>
+              <p className="mt-1 text-[10px] text-white/55">IVA inclusa · risparmi {formatPrice(Number(product.price) - firstOrderPrice)}</p>
             </div>
             <div className="absolute right-0 top-0 flex shrink-0 items-center gap-1 sm:static">
               <button type="button" onClick={shareProduct} className="flex h-10 w-10 items-center justify-center text-white/35 hover:text-white" aria-label="Condividi prodotto"><Share2 className="h-4 w-4" /></button>
@@ -293,15 +383,56 @@ export function ProductDetail({
             </div>
           </div>
 
-          <div className="mt-6 border-t border-white/15 pt-5 sm:mt-8 sm:pt-7">
+          <div className="mt-5 border-t border-white/15 pt-4 sm:mt-6 sm:pt-5">
             <div className="flex items-center justify-between">
               <p className="text-[10px] font-semibold uppercase tracking-[0.22em]">Colore</p>
               <span className="text-xs text-white/65">{colorName}</span>
             </div>
+            <div className="mt-3 flex flex-wrap gap-2" aria-label="Varianti colore">
+              {variants.map((variant) => {
+                const priceDifference = Number(variant.price) - Number(product.price)
+                const isCurrent = variant.id === product.id
+                return (
+                  <Link
+                    key={variant.id}
+                    href={`/prodotto/${variant.id}`}
+                    aria-current={isCurrent ? "page" : undefined}
+                    className={`flex min-w-[8.5rem] items-center gap-2 rounded-xl border px-2.5 py-2 transition-all ${
+                      isCurrent
+                        ? "border-[#9f86ff] bg-[#9f86ff]/15 shadow-[0_0_18px_rgba(159,134,255,0.22)]"
+                        : "border-white/15 bg-white/[0.035] hover:border-[#9f86ff]/65"
+                    }`}
+                  >
+                    <span
+                      className="h-5 w-5 shrink-0 rounded-full border border-white/20"
+                      style={{
+                        backgroundColor: variant.color_hex || undefined,
+                        backgroundImage: !variant.color_hex && variant.image_url
+                          ? `url("${variant.image_url}")`
+                          : undefined,
+                        backgroundPosition: "center",
+                        backgroundSize: "cover",
+                      }}
+                    />
+                    <span className="min-w-0">
+                      <span className="block truncate text-[10px] font-medium text-white/90">
+                        {variant.color_name || "Variante"}
+                      </span>
+                      <span className="block text-[9px] text-white/50">
+                        {formatPrice(variant.price)}
+                        {!isCurrent && priceDifference !== 0
+                          ? ` · ${priceDifference > 0 ? "+" : "−"}${formatPrice(Math.abs(priceDifference))}`
+                          : ""}
+                      </span>
+                    </span>
+                  </Link>
+                )
+              })}
+            </div>
           </div>
 
           {sizes.length > 0 && (
-            <div className="mt-5 sm:mt-7">
+            <div ref={purchaseRef} className="mt-5 sm:mt-6">
               <div className="flex items-center justify-between">
                 <p className="text-[10px] font-semibold uppercase tracking-[0.22em]">Taglia</p>
                 <button type="button" onClick={() => setSizeGuideOpen(true)} className="flex items-center gap-1.5 text-[10px] text-white/60 underline decoration-primary/40 underline-offset-4 hover:text-white">
@@ -344,7 +475,7 @@ export function ProductDetail({
             </div>
           )}
 
-          <div className="mt-5 grid gap-2 sm:mt-6 sm:grid-cols-[auto_minmax(0,1fr)]">
+          <div ref={sizes.length ? undefined : purchaseRef} className="mt-5 grid gap-2 sm:grid-cols-[auto_minmax(0,1fr)]">
             <div className="order-2 flex h-12 w-full items-center justify-center border border-white/20 bg-black/10 sm:order-1 sm:h-14 sm:w-auto">
               <button type="button" onClick={() => setQuantity((value) => Math.max(1, value - 1))} className="flex h-full w-10 items-center justify-center text-white/45 hover:text-white" aria-label="Riduci quantità"><Minus className="h-3.5 w-3.5" /></button>
               <span className="w-8 text-center text-xs font-medium">{quantity}</span>
@@ -361,6 +492,11 @@ export function ProductDetail({
           </div>
 
           {product.description && <p className="mt-6 max-w-xl text-sm leading-6 text-white/70">{product.description}</p>}
+          {product.supplier_sku && (
+            <p className="mt-3 text-[9px] uppercase tracking-[0.2em] text-white/40">
+              Codice prodotto {product.supplier_sku}
+            </p>
+          )}
 
           {product.in_stock && (
             <div className="mt-5 rounded-xl border border-white/10 bg-black/10 p-4">
@@ -445,7 +581,7 @@ export function ProductDetail({
         </section>
       </div>
 
-      {relatedProducts.length > 0 && (
+      {suggestedProducts.length > 0 && (
         <section className="mt-24 border-t border-primary/25 pt-12 md:mt-32 md:pt-16">
           <div className="mb-8 flex items-end justify-between">
             <div>
@@ -455,18 +591,48 @@ export function ProductDetail({
             <Link href="/collezioni" className="hidden border-b border-white/30 pb-1 text-[9px] uppercase tracking-[0.2em] text-white/50 hover:text-white sm:block">Shop all</Link>
           </div>
           <div className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-5">
-            {relatedProducts.map((item) => (
+            {suggestedProducts.map((item) => (
               <Link key={item.id} href={`/prodotto/${item.id}`} className="group min-w-0">
                 <div className="mirai-neon-frame mirai-neon-lift relative mb-3 aspect-[4/5] overflow-hidden rounded-2xl bg-white/5">
                   {item.image_url && <Image src={item.image_url} alt={item.name} fill className="object-cover transition-transform duration-700 group-hover:scale-[1.035]" sizes="(max-width: 768px) 50vw, 25vw" />}
                 </div>
-                <h3 className="truncate text-xs font-medium group-hover:text-[#9f86ff]">{item.name}</h3>
+                <h3 className="truncate text-xs font-medium group-hover:text-[#9f86ff]">{getProductDisplayTitle(item)}</h3>
                 <p className="mt-1 text-xs text-white/45">{formatPrice(item.price)}</p>
               </Link>
             ))}
           </div>
         </section>
       )}
+
+      <div className="fixed inset-x-0 bottom-0 z-[65] border-t border-[#9f86ff]/40 bg-[#100b17]/95 px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3 shadow-[0_-16px_42px_rgba(0,0,0,0.48)] backdrop-blur-xl md:hidden">
+        <div className="mx-auto flex max-w-lg items-center gap-3">
+          <div className="min-w-0 shrink-0">
+            <p className="text-base font-semibold leading-none text-white">{formatPrice(product.price)}</p>
+            <p className="mt-1 text-[9px] text-[#bcaeff]">{formatPrice(firstOrderPrice)} con MIRAI10</p>
+          </div>
+          <button
+            type="button"
+            onClick={handleMobilePurchase}
+            disabled={!product.in_stock}
+            className={`flex min-h-[54px] min-w-0 flex-1 items-center justify-center gap-2 px-4 text-[10px] font-bold uppercase tracking-[0.14em] ${
+              product.in_stock
+                ? "bg-primary text-primary-foreground shadow-[0_0_28px_rgba(159,134,255,0.45)]"
+                : "cursor-not-allowed bg-white/10 text-white/35"
+            }`}
+          >
+            <ShoppingBag className="h-4 w-4 shrink-0" />
+            <span className="truncate">
+              {!product.in_stock
+                ? "Esaurito"
+                : sizes.length > 0 && !selectedSize
+                  ? "Scegli taglia"
+                  : added
+                    ? "Aggiunto"
+                    : "Aggiungi al carrello"}
+            </span>
+          </button>
+        </div>
+      </div>
 
       {zoomOpen && selectedImage && (
         <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/95 p-4 md:p-10">
@@ -477,7 +643,10 @@ export function ProductDetail({
               alt={selectedImage.alt}
               fill
               className="object-cover"
-              style={{ objectPosition: selectedImage.position || "center" }}
+              style={{
+                objectPosition: selectedImage.position || "center",
+                transform: selectedImage.scale ? `scale(${selectedImage.scale})` : undefined,
+              }}
               sizes="100vw"
               priority
             />

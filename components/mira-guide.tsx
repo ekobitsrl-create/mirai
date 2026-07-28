@@ -687,7 +687,7 @@ export function MiraGuide() {
     setExpanded(false)
   }
 
-  if (!hydrated) return null
+  if (!hydrated || pathname.startsWith("/prodotto/")) return null
 
   const activeVariant = variant
   const stageSize = getStageSize()
