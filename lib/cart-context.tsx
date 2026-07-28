@@ -15,6 +15,13 @@ export type CartItem = {
   maxQuantity?: number
 }
 
+export const CART_ITEM_ADDED_EVENT = "mirai:cart-item-added"
+
+export type CartItemAddedDetail = {
+  name: string
+  quantity: number
+}
+
 type CartContextType = {
   items: CartItem[]
   addItem: (item: Omit<CartItem, "quantity"> & { quantity?: number }) => void
@@ -102,6 +109,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const addItem = useCallback(
     (item: Omit<CartItem, "quantity"> & { quantity?: number }) => {
+      const addedQuantity = Math.min(item.maxQuantity ?? 10, item.quantity || 1)
+
       setItems((prev) => {
         const existing = prev.find((i) => item.lineId
           ? i.lineId === item.lineId
@@ -121,10 +130,17 @@ export function CartProvider({ children }: { children: ReactNode }) {
           ...prev,
           {
             ...item,
-            quantity: Math.min(item.maxQuantity ?? 10, item.quantity || 1),
+            quantity: addedQuantity,
           },
         ]
       })
+
+      window.dispatchEvent(new CustomEvent<CartItemAddedDetail>(CART_ITEM_ADDED_EVENT, {
+        detail: {
+          name: item.name,
+          quantity: addedQuantity,
+        },
+      }))
     },
     []
   )

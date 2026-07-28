@@ -3,6 +3,7 @@ import { Inter, Space_Grotesk } from 'next/font/google'
 import Script from 'next/script'
 import { Analytics } from '@vercel/analytics/next'
 import { CartProvider } from '@/lib/cart-context'
+import { CartAddedBanner } from '@/components/cart-added-banner'
 import { LanguageProvider } from '@/lib/language-context'
 import { CookieBanner } from '@/components/cookie-banner'
 import { WhatsAppButton } from '@/components/whatsapp-button'
@@ -169,6 +170,7 @@ window.gtag('consent', 'default', {
         <LanguageProvider>
           <CartProvider>
             {children}
+            <CartAddedBanner />
             <MiraGuide />
             <BackgroundMusic />
             <WhatsAppButton />
