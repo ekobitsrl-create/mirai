@@ -46,28 +46,6 @@ const TITLE_PREFIXES: Record<ProductKind, string> = {
 const KNOWN_COLOR_SUFFIX =
   /(?:washed\s+|vintage\s+|light\s+)?(?:black|white|pink|sand|red|blue|brown|green|purple|yellow|orange|grey|gray|beige|nero|nera|bianco|bianca|rosa|rosso|rossa|blu|marrone|verde|viola|giallo|gialla|arancio|grigio|grigia|panna|sabbia|bordeaux)$/i
 
-const DISPLAY_COLOR_NAMES: Record<string, string> = {
-  nero: "Black",
-  nera: "Black",
-  bianco: "White",
-  bianca: "White",
-  rosa: "Pink",
-  sabbia: "Sand",
-  rosso: "Red",
-  rossa: "Red",
-  blu: "Blue",
-  marrone: "Brown",
-  verde: "Green",
-  viola: "Purple",
-  giallo: "Yellow",
-  gialla: "Yellow",
-  arancio: "Orange",
-  grigio: "Grey",
-  grigia: "Grey",
-  panna: "Cream",
-  bordeaux: "Burgundy",
-}
-
 function normalizedText(value: string | null | undefined) {
   return (value || "")
     .replace(/â€“|â€”|–|—/g, " - ")
@@ -213,16 +191,11 @@ export function getPremiumProductTitle(input: ProductTitleInput) {
 }
 
 /**
- * Short, commercial title for product cards and product detail pages.
- * The longer SEO title remains available through `getPremiumProductTitle`.
+ * Keep visible catalog titles aligned with the full SEO title requested for
+ * every product type. Colour remains available in the dedicated selector.
  */
 export function getProductDisplayTitle(input: ProductTitleInput) {
-  const kind = inferProductKind(input)
-  const design = getDesignName(input, kind)
-  const color = normalizedText(input.color_name)
-  const displayColor = DISPLAY_COLOR_NAMES[color.toLocaleLowerCase("it-IT")] || color
-
-  return displayColor ? `${design} — ${displayColor}` : design
+  return getPremiumProductTitle(input)
 }
 
 /**
