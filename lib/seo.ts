@@ -3,7 +3,7 @@ import { getAbsoluteUrl, SITE_URL } from "@/lib/site-url"
 
 export const SEO_BRAND_NAME = "MIRAI LAB STORE"
 export const SEO_SHORT_BRAND_NAME = "MIRAI"
-export const SEO_DEFAULT_IMAGE = "/images/hero-storefront.jpg"
+export const SEO_DEFAULT_IMAGE = "/images/categories/shorts.jpeg"
 
 type SeoMetadataInput = {
   title: string
@@ -38,7 +38,7 @@ export function buildSeoMetadata({
       title,
       description,
       images: imageUrl
-        ? [{ url: imageUrl, width: 1200, height: 630, alt: `${title} - ${SEO_BRAND_NAME}` }]
+        ? [{ url: imageUrl, width: 1536, height: 1024, alt: `${title} - ${SEO_BRAND_NAME}` }]
         : undefined,
     },
     twitter: {

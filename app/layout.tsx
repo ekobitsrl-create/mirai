@@ -50,10 +50,10 @@ export const metadata: Metadata = {
     description: "Abbigliamento streetwear online, capi oversize, cappelli custom e t-shirt personalizzate. Nato a Catania.",
     images: [
       {
-        url: getAbsoluteUrl("/images/hero-storefront.jpg"),
-        width: 1200,
-        height: 630,
-        alt: "MIRAI LAB STORE - Streetwear Made in Italy",
+        url: getAbsoluteUrl("/images/categories/shorts.jpeg"),
+        width: 1536,
+        height: 1024,
+        alt: "MIRAI LAB STORE - Streetwear e abbigliamento urban",
       },
     ],
   },
@@ -61,7 +61,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "MIRAI LAB STORE | Streetwear e cappelli custom",
     description: "Abbigliamento streetwear online, capi oversize, cappelli custom e t-shirt personalizzate. Nato a Catania.",
-    images: [getAbsoluteUrl("/images/hero-storefront.jpg")],
+    images: [getAbsoluteUrl("/images/categories/shorts.jpeg")],
   },
   robots: {
     index: true,
