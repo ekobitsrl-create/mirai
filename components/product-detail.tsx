@@ -288,9 +288,6 @@ export function ProductDetail({
               <p className="text-[10px] font-semibold uppercase tracking-[0.22em]">Colore</p>
               <span className="text-xs text-white/65">{colorName}</span>
             </div>
-            <button type="button" className="mt-3 flex items-center gap-2 border border-white/30 bg-white/[0.06] px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.15em] text-white">
-              <span className="h-3 w-3 rounded-full border border-white/25" style={{ backgroundColor: product.color_hex || "#ffffff" }} /> {colorName}
-            </button>
           </div>
 
           {sizes.length > 0 && (
