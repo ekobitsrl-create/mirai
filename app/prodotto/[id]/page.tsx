@@ -41,7 +41,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
 
   if (!product || isBlackIslandProduct(product)) return { title: "Prodotto non trovato" }
 
-  const description = product.description || `Scopri ${product.name} su MIRAI. Pezzo esclusivo fatto a mano.`
+  const description = product.description || `Scopri ${product.name} su MIRAI: design streetwear curato nei dettagli, disponibile nelle taglie indicate.`
   const imageUrl = absoluteProductImage(product.image_url)
   const productPath = `/prodotto/${encodeURIComponent(id)}`
 

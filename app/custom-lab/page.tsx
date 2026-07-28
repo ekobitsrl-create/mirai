@@ -171,7 +171,7 @@ export default function CustomLabPage() {
             <div className="flex items-start gap-3">
               <Sparkles className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
               <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.13em] text-white">Pezzo unico, fatto per te</p>
+                <p className="text-xs font-semibold uppercase tracking-[0.13em] text-white">Personalizzato secondo il tuo stile</p>
                 <p className="mt-1 text-xs leading-5 text-white/40">I prodotti custom non possono essere restituiti, salvo difetti di produzione.</p>
               </div>
             </div>

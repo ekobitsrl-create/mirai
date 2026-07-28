@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
+    "prebuild": "node scripts/013_fix_multisize_headwear_descriptions.mjs",
     "build": "next build",
     "start": "next start",
     "lint": "eslint ."
