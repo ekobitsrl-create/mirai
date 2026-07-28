@@ -2,7 +2,6 @@ import { redirect } from "next/navigation"
 import { isAdminEmail } from "@/lib/admin"
 import { getServerUserWithProfile, createClient, createUserClient } from "@/lib/supabase/server"
 import { AdminDashboard } from "@/components/admin-dashboard"
-import { getPremiumProductTitle } from "@/lib/product-titles"
 import { getEnvironmentDiscountCodes } from "@/lib/discounts"
 
 export default async function AdminPage() {
@@ -30,10 +29,7 @@ export default async function AdminPage() {
     adminSupabase.from("discount_codes").select("*").order("created_at", { ascending: false }),
   ])
 
-  const products = (productsRes.data || []).map((product) => ({
-    ...product,
-    name: getPremiumProductTitle(product),
-  }))
+  const products = productsRes.data || []
   const categories = categoriesRes.data || []
   const orders = ordersRes.data || []
   const users = usersRes.data || []

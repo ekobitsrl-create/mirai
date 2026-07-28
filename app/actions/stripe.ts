@@ -8,7 +8,6 @@ import { getStripeShippingOptions, SHIPPING_CONFIG } from '@/lib/shipping'
 import { SITE_URL } from '@/lib/site-url'
 import { applyOrderInventory } from '@/lib/orders/apply-order-inventory'
 import { getEstimatedDeliveryDate } from '@/lib/google-customer-reviews'
-import { getPremiumProductTitle } from '@/lib/product-titles'
 import { markCheckoutRecovered, saveAbandonedCheckout } from '@/lib/email/abandoned-cart'
 import { sendOrderConfirmationEmail } from '@/lib/email/order-emails'
 import {
@@ -175,10 +174,7 @@ export async function createCheckoutSession(
   const demoProducts = productIds
     .map(getDemoProduct)
     .filter((product): product is StoreProduct => product !== null)
-  const checkoutProducts = [...(products || []), ...demoProducts].map((product) => ({
-    ...product,
-    name: getPremiumProductTitle(product),
-  }))
+  const checkoutProducts = [...(products || []), ...demoProducts]
 
   if (error && checkoutProducts.length === 0) throw new Error('Errore nel recupero dei prodotti')
 
@@ -378,10 +374,7 @@ export async function createCashOnDeliveryOrder(cartItems: CartLineItem[], detai
   const demoProducts = productIds
     .map(getDemoProduct)
     .filter((product): product is StoreProduct => product !== null)
-  const checkoutProducts = [...(products || []), ...demoProducts].map((product) => ({
-    ...product,
-    name: getPremiumProductTitle(product),
-  }))
+  const checkoutProducts = [...(products || []), ...demoProducts]
 
   if (error && checkoutProducts.length === 0) throw new Error('Errore nel recupero dei prodotti')
   if (checkoutProducts.some(isBlackIslandProduct)) {

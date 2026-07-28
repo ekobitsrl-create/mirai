@@ -1,5 +1,3 @@
-import { getPremiumProductTitle } from "@/lib/product-titles"
-
 export type MiraiSupplierCatalogProduct = {
   name: string
   description: string
@@ -993,7 +991,7 @@ export const MIRAI_SUPPLIER_CATALOG: readonly MiraiSupplierCatalogProduct[] =
 
     return {
       ...product,
-      name: getPremiumProductTitle(product),
+      name: product.name.replace(/^MIRAI\s+/i, ""),
       image_gallery: [...product.image_gallery],
       sizes: product.sizes.length > 0 ? [...product.sizes] : [...DEFAULT_MIRAI_SIZES],
       stock_by_size: Object.keys(product.stock_by_size).length > 0

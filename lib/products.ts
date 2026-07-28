@@ -1,6 +1,5 @@
 import { CUSTOM_TEE_IMAGE, CUSTOM_TEE_PRICE, CUSTOM_TEE_PRODUCT_ID } from "@/lib/customization"
 import { HEADWEAR_GENERATED_GALLERIES } from "@/lib/headwear-generated-galleries"
-import { getPremiumProductTitle } from "@/lib/product-titles"
 
 type ProductIdentity = {
   name?: string | null
@@ -125,7 +124,7 @@ export const PRIVATE_CHECKOUT_PRODUCT_ID = "a0000000-0000-4000-8000-000000000017
 // only product that is NOT stored in the database.
 export const CUSTOM_TEE_PRODUCT: StoreProduct = {
   id: CUSTOM_TEE_PRODUCT_ID,
-  name: "T-shirt Personalizzata Premium Streetwear Mirai - Custom Heavy",
+  name: "MIRAI Custom Heavy Tee",
   description: "T-shirt heavyweight oversize personalizzata nel MIRAI Custom Lab. Una stampa fronte o retro inclusa.",
   price: CUSTOM_TEE_PRICE,
   category: "custom",
@@ -167,11 +166,7 @@ export function mapProductRow(row: Record<string, any>): StoreProduct {
   const rawStock = row.stock_by_size
   const rawDetails = row.detail_items
   const productId = String(row.id)
-  const productName = getPremiumProductTitle({
-    name: (row.name as string) ?? "",
-    category: (row.category as string) ?? "",
-    color_name: (row.color_name as string) ?? undefined,
-  })
+  const productName = (row.name as string) ?? ""
   const databaseGallery = Array.isArray(rawGallery)
     ? (rawGallery as StoreProductImage[])
     : []
