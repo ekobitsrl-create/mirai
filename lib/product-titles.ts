@@ -191,14 +191,6 @@ export function getPremiumProductTitle(input: ProductTitleInput) {
 }
 
 /**
- * Keep visible catalog titles aligned with the full SEO title requested for
- * every product type. Colour remains available in the dedicated selector.
- */
-export function getProductDisplayTitle(input: ProductTitleInput) {
-  return getPremiumProductTitle(input)
-}
-
-/**
  * Stable key used to connect colour variants without changing product IDs.
  */
 export function getProductVariantKey(input: ProductTitleInput) {

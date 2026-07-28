@@ -28,10 +28,7 @@ import {
   type StoreProduct,
   type StoreProductImage,
 } from "@/lib/products"
-import {
-  getProductDisplayTitle,
-  getProductVariantKey,
-} from "@/lib/product-titles"
+import { getProductVariantKey } from "@/lib/product-titles"
 
 function formatCategory(slug: string) {
   return slug.replace(/-/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase())
@@ -103,7 +100,7 @@ export function ProductDetail({
   const detailItems = product.detail_items || []
   const gallery = useMemo(() => getGalleryViews(product), [product])
   const selectedImage = gallery[selectedImageIndex] || gallery[0]
-  const displayTitle = getProductDisplayTitle(product)
+  const displayTitle = product.name
   const currentVariantKey = getProductVariantKey(product)
   const variants = useMemo(
     () => [product, ...relatedProducts]
@@ -551,7 +548,7 @@ export function ProductDetail({
                 <div className="mirai-neon-frame mirai-neon-lift relative mb-3 aspect-[4/5] overflow-hidden rounded-2xl bg-white/5">
                   {item.image_url && <Image src={item.image_url} alt={item.name} fill className="object-cover transition-transform duration-700 group-hover:scale-[1.035]" sizes="(max-width: 768px) 50vw, 25vw" />}
                 </div>
-                <h3 className="truncate text-xs font-medium group-hover:text-[#9f86ff]">{getProductDisplayTitle(item)}</h3>
+                <h3 className="truncate text-xs font-medium group-hover:text-[#9f86ff]">{item.name}</h3>
                 <p className="mt-1 text-xs text-white/45">{formatPrice(item.price)}</p>
               </Link>
             ))}
