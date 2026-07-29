@@ -143,6 +143,18 @@ export const CUSTOM_TEE_PRODUCT: StoreProduct = {
 }
 
 const BLACK_ISLAND_PATTERN = /black[\s_-]*island/i
+const PRODUCT_DESCRIPTION_CORRECTIONS: Array<[RegExp, string]> = [
+  [/\bperle gold sparsi\b/gi, "perle gold sparse"],
+]
+
+function normalizeProductDescription(description: string | null | undefined) {
+  if (!description) return null
+
+  return PRODUCT_DESCRIPTION_CORRECTIONS.reduce(
+    (value, [pattern, replacement]) => value.replace(pattern, replacement),
+    description,
+  )
+}
 
 export function isBlackIslandProduct(product: ProductIdentity) {
   return BLACK_ISLAND_PATTERN.test(product.name || "")
@@ -192,7 +204,7 @@ export function mapProductRow(row: Record<string, any>): StoreProduct {
   return {
     id: productId,
     name: productName,
-    description: (row.description as string | null) ?? null,
+    description: normalizeProductDescription(row.description as string | null),
     price: Number(row.price ?? 0),
     category: (row.category as string) ?? "",
     image_url: (row.image_url as string | null) ?? null,
