@@ -98,8 +98,8 @@ export default function CheckoutPage() {
       return checkoutSessionRef.current.promise
     }
 
-    if (!emailPattern.test(checkoutEmail)) {
-      const error = new Error("Inserisci un indirizzo email valido per ricevere la conferma ordine.")
+    if (checkoutEmail && !emailPattern.test(checkoutEmail)) {
+      const error = new Error("L'indirizzo email inserito non è valido.")
       setCardError(error.message)
       return Promise.reject(error)
     }
@@ -180,8 +180,8 @@ export default function CheckoutPage() {
   }
 
   const beginGuestCheckout = () => {
-    if (!emailPattern.test(guestEmail.trim())) {
-      setGuestError("Inserisci un indirizzo email valido per ricevere la conferma ordine.")
+    if (guestEmail.trim() && !emailPattern.test(guestEmail.trim())) {
+      setGuestError("L'indirizzo email inserito non è valido.")
       return
     }
 
@@ -293,12 +293,12 @@ export default function CheckoutPage() {
               <Mail className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
               <div>
                 <h2 className="font-semibold text-foreground">Acquisto come ospite</h2>
-                <p className="mt-1 text-sm leading-6 text-muted-foreground">Riceverai qui la conferma e gli aggiornamenti del tuo ordine.</p>
+                <p className="mt-1 text-sm leading-6 text-muted-foreground">Puoi continuare senza email. Se la inserisci, riceverai la conferma e gli aggiornamenti dell'ordine.</p>
               </div>
             </div>
 
             <div className="mt-6">
-              <Label htmlFor="guest-email" className="text-xs uppercase tracking-widest text-muted-foreground">Email</Label>
+              <Label htmlFor="guest-email" className="text-xs uppercase tracking-widest text-muted-foreground">Email (facoltativa)</Label>
               <Input
                 id="guest-email"
                 type="email"
@@ -306,6 +306,7 @@ export default function CheckoutPage() {
                 value={guestEmail}
                 onChange={(event) => {
                   setGuestEmail(event.target.value)
+                  if (!event.target.value.trim()) setMarketingConsent(false)
                   setGuestError(null)
                   if (appliedDiscount) {
                     setAppliedDiscount(null)
@@ -349,7 +350,7 @@ export default function CheckoutPage() {
           <>
             {requiresGuestEmail && (
               <div className="mb-4 flex items-center justify-between border border-border bg-card px-4 py-3 text-sm text-muted-foreground">
-                <span>Acquisto come ospite: {guestEmail.trim()}</span>
+                <span>{guestEmail.trim() ? `Acquisto come ospite: ${guestEmail.trim()}` : "Acquisto come ospite senza email"}</span>
                 <button
                   type="button"
                   onClick={() => {
@@ -451,10 +452,11 @@ export default function CheckoutPage() {
                 <Checkbox
                   id="marketing-consent"
                   checked={marketingConsent}
+                  disabled={!emailPattern.test(checkoutEmail)}
                   onCheckedChange={(checked) => setMarketingConsent(checked === true)}
                 />
                 <Label htmlFor="marketing-consent" className="cursor-pointer text-sm leading-5 text-muted-foreground">
-                  Desidero ricevere promemoria sul carrello e novita MIRAI. Posso disiscrivermi in qualsiasi momento.
+                  Desidero ricevere promemoria sul carrello e novita MIRAI. Richiede un indirizzo email.
                 </Label>
               </div>
             </section>

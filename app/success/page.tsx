@@ -126,7 +126,7 @@ function SuccessContent() {
   if (status === "cash_on_delivery") {
     return (
       <main className="flex min-h-screen items-center justify-center bg-background px-6">
-        {reviewOrder && <GoogleAdsPurchaseConversion transactionId={reviewOrder.orderId} />}
+        {orderId && <GoogleAdsPurchaseConversion transactionId={orderId} />}
         <section className="w-full max-w-md border border-border bg-card p-8 text-center">
           <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-green-500/10 text-green-500">
             <CheckCircle2 className="h-9 w-9" />

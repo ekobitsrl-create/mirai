@@ -144,8 +144,11 @@ export async function createCheckoutSession(
   assertStripeCheckoutConfigured()
   const user = await getServerUser()
   const customerEmail = validEmail(user?.email || guestEmail)
-  if (!customerEmail) {
-    throw new Error('Inserisci un indirizzo email valido per ricevere la conferma ordine')
+  if ((user?.email || guestEmail)?.trim() && !customerEmail) {
+    throw new Error("L'indirizzo email inserito non è valido")
+  }
+  if (discountCode && !customerEmail) {
+    throw new Error('Inserisci un indirizzo email valido per applicare il codice sconto')
   }
 
   if (!cartItems.length) {
@@ -241,7 +244,7 @@ export async function createCheckoutSession(
     ? await validateDiscountCode({
         supabase,
         code: discountCode,
-        customerEmail,
+        customerEmail: customerEmail!,
         subtotalCents,
       })
     : null
@@ -262,7 +265,7 @@ export async function createCheckoutSession(
     line_items: lineItems,
     mode: 'payment',
     customer_creation: 'if_required',
-    customer_email: customerEmail,
+    ...(customerEmail ? { customer_email: customerEmail } : {}),
     ...(user ? { client_reference_id: user.id } : {}),
     metadata: {
       order_item_count: String(cartItems.length),
@@ -270,7 +273,7 @@ export async function createCheckoutSession(
       ...discountMetadata,
     },
     payment_intent_data: {
-      receipt_email: customerEmail,
+      ...(customerEmail ? { receipt_email: customerEmail } : {}),
       metadata: {
         ...(user ? { user_id: user.id } : {}),
         ...discountMetadata,
@@ -296,18 +299,20 @@ export async function createCheckoutSession(
     await markCheckoutRecovered({ checkoutSessionId: previousCheckoutSessionId })
   }
 
-  await saveAbandonedCheckout({
-    checkoutSessionId: session.id,
-    email: customerEmail,
-    consent: marketingConsent,
-    items: lineItems.map((item) => ({
-      name: item.price_data.product_data.name,
-      quantity: item.quantity,
-      price: item.price_data.unit_amount / 100,
-      image: item.price_data.product_data.images?.[0] || null,
-      size: item.price_data.product_data.metadata.size || null,
-    })),
-  })
+  if (customerEmail) {
+    await saveAbandonedCheckout({
+      checkoutSessionId: session.id,
+      email: customerEmail,
+      consent: marketingConsent,
+      items: lineItems.map((item) => ({
+        name: item.price_data.product_data.name,
+        quantity: item.quantity,
+        price: item.price_data.unit_amount / 100,
+        image: item.price_data.product_data.images?.[0] || null,
+        size: item.price_data.product_data.metadata.size || null,
+      })),
+    })
+  }
 
   return {
     clientSecret: session.client_secret,
@@ -339,8 +344,11 @@ export async function createCashOnDeliveryOrder(cartItems: CartLineItem[], detai
 
   const user = await getServerUser()
   const customerEmail = validEmail(user?.email || details.guestEmail)
-  if (!customerEmail) {
-    throw new Error('Inserisci un indirizzo email valido')
+  if ((user?.email || details.guestEmail)?.trim() && !customerEmail) {
+    throw new Error("L'indirizzo email inserito non è valido")
+  }
+  if (details.discountCode && !customerEmail) {
+    throw new Error('Inserisci un indirizzo email valido per applicare il codice sconto')
   }
 
   if (!cartItems.length) {
@@ -417,7 +425,7 @@ export async function createCashOnDeliveryOrder(cartItems: CartLineItem[], detai
     ? await validateDiscountCode({
         supabase,
         code: details.discountCode,
-        customerEmail,
+        customerEmail: customerEmail!,
         subtotalCents,
       })
     : null
@@ -435,7 +443,7 @@ export async function createCashOnDeliveryOrder(cartItems: CartLineItem[], detai
 
   const baseOrderPayload = {
     user_id: user?.id || null,
-    email: customerEmail,
+    email: customerEmail || '',
     status: 'pending',
     total: totalCents / 100,
     shipping_name: shippingName,
@@ -495,14 +503,16 @@ export async function createCashOnDeliveryOrder(cartItems: CartLineItem[], detai
     throw new Error('Ordine registrato, ma la disponibilita del catalogo non e stata aggiornata')
   }
 
-  await markCheckoutRecovered({ email: customerEmail })
+  if (customerEmail) {
+    await markCheckoutRecovered({ email: customerEmail })
+  }
   await sendOrderConfirmationEmail(order.id, 'cash_on_delivery')
 
   return {
     orderId: order.id,
     review: {
       orderId: order.id,
-      email: customerEmail,
+      email: customerEmail || '',
       deliveryCountry: 'IT',
       estimatedDeliveryDate: getEstimatedDeliveryDate(SHIPPING_CONFIG.standardDeliveryDays.maximum),
     },
