@@ -24,7 +24,7 @@ export default async function AdminPage() {
   const [productsRes, categoriesRes, ordersRes, usersRes, discountCodesRes] = await Promise.all([
     supabase.from("products").select("*").order("created_at", { ascending: false }),
     supabase.from("categories").select("*").order("sort_order", { ascending: true }),
-    supabase.from("orders").select("*, order_items(*)").order("created_at", { ascending: false }),
+    adminSupabase.from("orders").select("*, order_items(*)").order("created_at", { ascending: false }),
     supabase.from("profiles").select("*").order("created_at", { ascending: false }),
     adminSupabase.from("discount_codes").select("*").order("created_at", { ascending: false }),
   ])
