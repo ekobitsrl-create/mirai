@@ -6,7 +6,7 @@ import { withDemoProducts } from "@/lib/products"
 import { CatalogSeoContent } from "@/components/seo-content"
 import { buildSeoMetadata, createWebPageJsonLd } from "@/lib/seo"
 
-export const dynamic = "force-dynamic"
+export const revalidate = 300
 
 const COLLECTIONS_DESCRIPTION =
   "Acquista abbigliamento streetwear online: t-shirt oversize, camicie, bermuda, cappelli custom e selezioni urban uomo MIRAI."
@@ -30,7 +30,10 @@ export default async function CollezioniPage() {
 
   const [categoriesRes, productsRes] = await Promise.all([
     supabase.from("categories").select("*").order("sort_order", { ascending: true }),
-    supabase.from("products").select("*").order("created_at", { ascending: false }),
+    supabase
+      .from("products")
+      .select("id, name, description, price, category, image_url, sizes, in_stock, is_new, created_at, stock_by_size")
+      .order("created_at", { ascending: false }),
   ])
 
   const categories = (categoriesRes.data || []).filter(

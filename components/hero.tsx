@@ -84,7 +84,6 @@ export function Hero() {
                 aria-hidden
                 fill
                 className="mirai-hero-edge-blur object-cover"
-                priority={i === 0}
                 sizes="100vw"
               />
               {/* Sharp base image, faded out just before its own hard edge. */}
@@ -93,7 +92,7 @@ export function Hero() {
                 alt={slides[i]?.title.replace("\n", " ") || ""}
                 fill
                 className="mirai-hero-base object-cover"
-                priority={i === 0}
+                preload={i === 0}
                 sizes="100vw"
               />
               <div

@@ -73,7 +73,7 @@ async function getCatalog() {
     const supabase = await createClient()
     const { data } = await supabase
       .from("products")
-      .select("*")
+      .select("id, name, description, price, category, image_url, sizes, in_stock, is_new, created_at, fit_note, color_name, care")
       .order("created_at", { ascending: false })
       .limit(40)
 
@@ -87,23 +87,30 @@ async function getCatalog() {
 // power its offline fallback answers (product names, sizes, fit, care, colors).
 export async function GET() {
   const products = await getCatalog()
-  return NextResponse.json({
-    products: products.map((product) => ({
-      id: product.id,
-      name: product.name,
-      description: product.description,
-      price: Number(product.price),
-      category: product.category,
-      image_url: product.image_url,
-      sizes: product.sizes || [],
-      in_stock: Boolean(product.in_stock),
-      is_new: Boolean(product.is_new),
-      created_at: product.created_at,
-      fit_note: product.fit_note,
-      color_name: product.color_name,
-      care: product.care,
-    })),
-  })
+  return NextResponse.json(
+    {
+      products: products.map((product) => ({
+        id: product.id,
+        name: product.name,
+        description: product.description,
+        price: Number(product.price),
+        category: product.category,
+        image_url: product.image_url,
+        sizes: product.sizes || [],
+        in_stock: Boolean(product.in_stock),
+        is_new: Boolean(product.is_new),
+        created_at: product.created_at,
+        fit_note: product.fit_note,
+        color_name: product.color_name,
+        care: product.care,
+      })),
+    },
+    {
+      headers: {
+        "Cache-Control": "public, s-maxage=300, stale-while-revalidate=600",
+      },
+    },
+  )
 }
 
 function catalogForPrompt(products: StoreProduct[]) {

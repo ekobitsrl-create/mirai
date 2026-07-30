@@ -87,7 +87,7 @@ export function SiteIntro() {
           autoPlay
           muted
           playsInline
-          preload="auto"
+          preload="metadata"
           onTimeUpdate={handleTimeUpdate}
           onEnded={finishIntro}
           onError={finishIntro}

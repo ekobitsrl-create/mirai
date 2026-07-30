@@ -8,7 +8,20 @@ const nextConfig = {
     ignoreBuildErrors: true,
   },
   images: {
-    unoptimized: true,
+    formats: ['image/webp'],
+    qualities: [90],
+    minimumCacheTTL: 86400,
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: '**.public.blob.vercel-storage.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'xbendkxwuaqrxsyrmgye.supabase.co',
+        pathname: '/storage/v1/object/public/**',
+      },
+    ],
   },
 }
 

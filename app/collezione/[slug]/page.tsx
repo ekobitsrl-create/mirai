@@ -11,6 +11,8 @@ import type { SupabaseClient } from "@supabase/supabase-js"
 import { CategorySeoContent } from "@/components/seo-content"
 import { buildSeoMetadata, createBreadcrumbJsonLd, createWebPageJsonLd, getCategorySeo } from "@/lib/seo"
 
+export const revalidate = 300
+
 const STATIC_CATEGORY_NAMES: Record<string, string> = {
   "t-shirt": "T-Shirt",
   cappelli: "Cappelli",

@@ -71,5 +71,5 @@ export function BackgroundMusic() {
 
   if (isBeatPage) return null
 
-  return <audio ref={audioRef} src="/audio/mirai-emme-effe-rocco-beat-3.mp3" loop preload="auto" aria-hidden="true" />
+  return <audio ref={audioRef} src="/audio/mirai-emme-effe-rocco-beat-3.mp3" loop preload="none" aria-hidden="true" />
 }

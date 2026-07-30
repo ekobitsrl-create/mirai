@@ -118,7 +118,7 @@ window.gtag('config', '${GOOGLE_ADS_ID}');`}
       <Script
         id="merchantWidgetScript"
         src="https://www.gstatic.com/shopping/merchant/merchantwidget.js"
-        strategy="afterInteractive"
+        strategy="lazyOnload"
         onLoad={startMerchantWidget}
         onReady={startMerchantWidget}
       />

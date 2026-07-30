@@ -13,6 +13,8 @@ import {
 } from "@/lib/products"
 import { getAbsoluteUrl, SITE_URL } from "@/lib/site-url"
 
+export const revalidate = 300
+
 function absoluteProductImage(imageUrl: string | null | undefined) {
   if (!imageUrl) return undefined
   return imageUrl.startsWith("http") ? imageUrl : getAbsoluteUrl(imageUrl)

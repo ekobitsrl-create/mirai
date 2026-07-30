@@ -71,6 +71,7 @@ export function ProductGrid({ products, title, subtitle }: { products: Product[]
                     alt={product.name}
                     fill
                     className="object-cover object-top transition-transform duration-700 ease-out group-hover:scale-110"
+                    sizes="(max-width: 1024px) 50vw, 25vw"
                   />
                   {product.is_new && (
                     <span className="absolute top-3 left-3 px-2.5 py-1 bg-primary text-primary-foreground text-[10px] font-bold tracking-widest uppercase rounded-sm">

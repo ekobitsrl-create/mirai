@@ -19,6 +19,8 @@ type CategoryNode = {
 }
 
 const PERFUME_CATEGORY_PATTERN = /profum|parfum|fragrance/i
+const CATEGORY_CACHE_KEY = "mirai-navbar-categories-v1"
+const CATEGORY_CACHE_TTL_MS = 15 * 60 * 1000
 
 function isPerfumeCategory(category: Pick<CategoryNode, "name" | "slug">) {
   return PERFUME_CATEGORY_PATTERN.test(`${category.name} ${category.slug}`)
@@ -43,6 +45,22 @@ function useCategories() {
   useEffect(() => {
     if (fetched.current) return
     fetched.current = true
+
+    try {
+      const cached = JSON.parse(window.sessionStorage.getItem(CATEGORY_CACHE_KEY) || "null")
+      if (
+        cached
+        && Array.isArray(cached.tree)
+        && typeof cached.savedAt === "number"
+        && Date.now() - cached.savedAt < CATEGORY_CACHE_TTL_MS
+      ) {
+        setTree(cached.tree)
+        return
+      }
+    } catch {
+      // Fall through to the live catalog query if session storage is unavailable.
+    }
+
     const supabase = createClient()
     supabase
       .from("categories")
@@ -74,14 +92,21 @@ function useCategories() {
           return { ...p, children }
         })
         const seen = new Set<string>()
-        setTree(
-          built.filter((category) => {
+        const nextTree = built.filter((category) => {
             const key = isPerfumeCategory(category) ? "profumi" : category.slug.toLowerCase()
             if (seen.has(key)) return false
             seen.add(key)
             return true
-          }),
-        )
+          })
+        setTree(nextTree)
+        try {
+          window.sessionStorage.setItem(
+            CATEGORY_CACHE_KEY,
+            JSON.stringify({ tree: nextTree, savedAt: Date.now() }),
+          )
+        } catch {
+          // The navigation remains fully functional without session storage.
+        }
       })
   }, [])
 
@@ -123,9 +148,9 @@ export function Navbar({ showPromo = false }: { showPromo?: boolean }) {
     try {
       const supabase = createClient()
       supabase.auth
-        .getUser()
-        .then(({ data: { user } }) => {
-          setIsLoggedIn(!!user)
+        .getSession()
+        .then(({ data: { session } }) => {
+          setIsLoggedIn(!!session?.user)
         })
         .catch(() => {})
 

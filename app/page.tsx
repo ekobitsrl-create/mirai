@@ -11,7 +11,7 @@ import { withDemoProducts } from "@/lib/products"
 import { HomeSeoContent } from "@/components/seo-content"
 import { buildSeoMetadata, createWebPageJsonLd } from "@/lib/seo"
 
-export const dynamic = "force-dynamic"
+export const revalidate = 300
 
 const HOME_DESCRIPTION =
   "MIRAI LAB STORE: streetwear a Catania e online. Scopri abbigliamento urban uomo, t-shirt oversize, cappelli custom e il Custom Lab."
@@ -39,7 +39,7 @@ export default async function Home() {
     const [prodRes, catRes] = await Promise.all([
       supabase
         .from("products")
-        .select("*")
+        .select("id, name, description, price, category, image_url, sizes, in_stock, is_new, created_at, stock_by_size")
         .eq("is_new", true)
         .order("created_at", { ascending: false })
         .limit(32),

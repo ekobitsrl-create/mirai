@@ -70,8 +70,7 @@ export function Collections({ categories = [] }: { categories?: Category[] }) {
                       : "object-contain object-center p-2"
                   } transition-[filter] duration-500 ease-out group-hover:brightness-110`}
                   sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                  priority={i < 2}
-                  loading={i < 2 ? "eager" : "lazy"}
+                  loading="lazy"
                 />
                 {/* Overlay gradient */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-80 group-hover:opacity-90 transition-opacity duration-300" />

@@ -145,7 +145,6 @@ function MiraModel({
           sizes="(min-width: 768px) 144px, 96px"
           className="select-none object-contain object-bottom"
           draggable={false}
-          priority
         />
       </div>
     </div>
