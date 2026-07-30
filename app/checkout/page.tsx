@@ -349,15 +349,15 @@ export default function CheckoutPage() {
         ) : (
           <>
             {requiresGuestEmail && (
-              <div className="mb-4 flex items-center justify-between border border-border bg-card px-4 py-3 text-sm text-muted-foreground">
-                <span>{guestEmail.trim() ? `Acquisto come ospite: ${guestEmail.trim()}` : "Acquisto come ospite senza email"}</span>
+              <div className="mb-4 flex flex-col gap-2 border border-border bg-card px-4 py-3 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
+                <span className="min-w-0 break-all">{guestEmail.trim() ? `Acquisto come ospite: ${guestEmail.trim()}` : "Acquisto come ospite senza email"}</span>
                 <button
                   type="button"
                   onClick={() => {
                     setGuestCheckoutReady(false)
                     if (appliedDiscount) removePromoCode()
                   }}
-                  className="text-xs font-bold uppercase tracking-widest text-primary"
+                  className="shrink-0 self-end text-xs font-bold uppercase tracking-widest text-primary sm:self-auto"
                 >
                   Modifica
                 </button>
