@@ -7,8 +7,8 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { User, Package, ArrowRight, LogOut } from "lucide-react"
 import { isAdminEmail } from "@/lib/admin"
-import { AdminPanel } from "@/components/admin-panel"
 import { CommunityPreview } from "@/components/mirai-community"
+import type { Session, User as SupabaseUser } from "@supabase/supabase-js"
 
 type AccountOrder = {
   id: string
@@ -33,29 +33,41 @@ export default function AccountPage() {
   const [user, setUser] = useState<any>(null)
   const [profile, setProfile] = useState<any>(null)
   const [loading, setLoading] = useState(true)
-  const [isAdmin, setIsAdmin] = useState(false)
   const [orders, setOrders] = useState<AccountOrder[]>([])
 
   useEffect(() => {
-    // Listen for auth state changes - this properly waits for session hydration
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log("[v0] Auth state change:", event, "user:", session?.user?.email)
-      
-      if (event === "SIGNED_OUT" || (!session && event === "INITIAL_SESSION")) {
-        router.push("/auth/login")
-        return
-      }
+    let active = true
+    let requestId = 0
 
-      if (!session?.user) return
+    const redirectToLogin = () => {
+      if (!active) return
+      setLoading(false)
+      router.replace("/auth/login?redirectTo=/account")
+    }
 
-      const currentUser = session.user
+    const syncServerSession = async (session: Session) => {
+      const response = await fetch("/api/auth/set-session", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({
+          access_token: session.access_token,
+          refresh_token: session.refresh_token,
+        }),
+      })
+      if (!response.ok) throw new Error("Impossibile sincronizzare la sessione")
+    }
+
+    const loadAccount = async (session: Session) => {
+      const currentRequest = ++requestId
+      await syncServerSession(session)
+      if (!active || currentRequest !== requestId) return
+
+      const currentUser: SupabaseUser = session.user
       setUser(currentUser)
 
-      // Check if admin by email (instant, no DB needed)
       if (isAdminEmail(currentUser.email)) {
-        console.log("[v0] IS ADMIN - showing admin panel")
-        setIsAdmin(true)
-        setLoading(false)
+        window.location.replace("/admin")
         return
       }
 
@@ -71,16 +83,44 @@ export default function AccountPage() {
           .order("created_at", { ascending: false }),
       ])
 
+      if (!active || currentRequest !== requestId) return
+
       const typedProfile = profileResult.data as { role?: string; first_name?: string; last_name?: string } | null
+      if (typedProfile?.role === "admin") {
+        window.location.replace("/admin")
+        return
+      }
+
       setProfile(typedProfile)
       setOrders((ordersResult.data || []) as AccountOrder[])
-      if (typedProfile?.role === "admin") {
-        setIsAdmin(true)
-      }
       setLoading(false)
+    }
+
+    void supabase.auth.getSession().then(({ data, error }) => {
+      if (error || !data.session) {
+        redirectToLogin()
+        return
+      }
+      void loadAccount(data.session).catch(redirectToLogin)
+    }).catch(redirectToLogin)
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === "SIGNED_OUT") {
+        redirectToLogin()
+        return
+      }
+
+      if (session && (event === "SIGNED_IN" || event === "TOKEN_REFRESHED" || event === "USER_UPDATED")) {
+        window.setTimeout(() => {
+          void loadAccount(session).catch(redirectToLogin)
+        }, 0)
+      }
     })
 
-    return () => subscription.unsubscribe()
+    return () => {
+      active = false
+      subscription.unsubscribe()
+    }
   }, [supabase, router])
 
   const handleLogout = async () => {
@@ -98,11 +138,6 @@ export default function AccountPage() {
   }
 
   if (!user) return null
-
-  // If admin, show the admin panel directly
-  if (isAdmin) {
-    return <AdminPanel />
-  }
 
   // Normal user account page
   const fullName = [profile?.first_name, profile?.last_name].filter(Boolean).join(" ")
