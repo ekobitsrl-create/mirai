@@ -15,6 +15,7 @@ function shippingAddress(session: Stripe.Checkout.Session) {
 
   return {
     name: details?.name || null,
+    phone: session.customer_details?.phone || null,
     address: [address?.line1, address?.line2].filter(Boolean).join(', ') || null,
     city: address?.city || null,
     zip: address?.postal_code || null,
@@ -73,6 +74,10 @@ export async function saveStripeOrder(session: Stripe.Checkout.Session) {
     shipping_zip: shipping.zip,
     shipping_country: shipping.country,
     stripe_session_id: session.id,
+    notes: [
+      'Pagamento online acquisito tramite Stripe',
+      shipping.phone ? `Telefono: ${shipping.phone}` : null,
+    ].filter(Boolean).join(' | '),
   }
   const discountAuditNote = discountCode
     ? `Codice sconto ${discountCode}: -€${(discountAmountCents / 100).toFixed(2)}`
@@ -96,7 +101,7 @@ export async function saveStripeOrder(session: Stripe.Checkout.Session) {
       .from('orders')
       .insert({
         ...baseOrderPayload,
-        notes: discountAuditNote,
+        notes: [baseOrderPayload.notes, discountAuditNote].filter(Boolean).join(' | '),
       })
       .select('id')
       .single()

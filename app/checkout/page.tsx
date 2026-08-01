@@ -30,7 +30,7 @@ export default function CheckoutPage() {
   const [marketingConsent, setMarketingConsent] = useState(false)
   const [guestError, setGuestError] = useState<string | null>(null)
   const [paymentMethod, setPaymentMethod] = useState<"card" | "cash_on_delivery">("card")
-  const [cashDetails, setCashDetails] = useState({ name: "", address: "", city: "", postalCode: "" })
+  const [cashDetails, setCashDetails] = useState({ name: "", phone: "", address: "", city: "", postalCode: "" })
   const [cashError, setCashError] = useState<string | null>(null)
   const [cashSubmitting, setCashSubmitting] = useState(false)
   const [cardError, setCardError] = useState<string | null>(null)
@@ -539,6 +539,10 @@ export default function CheckoutPage() {
                   <div className="sm:col-span-2">
                     <Label htmlFor="cash-name" className="text-xs uppercase tracking-widest text-muted-foreground">Nome e cognome</Label>
                     <Input id="cash-name" required autoComplete="name" value={cashDetails.name} onChange={(event) => setCashDetails((current) => ({ ...current, name: event.target.value }))} className="mt-2 bg-secondary" />
+                  </div>
+                  <div className="sm:col-span-2">
+                    <Label htmlFor="cash-phone" className="text-xs uppercase tracking-widest text-muted-foreground">Numero di telefono</Label>
+                    <Input id="cash-phone" type="tel" required inputMode="tel" autoComplete="tel" minLength={8} maxLength={24} placeholder="Es. +39 349 123 4567" value={cashDetails.phone} onChange={(event) => setCashDetails((current) => ({ ...current, phone: event.target.value }))} className="mt-2 bg-secondary" />
                   </div>
                   <div className="sm:col-span-2">
                     <Label htmlFor="cash-address" className="text-xs uppercase tracking-widest text-muted-foreground">Indirizzo</Label>

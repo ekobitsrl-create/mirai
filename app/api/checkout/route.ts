@@ -99,6 +99,9 @@ export async function POST(request: NextRequest) {
         shipping_address_collection: {
           allowed_countries: [...SHIPPING_CONFIG.allowedCountries],
         },
+        phone_number_collection: {
+          enabled: true,
+        },
         shipping_options: getStripeShippingOptions(price.unit_amount),
         success_url: `${baseUrl}/success?session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${baseUrl}${safeCancelPath}`,
@@ -234,6 +237,9 @@ export async function POST(request: NextRequest) {
       // Raccolta indirizzo di spedizione
       shipping_address_collection: {
         allowed_countries: [...SHIPPING_CONFIG.allowedCountries],
+      },
+      phone_number_collection: {
+        enabled: true,
       },
       shipping_options: getStripeShippingOptions(subtotalCents),
       // URL di redirect

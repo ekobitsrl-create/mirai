@@ -73,6 +73,10 @@ function getPaymentInfo(order: Order) {
   }
 }
 
+function getShippingPhone(notes: string | null) {
+  return notes?.match(/(?:^|\|)\s*Telefono:\s*([^|]+)/i)?.[1]?.trim() || null
+}
+
 export function AdminOrdersTable({ orders }: { orders: Order[] }) {
   const [expandedId, setExpandedId] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -124,6 +128,7 @@ export function AdminOrdersTable({ orders }: { orders: Order[] }) {
         const StatusIcon = statusInfo.icon
         const paymentInfo = getPaymentInfo(order)
         const PaymentIcon = paymentInfo.icon
+        const shippingPhone = getShippingPhone(order.notes)
         const isExpanded = expandedId === order.id
 
         return (
@@ -194,6 +199,11 @@ export function AdminOrdersTable({ orders }: { orders: Order[] }) {
                     {order.shipping_city && (
                       <p className="text-sm text-muted-foreground">
                         {order.shipping_zip} {order.shipping_city}, {order.shipping_country}
+                      </p>
+                    )}
+                    {shippingPhone && (
+                      <p className="mt-2 text-sm text-foreground">
+                        Telefono: <a href={`tel:${shippingPhone.replace(/[^+\d]/g, "")}`} className="font-semibold text-primary hover:underline">{shippingPhone}</a>
                       </p>
                     )}
                   </div>

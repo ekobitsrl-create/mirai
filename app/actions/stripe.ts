@@ -34,6 +34,7 @@ export type CashOnDeliveryDetails = {
   guestEmail?: string
   discountCode?: string
   name: string
+  phone: string
   address: string
   city: string
   postalCode: string
@@ -43,6 +44,12 @@ export type CashOnDeliveryDetails = {
 function validEmail(value?: string) {
   const email = value?.trim().toLowerCase() || ''
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ? email : null
+}
+
+function validPhone(value?: string) {
+  const phone = value?.replace(/\s+/g, ' ').trim() || ''
+  const digits = phone.replace(/\D/g, '')
+  return digits.length >= 8 && digits.length <= 15 ? phone.slice(0, 24) : null
 }
 
 function stripeCouponId(discount: AppliedDiscount) {
@@ -282,6 +289,9 @@ export async function createCheckoutSession(
     shipping_address_collection: {
       allowed_countries: [...SHIPPING_CONFIG.allowedCountries],
     },
+    phone_number_collection: {
+      enabled: true,
+    },
     shipping_options: getStripeShippingOptions(subtotalCents),
   }
 
@@ -356,6 +366,10 @@ export async function createCashOnDeliveryOrder(cartItems: CartLineItem[], detai
   }
 
   const shippingName = cleanDeliveryField(details.name, 'Nome e cognome', 120)
+  const shippingPhone = validPhone(details.phone)
+  if (!shippingPhone) {
+    throw new Error('Inserisci un numero di telefono valido')
+  }
   const shippingAddress = cleanDeliveryField(details.address, 'Indirizzo', 180)
   const shippingCity = cleanDeliveryField(details.city, 'Citta', 80)
   const shippingZip = cleanDeliveryField(details.postalCode, 'CAP', 16)
@@ -435,6 +449,7 @@ export async function createCashOnDeliveryOrder(cartItems: CartLineItem[], detai
     .map((item) => `${item.product.name}: ${customizationSummary(item.customization!)}`)
   const orderNotes = [
     'Pagamento in contrassegno alla consegna',
+    `Telefono: ${shippingPhone}`,
     ...(appliedDiscount
       ? [`Codice sconto ${appliedDiscount.code}: -€${(appliedDiscount.discountCents / 100).toFixed(2)}`]
       : []),
