@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { updateOrderStatus, deleteOrder } from "@/app/admin/actions"
 import { Button } from "@/components/ui/button"
-import { Trash2, ChevronDown, ChevronUp, Package, Truck, CheckCircle, Clock, XCircle, Loader2 } from "lucide-react"
+import { Trash2, ChevronDown, ChevronUp, Package, Truck, CheckCircle, Clock, XCircle, Loader2, Banknote, CreditCard, CircleHelp } from "lucide-react"
 
 type OrderItem = {
   id: string
@@ -43,6 +43,35 @@ const STATUS_OPTIONS = [
   { value: "delivered", label: "Consegnato", icon: CheckCircle, color: "text-green-500" },
   { value: "cancelled", label: "Annullato", icon: XCircle, color: "text-red-500" },
 ]
+
+function getPaymentInfo(order: Order) {
+  const notes = order.notes?.toLocaleLowerCase("it-IT") || ""
+
+  if (notes.includes("contrassegno")) {
+    return {
+      label: "Contrassegno",
+      detail: "Da incassare alla consegna",
+      icon: Banknote,
+      color: "text-amber-400",
+    }
+  }
+
+  if (order.stripe_session_id) {
+    return {
+      label: "Pagamento online",
+      detail: "Acquisito tramite Stripe",
+      icon: CreditCard,
+      color: "text-emerald-400",
+    }
+  }
+
+  return {
+    label: "Metodo non registrato",
+    detail: "Controllare il record dell'ordine",
+    icon: CircleHelp,
+    color: "text-muted-foreground",
+  }
+}
 
 export function AdminOrdersTable({ orders }: { orders: Order[] }) {
   const [expandedId, setExpandedId] = useState<string | null>(null)
@@ -93,6 +122,8 @@ export function AdminOrdersTable({ orders }: { orders: Order[] }) {
       {orders.map((order) => {
         const statusInfo = getStatusInfo(order.status)
         const StatusIcon = statusInfo.icon
+        const paymentInfo = getPaymentInfo(order)
+        const PaymentIcon = paymentInfo.icon
         const isExpanded = expandedId === order.id
 
         return (
@@ -120,6 +151,11 @@ export function AdminOrdersTable({ orders }: { orders: Order[] }) {
                   <span>{order.email}</span>
                   <span>{new Date(order.created_at).toLocaleDateString("it-IT", { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" })}</span>
                 </div>
+                <div className={`mt-2 flex items-center gap-1.5 text-xs font-semibold ${paymentInfo.color}`}>
+                  <PaymentIcon className="h-3.5 w-3.5" aria-hidden="true" />
+                  <span>{paymentInfo.label}</span>
+                  <span className="font-normal text-muted-foreground">— {paymentInfo.detail}</span>
+                </div>
               </div>
 
               {/* Total */}
@@ -140,6 +176,15 @@ export function AdminOrdersTable({ orders }: { orders: Order[] }) {
 
             {isExpanded && (
               <div className="border-t border-border p-6">
+                <div className="mb-6 rounded-lg border border-border bg-secondary/50 p-4">
+                  <p className="text-xs uppercase tracking-widest text-muted-foreground">Pagamento</p>
+                  <div className={`mt-2 flex items-center gap-2 text-sm font-semibold ${paymentInfo.color}`}>
+                    <PaymentIcon className="h-4 w-4" aria-hidden="true" />
+                    <span>{paymentInfo.label}</span>
+                  </div>
+                  <p className="mt-1 text-sm text-muted-foreground">{paymentInfo.detail}</p>
+                </div>
+
                 {/* Shipping info */}
                 {order.shipping_name && (
                   <div className="mb-6 p-4 rounded-lg bg-secondary/50">
