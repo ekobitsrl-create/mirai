@@ -9,7 +9,8 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import {
   Shield, Package, Tag, ShoppingBag, Users,
-  Plus, Pencil, Trash2, X, Check, LogOut, ChevronDown
+  Plus, Pencil, Trash2, X, Check, LogOut, ChevronDown,
+  Banknote, CreditCard, CircleHelp, Phone
 } from "lucide-react"
 import { ImageUpload } from "@/components/image-upload"
 import { getSupplierProfile, SUPPLIER_PROFILE_OPTIONS, type SupplierProfile } from "@/lib/products"
@@ -725,6 +726,21 @@ function OrdersTab({ orders, onRefresh }: { orders: any[]; onRefresh: () => void
     cancelled: "bg-red-500/20 text-red-400",
   }
 
+  function paymentInfo(order: any) {
+    const notes = String(order.notes || "").toLocaleLowerCase("it-IT")
+    if (notes.includes("contrassegno")) {
+      return { label: "Contrassegno", detail: "Da incassare alla consegna", color: "text-amber-400", Icon: Banknote }
+    }
+    if (order.stripe_session_id) {
+      return { label: "Pagamento online", detail: "Acquisito tramite Stripe", color: "text-emerald-400", Icon: CreditCard }
+    }
+    return { label: "Metodo non registrato", detail: "Controllare l'ordine", color: "text-muted-foreground", Icon: CircleHelp }
+  }
+
+  function shippingPhone(order: any) {
+    return String(order.notes || "").match(/(?:^|\|)\s*Telefono:\s*([^|]+)/i)?.[1]?.trim() || null
+  }
+
   async function updateStatus(id: string, status: string) {
     await supabase.from("orders").update({ status, updated_at: new Date().toISOString() }).eq("id", id)
     onRefresh()
@@ -747,8 +763,12 @@ function OrdersTab({ orders, onRefresh }: { orders: any[]; onRefresh: () => void
         </div>
       ) : (
         <div className="grid gap-3">
-          {orders.map((o) => (
-            <div key={o.id} className="bg-card border border-border rounded-lg p-5">
+          {orders.map((o) => {
+            const payment = paymentInfo(o)
+            const phone = shippingPhone(o)
+            const PaymentIcon = payment.Icon
+
+            return <div key={o.id} className="bg-card border border-border rounded-lg p-5">
               <div className="flex items-start justify-between mb-3">
                 <div>
                   <div className="flex items-center gap-3 mb-1">
@@ -764,6 +784,15 @@ function OrdersTab({ orders, onRefresh }: { orders: any[]; onRefresh: () => void
                 </div>
               </div>
 
+              <div className="mb-3 rounded-md border border-border bg-secondary/50 p-3">
+                <p className="text-[9px] uppercase tracking-widest text-muted-foreground">Pagamento</p>
+                <div className={`mt-1.5 flex items-center gap-2 text-xs font-semibold ${payment.color}`}>
+                  <PaymentIcon className="h-4 w-4" aria-hidden="true" />
+                  <span>{payment.label}</span>
+                  <span className="font-normal text-muted-foreground">— {payment.detail}</span>
+                </div>
+              </div>
+
               {/* Shipping info */}
               {o.shipping_name && (
                 <div className="text-xs text-muted-foreground mb-3 bg-secondary/50 rounded-md p-2">
@@ -771,6 +800,11 @@ function OrdersTab({ orders, onRefresh }: { orders: any[]; onRefresh: () => void
                   {o.shipping_address && <> - {o.shipping_address}</>}
                   {o.shipping_city && <>, {o.shipping_city}</>}
                   {o.shipping_zip && <> {o.shipping_zip}</>}
+                  {phone && (
+                    <a href={`tel:${phone.replace(/[^+\d]/g, "")}`} className="mt-2 flex items-center gap-1.5 font-semibold text-primary hover:underline">
+                      <Phone className="h-3.5 w-3.5" aria-hidden="true" /> {phone}
+                    </a>
+                  )}
                 </div>
               )}
 
@@ -803,7 +837,7 @@ function OrdersTab({ orders, onRefresh }: { orders: any[]; onRefresh: () => void
                 </Button>
               </div>
             </div>
-          ))}
+          })}
         </div>
       )}
     </div>

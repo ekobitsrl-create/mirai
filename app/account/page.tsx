@@ -7,6 +7,7 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { User, Package, ArrowRight, LogOut } from "lucide-react"
 import { isAdminEmail } from "@/lib/admin"
+import { AdminPanel } from "@/components/admin-panel"
 import { CommunityPreview } from "@/components/mirai-community"
 import type { Session, User as SupabaseUser } from "@supabase/supabase-js"
 
@@ -33,6 +34,7 @@ export default function AccountPage() {
   const [user, setUser] = useState<any>(null)
   const [profile, setProfile] = useState<any>(null)
   const [loading, setLoading] = useState(true)
+  const [isAdmin, setIsAdmin] = useState(false)
   const [orders, setOrders] = useState<AccountOrder[]>([])
 
   useEffect(() => {
@@ -67,7 +69,8 @@ export default function AccountPage() {
       setUser(currentUser)
 
       if (isAdminEmail(currentUser.email)) {
-        window.location.replace("/admin")
+        setIsAdmin(true)
+        setLoading(false)
         return
       }
 
@@ -87,7 +90,9 @@ export default function AccountPage() {
 
       const typedProfile = profileResult.data as { role?: string; first_name?: string; last_name?: string } | null
       if (typedProfile?.role === "admin") {
-        window.location.replace("/admin")
+        setProfile(typedProfile)
+        setIsAdmin(true)
+        setLoading(false)
         return
       }
 
@@ -138,6 +143,10 @@ export default function AccountPage() {
   }
 
   if (!user) return null
+
+  if (isAdmin) {
+    return <AdminPanel />
+  }
 
   // Normal user account page
   const fullName = [profile?.first_name, profile?.last_name].filter(Boolean).join(" ")
