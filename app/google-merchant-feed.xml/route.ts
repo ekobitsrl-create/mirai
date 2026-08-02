@@ -446,9 +446,11 @@ function renderProductVariant(product: StoreProduct, size: string, baseUrl: stri
 export async function GET(request: NextRequest) {
   const baseUrl = getBaseUrl(request)
   const requestedSupplier = request.nextUrl.searchParams.get("supplier")
+  const requestedPlatform = request.nextUrl.searchParams.get("platform")
   const supplierProfile: SupplierProfile | null = requestedSupplier === "minimal" || requestedSupplier === "mirai"
     ? requestedSupplier
     : null
+  const platformLabel = requestedPlatform === "meta" ? "Meta Catalog" : "Google Merchant Center"
   const catalogProducts = await getCatalogProducts()
   const products = catalogProducts.filter(
     (product) => product.image_url
@@ -464,9 +466,9 @@ export async function GET(request: NextRequest) {
     '<?xml version="1.0" encoding="UTF-8"?>',
     '<rss version="2.0" xmlns:g="http://base.google.com/ns/1.0">',
     "  <channel>",
-    `    <title>${supplierProfile ? `MIRAI LAB STORE - ${supplierProfile === "minimal" ? "Minimal" : "MIRAI"}` : "MIRAI LAB STORE"}</title>`,
+    `    <title>${supplierProfile ? `MIRAI LAB STORE - ${supplierProfile === "minimal" ? "Minimal" : "MIRAI"}` : "MIRAI LAB STORE"}${requestedPlatform === "meta" ? " - Meta" : ""}</title>`,
     `    <link>${escapeXml(baseUrl)}</link>`,
-    `    <description>Catalogo prodotti ${supplierProfile === "minimal" ? "Minimal" : supplierProfile === "mirai" ? "MIRAI" : "MIRAI LAB STORE"} per Google Merchant Center</description>`,
+    `    <description>Catalogo prodotti ${supplierProfile === "minimal" ? "Minimal" : supplierProfile === "mirai" ? "MIRAI" : "MIRAI LAB STORE"} per ${platformLabel}</description>`,
     ...items,
     "  </channel>",
     "</rss>",
