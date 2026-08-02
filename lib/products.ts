@@ -147,12 +147,24 @@ const PRODUCT_DESCRIPTION_CORRECTIONS: Array<[RegExp, string]> = [
   [/\bperle gold sparsi\b/gi, "perle gold sparse"],
 ]
 
-function normalizeProductDescription(description: string | null | undefined) {
-  if (!description) return null
+const PRODUCT_DESCRIPTION_OVERRIDES: Record<string, string> = {
+  "4c89683d-939d-427a-8a34-3e00f9509d1e": "Cappello New Era 59FIFTY rosso personalizzato a mano con applicazioni di borchie sferiche dorate. Il logo NY ricamato in bianco è stato impreziosito da un contorno completo di micro-borchie gold, che ne esalta la forma e crea un forte effetto gioiello.",
+  "dc89f425-f02a-44e6-9694-b8131baed774": "Cappello New Era 59FIFTY Los Angeles in tonalità bianco ghiaccio, personalizzato artigianalmente con applicazioni dorate. Il logo LA ricamato è stato interamente contornato da micro-borchie gold, applicate una ad una per creare un raffinato effetto gioiello. La visiera presenta una lavorazione distressed sui bordi ed è impreziosita da borchie dorate di diverse dimensioni, distribuite in modo irregolare per un risultato ancora più esclusivo.",
+  "d7304772-f3df-4ad3-84b0-b2039f9812a1": "Cappello New Era 59FIFTY New York nero personalizzato artigianalmente con una lavorazione distressed e applicazioni metalliche dorate.\n\nIl logo NY ricamato in bianco è evidenziato da una fitta cornice di micro-borchie sferiche color oro, applicate singolarmente lungo tutto il profilo delle lettere. La combinazione di borchie piccole e più grandi crea volume, luminosità e un marcato effetto gioiello. Ulteriori borchie bombate, disposte in piccoli gruppi sulla corona e sulla visiera, completano la personalizzazione con un risultato irregolare e ricercato.\n\nLa lavorazione distressed è visibile nelle cuciture e nei bordi volutamente consumati e leggermente sfilacciati, che conferiscono al cappello un aspetto vissuto, ruvido e autenticamente streetwear.",
+  "b7629ec4-34d2-428b-b0d8-ccfd9317de99": "Cappello New Era 59FIFTY Los Angeles in azzurro pastello, personalizzato artigianalmente con una lavorazione distressed e applicazioni metalliche color argento.\n\nIl logo LA ricamato in bianco è interamente rifinito con micro-borchie sferiche argentate, applicate una ad una lungo il profilo delle lettere per creare un effetto tridimensionale, luminoso e prezioso.\n\nLa visiera è decorata con borchie bombate di diverse dimensioni, distribuite in modo irregolare per dare movimento e carattere al design. Ulteriori dettagli metallici sono applicati lungo le cuciture e sulla corona.\n\nLa lavorazione distressed si concentra soprattutto sul bordo della visiera e sulle cuciture, volutamente consumate e leggermente sfilacciate, per donare al cappello un aspetto vissuto e autenticamente streetwear.",
+  "835cb227-c4f9-48db-88a2-d8a0ac021c66": "Cappello New Era 59FIFTY New York nero personalizzato artigianalmente con cristalli rossi applicati a mano.\n\nIl logo NY ricamato in bianco è stato completamente impreziosito da una fitta composizione di strass rossi, posizionati uno ad uno per seguire la forma delle lettere e creare un effetto luminoso e tridimensionale. Il contrasto tra il nero del cappello, il ricamo bianco e il rosso brillante rende il design deciso e immediatamente riconoscibile.\n\nA completare il custom sono presenti dettagli ricamati laterali, tra cui una patch grafica e un piccolo simbolo ispirato al mondo del baseball.",
+}
+
+function normalizeProductDescription(
+  description: string | null | undefined,
+  productId?: string,
+) {
+  const value = productId ? PRODUCT_DESCRIPTION_OVERRIDES[productId] || description : description
+  if (!value) return null
 
   return PRODUCT_DESCRIPTION_CORRECTIONS.reduce(
     (value, [pattern, replacement]) => value.replace(pattern, replacement),
-    description,
+    value,
   )
 }
 
@@ -204,7 +216,7 @@ export function mapProductRow(row: Record<string, any>): StoreProduct {
   return {
     id: productId,
     name: productName,
-    description: normalizeProductDescription(row.description as string | null),
+    description: normalizeProductDescription(row.description as string | null, productId),
     price: Number(row.price ?? 0),
     category: (row.category as string) ?? "",
     image_url: (row.image_url as string | null) ?? null,
