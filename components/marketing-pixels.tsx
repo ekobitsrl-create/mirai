@@ -4,6 +4,7 @@ import Script from "next/script"
 import { usePathname } from "next/navigation"
 import { useEffect, useRef, useState } from "react"
 import {
+  createMetaEventId,
   META_CONSENT_EVENT,
   META_PIXEL_ID,
   META_PIXEL_READY_EVENT,
@@ -34,6 +35,7 @@ export function MarketingPixels() {
   const pathname = usePathname()
   const [enabled, setEnabled] = useState(false)
   const previousPath = useRef<string | null>(null)
+  const metaPageView = useRef<{ eventId: string; tracked: boolean; url: string } | null>(null)
 
   useEffect(() => {
     setEnabled(hasMarketingConsent())
@@ -50,26 +52,46 @@ export function MarketingPixels() {
   useEffect(() => {
     if (!enabled) {
       previousPath.current = null
+      metaPageView.current = null
       return
     }
 
     const pagePath = `${pathname}${window.location.search}`
+    const pageUrl = window.location.href
+    const isInitialPageView = previousPath.current === null
+    const isNewPageView = previousPath.current !== pagePath
 
-    if (previousPath.current === null) {
+    if (isNewPageView) {
       previousPath.current = pagePath
-      return
+
+      if (!isInitialPageView) {
+        window.dataLayer?.push({
+          event: "mirai_virtual_page_view",
+          page_path: pagePath,
+          page_title: document.title,
+        })
+        window.ttq?.page?.()
+      }
+
+      metaPageView.current = {
+        eventId: createMetaEventId("PageView"),
+        tracked: false,
+        url: pageUrl,
+      }
     }
 
-    if (previousPath.current === pagePath) return
-    previousPath.current = pagePath
+    const sendMetaPageView = () => {
+      const currentPageView = metaPageView.current
+      if (!currentPageView || currentPageView.url !== pageUrl || currentPageView.tracked) return
 
-    window.dataLayer?.push({
-      event: "mirai_virtual_page_view",
-      page_path: pagePath,
-      page_title: document.title,
-    })
-    trackMetaEvent("PageView")
-    window.ttq?.page?.()
+      if (trackMetaEvent("PageView", undefined, currentPageView.eventId)) {
+        currentPageView.tracked = true
+      }
+    }
+
+    sendMetaPageView()
+    window.addEventListener(META_PIXEL_READY_EVENT, sendMetaPageView)
+    return () => window.removeEventListener(META_PIXEL_READY_EVENT, sendMetaPageView)
   }, [enabled, pathname])
 
   if (!enabled) return null
@@ -95,7 +117,6 @@ t.src=v;s=b.getElementsByTagName(e)[0];
 s.parentNode.insertBefore(t,s)}(window,document,'script',
 'https://connect.facebook.net/en_US/fbevents.js');
 fbq('init','${META_PIXEL_ID}');
-fbq('track','PageView');
 window.dispatchEvent(new Event('${META_PIXEL_READY_EVENT}'));`}
         </Script>
       )}
