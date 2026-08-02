@@ -369,7 +369,15 @@ export function ProductDetail({
           </button>
         </section>
 
-        <section className="mirai-neon-card relative overflow-hidden rounded-[1.75rem] p-5 sm:p-7 lg:!sticky lg:top-28 lg:self-start lg:p-7">
+        <div className="lg:sticky lg:top-28 lg:self-start">
+          <p className="mb-3 flex items-center gap-2 px-1 text-sm font-medium text-white/85 sm:mb-4 sm:px-2">
+            <TrendingUp className="h-5 w-5 text-[#bcaeff]" />
+            <span>
+              Venduti questo mese: <strong className="font-semibold text-white">{monthlySoldCount}</strong>
+            </span>
+          </p>
+
+          <section className="mirai-neon-card relative overflow-hidden rounded-[1.75rem] p-5 sm:p-7 lg:p-7">
           <div className="relative sm:flex sm:items-start sm:justify-between sm:gap-6">
             <div className="min-w-0 flex-1">
               <p className="pr-20 text-[9px] font-semibold uppercase tracking-[0.3em] text-[#9f86ff] sm:pr-0">MIRAI LAB / {product.brand || formatCategory(product.category)}</p>
@@ -486,13 +494,6 @@ export function ProductDetail({
             </div>
           )}
 
-          <div className="mt-4 flex items-center gap-2 text-[11px] text-white/70">
-            <TrendingUp className="h-4 w-4 text-[#bcaeff]" />
-            <span>
-              Venduti questo mese: <strong className="font-semibold text-white">{monthlySoldCount}</strong>
-            </span>
-          </div>
-
           <div ref={sizes.length ? undefined : purchaseRef} className="mt-3 grid gap-2 sm:grid-cols-[auto_minmax(0,1fr)]">
             <div className="order-2 flex h-12 w-full items-center justify-center border border-white/20 bg-black/10 sm:order-1 sm:h-14 sm:w-auto">
               <button type="button" onClick={() => setQuantity((value) => Math.max(1, value - 1))} className="flex h-full w-10 items-center justify-center text-white/45 hover:text-white" aria-label="Riduci quantità"><Minus className="h-3.5 w-3.5" /></button>
@@ -591,7 +592,8 @@ export function ProductDetail({
               Tempi previsti: {shippingEstimate}. Spedizione tracciata in Italia e in Europa. Puoi richiedere il reso entro 14 giorni dalla consegna, {returnCondition}. Consulta la pagina <Link href="/resi" className="text-[#9f86ff] underline underline-offset-4">Resi e Rimborsi</Link>.
             </Details>
           </div>
-        </section>
+          </section>
+        </div>
       </div>
 
       {suggestedProducts.length > 0 && (
