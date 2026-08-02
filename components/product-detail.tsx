@@ -370,7 +370,7 @@ export function ProductDetail({
         </section>
 
         <div className="lg:sticky lg:top-28 lg:self-start">
-          <p className="mb-3 flex items-center gap-2 px-1 text-sm font-medium text-white/85 sm:mb-4 sm:px-2">
+          <p className="mb-3 flex items-center gap-2 px-1 text-base font-medium text-white/85 sm:mb-4 sm:px-2">
             <TrendingUp className="h-5 w-5 text-[#bcaeff]" />
             <span>
               Venduti questo mese: <strong className="font-semibold text-white">{monthlySoldCount}</strong>
