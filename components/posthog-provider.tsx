@@ -33,6 +33,7 @@ function initializePostHog(onReady: () => void) {
   posthog.init(projectToken, {
     api_host: apiHost,
     defaults: "2026-05-30",
+    person_profiles: "identified_only",
     autocapture: true,
     capture_pageview: false,
     capture_pageleave: true,
