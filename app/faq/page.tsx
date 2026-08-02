@@ -17,7 +17,7 @@ const faqs = [
     questions: [
       {
         q: "Quali metodi di pagamento accettate?",
-        a: "Accettiamo Visa, Mastercard, Postepay, PayPal, Apple Pay e Google Pay. Klarna e Scalapay sono disponibili quando l'ordine e il cliente rispettano i requisiti mostrati da Stripe. Tutti i pagamenti sono processati in modo sicuro tramite Stripe.",
+        a: "Accettiamo Visa, Mastercard, Postepay, PayPal, Apple Pay e Google Pay. Klarna e Scalapay sono disponibili quando l'ordine e il cliente rispettano i requisiti mostrati da Stripe. Per le consegne in Italia puoi scegliere anche il contrassegno, con un supplemento fisso di 9 €. Tutti i pagamenti online sono processati in modo sicuro tramite Stripe.",
       },
       {
         q: "Posso modificare o annullare un ordine?",
@@ -34,7 +34,7 @@ const faqs = [
     questions: [
       {
         q: "Quanto costa la spedizione?",
-        a: "La spedizione è sempre gratuita in tutte le destinazioni supportate, senza importo minimo.",
+        a: "La spedizione è sempre gratuita in tutte le destinazioni supportate, senza importo minimo. Se scegli il contrassegno per una consegna in Italia viene applicato un supplemento fisso di 9 € relativo al metodo di pagamento, non alla spedizione.",
       },
       {
         q: "In quanto tempo ricevero il mio ordine?",

@@ -14,6 +14,7 @@ import { createClient } from "@/lib/supabase/client"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { CASH_ON_DELIVERY_FEE_CENTS } from "@/lib/checkout-fees"
 
 const stripePublishableKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
 const stripePromise = stripePublishableKey ? loadStripe(stripePublishableKey) : null
@@ -251,6 +252,9 @@ export default function CheckoutPage() {
   }
 
   const accountSignUpHref = `/auth/sign-up?next=/checkout&email=${encodeURIComponent(guestEmail.trim())}`
+  const discountedProductsTotalCents = appliedDiscount?.totalCents ?? Math.round(getTotal() * 100)
+  const selectedPaymentFeeCents = paymentMethod === "cash_on_delivery" ? CASH_ON_DELIVERY_FEE_CENTS : 0
+  const checkoutTotalCents = discountedProductsTotalCents + selectedPaymentFeeCents
 
   return (
     <main className="min-h-screen bg-background">
@@ -267,23 +271,25 @@ export default function CheckoutPage() {
           </div>
           <div className="text-right">
             {appliedDiscount ? (
-              <>
+              <div>
                 <p className="text-xs text-muted-foreground">
                   Subtotale <span className="line-through">{"\u20AC"}{(appliedDiscount.subtotalCents / 100).toFixed(2)}</span>
                 </p>
                 <p className="mt-1 text-xs font-semibold text-emerald-400">
                   -{"\u20AC"}{(appliedDiscount.discountCents / 100).toFixed(2)} con {appliedDiscount.code}
                 </p>
-                <p className="mt-1 text-2xl font-bold text-foreground">
-                  {"\u20AC"}{(appliedDiscount.totalCents / 100).toFixed(2)}
-                </p>
-              </>
+              </div>
             ) : (
-              <>
-                <p className="text-sm text-muted-foreground">{t.checkout.total}</p>
-                <p className="text-2xl font-bold text-foreground">{"\u20AC"}{getTotal().toFixed(2)}</p>
-              </>
+              <p className="text-sm text-muted-foreground">Prodotti {"\u20AC"}{getTotal().toFixed(2)}</p>
             )}
+            {selectedPaymentFeeCents > 0 && (
+              <p className="mt-1 text-xs font-semibold text-amber-400">
+                Supplemento contrassegno +{"\u20AC"}{(selectedPaymentFeeCents / 100).toFixed(2)}
+              </p>
+            )}
+            <p className="mt-1 text-2xl font-bold text-foreground">
+              {"\u20AC"}{(checkoutTotalCents / 100).toFixed(2)}
+            </p>
           </div>
         </div>
 
@@ -445,7 +451,7 @@ export default function CheckoutPage() {
                   onClick={() => setPaymentMethod("cash_on_delivery")}
                   className={`flex min-h-12 items-center justify-center gap-2 border-l border-border px-3 text-xs font-bold uppercase tracking-widest transition-colors ${paymentMethod === "cash_on_delivery" ? "bg-primary text-primary-foreground" : "text-foreground hover:bg-secondary"}`}
                 >
-                  <Banknote className="h-4 w-4" /> Contrassegno
+                  <Banknote className="h-4 w-4" /> Contrassegno (+{"\u20AC"}9)
                 </button>
               </div>
               <div className="mt-4 flex items-start gap-3 border-t border-border pt-4">
@@ -531,7 +537,9 @@ export default function CheckoutPage() {
                   <Banknote className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
                   <div>
                     <h2 className="font-semibold text-foreground">Pagamento alla consegna</h2>
-                    <p className="mt-1 text-sm leading-6 text-muted-foreground">Pagherai al corriere quando riceverai il tuo ordine. Disponibile solo in Italia.</p>
+                    <p className="mt-1 text-sm leading-6 text-muted-foreground">
+                      Pagherai al corriere quando riceverai il tuo ordine. Il totale include un supplemento fisso di {"\u20AC"}9,00. Disponibile solo in Italia.
+                    </p>
                   </div>
                 </div>
 

@@ -166,6 +166,20 @@ export function Navbar({ showPromo = false }: { showPromo?: boolean }) {
     }
   }, [])
 
+  useEffect(() => {
+    document.body.classList.toggle("mirai-mobile-menu-open", mobileOpen)
+
+    if (!mobileOpen) return
+
+    const previousOverflow = document.body.style.overflow
+    document.body.style.overflow = "hidden"
+
+    return () => {
+      document.body.classList.remove("mirai-mobile-menu-open")
+      document.body.style.overflow = previousOverflow
+    }
+  }, [mobileOpen])
+
   const accountHref = isLoggedIn ? "/account" : "/auth/login"
 
   const handleDropdownEnter = () => {
@@ -336,8 +350,12 @@ export function Navbar({ showPromo = false }: { showPromo?: boolean }) {
 
       {/* Mobile menu */}
       {mobileOpen && (
-        <div className="border-t border-white/10 bg-[#111113] 2xl:hidden">
-          <div className="flex flex-col px-6 py-6 gap-4">
+        <div
+          className={`touch-pan-y overflow-y-auto overscroll-contain border-t border-white/10 bg-[#111113] [-webkit-overflow-scrolling:touch] 2xl:hidden ${
+            showPromo ? "max-h-[calc(100dvh-6.5rem)]" : "max-h-[calc(100dvh-4rem)]"
+          }`}
+        >
+          <div className="flex flex-col gap-4 px-6 pb-[calc(2rem+env(safe-area-inset-bottom))] pt-6">
             <Link
               href="/collezioni"
               className="flex items-center justify-center rounded-sm bg-primary px-4 py-3 text-xs font-bold uppercase tracking-[0.2em] text-primary-foreground"

@@ -222,7 +222,7 @@ export function getMiraLocalReply(rawMessage: string, context: MiraKnowledgeCont
 
   const asksShipping = hasAny(message, ["spedizione", "spedire", "consegna", "corriere", "estero"])
   const asksReturns = hasAny(message, ["reso", "restituire", "restituzione", "rimandare indietro", "rimborso"])
-  const asksPayments = hasAny(message, ["pagamento", "pagare", "paypal", "klarna", "scalapay", "visa", "mastercard", "postepay", "carta", "apple pay", "google pay", "stripe"])
+  const asksPayments = hasAny(message, ["pagamento", "pagare", "paypal", "klarna", "scalapay", "visa", "mastercard", "postepay", "carta", "apple pay", "google pay", "stripe", "contrassegno", "alla consegna"])
 
   if (asksShipping && asksReturns) {
     return answer(
@@ -236,7 +236,7 @@ export function getMiraLocalReply(rawMessage: string, context: MiraKnowledgeCont
   if (asksShipping && asksPayments) {
     return answer(
       "shipping",
-      "La spedizione standard e gratuita. Al checkout puoi pagare con i metodi Stripe disponibili oppure scegliere il contrassegno per consegne in Italia.",
+      "La spedizione standard è gratuita. Al checkout puoi pagare con i metodi Stripe disponibili oppure scegliere il contrassegno per consegne in Italia, con un supplemento fisso di 9 €.",
       "/faq",
       "FAQ acquisto",
     )
@@ -327,6 +327,9 @@ export function getMiraLocalReply(rawMessage: string, context: MiraKnowledgeCont
     }
     if (hasAny(message, ["scalapay"])) {
       return answer("payments", "Scalapay può comparire tra i pagamenti rapidi per ordini in euro idonei, quando è attivo sul tuo account Stripe. La disponibilità definitiva viene verificata nel checkout.", "/faq", "FAQ pagamenti")
+    }
+    if (hasAny(message, ["contrassegno", "alla consegna"])) {
+      return answer("payments", "Il contrassegno è disponibile per le consegne in Italia e prevede un supplemento fisso di 9 €, mostrato e incluso nel totale prima della conferma dell'ordine.", "/faq", "FAQ pagamenti")
     }
     return answer("payments", "Il checkout è gestito tramite Stripe. Sono previsti Visa, Mastercard, Postepay, PayPal, Apple Pay e Google Pay; Klarna e Scalapay compaiono quando disponibili e abilitati.", "/faq", "Metodi di pagamento")
   }
