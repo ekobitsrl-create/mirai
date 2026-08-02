@@ -4,6 +4,7 @@ import { useState } from "react"
 import { updateOrderStatus, deleteOrder } from "@/app/admin/actions"
 import { Button } from "@/components/ui/button"
 import { Trash2, ChevronDown, ChevronUp, Package, Truck, CheckCircle, Clock, XCircle, Loader2, Banknote, CreditCard, CircleHelp } from "lucide-react"
+import { CASH_ON_DELIVERY_FEE_EUROS } from "@/lib/checkout-fees"
 
 type OrderItem = {
   id: string
@@ -48,9 +49,12 @@ function getPaymentInfo(order: Order) {
   const notes = order.notes?.toLocaleLowerCase("it-IT") || ""
 
   if (notes.includes("contrassegno")) {
+    const includesFee = notes.includes("supplemento contrassegno")
     return {
       label: "Contrassegno",
-      detail: "Da incassare alla consegna",
+      detail: includesFee
+        ? `Da incassare alla consegna · supplemento €${CASH_ON_DELIVERY_FEE_EUROS.toFixed(2)} incluso`
+        : "Da incassare alla consegna",
       icon: Banknote,
       color: "text-amber-400",
     }
@@ -129,6 +133,7 @@ export function AdminOrdersTable({ orders }: { orders: Order[] }) {
         const paymentInfo = getPaymentInfo(order)
         const PaymentIcon = paymentInfo.icon
         const shippingPhone = getShippingPhone(order.notes)
+        const includesCashOnDeliveryFee = order.notes?.toLocaleLowerCase("it-IT").includes("supplemento contrassegno") || false
         const isExpanded = expandedId === order.id
 
         return (
@@ -218,6 +223,9 @@ export function AdminOrdersTable({ orders }: { orders: Order[] }) {
                         Subtotale {"\u20AC"}{Number(order.subtotal || 0).toFixed(2)}
                         {" · "}
                         Sconto -{"\u20AC"}{Number(order.discount_amount).toFixed(2)}
+                        {includesCashOnDeliveryFee && (
+                          <> {" · "} Contrassegno +{"\u20AC"}{CASH_ON_DELIVERY_FEE_EUROS.toFixed(2)}</>
+                        )}
                         {" · "}
                         Totale {"\u20AC"}{Number(order.total).toFixed(2)}
                       </span>

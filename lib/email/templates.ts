@@ -1,5 +1,6 @@
 import { SITE_URL } from "@/lib/site-url"
 import type { EmailContent } from "@/lib/email/resend"
+import { CASH_ON_DELIVERY_FEE_EUROS } from "@/lib/checkout-fees"
 
 export type EmailOrderItem = {
   name: string
@@ -143,9 +144,9 @@ export function cashOnDeliveryTemplate(order: EmailOrder): EmailContent {
     html: layout(
       "Ordine in contrassegno ricevuto.",
       "Il tuo ordine e stato ricevuto",
-      `<p style="margin:0 0 24px;color:#c9c2d2;line-height:1.7">Hai scelto il pagamento in contrassegno. Pagherai al corriere alla consegna; ti avviseremo quando l'ordine verra spedito.</p>${orderSummary(order)}`,
+      `<p style="margin:0 0 24px;color:#c9c2d2;line-height:1.7">Hai scelto il pagamento in contrassegno. Pagherai al corriere alla consegna; il totale include il supplemento fisso di ${escapeHtml(money(CASH_ON_DELIVERY_FEE_EUROS))}. Ti avviseremo quando l'ordine verra spedito.</p>${orderSummary(order)}`,
     ),
-    text: `Abbiamo ricevuto il tuo ordine MIRAI con pagamento in contrassegno.\nPagherai al corriere alla consegna.\n\n${orderText(order)}\n\nAssistenza: info@mirailabstore.com`,
+    text: `Abbiamo ricevuto il tuo ordine MIRAI con pagamento in contrassegno.\nPagherai al corriere alla consegna; il totale include il supplemento fisso di ${money(CASH_ON_DELIVERY_FEE_EUROS)}.\n\n${orderText(order)}\n\nAssistenza: info@mirailabstore.com`,
   }
 }
 

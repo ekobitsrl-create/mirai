@@ -5,6 +5,7 @@ import { assertStripeCheckoutConfigured, stripe } from '@/lib/stripe'
 import { createClient, getServerUser } from '@/lib/supabase/server'
 import { getDemoProduct, isBlackIslandProduct, type StoreProduct } from '@/lib/products'
 import { getStripeShippingOptions, SHIPPING_CONFIG } from '@/lib/shipping'
+import { CASH_ON_DELIVERY_FEE_CENTS } from '@/lib/checkout-fees'
 import { SITE_URL } from '@/lib/site-url'
 import { applyOrderInventory } from '@/lib/orders/apply-order-inventory'
 import { getEstimatedDeliveryDate } from '@/lib/google-customer-reviews'
@@ -443,12 +444,14 @@ export async function createCashOnDeliveryOrder(cartItems: CartLineItem[], detai
         subtotalCents,
       })
     : null
-  const totalCents = appliedDiscount?.totalCents ?? subtotalCents
+  const discountedProductsTotalCents = appliedDiscount?.totalCents ?? subtotalCents
+  const totalCents = discountedProductsTotalCents + CASH_ON_DELIVERY_FEE_CENTS
   const customizations = validatedItems
     .filter((item) => item.customization)
     .map((item) => `${item.product.name}: ${customizationSummary(item.customization!)}`)
   const orderNotes = [
     'Pagamento in contrassegno alla consegna',
+    `Supplemento contrassegno: €${(CASH_ON_DELIVERY_FEE_CENTS / 100).toFixed(2)}`,
     `Telefono: ${shippingPhone}`,
     ...(appliedDiscount
       ? [`Codice sconto ${appliedDiscount.code}: -€${(appliedDiscount.discountCents / 100).toFixed(2)}`]

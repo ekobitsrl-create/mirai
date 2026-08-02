@@ -14,6 +14,7 @@ import {
 } from "lucide-react"
 import { ImageUpload } from "@/components/image-upload"
 import { getSupplierProfile, SUPPLIER_PROFILE_OPTIONS, type SupplierProfile } from "@/lib/products"
+import { CASH_ON_DELIVERY_FEE_EUROS } from "@/lib/checkout-fees"
 
 type Tab = "products" | "categories" | "orders" | "users"
 
@@ -729,7 +730,15 @@ function OrdersTab({ orders, onRefresh }: { orders: any[]; onRefresh: () => void
   function paymentInfo(order: any) {
     const notes = String(order.notes || "").toLocaleLowerCase("it-IT")
     if (notes.includes("contrassegno")) {
-      return { label: "Contrassegno", detail: "Da incassare alla consegna", color: "text-amber-400", Icon: Banknote }
+      const includesFee = notes.includes("supplemento contrassegno")
+      return {
+        label: "Contrassegno",
+        detail: includesFee
+          ? `Da incassare alla consegna · supplemento €${CASH_ON_DELIVERY_FEE_EUROS.toFixed(2)} incluso`
+          : "Da incassare alla consegna",
+        color: "text-amber-400",
+        Icon: Banknote,
+      }
     }
     if (order.stripe_session_id) {
       return { label: "Pagamento online", detail: "Acquisito tramite Stripe", color: "text-emerald-400", Icon: CreditCard }

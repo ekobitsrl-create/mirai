@@ -65,6 +65,66 @@ const GOOGLE_ADS_SELECTED_SUPPLIER_SKUS = new Set([
   "MIRAI-VALLEY-SHORT-BLU-032",
 ])
 
+type MerchantCopyOverride = {
+  title: string
+  description: string
+}
+
+const GOOGLE_ADS_MERCHANT_COPY_BY_PRODUCT_ID: Record<string, MerchantCopyOverride> = {
+  "93638035-fc17-4d46-b4a0-c4129cd54d42": {
+    title: "Bermuda Denim Streetwear con Strass e Perle Minimal Couture",
+    description: "Bermuda streetwear Minimal Couture in denim blu con costruzione cinque tasche. Strass e perle sono distribuiti sul fronte e aggiungono una finitura luminosa al lavaggio denim. Il modello mantiene una linea pulita e versatile, adatta ad abbinamenti urban e oversize. Colore denim blu, dettagli applicati sul davanti e chiusura classica in vita.",
+  },
+  "3e3acd47-bb56-495a-9ddd-f89d60d003ec": {
+    title: "Bermuda Camouflage con Cristalli Minimal Couture",
+    description: "Bermuda streetwear Minimal Couture in tessuto camouflage woodland multicolore. Cristalli e pietre colorate applicati sul fronte valorizzano la fantasia military senza coprirne il disegno. La linea ampia e rilassata favorisce il comfort e crea un volume adatto a look urban. Modello con passanti in vita, tasche e lunghezza al ginocchio.",
+  },
+  "2f1ae414-2e5c-45e4-8db9-67034e173be5": {
+    title: "Bermuda Denim Streetwear con Strass Laterali Minimal Couture",
+    description: "Bermuda Minimal Couture in denim nero con lavaggio washed e costruzione cinque tasche. Le applicazioni di strass disposte lungo entrambi i lati creano una finitura luminosa mantenendo pulita la parte centrale. Il taglio regolare e la lunghezza al ginocchio rendono il modello adatto a outfit streetwear. Colore nero slavato con dettagli crystal laterali.",
+  },
+  "8e0ff625-3cbc-4ad8-8470-5c66c9b8ecf9": {
+    title: "Bermuda Denim Streetwear con Applicazioni Minimal Couture",
+    description: "Bermuda Minimal Couture in denim blu con lavaggio sfumato e costruzione cinque tasche. Le applicazioni luminose seguono i lati del capo e aggiungono texture senza alterare la linea regolare. La lunghezza al ginocchio e la tonalità blu washed lo rendono adatto ad abbinamenti streetwear quotidiani. Colore blu slavato con dettagli applicati lateralmente.",
+  },
+  "95e77b7a-90b6-4b12-9b03-63f0f97cf286": {
+    title: "Bermuda Denim Streetwear con Cristalli Minimal Couture",
+    description: "Bermuda Minimal Couture in denim marrone con lavaggio washed e applicazioni crystal sfumate lungo entrambi i lati. La tonalità calda mette in risalto i dettagli luminosi, mentre la costruzione in denim mantiene il carattere streetwear del modello. Lunghezza al ginocchio, vita con passanti e tasche. Colore marrone slavato con cristalli laterali.",
+  },
+  "824c2ce3-95d1-4e52-8455-f681379c4071": {
+    title: "Canotta Oversize Streetwear Crown Minimal Couture",
+    description: "Canotta oversize Minimal Couture in cotone verde washed con stampa Crown sul fronte. La grafica combina corona, occhio e dadi, mentre il lavaggio vissuto e le finiture distressed rafforzano l'estetica streetwear. Il giromanica ampio e la silhouette rilassata favoriscono libertà di movimento e layering. Colore verde slavato con stampa grafica frontale.",
+  },
+  "8f21753c-398d-476e-9368-e073757ae61b": {
+    title: "Canotta Oversize Streetwear Eagle Minimal Couture",
+    description: "Canotta oversize Minimal Couture in cotone bordeaux con stampa Eagle sul fronte. La grafica con aquila e fiamme si abbina al lavaggio vissuto del tessuto, creando un aspetto streetwear deciso. Il giromanica ampio e la linea rilassata rendono il capo adatto alla stagione estiva e al layering. Colore bordeaux con stampa grafica frontale.",
+  },
+  "35d2db43-37ad-4ccf-9a41-8d136012f6b5": {
+    title: "Canotta Oversize Streetwear Liberty Speed",
+    description: "Canotta oversize MIRAI in cotone nero slavato con taglio smanicato. La grafica urban dedicata alla Statua della Libertà è presente sul fronte, mentre il retro è caratterizzato da un maxi simbolo coordinato. La silhouette ampia è pensata per layering e outfit estivi streetwear. Colore nero washed, stampa fronte-retro e giromanica ampio.",
+  },
+  "86711f4d-82f9-4ec8-85d2-1fa1f6deadde": {
+    title: "Bermuda Baggy Streetwear con Cristalli Night Spark",
+    description: "Bermuda MIRAI Night Spark nero dal taglio ampio e baggy, con lavaggio sfumato e applicazioni di cristalli distribuite su tutta la superficie. La texture luminosa caratterizza il capo senza aggiungere grafiche, mentre i lacci lunghi completano la costruzione streetwear. Colore nero, lunghezza al ginocchio e vestibilità rilassata.",
+  },
+  "9ee8e00d-08be-4523-b02e-e617c84c38d5": {
+    title: "Canotta Oversize Streetwear Santa Madre con Borchie",
+    description: "Canotta oversize Minimal Santa Madre in cotone bianco con lettering rosso sul fronte. Le applicazioni metalliche lungo il girocollo aggiungono un dettaglio luminoso alla linea essenziale, mentre le spalle ampie definiscono la silhouette streetwear. Colore bianco, stampa frontale Santa Madre, giromanica ampio e finiture metalliche sul collo.",
+  },
+  "1a05047e-bf92-49c6-939d-34f7b4d7f393": {
+    title: "Bermuda Baggy Denim Patchwork Valley",
+    description: "Bermuda MIRAI Valley in denim nero washed con silhouette baggy e lunghezza al ginocchio. Patch multicolore, maxi lettering applicato e dettagli crystal costruiscono una superficie ricca ma coerente. I lacci lunghi completano la linea streetwear e consentono di regolare la vita. Colore nero slavato con patchwork, lettering e applicazioni luminose.",
+  },
+  "1e1a5d1b-249f-4e5a-9ec4-921291c6fc1e": {
+    title: "Bermuda Baggy Denim Patchwork Valley",
+    description: "Bermuda MIRAI Valley in denim blu washed con silhouette ampia e baggy. Patch ricamate, maxi lettering applicato e dettagli crystal animano il fronte mantenendo riconoscibile il lavaggio denim. I lacci extra long completano l'estetica urban e regolano la vita. Colore blu slavato, lunghezza al ginocchio e finiture patchwork multicolore.",
+  },
+  "4a178ecb-500d-4e95-a83f-08fe90818e36": {
+    title: "Bermuda Baggy Denim Patchwork Valley",
+    description: "Bermuda MIRAI Valley in denim marrone washed con taglio lungo e rilassato. Patch multicolore, maxi lettering applicato e dettagli crystal valorizzano il fronte, mentre la silhouette baggy mantiene il volume tipico dello streetwear. I lacci lunghi permettono di regolare la vita. Colore marrone slavato con patchwork e applicazioni luminose.",
+  },
+}
+
 const COLOR_KEYWORDS: Array<[RegExp, string]> = [
   [/\bnavy\b/i, "Blu navy"],
   [/\bblu\b/i, "Blu"],
@@ -309,9 +369,11 @@ function renderProductVariant(product: StoreProduct, size: string, baseUrl: stri
   const merchantProductName = supplierSettings.profile === "mirai"
     ? product.name.replace(/^MIRAI\s+/i, "").trim()
     : product.name
-  const titleParts = [merchantProductName, color, `Taglia ${size}`].filter(Boolean)
+  const merchantCopyOverride = GOOGLE_ADS_MERCHANT_COPY_BY_PRODUCT_ID[product.id]
+  const titleParts = [merchantCopyOverride?.title || merchantProductName, color, `Taglia ${size}`].filter(Boolean)
   const title = titleParts.join(" - ")
-  const description = getMerchantDescription(product, merchantProductName, color, pattern, material)
+  const description = merchantCopyOverride?.description
+    || getMerchantDescription(product, merchantProductName, color, pattern, material)
   const brand = supplierSettings.brand
   const itemGroupId = getItemGroupId(product)
   const productType = PRODUCT_TYPE_BY_STORE_CATEGORY[categoryKey] || `Abbigliamento > ${product.category}`

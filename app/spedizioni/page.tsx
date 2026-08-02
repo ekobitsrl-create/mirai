@@ -1,6 +1,6 @@
 import type { Metadata } from "next"
 import Link from "next/link"
-import { ArrowLeft, Clock3, Globe, Package, Truck } from "lucide-react"
+import { ArrowLeft, Banknote, Clock3, Globe, Package, Truck } from "lucide-react"
 import { Navbar } from "@/components/navbar"
 import { Footer } from "@/components/footer"
 
@@ -25,7 +25,7 @@ export default function SpedizioniPage() {
             Spedizioni
           </h1>
           <p className="mb-12 max-w-2xl text-lg text-muted-foreground text-pretty">
-            La spedizione è sempre gratuita, senza importo minimo. I tempi di consegna variano in base al prodotto e sono indicati chiaramente nella relativa scheda.
+            La spedizione è sempre gratuita, senza importo minimo. Se scegli il pagamento in contrassegno viene applicato un supplemento fisso di 9 €, distinto dal costo di spedizione. I tempi di consegna variano in base al prodotto e sono indicati chiaramente nella relativa scheda.
           </p>
 
           <div className="mb-16 grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -47,6 +47,18 @@ export default function SpedizioniPage() {
               </div>
             ))}
           </div>
+
+          <section className="mb-16 rounded-lg border border-amber-400/30 bg-amber-400/5 p-6">
+            <div className="flex items-start gap-4">
+              <Banknote className="mt-0.5 h-5 w-5 shrink-0 text-amber-400" />
+              <div>
+                <h2 className="text-sm font-bold uppercase tracking-widest text-foreground">Pagamento in contrassegno</h2>
+                <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                  Il contrassegno è disponibile esclusivamente per le consegne in Italia e prevede un supplemento fisso di 9 €. Il supplemento riguarda il metodo di pagamento, non la spedizione, che resta gratuita. L'importo viene mostrato e incluso nel totale del checkout prima della conferma dell'ordine.
+                </p>
+              </div>
+            </div>
+          </section>
 
           <div className="mb-16 h-px bg-border" />
 

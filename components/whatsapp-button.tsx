@@ -9,6 +9,7 @@ export function WhatsAppButton() {
 
   return (
     <Link
+      data-whatsapp-button
       href="https://wa.me/393498663584?text=Ciao%2C%20vorrei%20informazioni%20sui%20vostri%20prodotti"
       target="_blank"
       rel="noopener noreferrer"
