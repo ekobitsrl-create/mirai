@@ -24,6 +24,7 @@ import {
   type CustomPrintSide,
   sanitizeCustomization,
 } from "@/lib/customization"
+import { getCatalogItemId } from "@/lib/catalog-identifiers"
 
 type GarmentColor = {
   name: string
@@ -226,6 +227,7 @@ export function CustomTeeEditor() {
       image_url: shirtImage,
       size,
       customization,
+      metaContentId: getCatalogItemId({ id: CUSTOM_TEE_PRODUCT_ID }, size),
     })
     setAdded(true)
     window.setTimeout(() => window.dispatchEvent(new Event("mirai:open-cart")), 350)

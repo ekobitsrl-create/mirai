@@ -22,6 +22,7 @@ import {
   customizationSummary,
   sanitizeCustomization,
 } from '@/lib/customization'
+import { getCatalogItemId } from '@/lib/catalog-identifiers'
 
 type CartLineItem = {
   productId: string
@@ -168,7 +169,7 @@ export async function createCheckoutSession(
   const productIds = cartItems.map((item) => item.productId)
   let { data: products, error } = await supabase
     .from('products')
-    .select('id, name, description, price, image_url, stock_by_size')
+    .select('id, name, description, price, image_url, stock_by_size, supplier_sku, color_name')
     .in('id', productIds)
 
   if (error?.message.includes('stock_by_size')) {
@@ -234,6 +235,7 @@ export async function createCheckoutSession(
             : undefined,
           metadata: {
             product_id: product.id,
+            meta_content_id: getCatalogItemId(staticProduct, cartItem.size || 'OS'),
             ...(cartItem.size ? { size: cartItem.size } : {}),
             ...(customization ? customizationMetadata(customization) : {}),
           },
@@ -382,7 +384,7 @@ export async function createCashOnDeliveryOrder(cartItems: CartLineItem[], detai
   const productIds = [...new Set(cartItems.map((item) => item.productId))]
   let { data: products, error } = await supabase
     .from('products')
-    .select('id, name, description, price, image_url, stock_by_size')
+    .select('id, name, description, price, image_url, stock_by_size, supplier_sku, color_name')
     .in('id', productIds)
 
   if (error?.message.includes('stock_by_size')) {
@@ -528,6 +530,20 @@ export async function createCashOnDeliveryOrder(cartItems: CartLineItem[], detai
 
   return {
     orderId: order.id,
+    meta: {
+      content_ids: [...new Set(validatedItems.map(({ cartItem, product }) => (
+        getCatalogItemId(product, cartItem.size || 'OS')
+      )))],
+      content_type: 'product' as const,
+      value: totalCents / 100,
+      currency: 'EUR',
+      contents: validatedItems.map(({ cartItem, product, quantity }) => ({
+        id: getCatalogItemId(product, cartItem.size || 'OS'),
+        quantity,
+        item_price: Number(product.price),
+      })),
+      num_items: validatedItems.reduce((total, item) => total + item.quantity, 0),
+    },
     review: {
       orderId: order.id,
       email: customerEmail || '',

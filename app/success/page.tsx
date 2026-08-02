@@ -14,6 +14,12 @@ import {
   isGoogleCustomerReviewOrder,
   type GoogleCustomerReviewOrder,
 } from "@/lib/google-customer-reviews"
+import { MetaPixelEvent } from "@/components/meta-pixel-event"
+import {
+  getMetaPurchaseStorageKey,
+  isMetaCommerceParameters,
+  type MetaCommerceParameters,
+} from "@/lib/meta-pixel"
 
 type OrderSummary = {
   id: string
@@ -28,7 +34,7 @@ type OrderSummary = {
     postalCode: string | null
     country: string | null
   } | null
-  items: Array<{ name: string; quantity: number; amount: number }>
+  items: Array<{ name: string; quantity: number; amount: number; contentId: string }>
 }
 
 function formatPrice(value: number, currency: string) {
@@ -47,6 +53,7 @@ function SuccessContent() {
   const { clearCart } = useCart()
   const [order, setOrder] = useState<OrderSummary | null>(null)
   const [reviewOrder, setReviewOrder] = useState<GoogleCustomerReviewOrder | null>(null)
+  const [cashPurchase, setCashPurchase] = useState<MetaCommerceParameters | null>(null)
   const [status, setStatus] = useState<"loading" | "pending" | "error" | "success" | "cash_on_delivery">("loading")
 
   useEffect(() => {
@@ -61,6 +68,14 @@ function SuccessContent() {
               setReviewOrder(parsedOrder)
             }
             window.sessionStorage.removeItem(storageKey)
+          }
+
+          const storedPurchase = window.sessionStorage.getItem(getMetaPurchaseStorageKey(orderId))
+          if (storedPurchase) {
+            const parsedPurchase: unknown = JSON.parse(storedPurchase)
+            if (isMetaCommerceParameters(parsedPurchase)) {
+              setCashPurchase(parsedPurchase)
+            }
           }
         } catch {
           // La conferma resta disponibile se lo storage e bloccato o non valido.
@@ -96,7 +111,7 @@ function SuccessContent() {
     return () => {
       active = false
     }
-  }, [clearCart, isCashOnDelivery, sessionId])
+  }, [clearCart, isCashOnDelivery, orderId, sessionId])
 
   if (status === "loading") {
     return (
@@ -127,6 +142,14 @@ function SuccessContent() {
     return (
       <main className="flex min-h-screen items-center justify-center bg-background px-6">
         {orderId && <GoogleAdsPurchaseConversion transactionId={orderId} />}
+        {orderId && cashPurchase && (
+          <MetaPixelEvent
+            eventName="Purchase"
+            parameters={cashPurchase}
+            eventId={orderId}
+            dedupeKey={`mirai-meta-purchase-tracked:${orderId}`}
+          />
+        )}
         <section className="w-full max-w-md border border-border bg-card p-8 text-center">
           <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-green-500/10 text-green-500">
             <CheckCircle2 className="h-9 w-9" />
@@ -170,10 +193,28 @@ function SuccessContent() {
   const shippingLine = [order.shipping?.postalCode, order.shipping?.city, order.shipping?.country]
     .filter(Boolean)
     .join(" ")
+  const purchaseParameters: MetaCommerceParameters = {
+    content_ids: [...new Set(order.items.map((item) => item.contentId))],
+    content_type: "product",
+    value: order.amountTotal,
+    currency: order.currency.toUpperCase(),
+    contents: order.items.map((item) => ({
+      id: item.contentId,
+      quantity: item.quantity,
+      item_price: item.quantity > 0 ? item.amount / item.quantity : item.amount,
+    })),
+    num_items: order.items.reduce((total, item) => total + item.quantity, 0),
+  }
 
   return (
     <main className="min-h-screen bg-background px-6 py-16">
       <GoogleAdsPurchaseConversion transactionId={order.id} />
+      <MetaPixelEvent
+        eventName="Purchase"
+        parameters={purchaseParameters}
+        eventId={order.id}
+        dedupeKey={`mirai-meta-purchase-tracked:${order.id}`}
+      />
       {order.email && order.shipping?.country && (
         <GoogleCustomerReviewsOptIn
           order={{

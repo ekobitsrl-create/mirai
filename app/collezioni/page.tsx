@@ -32,7 +32,7 @@ export default async function CollezioniPage() {
     supabase.from("categories").select("*").order("sort_order", { ascending: true }),
     supabase
       .from("products")
-      .select("id, name, description, price, category, image_url, sizes, in_stock, is_new, created_at, stock_by_size")
+      .select("id, name, description, price, category, image_url, sizes, in_stock, is_new, created_at, stock_by_size, supplier_sku, color_name")
       .order("created_at", { ascending: false }),
   ])
 

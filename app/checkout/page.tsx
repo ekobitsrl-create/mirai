@@ -15,6 +15,8 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { CASH_ON_DELIVERY_FEE_CENTS } from "@/lib/checkout-fees"
+import { MetaPixelEvent } from "@/components/meta-pixel-event"
+import { buildMetaCartParameters, getMetaPurchaseStorageKey } from "@/lib/meta-pixel"
 
 const stripePublishableKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
 const stripePromise = stripePublishableKey ? loadStripe(stripePublishableKey) : null
@@ -217,6 +219,10 @@ export default function CheckoutPage() {
           getGoogleReviewStorageKey(order.orderId),
           JSON.stringify(order.review),
         )
+        window.sessionStorage.setItem(
+          getMetaPurchaseStorageKey(order.orderId),
+          JSON.stringify(order.meta),
+        )
       } catch {
         // L'ordine resta valido anche se il browser blocca lo storage.
       }
@@ -255,9 +261,14 @@ export default function CheckoutPage() {
   const discountedProductsTotalCents = appliedDiscount?.totalCents ?? Math.round(getTotal() * 100)
   const selectedPaymentFeeCents = paymentMethod === "cash_on_delivery" ? CASH_ON_DELIVERY_FEE_CENTS : 0
   const checkoutTotalCents = discountedProductsTotalCents + selectedPaymentFeeCents
+  const checkoutMetaParameters = buildMetaCartParameters(items, getTotal())
 
   return (
     <main className="min-h-screen bg-background">
+      <MetaPixelEvent
+        eventName="InitiateCheckout"
+        parameters={checkoutMetaParameters}
+      />
       <div className="mx-auto max-w-4xl px-6 pb-16 pt-28">
         <div className="mb-10 flex items-center justify-between">
           <div>

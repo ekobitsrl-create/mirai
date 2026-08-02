@@ -3,11 +3,15 @@
 import Script from "next/script"
 import { usePathname } from "next/navigation"
 import { useEffect, useRef, useState } from "react"
+import {
+  META_CONSENT_EVENT,
+  META_PIXEL_ID,
+  META_PIXEL_READY_EVENT,
+  trackMetaEvent,
+} from "@/lib/meta-pixel"
 
 const GOOGLE_TAG_MANAGER_ID = "GTM-PRDL84CL"
 const TIKTOK_PIXEL_ID = "D9BLKH3C77UBS5FSCEK0"
-const META_PIXEL_ID = "1373791028153076"
-const COOKIE_CONSENT_EVENT = "mirai:cookie-consent"
 
 type TikTokQueue = unknown[] & {
   page?: () => void
@@ -16,7 +20,6 @@ type TikTokQueue = unknown[] & {
 declare global {
   interface Window {
     dataLayer?: Array<Record<string, unknown>>
-    fbq?: (...args: unknown[]) => void
     ttq?: TikTokQueue
   }
 }
@@ -40,8 +43,8 @@ export function MarketingPixels() {
       setEnabled(consent === "all")
     }
 
-    window.addEventListener(COOKIE_CONSENT_EVENT, handleConsent)
-    return () => window.removeEventListener(COOKIE_CONSENT_EVENT, handleConsent)
+    window.addEventListener(META_CONSENT_EVENT, handleConsent)
+    return () => window.removeEventListener(META_CONSENT_EVENT, handleConsent)
   }, [])
 
   useEffect(() => {
@@ -65,7 +68,7 @@ export function MarketingPixels() {
       page_path: pagePath,
       page_title: document.title,
     })
-    window.fbq?.("track", "PageView")
+    trackMetaEvent("PageView")
     window.ttq?.page?.()
   }, [enabled, pathname])
 
@@ -81,8 +84,9 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 })(window,document,'script','dataLayer','${GOOGLE_TAG_MANAGER_ID}');`}
       </Script>
 
-      <Script id="mirai-meta-pixel" strategy="afterInteractive">
-        {`!function(f,b,e,v,n,t,s)
+      {META_PIXEL_ID && (
+        <Script id="mirai-meta-pixel" strategy="afterInteractive">
+          {`!function(f,b,e,v,n,t,s)
 {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
 n.callMethod.apply(n,arguments):n.queue.push(arguments)};
 if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
@@ -91,8 +95,10 @@ t.src=v;s=b.getElementsByTagName(e)[0];
 s.parentNode.insertBefore(t,s)}(window,document,'script',
 'https://connect.facebook.net/en_US/fbevents.js');
 fbq('init','${META_PIXEL_ID}');
-fbq('track','PageView');`}
-      </Script>
+fbq('track','PageView');
+window.dispatchEvent(new Event('${META_PIXEL_READY_EVENT}'));`}
+        </Script>
+      )}
 
       <Script id="mirai-tiktok-pixel" strategy="afterInteractive">
         {`!function (w, d, t) {

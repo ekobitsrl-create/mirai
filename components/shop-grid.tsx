@@ -19,6 +19,7 @@ import {
 import { useCart } from "@/lib/cart-context"
 import type { StoreProduct } from "@/lib/products"
 import { useLanguage } from "@/lib/language-context"
+import { getCatalogItemId } from "@/lib/catalog-identifiers"
 
 type Category = {
   id: string
@@ -297,6 +298,7 @@ export function ShopGrid({
       image_url: product.image_url,
       size,
       maxQuantity: product.stock_by_size?.[size],
+      metaContentId: getCatalogItemId(product, size),
     })
     setQuickAddProduct(null)
     setQuickAddSize(null)

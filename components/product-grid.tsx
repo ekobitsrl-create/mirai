@@ -7,6 +7,7 @@ import { Heart } from "lucide-react"
 import { useCart } from "@/lib/cart-context"
 import { useScrollAnimation } from "@/hooks/use-scroll-animation"
 import { useLanguage } from "@/lib/language-context"
+import { getCatalogItemId } from "@/lib/catalog-identifiers"
 
 type Product = {
   id: string
@@ -18,6 +19,8 @@ type Product = {
   sizes: string[]
   in_stock: boolean
   is_new: boolean
+  supplier_sku?: string | null
+  color_name?: string | null
   stock_by_size?: Record<string, number>
 }
 
@@ -108,6 +111,7 @@ export function ProductGrid({ products, title, subtitle }: { products: Product[]
                             image_url: product.image_url,
                             size: availableSize,
                             maxQuantity: product.stock_by_size?.[availableSize],
+                            metaContentId: getCatalogItemId(product, availableSize),
                           })
                         }}
                         className="mirai-neon-primary w-full rounded-xl bg-primary py-3 text-[10px] font-bold uppercase tracking-widest text-primary-foreground transition-all duration-300 hover:bg-primary/90 md:text-xs"

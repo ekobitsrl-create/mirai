@@ -10,6 +10,7 @@ import {
 } from "@/lib/products"
 import { createClient } from "@/lib/supabase/server"
 import { SITE_URL } from "@/lib/site-url"
+import { getCatalogItemId, normalizeCatalogIdentifier } from "@/lib/catalog-identifiers"
 
 export const runtime = "nodejs"
 export const dynamic = "force-dynamic"
@@ -171,44 +172,12 @@ function absoluteUrl(path: string, baseUrl: string) {
   }
 }
 
-function normalizedIdentifier(value: string) {
-  return value
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-|-$/g, "")
-}
-
-function stableHash(value: string) {
-  let hash = 2166136261
-
-  for (let index = 0; index < value.length; index += 1) {
-    hash ^= value.charCodeAt(index)
-    hash = Math.imul(hash, 16777619)
-  }
-
-  return (hash >>> 0).toString(36)
-}
-
-function getMerchantItemId(product: StoreProduct, size: string) {
-  const source = product.supplier_sku
-    ? `${product.supplier_sku}-${product.color_name || product.id}-${size}`
-    : `${product.id}-${size}`
-  const candidate = normalizedIdentifier(source)
-
-  if (candidate.length <= 50) return candidate
-
-  const suffix = stableHash(`${product.id}-${size}`)
-  return `${candidate.slice(0, 49 - suffix.length)}-${suffix}`
-}
-
 function getItemGroupId(product: StoreProduct) {
   if (product.supplier_sku) {
-    return normalizedIdentifier(`${getProductSupplierSettings(product).brand}-${product.supplier_sku}`)
+    return normalizeCatalogIdentifier(`${getProductSupplierSettings(product).brand}-${product.supplier_sku}`)
   }
 
-  return normalizedIdentifier(product.id).slice(0, 50)
+  return normalizeCatalogIdentifier(product.id).slice(0, 50)
 }
 
 function getSizes(product: StoreProduct) {
@@ -364,7 +333,7 @@ const META_DARKADS_ITEM_GROUP_IDS = new Set([
 ])
 
 function renderProductVariant(product: StoreProduct, size: string, baseUrl: string, platform?: string | null) {
-  const itemId = getMerchantItemId(product, size)
+  const itemId = getCatalogItemId(product, size)
   const productUrl = absoluteUrl(`/prodotto/${encodeURIComponent(product.id)}`, baseUrl)
   const primaryImage = product.image_url ? absoluteUrl(product.image_url, baseUrl) : ""
   const additionalImages = getAdditionalImages(product, baseUrl, primaryImage)

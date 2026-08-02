@@ -29,6 +29,8 @@ import {
   type StoreProductImage,
 } from "@/lib/products"
 import { getProductVariantKey } from "@/lib/product-titles"
+import { getCatalogItemId } from "@/lib/catalog-identifiers"
+import { MetaPixelEvent } from "@/components/meta-pixel-event"
 
 function formatCategory(slug: string) {
   return slug.replace(/-/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase())
@@ -187,6 +189,7 @@ export function ProductDetail({
       size: selectedSize || "OS",
       quantity,
       maxQuantity,
+      metaContentId: getCatalogItemId(product, selectedSize || "OS"),
     })
     setAdded(true)
     window.setTimeout(() => setAdded(false), 2200)
@@ -232,6 +235,7 @@ export function ProductDetail({
         size: checkoutSize,
         quantity,
         maxQuantity,
+        metaContentId: getCatalogItemId(product, checkoutSize),
       })
     }
 
@@ -248,6 +252,21 @@ export function ProductDetail({
 
   return (
     <div className="mx-auto max-w-[1500px] px-5 text-[#faf8ff] md:px-8">
+      <MetaPixelEvent
+        eventName="ViewContent"
+        parameters={{
+          content_ids: [getCatalogItemId(product, sizes[0] || "OS")],
+          content_type: "product",
+          value: Number(product.price),
+          currency: "EUR",
+          contents: [{
+            id: getCatalogItemId(product, sizes[0] || "OS"),
+            quantity: 1,
+            item_price: Number(product.price),
+          }],
+          num_items: 1,
+        }}
+      />
       <nav className="mb-7 flex items-center gap-1.5 overflow-hidden text-[9px] font-medium uppercase tracking-[0.2em] text-white/50" aria-label="Breadcrumb">
         <Link href="/" className="shrink-0 hover:text-white">Home</Link>
         <ChevronRight className="h-3 w-3 shrink-0" />

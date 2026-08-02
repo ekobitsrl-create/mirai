@@ -2,6 +2,8 @@
 
 import { createContext, useContext, useState, useCallback, useEffect, type ReactNode } from "react"
 import type { CustomizationDetails } from "@/lib/customization"
+import { getCatalogItemId } from "@/lib/catalog-identifiers"
+import { trackMetaEvent } from "@/lib/meta-pixel"
 
 export type CartItem = {
   productId: string
@@ -11,6 +13,7 @@ export type CartItem = {
   quantity: number
   size: string
   lineId?: string
+  metaContentId?: string
   customization?: CustomizationDetails
   maxQuantity?: number
 }
@@ -67,6 +70,7 @@ function normalizeStoredCartItem(value: unknown): CartItem | null {
       ? candidate.size
       : "Unica",
     lineId: typeof candidate.lineId === "string" ? candidate.lineId : undefined,
+    metaContentId: typeof candidate.metaContentId === "string" ? candidate.metaContentId : undefined,
     customization:
       candidate.customization && typeof candidate.customization === "object"
         ? candidate.customization as CustomizationDetails
@@ -141,6 +145,21 @@ export function CartProvider({ children }: { children: ReactNode }) {
           quantity: addedQuantity,
         },
       }))
+
+      const contentId = item.metaContentId
+        || getCatalogItemId({ id: item.productId }, item.size || "OS")
+      trackMetaEvent("AddToCart", {
+        content_ids: [contentId],
+        content_type: "product",
+        value: Number((item.price * addedQuantity).toFixed(2)),
+        currency: "EUR",
+        contents: [{
+          id: contentId,
+          quantity: addedQuantity,
+          item_price: Number(item.price),
+        }],
+        num_items: addedQuantity,
+      })
     },
     []
   )

@@ -8,6 +8,7 @@ import { Heart, ArrowLeft } from "lucide-react"
 import { useCart } from "@/lib/cart-context"
 import { useLanguage } from "@/lib/language-context"
 import { getCategoryImage } from "@/lib/category-images"
+import { getCatalogItemId } from "@/lib/catalog-identifiers"
 
 type Product = {
   id: string
@@ -20,6 +21,8 @@ type Product = {
   in_stock: boolean
   is_new: boolean
   stock_by_size?: Record<string, number>
+  supplier_sku?: string | null
+  color_name?: string | null
 }
 
 function getFirstAvailableSize(product: Product) {
@@ -276,6 +279,7 @@ export function CollectionProducts({
                                   image_url: product.image_url,
                                   size: availableSize,
                                   maxQuantity: product.stock_by_size?.[availableSize],
+                                  metaContentId: getCatalogItemId(product, availableSize),
                                 })
                               }}
                               className="w-full py-3 bg-primary text-primary-foreground text-xs font-bold tracking-widest uppercase rounded-sm hover:bg-primary/90 hover:shadow-[0_0_20px_rgba(168,85,247,0.25)] transition-all duration-300"

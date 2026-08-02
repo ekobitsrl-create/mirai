@@ -14,6 +14,11 @@ function formatAddress(address: Stripe.Address | null | undefined) {
   return [address.line1, address.line2].filter(Boolean).join(', ') || null
 }
 
+function activeProduct(product: string | Stripe.Product | Stripe.DeletedProduct | null): Stripe.Product | null {
+  if (!product || typeof product === 'string' || ('deleted' in product && product.deleted)) return null
+  return product
+}
+
 export async function GET(request: NextRequest) {
   try {
     assertStripeConfigured()
@@ -70,11 +75,18 @@ export async function GET(request: NextRequest) {
             country: shippingAddress?.country || null,
           }
         : null,
-      items: lineItems.data.map((item) => ({
-        name: item.description,
-        quantity: item.quantity || 0,
-        amount: (item.amount_total || 0) / 100,
-      })),
+      items: lineItems.data.map((item) => {
+        const product = activeProduct(item.price?.product || null)
+        return {
+          name: item.description,
+          quantity: item.quantity || 0,
+          amount: (item.amount_total || 0) / 100,
+          contentId: product?.metadata.meta_content_id
+            || product?.metadata.product_id
+            || item.price?.id
+            || item.id,
+        }
+      }),
     })
   } catch (error) {
     console.error('Errore recupero conferma ordine:', error)

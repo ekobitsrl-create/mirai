@@ -10,6 +10,7 @@ import {
   customizationSummary,
   sanitizeCustomization,
 } from '@/lib/customization'
+import { getCatalogItemId } from '@/lib/catalog-identifiers'
 
 type CheckoutCartItem = {
   productId: string
@@ -126,7 +127,7 @@ export async function POST(request: NextRequest) {
     
     let { data: products, error } = await supabase
       .from('products')
-      .select('id, name, description, price, image_url, stock_by_size')
+      .select('id, name, description, price, image_url, stock_by_size, supplier_sku, color_name')
       .in('id', productIds)
 
     if (error?.message.includes('stock_by_size')) {
@@ -199,6 +200,7 @@ export async function POST(request: NextRequest) {
               : undefined,
             metadata: {
               product_id: product.id,
+              meta_content_id: getCatalogItemId(staticProduct, cartItem.size || 'OS'),
               ...(cartItem.size ? { size: cartItem.size } : {}),
               ...(customization ? customizationMetadata(customization) : {}),
             },
