@@ -356,7 +356,14 @@ async function getCatalogProducts() {
   }
 }
 
-function renderProductVariant(product: StoreProduct, size: string, baseUrl: string) {
+const META_DARKADS_ITEM_GROUP_IDS = new Set([
+  "mirai-mirai-night-spark-027",
+  "mirai-mirai-liberty-008",
+  "mirai-mirai-reaper-024",
+  "4c89683d-939d-427a-8a34-3e00f9509d1e",
+])
+
+function renderProductVariant(product: StoreProduct, size: string, baseUrl: string, platform?: string | null) {
   const itemId = getMerchantItemId(product, size)
   const productUrl = absoluteUrl(`/prodotto/${encodeURIComponent(product.id)}`, baseUrl)
   const primaryImage = product.image_url ? absoluteUrl(product.image_url, baseUrl) : ""
@@ -376,6 +383,9 @@ function renderProductVariant(product: StoreProduct, size: string, baseUrl: stri
     || getMerchantDescription(product, merchantProductName, color, pattern, material)
   const brand = supplierSettings.brand
   const itemGroupId = getItemGroupId(product)
+  const metaInternalLabel = platform === "meta" && META_DARKADS_ITEM_GROUP_IDS.has(itemGroupId)
+    ? "darkads"
+    : null
   const productType = PRODUCT_TYPE_BY_STORE_CATEGORY[categoryKey] || `Abbigliamento > ${product.category}`
   const googleCategory = GOOGLE_CATEGORY_BY_STORE_CATEGORY[categoryKey] || "166"
   const availability = getAvailability(product, size)
@@ -404,6 +414,9 @@ function renderProductVariant(product: StoreProduct, size: string, baseUrl: stri
     `      <g:product_type>${escapeXml(productType)}</g:product_type>`,
     `      <g:item_group_id>${escapeXml(itemGroupId)}</g:item_group_id>`,
     `      <g:item_group_title>${escapeXml(merchantProductName)}</g:item_group_title>`,
+    ...(metaInternalLabel
+      ? [`      <g:internal_label>${escapeXml(metaInternalLabel)}</g:internal_label>`]
+      : []),
     `      <g:size>${escapeXml(size)}</g:size>`,
     `      <g:size_system>${isHeadwear ? "US" : "EU"}</g:size_system>`,
     isHeadwear ? "" : "      <g:size_type>regular</g:size_type>",
@@ -459,7 +472,7 @@ export async function GET(request: NextRequest) {
       && (!supplierProfile || getSupplierProfile(product) === supplierProfile),
   )
   const items = products.flatMap((product) =>
-    getSizes(product).map((size) => renderProductVariant(product, size, baseUrl)),
+    getSizes(product).map((size) => renderProductVariant(product, size, baseUrl, requestedPlatform)),
   )
 
   const xml = [
