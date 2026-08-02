@@ -865,7 +865,7 @@ const MIRAI_SUPPLIER_CATALOG_BASE = [
   },
   {
     "name": "MIRAI Valley Patchwork Shorts - Brown",
-    "description": "Shorts in denim marrone washed con patch multicolore, maxi lettering applicato e dettagli crystal. Il taglio lungo e rilassato bilancia la ricchezza grafica, creando un capo centrale per look urban e oversize.",
+    "description": "Bermuda baggy in denim marrone washed con maxi lettering Valley, patch multicolore e applicazioni crystal sul fronte. Il taglio ampio sotto il ginocchio e i lacci lunghi completano una silhouette urban rilassata e ricca di dettagli.",
     "price": 140,
     "category": "shorts",
     "image_url": "/products/mirai-supplier/valley-patchwork-shorts-brown-01.webp",
@@ -878,14 +878,14 @@ const MIRAI_SUPPLIER_CATALOG_BASE = [
     "supplier_sku": "MIRAI-VALLEY-SHORT-BRN-030",
     "color_name": "Marrone washed",
     "color_hex": "#6b4c3c",
-    "fit_note": "Vestibilita baggy con lunghezza sotto il ginocchio. Taglie disponibili dalla 44 alla 56.",
-    "detail_items": ["Denim marrone effetto washed", "Patch ricamate multicolore", "Maxi lettering con dettagli crystal", "Lacci lunghi a contrasto", "Taglio ampio sotto il ginocchio"],
-    "composition": null,
-    "care": "Seguire le istruzioni riportate sull'etichetta interna."
+    "fit_note": "Vestibilità baggy, ampia sulla gamba e con lunghezza sotto il ginocchio. Disponibile nelle taglie dalla 44 alla 56; scegli la tua taglia abituale per mantenere il volume previsto.",
+    "detail_items": ["Denim marrone con lavaggio washed", "Maxi lettering Valley applicato", "Patch multicolore e dettagli crystal", "Vita regolabile con lacci extra long", "Taglio baggy sotto il ginocchio"],
+    "composition": "Tessuto denim. Per la composizione completa consultare l'etichetta interna del capo.",
+    "care": "Per preservare lavaggio, patch e applicazioni, lavare al rovescio con ciclo delicato e senza strofinare i dettagli. Seguire sempre le indicazioni riportate sull'etichetta interna."
   },
   {
     "name": "MIRAI Valley Patchwork Shorts - Black",
-    "description": "Shorts in denim nero washed costruiti attorno a patch multicolore e maxi lettering con applicazioni luminose. La silhouette baggy e i lacci lunghi amplificano l'attitudine streetwear del modello.",
+    "description": "Bermuda baggy in denim nero washed con maxi lettering Valley, patch multicolore e applicazioni crystal sul fronte. Il taglio ampio sotto il ginocchio e i lacci lunghi definiscono una silhouette streetwear decisa, pensata per outfit oversize e layering estivo.",
     "price": 140,
     "category": "shorts",
     "image_url": "/products/mirai-supplier/valley-patchwork-shorts-black-01.webp",
@@ -898,14 +898,14 @@ const MIRAI_SUPPLIER_CATALOG_BASE = [
     "supplier_sku": "MIRAI-VALLEY-SHORT-BLK-031",
     "color_name": "Nero washed",
     "color_hex": "#202020",
-    "fit_note": "Vestibilita baggy con lunghezza sotto il ginocchio. Taglie disponibili dalla 44 alla 56.",
-    "detail_items": ["Denim nero effetto washed", "Patch ricamate multicolore", "Maxi lettering con dettagli crystal", "Lacci lunghi a contrasto", "Taglio ampio sotto il ginocchio"],
-    "composition": null,
-    "care": "Seguire le istruzioni riportate sull'etichetta interna."
+    "fit_note": "Vestibilità baggy, ampia sulla gamba e con lunghezza sotto il ginocchio. Disponibile nelle taglie dalla 44 alla 56; scegli la tua taglia abituale per mantenere il volume previsto.",
+    "detail_items": ["Denim nero con lavaggio washed", "Maxi lettering Valley applicato", "Patch multicolore e dettagli crystal", "Vita regolabile con lacci extra long", "Taglio baggy sotto il ginocchio"],
+    "composition": "Tessuto denim. Per la composizione completa consultare l'etichetta interna del capo.",
+    "care": "Per preservare lavaggio, patch e applicazioni, lavare al rovescio con ciclo delicato e senza strofinare i dettagli. Seguire sempre le indicazioni riportate sull'etichetta interna."
   },
   {
     "name": "MIRAI Valley Patchwork Shorts - Blue",
-    "description": "Shorts in denim blu washed con patch ricamate, maxi lettering applicato e dettagli crystal. Una variante energica dal volume ampio, rifinita con lacci extra long per un'estetica urban riconoscibile.",
+    "description": "Bermuda baggy in denim blu washed con maxi lettering Valley, patch multicolore e applicazioni crystal sul fronte. Il taglio ampio sotto il ginocchio e i lacci extra long valorizzano il volume del modello, ideale per outfit streetwear oversize.",
     "price": 140,
     "category": "shorts",
     "image_url": "/products/mirai-supplier/valley-patchwork-shorts-blue-01.webp",
@@ -918,10 +918,10 @@ const MIRAI_SUPPLIER_CATALOG_BASE = [
     "supplier_sku": "MIRAI-VALLEY-SHORT-BLU-032",
     "color_name": "Blu washed",
     "color_hex": "#344f68",
-    "fit_note": "Vestibilita baggy con lunghezza sotto il ginocchio. Taglie disponibili dalla 44 alla 56.",
-    "detail_items": ["Denim blu effetto washed", "Patch ricamate multicolore", "Maxi lettering con dettagli crystal", "Lacci lunghi a contrasto", "Taglio ampio sotto il ginocchio"],
-    "composition": null,
-    "care": "Seguire le istruzioni riportate sull'etichetta interna."
+    "fit_note": "Vestibilità baggy, ampia sulla gamba e con lunghezza sotto il ginocchio. Disponibile nelle taglie dalla 44 alla 56; scegli la tua taglia abituale per mantenere il volume previsto.",
+    "detail_items": ["Denim blu con lavaggio washed", "Maxi lettering Valley applicato", "Patch multicolore e dettagli crystal", "Vita regolabile con lacci extra long", "Taglio baggy sotto il ginocchio"],
+    "composition": "Tessuto denim. Per la composizione completa consultare l'etichetta interna del capo.",
+    "care": "Per preservare lavaggio, patch e applicazioni, lavare al rovescio con ciclo delicato e senza strofinare i dettagli. Seguire sempre le indicazioni riportate sull'etichetta interna."
   },
   {
     "name": "MIRAI Santa Madre Studded Canotta - White",
