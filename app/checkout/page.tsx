@@ -17,6 +17,8 @@ import { Label } from "@/components/ui/label"
 import { CASH_ON_DELIVERY_FEE_CENTS } from "@/lib/checkout-fees"
 import { MetaPixelEvent } from "@/components/meta-pixel-event"
 import { buildMetaCartParameters, getMetaPurchaseStorageKey } from "@/lib/meta-pixel"
+import { PostHogCommerceEvent } from "@/components/posthog-commerce-event"
+import { getCatalogItemId } from "@/lib/catalog-identifiers"
 
 const stripePublishableKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
 const stripePromise = stripePublishableKey ? loadStripe(stripePublishableKey) : null
@@ -268,6 +270,22 @@ export default function CheckoutPage() {
       <MetaPixelEvent
         eventName="InitiateCheckout"
         parameters={checkoutMetaParameters}
+      />
+      <PostHogCommerceEvent
+        eventName="begin_checkout"
+        properties={{
+          value: Number(getTotal().toFixed(2)),
+          currency: "EUR",
+          item_count: items.reduce((total, item) => total + item.quantity, 0),
+          items: items.map((item) => ({
+            product_id: item.metaContentId || getCatalogItemId({ id: item.productId }, item.size || "OS"),
+            product_name: item.name,
+            price: Number(item.price),
+            currency: "EUR",
+            quantity: item.quantity,
+            size: item.size,
+          })),
+        }}
       />
       <div className="mx-auto max-w-4xl px-6 pb-16 pt-28">
         <div className="mb-10 flex items-center justify-between">

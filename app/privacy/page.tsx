@@ -24,7 +24,7 @@ export default function PrivacyPage() {
           <h1 className="mb-2 font-[family-name:var(--font-space-grotesk)] text-3xl font-bold tracking-tight text-foreground text-balance md:text-4xl">
             Privacy Policy
           </h1>
-          <p className="text-sm text-muted-foreground mb-12">Ultimo aggiornamento: 27 luglio 2026</p>
+          <p className="text-sm text-muted-foreground mb-12">Ultimo aggiornamento: 2 agosto 2026</p>
 
           <div className="flex flex-col gap-10 text-muted-foreground leading-relaxed">
             <div className="flex flex-col gap-3">
@@ -70,7 +70,7 @@ export default function PrivacyPage() {
 
             <div className="flex flex-col gap-3">
               <h2 className="font-[family-name:var(--font-space-grotesk)] text-xl font-bold text-foreground">6. Condivisione con Terze Parti</h2>
-              <p>I tuoi dati possono essere condivisi con: Stripe (elaborazione pagamenti), corrieri (spedizioni), Supabase (hosting database e autenticazione), Resend (invio delle email transazionali e, con consenso, dei promemoria), Vercel (hosting sito web) e strumenti di analytics e advertising come Google Analytics/Google Tag Manager/Google Ads, TikTok Pixel e Meta Pixel, ove attivi e previo consenso ove richiesto. Non vendiamo o cediamo i tuoi dati a terzi per finalita di marketing.</p>
+              <p>I tuoi dati possono essere condivisi con: Stripe (elaborazione pagamenti), corrieri (spedizioni), Supabase (hosting database e autenticazione), Resend (invio delle email transazionali e, con consenso, dei promemoria), Vercel (hosting sito web) e strumenti di analytics e advertising come Google Analytics/Google Tag Manager/Google Ads, PostHog, TikTok Pixel e Meta Pixel, ove attivi e previo consenso ove richiesto. PostHog viene usato per analytics, autocapture, replay delle sessioni e mappe di calore; gli input sono mascherati nelle registrazioni. Non vendiamo o cediamo i tuoi dati a terzi per finalita di marketing.</p>
             </div>
 
             <div className="flex flex-col gap-3">

@@ -12,6 +12,7 @@ import { SiteIntro } from '@/components/site-intro'
 import { MiraGuide } from '@/components/mira-guide'
 import { MarketingPixels } from '@/components/marketing-pixels'
 import { GoogleIntegrations } from '@/components/google-integrations'
+import { PostHogProvider } from '@/components/posthog-provider'
 import { COMPANY_INFO } from '@/lib/company-info'
 import { getAbsoluteUrl, SITE_URL } from '@/lib/site-url'
 import './globals.css'
@@ -118,11 +119,12 @@ window.gtag('consent', 'default', {
         </Script>
       </head>
       <body className={`${inter.variable} ${spaceGrotesk.variable} font-sans antialiased`}>
-        <GoogleIntegrations />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
+        <PostHogProvider>
+          <GoogleIntegrations />
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{
+              __html: JSON.stringify({
               "@context": "https://schema.org",
               "@type": "Organization",
               "@id": `${SITE_URL}/#organization`,
@@ -150,13 +152,13 @@ window.gtag('consent', 'default', {
                 telephone: "+39 349 866 3584",
                 availableLanguage: "Italian",
               },
-            }),
-          }}
-        />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
+              }),
+            }}
+          />
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{
+              __html: JSON.stringify({
               "@context": "https://schema.org",
               "@type": "WebSite",
               "@id": `${SITE_URL}/#website`,
@@ -164,22 +166,23 @@ window.gtag('consent', 'default', {
               url: SITE_URL,
               inLanguage: "it-IT",
               publisher: { "@id": `${SITE_URL}/#organization` },
-            }),
-          }}
-        />
-        <SiteIntro />
-        <LanguageProvider>
-          <CartProvider>
-            {children}
-            <CartAddedBanner />
-            <MiraGuide />
-            <BackgroundMusic />
-            <WhatsAppButton />
-            <CookieBanner />
-          </CartProvider>
-        </LanguageProvider>
-        <MarketingPixels />
-        <Analytics />
+              }),
+            }}
+          />
+          <SiteIntro />
+          <LanguageProvider>
+            <CartProvider>
+              {children}
+              <CartAddedBanner />
+              <MiraGuide />
+              <BackgroundMusic />
+              <WhatsAppButton />
+              <CookieBanner />
+            </CartProvider>
+          </LanguageProvider>
+          <MarketingPixels />
+          <Analytics />
+        </PostHogProvider>
       </body>
     </html>
   )

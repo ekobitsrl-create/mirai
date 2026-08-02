@@ -20,6 +20,7 @@ import {
   isMetaCommerceParameters,
   type MetaCommerceParameters,
 } from "@/lib/meta-pixel"
+import { PostHogCommerceEvent } from "@/components/posthog-commerce-event"
 
 type OrderSummary = {
   id: string
@@ -143,12 +144,31 @@ function SuccessContent() {
       <main className="flex min-h-screen items-center justify-center bg-background px-6">
         {orderId && <GoogleAdsPurchaseConversion transactionId={orderId} />}
         {orderId && cashPurchase && (
-          <MetaPixelEvent
-            eventName="Purchase"
-            parameters={cashPurchase}
-            eventId={orderId}
-            dedupeKey={`mirai-meta-purchase-tracked:${orderId}`}
-          />
+          <>
+            <MetaPixelEvent
+              eventName="Purchase"
+              parameters={cashPurchase}
+              eventId={orderId}
+              dedupeKey={`mirai-meta-purchase-tracked:${orderId}`}
+            />
+            <PostHogCommerceEvent
+              eventName="purchase"
+              properties={{
+                order_id: orderId,
+                payment_method: "cash_on_delivery",
+                value: cashPurchase.value,
+                currency: cashPurchase.currency,
+                item_count: cashPurchase.num_items,
+                items: cashPurchase.contents?.map((item) => ({
+                  product_id: item.id,
+                  price: item.item_price,
+                  currency: cashPurchase.currency,
+                  quantity: item.quantity,
+                })),
+              }}
+              dedupeKey={`mirai-posthog-purchase-tracked:${orderId}`}
+            />
+          </>
         )}
         <section className="w-full max-w-md border border-border bg-card p-8 text-center">
           <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-green-500/10 text-green-500">
@@ -214,6 +234,24 @@ function SuccessContent() {
         parameters={purchaseParameters}
         eventId={order.id}
         dedupeKey={`mirai-meta-purchase-tracked:${order.id}`}
+      />
+      <PostHogCommerceEvent
+        eventName="purchase"
+        properties={{
+          order_id: order.id,
+          payment_method: "card",
+          value: order.amountTotal,
+          currency: order.currency.toUpperCase(),
+          item_count: order.items.reduce((total, item) => total + item.quantity, 0),
+          items: order.items.map((item) => ({
+            product_id: item.contentId,
+            product_name: item.name,
+            price: item.quantity > 0 ? item.amount / item.quantity : item.amount,
+            currency: order.currency.toUpperCase(),
+            quantity: item.quantity,
+          })),
+        }}
+        dedupeKey={`mirai-posthog-purchase-tracked:${order.id}`}
       />
       {order.email && order.shipping?.country && (
         <GoogleCustomerReviewsOptIn

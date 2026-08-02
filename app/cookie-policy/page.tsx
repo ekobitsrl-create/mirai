@@ -25,7 +25,7 @@ export default function CookiePolicyPage() {
           <h1 className="mb-2 font-[family-name:var(--font-space-grotesk)] text-3xl font-bold tracking-tight text-foreground text-balance md:text-4xl">
             Cookie Policy
           </h1>
-          <p className="text-sm text-muted-foreground mb-12">Ultimo aggiornamento: 16 luglio 2026</p>
+          <p className="text-sm text-muted-foreground mb-12">Ultimo aggiornamento: 2 agosto 2026</p>
 
           <div className="flex flex-col gap-10 text-muted-foreground leading-relaxed">
             <div className="flex flex-col gap-3">
@@ -49,8 +49,8 @@ export default function CookiePolicyPage() {
                       { tipo: "Tecnici (necessari)", finalita: "Funzionamento del sito, gestione della sessione, carrello acquisti", durata: "Sessione / 1 anno" },
                       { tipo: "Autenticazione", finalita: "Mantenimento dell'accesso all'account utente", durata: "30 giorni" },
                       { tipo: "Preferenze", finalita: "Salvataggio delle preferenze (cookie consent, lingua)", durata: "1 anno" },
-                      { tipo: "Analitici", finalita: "Analisi anonimizzata del traffico tramite Vercel Analytics", durata: "Sessione" },
-                      { tipo: "Marketing", finalita: "Misurazione delle campagne e delle conversioni tramite Google Tag Manager e TikTok Pixel, solo dopo il consenso", durata: "Secondo le impostazioni dei fornitori" },
+                      { tipo: "Analitici", finalita: "Analisi del traffico e dell'esperienza tramite Vercel Analytics e, solo dopo il consenso, PostHog (eventi, replay di sessione e mappe di calore)", durata: "Secondo le impostazioni dei fornitori" },
+                      { tipo: "Marketing", finalita: "Misurazione delle campagne e delle conversioni tramite Google Tag Manager, Meta Pixel e TikTok Pixel, solo dopo il consenso", durata: "Secondo le impostazioni dei fornitori" },
                     ].map((row) => (
                       <tr key={row.tipo} className="border-b border-border last:border-0">
                         <td className="p-4 text-foreground font-medium">{row.tipo}</td>
@@ -72,7 +72,9 @@ export default function CookiePolicyPage() {
                   "Vercel Analytics: per statistiche anonime sulle visite",
                   "Supabase: per la gestione dell'autenticazione",
                   "Google Tag Manager: per gestire i tag di misurazione e advertising, solo dopo il consenso",
+                  "Meta Pixel: per misurare visite, campagne e conversioni pubblicitarie, solo dopo il consenso",
                   "TikTok Pixel: per misurare visite, campagne e conversioni pubblicitarie, solo dopo il consenso",
+                  "PostHog: per analytics, autocapture, replay delle sessioni e mappe di calore, solo dopo il consenso; gli input sono mascherati nelle registrazioni",
                 ].map((item) => (
                   <li key={item} className="flex items-start gap-2 text-sm">
                     <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-primary shrink-0" />

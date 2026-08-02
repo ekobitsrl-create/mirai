@@ -31,6 +31,7 @@ import {
 import { getProductVariantKey } from "@/lib/product-titles"
 import { getCatalogItemId } from "@/lib/catalog-identifiers"
 import { MetaPixelEvent } from "@/components/meta-pixel-event"
+import { PostHogCommerceEvent } from "@/components/posthog-commerce-event"
 
 function formatCategory(slug: string) {
   return slug.replace(/-/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase())
@@ -265,6 +266,17 @@ export function ProductDetail({
             item_price: Number(product.price),
           }],
           num_items: 1,
+        }}
+      />
+      <PostHogCommerceEvent
+        eventName="view_product"
+        properties={{
+          product_id: getCatalogItemId(product, sizes[0] || "OS"),
+          product_name: product.name,
+          category: product.category,
+          brand: supplierSettings.brand,
+          price: Number(product.price),
+          currency: "EUR",
         }}
       />
       <nav className="mb-7 flex items-center gap-1.5 overflow-hidden text-[9px] font-medium uppercase tracking-[0.2em] text-white/50" aria-label="Breadcrumb">

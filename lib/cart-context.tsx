@@ -4,6 +4,7 @@ import { createContext, useContext, useState, useCallback, useEffect, type React
 import type { CustomizationDetails } from "@/lib/customization"
 import { getCatalogItemId } from "@/lib/catalog-identifiers"
 import { trackMetaEvent } from "@/lib/meta-pixel"
+import { trackAddToCart } from "@/lib/posthog-events"
 
 export type CartItem = {
   productId: string
@@ -159,6 +160,15 @@ export function CartProvider({ children }: { children: ReactNode }) {
           item_price: Number(item.price),
         }],
         num_items: addedQuantity,
+      })
+      trackAddToCart({
+        product_id: contentId,
+        product_name: item.name,
+        price: Number(item.price),
+        currency: "EUR",
+        quantity: addedQuantity,
+        size: item.size || "OS",
+        value: Number((item.price * addedQuantity).toFixed(2)),
       })
     },
     []
