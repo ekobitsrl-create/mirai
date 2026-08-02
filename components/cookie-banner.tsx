@@ -1,7 +1,9 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import Link from "next/link"
+import posthog from "posthog-js"
+import { createClient } from "@/lib/supabase/client"
 import { useLanguage } from "@/lib/language-context"
 
 type GoogleConsentValue = "granted" | "denied"
@@ -24,6 +26,51 @@ function updateGoogleConsent(consent: "all" | "necessary") {
 export function CookieBanner() {
   const [visible, setVisible] = useState(false)
   const { t } = useLanguage()
+  const identifiedUserId = useRef<string | null>(null)
+
+  useEffect(() => {
+    const supabase = createClient()
+
+    const identifyUser = (user: {
+      id: string
+      email?: string
+      user_metadata?: { first_name?: string; last_name?: string }
+    }) => {
+      if (identifiedUserId.current === user.id) return
+
+      if (identifiedUserId.current && identifiedUserId.current !== user.id) {
+        posthog.reset()
+      }
+
+      const name = [user.user_metadata?.first_name, user.user_metadata?.last_name]
+        .filter(Boolean)
+        .join(" ")
+
+      posthog.identify(user.id, {
+        ...(user.email ? { email: user.email } : {}),
+        ...(name ? { name } : {}),
+      })
+      identifiedUserId.current = user.id
+    }
+
+    void supabase.auth.getSession().then(({ data }) => {
+      if (data.session?.user) identifyUser(data.session.user)
+    })
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === "SIGNED_OUT") {
+        identifiedUserId.current = null
+        posthog.reset()
+        return
+      }
+
+      if (event === "SIGNED_IN" && session?.user) {
+        identifyUser(session.user)
+      }
+    })
+
+    return () => subscription.unsubscribe()
+  }, [])
 
   useEffect(() => {
     const consent = document.cookie

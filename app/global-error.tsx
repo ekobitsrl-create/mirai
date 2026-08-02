@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect } from "react"
+import posthog from "posthog-js"
 
 const pageStyle = {
   minHeight: "100vh",
@@ -23,6 +24,7 @@ export default function GlobalError({
 }) {
   useEffect(() => {
     console.error("Errore globale MIRAI", error)
+    posthog.captureException(error)
   }, [error])
 
   return (

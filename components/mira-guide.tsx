@@ -14,6 +14,7 @@ import {
 } from "react"
 import { getMiraLocalReply, setMiraCatalog, type MiraIntent } from "@/lib/mira-knowledge"
 import type { StoreProduct } from "@/lib/products"
+import posthog from "posthog-js"
 
 type MiraVariant = "male" | "female"
 type MiraAssetPose = "idle" | "listening" | "speaking"
@@ -438,6 +439,11 @@ export function MiraGuide() {
   async function askMira(rawMessage: string, voiceRequest = false) {
     const cleanMessage = rawMessage.trim()
     if (!cleanMessage || requestInFlightRef.current) return
+
+    posthog.capture("mira_question_submitted", {
+      input_method: voiceRequest ? "voice" : "text",
+      page_path: pathname,
+    })
 
     if (poseTimerRef.current) window.clearTimeout(poseTimerRef.current)
     requestAbortRef.current?.abort()

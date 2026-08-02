@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { useScrollAnimation } from "@/hooks/use-scroll-animation"
 import { useLanguage } from "@/lib/language-context"
+import posthog from "posthog-js"
 
 export function Newsletter() {
   const [email, setEmail] = useState("")
@@ -13,6 +14,7 @@ export function Newsletter() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (email) {
+      posthog.capture("newsletter_subscribed")
       setSubmitted(true)
       setEmail("")
     }
