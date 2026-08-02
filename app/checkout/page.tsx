@@ -17,6 +17,7 @@ import { Label } from "@/components/ui/label"
 import { CASH_ON_DELIVERY_FEE_CENTS } from "@/lib/checkout-fees"
 import { MetaPixelEvent } from "@/components/meta-pixel-event"
 import { buildMetaCartParameters, getMetaPurchaseStorageKey } from "@/lib/meta-pixel"
+import posthog from "posthog-js"
 
 const stripePublishableKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
 const stripePromise = stripePublishableKey ? loadStripe(stripePublishableKey) : null
@@ -109,6 +110,11 @@ export default function CheckoutPage() {
 
     setCardError(null)
     setCardLoading(true)
+    posthog.capture("checkout_started", {
+      item_count: items.reduce((count, item) => count + item.quantity, 0),
+      cart_line_count: items.length,
+      contains_custom_product: items.some((item) => Boolean(item.customization)),
+    })
     const promise = createCheckoutSession(
       cartLineItems,
       checkoutEmail,
@@ -132,7 +138,7 @@ export default function CheckoutPage() {
 
     checkoutSessionRef.current = { key: checkoutKey, promise }
     return promise
-  }, [appliedDiscount?.code, cartLineItems, checkoutEmail, checkoutKey, marketingConsent, t.checkout.error])
+  }, [appliedDiscount?.code, cartLineItems, checkoutEmail, checkoutKey, items, marketingConsent, t.checkout.error])
 
   const retryCardCheckout = () => {
     checkoutSessionRef.current = null
