@@ -1,7 +1,8 @@
 "use client"
 
-import { useEffect } from "react"
+import { useEffect, useRef } from "react"
 import {
+  createMetaEventId,
   META_CONSENT_EVENT,
   META_PIXEL_READY_EVENT,
   trackMetaEvent,
@@ -23,6 +24,7 @@ export function MetaPixelEvent({
   dedupeKey,
 }: MetaPixelEventProps) {
   const serializedParameters = JSON.stringify(parameters)
+  const stableEventId = useRef<string | null>(eventId?.trim() || null)
 
   useEffect(() => {
     let trackedThisMount = false
@@ -41,10 +43,14 @@ export function MetaPixelEvent({
         }
       }
 
+      if (!stableEventId.current) {
+        stableEventId.current = createMetaEventId(eventName)
+      }
+
       const tracked = trackMetaEvent(
         eventName,
         JSON.parse(serializedParameters) as MetaCommerceParameters,
-        eventId,
+        stableEventId.current,
       )
       if (!tracked) return
 
@@ -71,7 +77,7 @@ export function MetaPixelEvent({
       window.removeEventListener(META_CONSENT_EVENT, handleConsent)
       window.removeEventListener(META_PIXEL_READY_EVENT, sendEvent)
     }
-  }, [dedupeKey, eventId, eventName, serializedParameters])
+  }, [dedupeKey, eventName, serializedParameters])
 
   return null
 }

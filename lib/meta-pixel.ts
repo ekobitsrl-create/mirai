@@ -48,6 +48,22 @@ export function hasMetaConsent() {
     .some((row) => row === "cookie_consent=all")
 }
 
+export function createMetaEventId(eventName: MetaEventName) {
+  const cryptoApi = globalThis.crypto
+  if (typeof cryptoApi?.randomUUID === "function") {
+    return `${eventName}-${cryptoApi.randomUUID()}`
+  }
+
+  if (typeof cryptoApi?.getRandomValues === "function") {
+    const randomBytes = new Uint8Array(16)
+    cryptoApi.getRandomValues(randomBytes)
+    const randomHex = Array.from(randomBytes, (byte) => byte.toString(16).padStart(2, "0")).join("")
+    return `${eventName}-${randomHex}`
+  }
+
+  return `${eventName}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`
+}
+
 export function trackMetaEvent(
   eventName: MetaEventName,
   parameters?: MetaCommerceParameters,
@@ -57,13 +73,24 @@ export function trackMetaEvent(
     return false
   }
 
-  if (parameters && eventId) {
-    window.fbq("track", eventName, parameters, { eventID: eventId })
-  } else if (parameters) {
-    window.fbq("track", eventName, parameters)
-  } else {
-    window.fbq("track", eventName)
-  }
+  const resolvedEventId = eventId?.trim() || createMetaEventId(eventName)
+  window.fbq("track", eventName, parameters || {}, { eventID: resolvedEventId })
+
+  void fetch("/api/meta/events", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      event_name: eventName,
+      event_id: resolvedEventId,
+      event_source_url: window.location.href,
+      ...(parameters ? { custom_data: parameters } : {}),
+    }),
+    credentials: "same-origin",
+    keepalive: true,
+    cache: "no-store",
+  }).catch(() => {
+    // Browser tracking must stay non-blocking if the server event is unavailable.
+  })
 
   return true
 }
