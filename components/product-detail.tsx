@@ -19,6 +19,7 @@ import {
   ShieldCheck,
   ShoppingBag,
   Truck,
+  TrendingUp,
   X,
   ZoomIn,
 } from "lucide-react"
@@ -45,6 +46,19 @@ function formatPrice(price: number) {
 }
 
 const FIRST_ORDER_DISCOUNT_PERCENT = 10
+const MIN_MONTHLY_SOLD = 7
+const MONTHLY_SOLD_RANGE = 14
+
+function getTestMonthlySoldCount(productId: string) {
+  let hash = 2166136261
+
+  for (let index = 0; index < productId.length; index += 1) {
+    hash ^= productId.charCodeAt(index)
+    hash = Math.imul(hash, 16777619)
+  }
+
+  return MIN_MONTHLY_SOLD + ((hash >>> 0) % MONTHLY_SOLD_RANGE)
+}
 
 type ProductGalleryView = StoreProductImage & {
   label: string
@@ -109,6 +123,7 @@ export function ProductDetail({
     Number(product.price) * (1 - FIRST_ORDER_DISCOUNT_PERCENT / 100) * 100,
   ) / 100
   const firstOrderSavings = Number(product.price) - firstOrderPrice
+  const monthlySoldCount = getTestMonthlySoldCount(product.id)
   const currentVariantKey = getProductVariantKey(product)
   const variants = useMemo(
     () => [product, ...relatedProducts]
@@ -471,7 +486,14 @@ export function ProductDetail({
             </div>
           )}
 
-          <div ref={sizes.length ? undefined : purchaseRef} className="mt-5 grid gap-2 sm:grid-cols-[auto_minmax(0,1fr)]">
+          <div className="mt-4 flex items-center gap-2 text-[10px] text-white/60">
+            <TrendingUp className="h-4 w-4 text-[#bcaeff]" />
+            <span>
+              N° venduti questo mese: <strong className="font-semibold text-white">{monthlySoldCount}</strong>
+            </span>
+          </div>
+
+          <div ref={sizes.length ? undefined : purchaseRef} className="mt-3 grid gap-2 sm:grid-cols-[auto_minmax(0,1fr)]">
             <div className="order-2 flex h-12 w-full items-center justify-center border border-white/20 bg-black/10 sm:order-1 sm:h-14 sm:w-auto">
               <button type="button" onClick={() => setQuantity((value) => Math.max(1, value - 1))} className="flex h-full w-10 items-center justify-center text-white/45 hover:text-white" aria-label="Riduci quantità"><Minus className="h-3.5 w-3.5" /></button>
               <span className="w-8 text-center text-xs font-medium">{quantity}</span>
