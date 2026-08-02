@@ -357,9 +357,9 @@ async function getCatalogProducts() {
 }
 
 const META_DARKADS_ITEM_GROUP_IDS = new Set([
-  "mirai-mirai-night-spark-027",
+  "minimal-couture-m-0089",
   "mirai-mirai-liberty-008",
-  "mirai-mirai-reaper-024",
+  "mirai-mirai-valley-short-blu-032",
   "4c89683d-939d-427a-8a34-3e00f9509d1e",
 ])
 
