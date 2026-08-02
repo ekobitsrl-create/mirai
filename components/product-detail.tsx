@@ -486,7 +486,7 @@ export function ProductDetail({
             </div>
           )}
 
-          <div className="mt-4 flex items-center gap-2 text-[10px] text-white/60">
+          <div className="mt-4 flex items-center gap-2 text-[11px] text-white/70">
             <TrendingUp className="h-4 w-4 text-[#bcaeff]" />
             <span>
               Venduti questo mese: <strong className="font-semibold text-white">{monthlySoldCount}</strong>

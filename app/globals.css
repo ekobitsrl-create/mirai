@@ -452,6 +452,10 @@ body.mirai-mobile-menu-open [data-whatsapp-button] {
   display: none;
 }
 
+body.mirai-mobile-menu-open [data-background-music-control] {
+  display: none;
+}
+
 @keyframes mira-model-idle {
   0%, 100% {
     transform: translate3d(0, 0, 0) rotate(0.35deg) scaleX(var(--mira-flip));
