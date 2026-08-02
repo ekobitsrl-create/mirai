@@ -8,7 +8,7 @@ export const dynamic = "force-dynamic"
 export async function GET(request: NextRequest) {
   const feedUrl = request.nextUrl.clone()
   feedUrl.pathname = "/google-merchant-feed.xml"
-  feedUrl.searchParams.set("supplier", "mirai")
+  feedUrl.searchParams.delete("supplier")
   feedUrl.searchParams.set("platform", "meta")
 
   const response = await getMerchantFeed(new MetaFeedRequest(feedUrl, { headers: request.headers }))
