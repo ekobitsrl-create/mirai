@@ -3,7 +3,7 @@
 import type Stripe from 'stripe'
 import { assertStripeCheckoutConfigured, stripe } from '@/lib/stripe'
 import { createClient, getServerUser } from '@/lib/supabase/server'
-import { getDemoProduct, isBlackIslandProduct, type StoreProduct } from '@/lib/products'
+import { getDemoProduct, getSupplierProfile, isBlackIslandProduct, type StoreProduct } from '@/lib/products'
 import { getStripeShippingOptions, SHIPPING_CONFIG } from '@/lib/shipping'
 import { CASH_ON_DELIVERY_FEE_CENTS } from '@/lib/checkout-fees'
 import { SITE_URL } from '@/lib/site-url'
@@ -346,6 +346,37 @@ function isMissingDiscountOrderColumns(error: { code?: string; message?: string 
     && (message.includes('subtotal') || message.includes('discount_'))
 }
 
+/**
+ * Cash on delivery (contrassegno) is only offered for carts made up entirely of
+ * Minimal-brand products. Returns whether every product in the cart belongs to the
+ * "minimal" supplier profile.
+ */
+export async function getCashOnDeliveryEligibility(cartItems: CartLineItem[]) {
+  if (!cartItems.length) return { eligible: false }
+
+  const supabase = await createClient()
+  const productIds = [...new Set(cartItems.map((item) => item.productId))]
+  const { data: products, error } = await supabase
+    .from('products')
+    .select('id, brand, supplier_profile')
+    .in('id', productIds)
+
+  const demoProducts = productIds
+    .map(getDemoProduct)
+    .filter((product): product is StoreProduct => product !== null)
+  const checkoutProducts = [...(products || []), ...demoProducts]
+
+  if (error && checkoutProducts.length === 0) return { eligible: false }
+
+  const eligible = productIds.every((productId) => {
+    const product = checkoutProducts.find((candidate) => candidate?.id === productId)
+    if (!product) return false
+    return getSupplierProfile(product) === 'minimal'
+  })
+
+  return { eligible }
+}
+
 export async function createCashOnDeliveryOrder(cartItems: CartLineItem[], details: CashOnDeliveryDetails) {
   if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
     throw new Error('Il servizio ordini non e configurato')
@@ -384,7 +415,7 @@ export async function createCashOnDeliveryOrder(cartItems: CartLineItem[], detai
   const productIds = [...new Set(cartItems.map((item) => item.productId))]
   let { data: products, error } = await supabase
     .from('products')
-    .select('id, name, description, price, image_url, stock_by_size, supplier_sku, color_name')
+    .select('id, name, description, price, image_url, stock_by_size, supplier_sku, color_name, supplier_profile, brand')
     .in('id', productIds)
 
   if (error?.message.includes('stock_by_size')) {
@@ -404,6 +435,15 @@ export async function createCashOnDeliveryOrder(cartItems: CartLineItem[], detai
   if (error && checkoutProducts.length === 0) throw new Error('Errore nel recupero dei prodotti')
   if (checkoutProducts.some(isBlackIslandProduct)) {
     throw new Error('Uno dei prodotti selezionati non e piu disponibile')
+  }
+
+  // Il contrassegno è riservato ai prodotti del brand Minimal.
+  const allMinimal = productIds.every((productId) => {
+    const product = checkoutProducts.find((candidate) => candidate?.id === productId)
+    return product ? getSupplierProfile(product) === 'minimal' : false
+  })
+  if (!allMinimal) {
+    throw new Error('Il contrassegno è disponibile solo per i prodotti del brand Minimal')
   }
 
   const validatedItems = cartItems.map((cartItem) => {

@@ -7,7 +7,7 @@ import Link from "next/link"
 import { AlertCircle, ArrowLeft, BadgePercent, Banknote, Check, CreditCard, LoaderCircle, LockKeyhole, Mail, RefreshCw, ShoppingBag, UserPlus, X } from "lucide-react"
 import { useCart } from "@/lib/cart-context"
 import { useLanguage } from "@/lib/language-context"
-import { createCashOnDeliveryOrder, createCheckoutSession, validateCheckoutDiscount } from "@/app/actions/stripe"
+import { createCashOnDeliveryOrder, createCheckoutSession, getCashOnDeliveryEligibility, validateCheckoutDiscount } from "@/app/actions/stripe"
 import type { AppliedDiscount } from "@/lib/discounts"
 import { getGoogleReviewStorageKey } from "@/lib/google-customer-reviews"
 import { createClient } from "@/lib/supabase/client"
@@ -35,6 +35,7 @@ export default function CheckoutPage() {
   const [marketingConsent, setMarketingConsent] = useState(false)
   const [guestError, setGuestError] = useState<string | null>(null)
   const [paymentMethod, setPaymentMethod] = useState<"card" | "cash_on_delivery">("card")
+  const [cashOnDeliveryAvailable, setCashOnDeliveryAvailable] = useState(false)
   const [cashDetails, setCashDetails] = useState({ name: "", phone: "", address: "", city: "", postalCode: "" })
   const [cashError, setCashError] = useState<string | null>(null)
   const [cashSubmitting, setCashSubmitting] = useState(false)
@@ -83,6 +84,33 @@ export default function CheckoutPage() {
     lineId: item.lineId,
     customization: item.customization,
   })), [items])
+
+  useEffect(() => {
+    let active = true
+
+    if (!cartLineItems.length) {
+      setCashOnDeliveryAvailable(false)
+      return
+    }
+
+    getCashOnDeliveryEligibility(cartLineItems)
+      .then((result) => {
+        if (active) setCashOnDeliveryAvailable(result.eligible)
+      })
+      .catch(() => {
+        if (active) setCashOnDeliveryAvailable(false)
+      })
+
+    return () => {
+      active = false
+    }
+  }, [cartLineItems])
+
+  useEffect(() => {
+    if (!cashOnDeliveryAvailable && paymentMethod === "cash_on_delivery") {
+      setPaymentMethod("card")
+    }
+  }, [cashOnDeliveryAvailable, paymentMethod])
 
   const hasAccountEmail = emailPattern.test(accountEmail)
   const requiresGuestEmail = !isAuthenticated || !hasAccountEmail
@@ -463,7 +491,7 @@ export default function CheckoutPage() {
             </section>
             <section className="mb-4 border border-border bg-card p-4 sm:p-5">
               <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Metodo di pagamento</p>
-              <div className="mt-3 grid grid-cols-2 border border-border" role="radiogroup" aria-label="Metodo di pagamento">
+              <div className={`mt-3 grid border border-border ${cashOnDeliveryAvailable ? "grid-cols-2" : "grid-cols-1"}`} role="radiogroup" aria-label="Metodo di pagamento">
                 <button
                   type="button"
                   role="radio"
@@ -473,16 +501,23 @@ export default function CheckoutPage() {
                 >
                   <CreditCard className="h-4 w-4" /> Carta
                 </button>
-                <button
-                  type="button"
-                  role="radio"
-                  aria-checked={paymentMethod === "cash_on_delivery"}
-                  onClick={() => setPaymentMethod("cash_on_delivery")}
-                  className={`flex min-h-12 items-center justify-center gap-2 border-l border-border px-3 text-xs font-bold uppercase tracking-widest transition-colors ${paymentMethod === "cash_on_delivery" ? "bg-primary text-primary-foreground" : "text-foreground hover:bg-secondary"}`}
-                >
-                  <Banknote className="h-4 w-4" /> Contrassegno (+{"\u20AC"}9)
-                </button>
+                {cashOnDeliveryAvailable && (
+                  <button
+                    type="button"
+                    role="radio"
+                    aria-checked={paymentMethod === "cash_on_delivery"}
+                    onClick={() => setPaymentMethod("cash_on_delivery")}
+                    className={`flex min-h-12 items-center justify-center gap-2 border-l border-border px-3 text-xs font-bold uppercase tracking-widest transition-colors ${paymentMethod === "cash_on_delivery" ? "bg-primary text-primary-foreground" : "text-foreground hover:bg-secondary"}`}
+                  >
+                    <Banknote className="h-4 w-4" /> Contrassegno (+{"\u20AC"}9)
+                  </button>
+                )}
               </div>
+              {!cashOnDeliveryAvailable && (
+                <p className="mt-3 text-xs leading-5 text-muted-foreground">
+                  Il pagamento in contrassegno è disponibile solo per gli ordini che contengono esclusivamente prodotti del brand Minimal.
+                </p>
+              )}
               <div className="mt-4 flex items-start gap-3 border-t border-border pt-4">
                 <Checkbox
                   id="marketing-consent"
