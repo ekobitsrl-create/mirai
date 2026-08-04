@@ -52,6 +52,11 @@ const PRODUCT_TYPE_BY_STORE_CATEGORY: Record<string, string> = {
   hats: "Accessori > Cappelli personalizzati",
 }
 
+// Prodotti esclusi da tutti i feed (Google Merchant, Meta, Minimal, MIRAI)
+const FEED_EXCLUDED_PRODUCT_IDS = new Set([
+  "9ee8e00d-08be-4523-b02e-e617c84c38d5", // Canotta Santa Madre
+])
+
 const HEADWEAR_CATEGORIES = new Set(["headwear", "cappelli", "caps", "hats"])
 const TSHIRT_CATEGORIES = new Set(["t-shirt", "tshirt", "magliette"])
 const GOOGLE_ADS_CAMPAIGN_LABEL = "campagna_selezionati"
@@ -438,6 +443,7 @@ export async function GET(request: NextRequest) {
     (product) => product.image_url
       && Number(product.price) > 0
       && !isPrivateCheckoutProduct(product)
+      && !FEED_EXCLUDED_PRODUCT_IDS.has(product.id)
       && (!supplierProfile || getSupplierProfile(product) === supplierProfile),
   )
   const items = products.flatMap((product) =>
