@@ -2,12 +2,16 @@ import type Stripe from "stripe"
 import { createClient } from "@/lib/supabase/server"
 import { sendEmailSafely } from "@/lib/email/resend"
 import {
+  adminOrderNotificationTemplate,
   cashOnDeliveryTemplate,
   orderStatusTemplate,
   paidOrderTemplate,
   paymentFailedTemplate,
   type EmailOrder,
 } from "@/lib/email/templates"
+
+const ADMIN_ORDER_NOTIFICATION_EMAIL =
+  process.env.ORDER_NOTIFICATION_EMAIL?.trim() || "miralabstore@gmail.com"
 
 type OrderRow = {
   id: string
@@ -73,16 +77,25 @@ export async function sendOrderConfirmationEmail(
   paymentMethod: "stripe" | "cash_on_delivery",
 ) {
   const order = await loadOrder(orderId)
-  if (!order?.email) return
+  if (!order) return
 
-  const content = paymentMethod === "cash_on_delivery"
-    ? cashOnDeliveryTemplate(order)
-    : paidOrderTemplate(order)
+  if (order.email) {
+    const content = paymentMethod === "cash_on_delivery"
+      ? cashOnDeliveryTemplate(order)
+      : paidOrderTemplate(order)
+
+    await sendEmailSafely({
+      ...content,
+      to: order.email,
+      eventKey: `order-confirmation-${paymentMethod}-${order.id}`,
+      category: "transactional",
+    })
+  }
 
   await sendEmailSafely({
-    ...content,
-    to: order.email,
-    eventKey: `order-confirmation-${paymentMethod}-${order.id}`,
+    ...adminOrderNotificationTemplate(order, paymentMethod),
+    to: ADMIN_ORDER_NOTIFICATION_EMAIL,
+    eventKey: `order-admin-notification-${order.id}`,
     category: "transactional",
   })
 }

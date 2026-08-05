@@ -106,6 +106,7 @@ export function ProductDetail({
   const colorName = product.color_name || "Multicolor"
   const fitNote = product.fit_note || "Consulta la guida alle taglie prima di scegliere."
   const supplierSettings = getProductSupplierSettings(product)
+  const isUnlimitedStock = supplierSettings.profile === "mirai"
   const isFragrance = ["profumi", "profumo", "fragrance", "fragrances"].includes(
     product.category.trim().toLowerCase(),
   )
@@ -473,7 +474,7 @@ export function ProductDetail({
                           setQuantity((value) => Math.max(1, Math.min(value, sizeStock ?? 10)))
                           setSizeError(false)
                         }}
-                        aria-label={soldOut ? `Taglia ${size} esaurita` : sizeStock !== undefined ? `Taglia ${size}, ${sizeStock} disponibili` : `Taglia ${size}`}
+                        aria-label={soldOut ? `Taglia ${size} esaurita` : isUnlimitedStock ? `Taglia ${size}, disponibile` : sizeStock !== undefined ? `Taglia ${size}, ${sizeStock} disponibili` : `Taglia ${size}`}
                         className={`border py-3 text-xs font-medium transition-all ${soldOut ? "cursor-not-allowed border-white/10 bg-white/[0.02] text-white/25 line-through" : selectedSize === size ? "border-[#9f86ff] bg-[#9f86ff] text-black shadow-[0_0_20px_rgba(159,134,255,0.35)]" : "border-white/20 bg-white/[0.035] text-white/75 hover:border-primary/70 hover:text-white"}`}
                       >
                         {size}
@@ -487,9 +488,11 @@ export function ProductDetail({
                   ? selectedStock !== undefined && selectedStock <= 0
                     ? "Questa taglia è esaurita. Scegline un'altra."
                     : "Seleziona una taglia prima di continuare."
-                  : selectedStock !== undefined
-                    ? `${fitNote} Disponibilità: ${selectedStock} ${selectedStock === 1 ? "pezzo" : "pezzi"}.`
-                    : fitNote}
+                  : isUnlimitedStock
+                    ? `${fitNote} Disponibile.`
+                    : selectedStock !== undefined
+                      ? `${fitNote} Disponibilità: ${selectedStock} ${selectedStock === 1 ? "pezzo" : "pezzi"}.`
+                      : fitNote}
               </p>
             </div>
           )}
