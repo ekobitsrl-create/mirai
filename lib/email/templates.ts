@@ -150,6 +150,28 @@ export function cashOnDeliveryTemplate(order: EmailOrder): EmailContent {
   }
 }
 
+export function adminOrderNotificationTemplate(
+  order: EmailOrder,
+  paymentMethod: "stripe" | "cash_on_delivery",
+): EmailContent {
+  const paymentLabel = paymentMethod === "cash_on_delivery" ? "Contrassegno" : "Carta (Stripe)"
+  const contact = [
+    order.shippingName ? `Cliente: ${escapeHtml(order.shippingName)}` : "",
+    `Email: ${escapeHtml(order.email)}`,
+    `Pagamento: ${escapeHtml(paymentLabel)}`,
+  ].filter(Boolean).join("<br>")
+
+  return {
+    subject: `Nuovo ordine #${orderNumber(order.id)} - ${money(order.total)}`,
+    html: layout(
+      `Nuovo ordine ricevuto (${paymentLabel}).`,
+      "Nuovo ordine ricevuto",
+      `<p style="margin:0 0 22px;color:#c9c2d2;line-height:1.7">E arrivato un nuovo ordine sullo store.</p><div style="margin:0 0 22px;padding:18px;background:#0f0918;color:#c9c2d2;font-size:13px;line-height:1.7">${contact}</div>${orderSummary(order)}<div style="margin-top:26px">${button("Apri il pannello ordini", `${SITE_URL}/admin`)}</div>`,
+    ),
+    text: `Nuovo ordine ricevuto (${paymentLabel}).\nCliente: ${order.shippingName || "-"}\nEmail: ${order.email}\n\n${orderText(order)}\n\nPannello: ${SITE_URL}/admin`,
+  }
+}
+
 export function paymentFailedTemplate(reference: string): EmailContent {
   return {
     subject: "Il pagamento MIRAI non e andato a buon fine",
