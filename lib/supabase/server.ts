@@ -3,7 +3,10 @@ import { cookies } from 'next/headers'
 
 const SUPABASE_URL = 'https://xbendkxwuaqrxsyrmgye.supabase.co'
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhiZW5ka3h3dWFxcnhzeXJtZ3llIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE1MDE5NDYsImV4cCI6MjA4NzA3Nzk0Nn0.QAnZGtZy2ebu7RCdeWFJr5SQo3XXdJOL3aUe5MMJmb4'
-const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || ''
+const SUPABASE_ADMIN_KEY =
+  process.env.SUPABASE_SECRET_KEY ||
+  process.env.SUPABASE_SERVICE_ROLE_KEY ||
+  ''
 
 // Get the access token from cookie
 async function getAccessToken() {
@@ -11,10 +14,22 @@ async function getAccessToken() {
   return cookieStore.get('sb-access-token')?.value || null
 }
 
-// Authenticated client (user's JWT, passes RLS as that user)
+// Authenticated server client used after the caller has already verified the user.
+// Admin mutations must bypass product RLS; otherwise Supabase can return no error
+// while deleting zero rows. If the admin key is unavailable, keep the signed-in
+// user client as a safe fallback.
 export async function createUserClient() {
   const accessToken = await getAccessToken()
   if (!accessToken) return null
+
+  if (SUPABASE_ADMIN_KEY) {
+    return createSupabaseClient(SUPABASE_URL, SUPABASE_ADMIN_KEY, {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false,
+      },
+    })
+  }
 
   return createSupabaseClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
     global: {
@@ -23,9 +38,9 @@ export async function createUserClient() {
   })
 }
 
-// Service role client (bypasses ALL RLS - for admin operations)
+// Admin client (bypasses ALL RLS when a secret/service-role key is configured)
 export async function createClient() {
-  const key = SUPABASE_SERVICE_ROLE_KEY || SUPABASE_ANON_KEY
+  const key = SUPABASE_ADMIN_KEY || SUPABASE_ANON_KEY
   return createSupabaseClient(SUPABASE_URL, key)
 }
 
