@@ -3,6 +3,7 @@ import { isAdminEmail } from "@/lib/admin"
 import { getServerUserWithProfile, createClient, createUserClient } from "@/lib/supabase/server"
 import { AdminDashboard } from "@/components/admin-dashboard"
 import { getEnvironmentDiscountCodes } from "@/lib/discounts"
+import { syncMiraiUploadedCatalog } from "@/lib/mirai-catalog-sync"
 
 export default async function AdminPage() {
   let userResult
@@ -20,6 +21,14 @@ export default async function AdminPage() {
   const supabase = await createUserClient()
   if (!supabase) redirect("/auth/login?redirectTo=/admin")
   const adminSupabase = await createClient()
+
+  // Keep the uploaded product batch in sync without requiring a manual
+  // database migration. Reopening the admin safely updates the same SKUs.
+  try {
+    await syncMiraiUploadedCatalog(supabase)
+  } catch (error) {
+    console.error("Sincronizzazione catalogo MIRAI non riuscita", error)
+  }
 
   const [productsRes, categoriesRes, ordersRes, usersRes, discountCodesRes] = await Promise.all([
     supabase.from("products").select("*").order("created_at", { ascending: false }),
