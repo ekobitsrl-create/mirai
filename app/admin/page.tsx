@@ -28,14 +28,20 @@ export default async function AdminPage() {
     console.error("Sincronizzazione catalogo MIRAI non riuscita", error)
   }
 
+  const abandonedBefore = new Date(Date.now() - 30 * 60 * 1000).toISOString()
+
   const [productsRes, categoriesRes, ordersRes, usersRes, discountCodesRes, cartsCreatedRes, cartsAbandonedRes] = await Promise.all([
     supabase.from("products").select("*").order("created_at", { ascending: false }),
     supabase.from("categories").select("*").order("sort_order", { ascending: true }),
     adminSupabase.from("orders").select("*, order_items(*)").order("created_at", { ascending: false }),
     supabase.from("profiles").select("*").order("created_at", { ascending: false }),
     adminSupabase.from("discount_codes").select("*").order("created_at", { ascending: false }),
-    adminSupabase.from("cart_sessions").select("id", { count: "exact", head: true }),
-    adminSupabase.from("cart_sessions").select("id", { count: "exact", head: true }).eq("status", "active"),
+    adminSupabase.from("cart_sessions").select("id", { count: "exact", head: true }).neq("status", "cleared"),
+    adminSupabase
+      .from("cart_sessions")
+      .select("id", { count: "exact", head: true })
+      .eq("status", "active")
+      .lt("updated_at", abandonedBefore),
   ])
 
   const products = productsRes.data || []
