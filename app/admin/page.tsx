@@ -3,7 +3,6 @@ import { isAdminEmail } from "@/lib/admin"
 import { getServerUserWithProfile, createClient, createUserClient } from "@/lib/supabase/server"
 import { AdminDashboard } from "@/components/admin-dashboard"
 import { getEnvironmentDiscountCodes } from "@/lib/discounts"
-import { syncMiraiUploadedCatalog } from "@/lib/mirai-catalog-sync"
 
 export default async function AdminPage() {
   let userResult
@@ -21,12 +20,6 @@ export default async function AdminPage() {
   const supabase = await createUserClient()
   if (!supabase) redirect("/auth/login?redirectTo=/admin")
   const adminSupabase = await createClient()
-
-  try {
-    await syncMiraiUploadedCatalog(supabase)
-  } catch (error) {
-    console.error("Sincronizzazione catalogo MIRAI non riuscita", error)
-  }
 
   const abandonedBefore = new Date(Date.now() - 30 * 60 * 1000).toISOString()
 
