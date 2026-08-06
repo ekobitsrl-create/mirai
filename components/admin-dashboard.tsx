@@ -21,6 +21,8 @@ type Props = {
     totalUsers: number
     totalRevenue: number
     pendingOrders: number
+    cartsCreated: number
+    cartsAbandoned: number
   }
 }
 
@@ -47,8 +49,7 @@ export function AdminDashboard({
 
   return (
     <div>
-      {/* Stats overview */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-10">
+      <div className="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-7 gap-4 mb-10">
         <div className="border border-border rounded-lg bg-card p-5">
           <p className="text-xs uppercase tracking-widest text-muted-foreground mb-1">Prodotti</p>
           <p className="text-3xl font-bold text-foreground">{stats.totalProducts}</p>
@@ -65,18 +66,24 @@ export function AdminDashboard({
           )}
         </div>
         <div className="border border-border rounded-lg bg-card p-5">
+          <p className="text-xs uppercase tracking-widest text-muted-foreground mb-1">Carrelli creati</p>
+          <p className="text-3xl font-bold text-foreground">{stats.cartsCreated}</p>
+        </div>
+        <div className="border border-border rounded-lg bg-card p-5">
+          <p className="text-xs uppercase tracking-widest text-muted-foreground mb-1">Abbandonati</p>
+          <p className="text-3xl font-bold text-foreground">{stats.cartsAbandoned}</p>
+          <p className="text-xs text-muted-foreground mt-1">inattivi da 30 min</p>
+        </div>
+        <div className="border border-border rounded-lg bg-card p-5">
           <p className="text-xs uppercase tracking-widest text-muted-foreground mb-1">Utenti</p>
           <p className="text-3xl font-bold text-foreground">{stats.totalUsers}</p>
         </div>
         <div className="border border-border rounded-lg bg-card p-5">
           <p className="text-xs uppercase tracking-widest text-muted-foreground mb-1">Fatturato</p>
-          <p className="text-3xl font-bold text-foreground">
-            {"\u20AC"}{stats.totalRevenue.toFixed(2)}
-          </p>
+          <p className="text-3xl font-bold text-foreground">{"\u20AC"}{stats.totalRevenue.toFixed(2)}</p>
         </div>
       </div>
 
-      {/* Tabs */}
       <div className="flex items-center gap-1 border-b border-border mb-8 overflow-x-auto">
         {TABS.map((tab) => {
           const Icon = tab.icon
@@ -97,15 +104,11 @@ export function AdminDashboard({
         })}
       </div>
 
-      {/* Tab content */}
       {activeTab === "products" && <AdminProductTable products={products} categories={categories} />}
       {activeTab === "categories" && <AdminCategoriesTable categories={categories} />}
       {activeTab === "orders" && <AdminOrdersTable orders={orders} />}
       {activeTab === "discounts" && (
-        <AdminDiscountCodesTable
-          discountCodes={discountCodes}
-          readOnly={discountCodesReadOnly}
-        />
+        <AdminDiscountCodesTable discountCodes={discountCodes} readOnly={discountCodesReadOnly} />
       )}
       {activeTab === "users" && <AdminUsersTable users={users} />}
     </div>
