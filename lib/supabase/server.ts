@@ -11,10 +11,22 @@ async function getAccessToken() {
   return cookieStore.get('sb-access-token')?.value || null
 }
 
-// Authenticated client (user's JWT, passes RLS as that user)
+// Authenticated server client used after the caller has already verified the user.
+// Admin mutations must bypass product RLS; otherwise Supabase can return no error
+// while deleting zero rows. If the service key is unavailable, keep the signed-in
+// user client as a safe fallback.
 export async function createUserClient() {
   const accessToken = await getAccessToken()
   if (!accessToken) return null
+
+  if (SUPABASE_SERVICE_ROLE_KEY) {
+    return createSupabaseClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false,
+      },
+    })
+  }
 
   return createSupabaseClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
     global: {
