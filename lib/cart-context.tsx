@@ -38,6 +38,16 @@ type CartContextType = {
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined)
+const CART_SESSION_KEY = "mirai-cart-session-id"
+
+function getCartSessionId(hasItems: boolean) {
+  let sessionId = window.localStorage.getItem(CART_SESSION_KEY)
+  if (!sessionId && hasItems) {
+    sessionId = crypto.randomUUID()
+    window.localStorage.setItem(CART_SESSION_KEY, sessionId)
+  }
+  return sessionId
+}
 
 function normalizeStoredCartItem(value: unknown): CartItem | null {
   if (!value || typeof value !== "object") return null
@@ -110,6 +120,20 @@ export function CartProvider({ children }: { children: ReactNode }) {
     } catch {
       // Ignore blocked storage and keep the in-memory cart active.
     }
+
+    const sessionId = getCartSessionId(items.length > 0)
+    if (!sessionId) return
+
+    const timeout = window.setTimeout(() => {
+      void fetch("/api/cart-session", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ sessionId, items }),
+        keepalive: true,
+      }).catch(() => undefined)
+    }, 500)
+
+    return () => window.clearTimeout(timeout)
   }, [hydrated, items])
 
   const addItem = useCallback(

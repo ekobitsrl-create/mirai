@@ -22,20 +22,26 @@ export default async function AdminPage() {
   if (!supabase) redirect("/auth/login?redirectTo=/admin")
   const adminSupabase = await createClient()
 
-  // Keep the uploaded product batch in sync without requiring a manual
-  // database migration. Reopening the admin safely updates the same SKUs.
   try {
     await syncMiraiUploadedCatalog(supabase)
   } catch (error) {
     console.error("Sincronizzazione catalogo MIRAI non riuscita", error)
   }
 
-  const [productsRes, categoriesRes, ordersRes, usersRes, discountCodesRes] = await Promise.all([
+  const abandonedBefore = new Date(Date.now() - 30 * 60 * 1000).toISOString()
+
+  const [productsRes, categoriesRes, ordersRes, usersRes, discountCodesRes, cartsCreatedRes, cartsAbandonedRes] = await Promise.all([
     supabase.from("products").select("*").order("created_at", { ascending: false }),
     supabase.from("categories").select("*").order("sort_order", { ascending: true }),
     adminSupabase.from("orders").select("*, order_items(*)").order("created_at", { ascending: false }),
     supabase.from("profiles").select("*").order("created_at", { ascending: false }),
     adminSupabase.from("discount_codes").select("*").order("created_at", { ascending: false }),
+    adminSupabase.from("cart_sessions").select("id", { count: "exact", head: true }).neq("status", "cleared"),
+    adminSupabase
+      .from("cart_sessions")
+      .select("id", { count: "exact", head: true })
+      .eq("status", "active")
+      .lt("updated_at", abandonedBefore),
   ])
 
   const products = productsRes.data || []
@@ -59,6 +65,8 @@ export default async function AdminPage() {
       .filter((o: any) => o.status === "paid" || o.status === "shipped" || o.status === "delivered")
       .reduce((sum: number, o: any) => sum + (o.total || 0), 0),
     pendingOrders: orders.filter((o: any) => o.status === "pending").length,
+    cartsCreated: cartsCreatedRes.count || 0,
+    cartsAbandoned: cartsAbandonedRes.count || 0,
   }
 
   return (
