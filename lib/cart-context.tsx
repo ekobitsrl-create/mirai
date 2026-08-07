@@ -49,6 +49,35 @@ function getCartSessionId(hasItems: boolean) {
   return sessionId
 }
 
+async function saveCartSession(sessionId: string, items: CartItem[]) {
+  let lastError: unknown = null
+
+  for (let attempt = 1; attempt <= 3; attempt += 1) {
+    try {
+      const response = await fetch("/api/cart-session", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ sessionId, items }),
+        keepalive: true,
+        cache: "no-store",
+      })
+
+      if (response.ok) return
+
+      const payload = await response.json().catch(() => null)
+      lastError = new Error(payload?.error || `Cart session save failed (${response.status})`)
+    } catch (error) {
+      lastError = error
+    }
+
+    if (attempt < 3) {
+      await new Promise((resolve) => window.setTimeout(resolve, attempt * 700))
+    }
+  }
+
+  console.error("Cart session tracking failed after retries", lastError)
+}
+
 function normalizeStoredCartItem(value: unknown): CartItem | null {
   if (!value || typeof value !== "object") return null
 
@@ -125,13 +154,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
     if (!sessionId) return
 
     const timeout = window.setTimeout(() => {
-      void fetch("/api/cart-session", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ sessionId, items }),
-        keepalive: true,
-      }).catch(() => undefined)
-    }, 500)
+      void saveCartSession(sessionId, items)
+    }, 250)
 
     return () => window.clearTimeout(timeout)
   }, [hydrated, items])
