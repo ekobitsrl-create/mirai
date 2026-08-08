@@ -68,6 +68,7 @@ export function getDailyTimeWindow(now = new Date(), timeZone = "Europe/Rome") {
   }
 
   return {
+    dateKey: `${today.year}-${String(today.month).padStart(2, "0")}-${String(today.day).padStart(2, "0")}`,
     start: calendarMidnightToUtc(today, timeZone),
     end: calendarMidnightToUtc(tomorrow, timeZone),
   }

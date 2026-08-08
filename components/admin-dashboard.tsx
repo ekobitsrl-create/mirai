@@ -25,6 +25,7 @@ type Props = {
     pendingOrders: number
     cartsCreated: number
     cartsAbandoned: number
+    cookieDeclines: number
   }
 }
 
@@ -61,7 +62,7 @@ export function AdminDashboard({
 
   return (
     <div>
-      <div className="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-7 gap-4 mb-10">
+      <div className="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-8 gap-4 mb-10">
         <div className="border border-border rounded-lg bg-card p-5">
           <p className="text-xs uppercase tracking-widest text-muted-foreground mb-1">Prodotti</p>
           <p className="text-3xl font-bold text-foreground">{stats.totalProducts}</p>
@@ -85,6 +86,11 @@ export function AdminDashboard({
           <p className="text-xs uppercase tracking-widest text-muted-foreground mb-1">Abbandonati</p>
           <p className="text-3xl font-bold text-foreground">{stats.cartsAbandoned}</p>
           <p className="text-xs text-muted-foreground mt-1">oggi · inattivi da 30 min</p>
+        </div>
+        <div className="border border-border rounded-lg bg-card p-5">
+          <p className="text-xs uppercase tracking-widest text-muted-foreground mb-1">Cookie non accettati</p>
+          <p className="text-3xl font-bold text-foreground">{stats.cookieDeclines}</p>
+          <p className="text-xs text-muted-foreground mt-1">oggi · solo conteggio</p>
         </div>
         <div className="border border-border rounded-lg bg-card p-5">
           <p className="text-xs uppercase tracking-widest text-muted-foreground mb-1">Utenti</p>

@@ -26,7 +26,16 @@ export default async function AdminPage() {
   const cartCounterWindow = getDailyTimeWindow(new Date(), "Europe/Rome")
   const cartsCreatedAfter = cartCounterWindow.start.toISOString()
 
-  const [productsRes, categoriesRes, ordersRes, usersRes, discountCodesRes, cartsCreatedRes, cartsAbandonedRes] = await Promise.all([
+  const [
+    productsRes,
+    categoriesRes,
+    ordersRes,
+    usersRes,
+    discountCodesRes,
+    cartsCreatedRes,
+    cartsAbandonedRes,
+    cookieDeclinesRes,
+  ] = await Promise.all([
     supabase.from("products").select("*").order("created_at", { ascending: false }),
     supabase.from("categories").select("*").order("sort_order", { ascending: true }),
     adminSupabase.from("orders").select("*, order_items(*)").order("created_at", { ascending: false }),
@@ -43,6 +52,11 @@ export default async function AdminPage() {
       .gte("created_at", cartsCreatedAfter)
       .eq("status", "active")
       .lt("updated_at", abandonedBefore),
+    adminSupabase
+      .from("cookie_consent_daily_counts")
+      .select("necessary_only_count")
+      .eq("day", cartCounterWindow.dateKey)
+      .maybeSingle(),
   ])
 
   const products = productsRes.data || []
@@ -68,6 +82,7 @@ export default async function AdminPage() {
     pendingOrders: orders.filter((o: any) => o.status === "pending").length,
     cartsCreated: cartsCreatedRes.count || 0,
     cartsAbandoned: cartsAbandonedRes.count || 0,
+    cookieDeclines: Number(cookieDeclinesRes.data?.necessary_only_count) || 0,
   }
 
   return (

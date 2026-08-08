@@ -21,6 +21,23 @@ function updateGoogleConsent(consent: "all" | "necessary") {
   })
 }
 
+function recordNecessaryOnlyChoice() {
+  const endpoint = "/api/cookie-consent/decline"
+
+  if (typeof navigator.sendBeacon === "function") {
+    navigator.sendBeacon(endpoint)
+    return
+  }
+
+  void fetch(endpoint, {
+    method: "POST",
+    credentials: "same-origin",
+    keepalive: true,
+  }).catch(() => {
+    // The consent choice must still work if the anonymous counter is unavailable.
+  })
+}
+
 export function CookieBanner() {
   const [visible, setVisible] = useState(false)
   const { t } = useLanguage()
@@ -57,14 +74,18 @@ export function CookieBanner() {
   }
 
   function acceptNecessary() {
-    const hadMarketingConsent = document.cookie
+    const currentConsent = document.cookie
       .split("; ")
-      .some((row) => row === "cookie_consent=all")
+      .find((row) => row.startsWith("cookie_consent="))
+    const hadMarketingConsent = currentConsent === "cookie_consent=all"
+    const shouldCountChoice = currentConsent !== "cookie_consent=necessary"
 
     document.cookie = "cookie_consent=necessary; path=/; max-age=31536000; SameSite=Lax"
     updateGoogleConsent("necessary")
     window.dispatchEvent(new CustomEvent("mirai:cookie-consent", { detail: "necessary" }))
     setVisible(false)
+
+    if (shouldCountChoice) recordNecessaryOnlyChoice()
 
     if (hadMarketingConsent) window.location.reload()
   }
