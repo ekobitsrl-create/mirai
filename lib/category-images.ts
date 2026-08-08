@@ -31,14 +31,7 @@ const CATEGORY_IMAGES: Record<string, string> = {
   headwear: "/images/cap-ny-red-crystal.jpg",
   caps: "/images/cap-ny-red-crystal.jpg",
   hats: "/images/cap-ny-red-crystal.jpg",
-  camicie: "/images/collection-apparel.jpg",
-  shirts: "/images/collection-apparel.jpg",
-  "tee-e-short": "/images/categories/tee-e-short.jpeg",
-  "tee-e-shorts": "/images/categories/tee-e-short.jpeg",
-  "tee-short": "/images/categories/tee-e-short.jpeg",
-  "tee-shorts": "/images/categories/tee-e-short.jpeg",
-  teeshorts: "/images/categories/tee-e-short.jpeg",
-  tee: "/images/categories/tee-e-short.jpeg",
+  tee: "/images/categories/t-shirt.jpeg",
 }
 
 const DEFAULT_CATEGORY_IMAGE = "/images/collection-tshirt.jpg"
@@ -71,6 +64,8 @@ const CONTAINED_CATEGORY_SLUGS = new Set([
   "t-shirts",
   "tshirt",
   "magliette",
+  "camicie",
+  "shirts",
   "cappelli",
   "headwear",
   "caps",

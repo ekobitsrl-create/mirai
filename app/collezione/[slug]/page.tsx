@@ -22,6 +22,19 @@ const STATIC_CATEGORY_NAMES: Record<string, string> = {
   shorts: "Shorts e Bermuda",
 }
 
+const LEGACY_CATEGORY_SLUGS: Record<string, string> = {
+  "tee-e-short": "camicie",
+  "tee-e-shorts": "camicie",
+  "tee-short": "camicie",
+  "tee-shorts": "camicie",
+  teeshorts: "camicie",
+}
+
+function normalizeCategorySlug(rawSlug: string) {
+  const normalized = decodeURIComponent(rawSlug).trim().toLowerCase().replace(/\s+/g, "-")
+  return LEGACY_CATEGORY_SLUGS[normalized] || normalized
+}
+
 // Builds a virtual category for slugs that exist as product categories but don't
 // have a row in the `categories` table, deriving the cover image from the DB.
 async function getStaticCategory(slug: string, supabase: SupabaseClient) {
@@ -46,7 +59,7 @@ async function getStaticCategory(slug: string, supabase: SupabaseClient) {
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug: rawSlug } = await params
-  const slug = decodeURIComponent(rawSlug).trim().toLowerCase().replace(/\s+/g, '-')
+  const slug = normalizeCategorySlug(rawSlug)
   const supabase = await createClient()
   let { data: category } = await supabase.from("categories").select("name, description, image_url").eq("slug", slug).single()
   if (!category) {
@@ -78,7 +91,9 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 export default async function CollezionePage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug: rawSlug } = await params
   // Normalize the slug: decode URI, trim, lowercase, replace spaces with hyphens
-  const slug = decodeURIComponent(rawSlug).trim().toLowerCase().replace(/\s+/g, '-')
+  const requestedSlug = decodeURIComponent(rawSlug).trim().toLowerCase().replace(/\s+/g, "-")
+  const slug = normalizeCategorySlug(rawSlug)
+  if (requestedSlug !== slug) redirect(`/collezione/${slug}`)
   if (slug === "abbigliamento") redirect("/collezioni")
   
   const supabase = await createClient()
