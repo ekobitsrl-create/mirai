@@ -1,6 +1,7 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
 import { AdminProductTable } from "@/components/admin-product-table"
 import { AdminCategoriesTable } from "@/components/admin-categories-table"
 import { AdminOrdersTable } from "@/components/admin-orders-table"
@@ -15,6 +16,7 @@ type Props = {
   users: any[]
   discountCodes: any[]
   discountCodesReadOnly?: boolean
+  cartCounterResetAt: string
   stats: {
     totalProducts: number
     totalOrders: number
@@ -43,9 +45,19 @@ export function AdminDashboard({
   users,
   discountCodes,
   discountCodesReadOnly = false,
+  cartCounterResetAt,
   stats,
 }: Props) {
   const [activeTab, setActiveTab] = useState<TabId>("products")
+  const router = useRouter()
+
+  useEffect(() => {
+    const resetAt = new Date(cartCounterResetAt).getTime()
+    const delay = Math.max(1_000, resetAt - Date.now() + 1_000)
+    const timer = window.setTimeout(() => router.refresh(), delay)
+
+    return () => window.clearTimeout(timer)
+  }, [cartCounterResetAt, router])
 
   return (
     <div>
@@ -66,13 +78,13 @@ export function AdminDashboard({
           )}
         </div>
         <div className="border border-border rounded-lg bg-card p-5">
-          <p className="text-xs uppercase tracking-widest text-muted-foreground mb-1">Carrelli creati</p>
+          <p className="text-xs uppercase tracking-widest text-muted-foreground mb-1">Carrelli creati oggi</p>
           <p className="text-3xl font-bold text-foreground">{stats.cartsCreated}</p>
         </div>
         <div className="border border-border rounded-lg bg-card p-5">
           <p className="text-xs uppercase tracking-widest text-muted-foreground mb-1">Abbandonati</p>
           <p className="text-3xl font-bold text-foreground">{stats.cartsAbandoned}</p>
-          <p className="text-xs text-muted-foreground mt-1">inattivi da 30 min</p>
+          <p className="text-xs text-muted-foreground mt-1">oggi · inattivi da 30 min</p>
         </div>
         <div className="border border-border rounded-lg bg-card p-5">
           <p className="text-xs uppercase tracking-widest text-muted-foreground mb-1">Utenti</p>

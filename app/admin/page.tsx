@@ -3,6 +3,7 @@ import { isAdminEmail } from "@/lib/admin"
 import { getServerUserWithProfile, createClient, createUserClient } from "@/lib/supabase/server"
 import { AdminDashboard } from "@/components/admin-dashboard"
 import { getEnvironmentDiscountCodes } from "@/lib/discounts"
+import { getDailyTimeWindow } from "@/lib/daily-time-window"
 
 export default async function AdminPage() {
   let userResult
@@ -22,6 +23,8 @@ export default async function AdminPage() {
   const adminSupabase = await createClient()
 
   const abandonedBefore = new Date(Date.now() - 30 * 60 * 1000).toISOString()
+  const cartCounterWindow = getDailyTimeWindow(new Date(), "Europe/Rome")
+  const cartsCreatedAfter = cartCounterWindow.start.toISOString()
 
   const [productsRes, categoriesRes, ordersRes, usersRes, discountCodesRes, cartsCreatedRes, cartsAbandonedRes] = await Promise.all([
     supabase.from("products").select("*").order("created_at", { ascending: false }),
@@ -29,10 +32,15 @@ export default async function AdminPage() {
     adminSupabase.from("orders").select("*, order_items(*)").order("created_at", { ascending: false }),
     supabase.from("profiles").select("*").order("created_at", { ascending: false }),
     adminSupabase.from("discount_codes").select("*").order("created_at", { ascending: false }),
-    adminSupabase.from("cart_sessions").select("id", { count: "exact", head: true }).neq("status", "cleared"),
     adminSupabase
       .from("cart_sessions")
       .select("id", { count: "exact", head: true })
+      .gte("created_at", cartsCreatedAfter)
+      .neq("status", "cleared"),
+    adminSupabase
+      .from("cart_sessions")
+      .select("id", { count: "exact", head: true })
+      .gte("created_at", cartsCreatedAfter)
       .eq("status", "active")
       .lt("updated_at", abandonedBefore),
   ])
@@ -87,6 +95,7 @@ export default async function AdminPage() {
           discountCodes={discountCodes}
           discountCodesReadOnly={discountCodesReadOnly}
           stats={stats}
+          cartCounterResetAt={cartCounterWindow.end.toISOString()}
         />
       </div>
     </div>

@@ -13,7 +13,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Plus, Pencil, Trash2, X, Check, Package, Download } from "lucide-react"
-import { ImageUpload } from "@/components/image-upload"
+import { AdminProductGallery } from "@/components/admin-product-gallery"
 
 type Product = {
   id: string
@@ -22,6 +22,7 @@ type Product = {
   price: number
   category: string
   image_url: string | null
+  image_gallery?: unknown
   sizes: string[]
   stock_by_size?: Record<string, number>
   in_stock: boolean
@@ -364,7 +365,7 @@ function ProductForm({ product, categories = [] }: { product?: Product; categori
           className="bg-secondary border-border text-foreground"
         />
       </div>
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-2 md:col-span-2">
         <Label htmlFor="category" className="text-xs uppercase tracking-widest text-muted-foreground">
           Categoria
         </Label>
@@ -387,13 +388,11 @@ function ProductForm({ product, categories = [] }: { product?: Product; categori
           })}
         </select>
       </div>
-      <div className="flex flex-col gap-2">
-        <ImageUpload
-          name="image_url"
-          defaultValue={product?.image_url}
-          label="Immagine Prodotto"
-        />
-      </div>
+      <AdminProductGallery
+        defaultPrimary={product?.image_url}
+        defaultGallery={product?.image_gallery}
+        productName={product?.name || ""}
+      />
       <div className="flex flex-col gap-2">
         <Label htmlFor="sizes" className="text-xs uppercase tracking-widest text-muted-foreground">
           Taglie (separate da virgola)

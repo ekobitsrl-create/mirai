@@ -61,6 +61,80 @@ function parseProductDetails(formData: FormData) {
   }
 }
 
+type ProductGalleryImage = {
+  src: string
+  alt: string
+  fit: "contain" | "cover"
+  position: string
+}
+
+function isAllowedProductImageUrl(value: unknown): value is string {
+  return typeof value === "string" && (/^https?:\/\//i.test(value) || value.startsWith("/"))
+}
+
+function parseProductImages(formData: FormData, productName: string) {
+  const submittedPrimary = formData.get("image_url")
+  const primary = isAllowedProductImageUrl(submittedPrimary) ? submittedPrimary : null
+  let submittedGallery: unknown = []
+
+  try {
+    submittedGallery = JSON.parse((formData.get("image_gallery") as string) || "[]")
+  } catch {
+    submittedGallery = []
+  }
+
+  const image_gallery: ProductGalleryImage[] = []
+  const addImage = (candidate: unknown) => {
+    const src = typeof candidate === "string"
+      ? candidate
+      : candidate && typeof candidate === "object" && "src" in candidate
+        ? (candidate as { src?: unknown }).src
+        : null
+
+    if (!isAllowedProductImageUrl(src) || image_gallery.some((image) => image.src === src)) return
+
+    const details = candidate && typeof candidate === "object"
+      ? candidate as { alt?: unknown; fit?: unknown; position?: unknown }
+      : null
+    const submittedAlt = typeof details?.alt === "string" ? details.alt.trim().slice(0, 180) : ""
+    const submittedPosition = typeof details?.position === "string"
+      ? details.position.trim().slice(0, 80)
+      : ""
+
+    image_gallery.push({
+      src,
+      alt: submittedAlt && submittedAlt !== "Immagine prodotto"
+        ? submittedAlt
+        : productName || "Immagine prodotto",
+      fit: details?.fit === "cover" ? "cover" : "contain",
+      position: submittedPosition || "center",
+    })
+  }
+
+  if (Array.isArray(submittedGallery)) submittedGallery.slice(0, 20).forEach(addImage)
+
+  if (primary) {
+    const primaryIndex = image_gallery.findIndex((image) => image.src === primary)
+    if (primaryIndex === -1) {
+      image_gallery.unshift({
+        src: primary,
+        alt: productName || "Immagine prodotto",
+        fit: "contain",
+        position: "center",
+      })
+    } else if (primaryIndex > 0) {
+      const [primaryImage] = image_gallery.splice(primaryIndex, 1)
+      image_gallery.unshift(primaryImage)
+    }
+  }
+
+  const normalizedGallery = image_gallery.slice(0, 20)
+  return {
+    image_url: normalizedGallery[0]?.src || null,
+    image_gallery: normalizedGallery.length ? normalizedGallery : null,
+  }
+}
+
 function revalidateCatalog(productId?: string) {
   revalidatePath("/admin")
   revalidatePath("/")
@@ -91,17 +165,17 @@ export async function createProduct(formData: FormData) {
   const description = formData.get("description") as string
   const price = parseFloat(formData.get("price") as string)
   const category = formData.get("category") as string
-  const image_url = formData.get("image_url") as string
   const { sizes, stock_by_size, in_stock } = parseProductInventory(formData)
   const is_new = formData.get("is_new") === "on"
   const productDetails = parseProductDetails(formData)
+  const productImages = parseProductImages(formData, name)
 
   const { error } = await supabase.from("products").insert({
     name,
     description,
     price,
     category,
-    image_url: image_url || null,
+    ...productImages,
     sizes,
     stock_by_size,
     in_stock,
@@ -122,10 +196,10 @@ export async function updateProduct(formData: FormData) {
   const description = formData.get("description") as string
   const price = parseFloat(formData.get("price") as string)
   const category = formData.get("category") as string
-  const image_url = formData.get("image_url") as string
   const { sizes, stock_by_size, in_stock } = parseProductInventory(formData)
   const is_new = formData.get("is_new") === "on"
   const productDetails = parseProductDetails(formData)
+  const productImages = parseProductImages(formData, name)
 
   const { error } = await supabase
     .from("products")
@@ -134,7 +208,7 @@ export async function updateProduct(formData: FormData) {
       description,
       price,
       category,
-      image_url: image_url || null,
+      ...productImages,
       sizes,
       stock_by_size,
       in_stock,
