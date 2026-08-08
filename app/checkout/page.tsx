@@ -64,7 +64,6 @@ export default function CheckoutPage() {
         console.error("Impossibile ripristinare la sessione utente nel checkout", error)
         if (!active) return
 
-        // Authentication is optional: always leave guest checkout available.
         setIsAuthenticated(false)
         setAccountEmail("")
       }
@@ -127,9 +126,7 @@ export default function CheckoutPage() {
   )
 
   const fetchClientSecret = useCallback(() => {
-    if (checkoutSessionRef.current?.key === checkoutKey) {
-      return checkoutSessionRef.current.promise
-    }
+    if (checkoutSessionRef.current?.key === checkoutKey) return checkoutSessionRef.current.promise
 
     if (checkoutEmail && !emailPattern.test(checkoutEmail)) {
       const error = new Error("L'indirizzo email inserito non è valido.")
@@ -148,7 +145,6 @@ export default function CheckoutPage() {
     )
       .then((session) => {
         if (!session?.clientSecret) throw new Error(t.checkout.error)
-
         sessionIdRef.current = session.sessionId
         return session.clientSecret
       })
@@ -180,7 +176,6 @@ export default function CheckoutPage() {
   const applyPromoCode = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     setPromoError(null)
-
     if (!emailPattern.test(checkoutEmail)) {
       setPromoError("Inserisci prima un indirizzo email valido.")
       return
@@ -188,11 +183,7 @@ export default function CheckoutPage() {
 
     setPromoLoading(true)
     try {
-      const discount = await validateCheckoutDiscount(
-        cartLineItems,
-        checkoutEmail,
-        promoCode,
-      )
+      const discount = await validateCheckoutDiscount(cartLineItems, checkoutEmail, promoCode)
       setAppliedDiscount(discount)
       setPromoCode(discount.code)
       resetCardCheckout()
@@ -217,7 +208,6 @@ export default function CheckoutPage() {
       setGuestError("L'indirizzo email inserito non è valido.")
       return
     }
-
     setGuestError(null)
     setGuestCheckoutReady(true)
   }
@@ -245,17 +235,9 @@ export default function CheckoutPage() {
       )
 
       try {
-        window.sessionStorage.setItem(
-          getGoogleReviewStorageKey(order.orderId),
-          JSON.stringify(order.review),
-        )
-        window.sessionStorage.setItem(
-          getMetaPurchaseStorageKey(order.orderId),
-          JSON.stringify(order.meta),
-        )
-      } catch {
-        // L'ordine resta valido anche se il browser blocca lo storage.
-      }
+        window.sessionStorage.setItem(getGoogleReviewStorageKey(order.orderId), JSON.stringify(order.review))
+        window.sessionStorage.setItem(getMetaPurchaseStorageKey(order.orderId), JSON.stringify(order.meta))
+      } catch {}
 
       clearCart()
       window.location.assign(`/success?payment_method=cash_on_delivery&order_id=${encodeURIComponent(order.orderId)}`)
@@ -295,10 +277,7 @@ export default function CheckoutPage() {
 
   return (
     <main className="min-h-screen bg-background">
-      <MetaPixelEvent
-        eventName="InitiateCheckout"
-        parameters={checkoutMetaParameters}
-      />
+      <MetaPixelEvent eventName="InitiateCheckout" parameters={checkoutMetaParameters} />
       <PostHogCommerceEvent
         eventName="begin_checkout"
         properties={{
@@ -431,9 +410,7 @@ export default function CheckoutPage() {
                 <BadgePercent className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
                 <div className="min-w-0 flex-1">
                   <p className="font-semibold text-foreground">Hai un codice sconto?</p>
-                  <p className="mt-1 text-sm text-muted-foreground">
-                    MIRAI10 ti dà il 10% sul primo ordine.
-                  </p>
+                  <p className="mt-1 text-sm text-muted-foreground">MIRAI10 ti dà il 10% sul primo ordine.</p>
                 </div>
               </div>
 
@@ -444,19 +421,11 @@ export default function CheckoutPage() {
                       <Check className="h-4 w-4" />
                     </span>
                     <div>
-                      <p className="text-sm font-semibold text-foreground">
-                        Codice {appliedDiscount.code} applicato
-                      </p>
-                      <p className="text-xs text-emerald-400">
-                        Risparmi {"\u20AC"}{(appliedDiscount.discountCents / 100).toFixed(2)}
-                      </p>
+                      <p className="text-sm font-semibold text-foreground">Codice {appliedDiscount.code} applicato</p>
+                      <p className="text-xs text-emerald-400">Risparmi {"\u20AC"}{(appliedDiscount.discountCents / 100).toFixed(2)}</p>
                     </div>
                   </div>
-                  <button
-                    type="button"
-                    onClick={removePromoCode}
-                    className="inline-flex min-h-9 items-center justify-center gap-2 border border-border px-3 text-[10px] font-bold uppercase tracking-widest text-muted-foreground transition-colors hover:text-foreground"
-                  >
+                  <button type="button" onClick={removePromoCode} className="inline-flex min-h-9 items-center justify-center gap-2 border border-border px-3 text-[10px] font-bold uppercase tracking-widest text-muted-foreground transition-colors hover:text-foreground">
                     <X className="h-3.5 w-3.5" /> Rimuovi
                   </button>
                 </div>
@@ -474,21 +443,16 @@ export default function CheckoutPage() {
                     placeholder="Inserisci il codice"
                     className="h-11 flex-1 bg-secondary uppercase tracking-widest"
                   />
-                  <button
-                    type="submit"
-                    disabled={promoLoading || !promoCode.trim()}
-                    className="inline-flex min-h-11 items-center justify-center gap-2 bg-primary px-5 text-xs font-bold uppercase tracking-widest text-primary-foreground transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50"
-                  >
+                  <button type="submit" disabled={promoLoading || !promoCode.trim()} className="inline-flex min-h-11 items-center justify-center gap-2 bg-primary px-5 text-xs font-bold uppercase tracking-widest text-primary-foreground transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50">
                     {promoLoading && <LoaderCircle className="h-4 w-4 animate-spin" />}
                     Applica
                   </button>
                 </form>
               )}
 
-              {promoError && (
-                <p className="mt-3 text-sm text-destructive" role="alert">{promoError}</p>
-              )}
+              {promoError && <p className="mt-3 text-sm text-destructive" role="alert">{promoError}</p>}
             </section>
+
             <section className="mb-4 border border-border bg-card p-4 sm:p-5">
               <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Metodo di pagamento</p>
               <div className={`mt-3 grid border border-border ${cashOnDeliveryAvailable ? "grid-cols-2" : "grid-cols-1"}`} role="radiogroup" aria-label="Metodo di pagamento">
@@ -499,7 +463,7 @@ export default function CheckoutPage() {
                   onClick={() => setPaymentMethod("card")}
                   className={`flex min-h-12 items-center justify-center gap-2 px-3 text-xs font-bold uppercase tracking-widest transition-colors ${paymentMethod === "card" ? "bg-primary text-primary-foreground" : "text-foreground hover:bg-secondary"}`}
                 >
-                  <CreditCard className="h-4 w-4" /> Carta
+                  <CreditCard className="h-4 w-4" /> Pagamento online
                 </button>
                 {cashOnDeliveryAvailable && (
                   <button
@@ -532,28 +496,28 @@ export default function CheckoutPage() {
             </section>
 
             {paymentMethod === "card" ? (
-<section className="border border-border bg-card p-6 sm:p-8">
+              <section className="border border-border bg-card p-6 sm:p-8">
                 <div className="flex items-start gap-3">
                   <CreditCard className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
                   <div>
-                    <h2 className="font-semibold text-foreground">Pagamento sicuro con carta</h2>
+                    <h2 className="font-semibold text-foreground">Pagamento sicuro</h2>
                     <p className="mt-1 text-sm leading-6 text-muted-foreground">
-                      Continua sul checkout protetto di Stripe per inserire i dati della carta e l'indirizzo di spedizione.
+                      Scegli il metodo di pagamento disponibile nel checkout protetto di Stripe e completa i dati di spedizione.
                     </p>
                   </div>
                 </div>
 
                 <div className="mt-6 flex items-center gap-3 border border-border bg-secondary/40 px-4 py-3 text-sm text-muted-foreground">
                   <LockKeyhole className="h-4 w-4 shrink-0 text-primary" />
-                  <span>I dati della carta vengono gestiti direttamente da Stripe e non passano da MIRAI.</span>
+                  <span>I dati di pagamento vengono gestiti direttamente da Stripe e non passano da MIRAI.</span>
                 </div>
 
                 <div className="relative min-h-[400px] border border-border bg-card p-1 mt-6">
                   {!stripePromise ? (
                     <div className="flex min-h-[398px] flex-col items-center justify-center px-6 text-center" role="alert">
                       <AlertCircle className="h-8 w-8 text-destructive" />
-                      <h2 className="mt-4 font-semibold text-foreground">Pagamento con carta non disponibile</h2>
-                      <p className="mt-2 max-w-md text-sm leading-6 text-muted-foreground">La chiave pubblica Stripe non è configurata. Puoi scegliere il contrassegno oppure contattare l'assistenza.</p>
+                      <h2 className="mt-4 font-semibold text-foreground">Pagamento online non disponibile</h2>
+                      <p className="mt-2 max-w-md text-sm leading-6 text-muted-foreground">La configurazione Stripe non è disponibile. Puoi scegliere il contrassegno oppure contattare l'assistenza.</p>
                     </div>
                   ) : (
                     <EmbeddedCheckoutProvider
@@ -593,7 +557,6 @@ export default function CheckoutPage() {
                     </div>
                   )}
                 </div>
-
               </section>
             ) : (
               <form onSubmit={completeCashOnDelivery} className="border border-border bg-card p-6 sm:p-8">
