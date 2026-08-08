@@ -87,6 +87,7 @@ export function AdminProductTable({ products, categories = [] }: { products: Pro
     setFeedback(null)
     try {
       await deleteProduct(formData)
+      setFeedback("Prodotto eliminato dal catalogo e rimosso dai feed Google e Meta.")
     } catch (err) {
       console.error(err)
       setFeedback(err instanceof Error ? err.message : "Impossibile eliminare il prodotto.")

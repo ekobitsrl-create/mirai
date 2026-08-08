@@ -143,6 +143,7 @@ function revalidateCatalog(productId?: string) {
   revalidatePath("/google-merchant-feed.xml")
   revalidatePath("/google-merchant-feed-minimal.xml")
   revalidatePath("/google-merchant-feed-mirai.xml")
+  revalidatePath("/meta-product-feed-mirai.xml")
   revalidatePath("/sitemap.xml")
   if (productId) revalidatePath(`/prodotto/${productId}`)
 }
@@ -228,11 +229,19 @@ export async function deleteProduct(formData: FormData) {
 
   const id = formData.get("id") as string
 
-  const { error } = await supabase.from("products").delete().eq("id", id)
+  const { data: deletedProducts, error } = await supabase
+    .from("products")
+    .delete()
+    .eq("id", id)
+    .select("id")
 
   if (error) throw new Error(error.message)
+  if (!deletedProducts?.some((product) => product.id === id)) {
+    throw new Error("Il prodotto non è stato eliminato dal database. Riprova o verifica i permessi admin.")
+  }
 
   revalidateCatalog(id)
+  return { deletedId: id }
 }
 
 export async function deleteBlackIslandProducts() {

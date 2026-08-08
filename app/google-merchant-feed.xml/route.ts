@@ -467,7 +467,9 @@ export async function GET(request: NextRequest) {
     : new Date().toUTCString()
   const headers = {
     "Content-Type": "application/xml; charset=utf-8",
-    "Cache-Control": "public, max-age=0, s-maxage=60, stale-while-revalidate=300, must-revalidate",
+    // Catalogue deletions must be visible on the very next Google/Meta fetch.
+    // Keep ETag revalidation, but never serve a stale feed from the CDN.
+    "Cache-Control": "public, max-age=0, s-maxage=0, must-revalidate",
     "ETag": etag,
     "Last-Modified": lastModified,
     "X-Robots-Tag": "noindex",
