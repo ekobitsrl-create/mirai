@@ -465,8 +465,7 @@ function parseDiscountCodeForm(formData: FormData) {
 }
 
 export async function createDiscountCode(formData: FormData) {
-  await assertAdmin()
-  const supabase = await createServerClient()
+  const { supabase } = await assertAdmin()
   const values = parseDiscountCodeForm(formData)
   const { error } = await supabase.from("discount_codes").insert(values)
   if (error?.code === "23505") throw new Error("Esiste già un codice con questo nome")
@@ -475,8 +474,7 @@ export async function createDiscountCode(formData: FormData) {
 }
 
 export async function updateDiscountCode(formData: FormData) {
-  await assertAdmin()
-  const supabase = await createServerClient()
+  const { supabase } = await assertAdmin()
   const id = String(formData.get("id") || "")
   if (!id) throw new Error("Codice sconto non trovato")
 
@@ -491,8 +489,7 @@ export async function updateDiscountCode(formData: FormData) {
 }
 
 export async function deleteDiscountCode(formData: FormData) {
-  await assertAdmin()
-  const supabase = await createServerClient()
+  const { supabase } = await assertAdmin()
   const id = String(formData.get("id") || "")
   if (!id) throw new Error("Codice sconto non trovato")
 

@@ -40,7 +40,7 @@ export default async function AdminPage() {
     supabase.from("categories").select("*").order("sort_order", { ascending: true }),
     adminSupabase.from("orders").select("*, order_items(*)").order("created_at", { ascending: false }),
     supabase.from("profiles").select("*").order("created_at", { ascending: false }),
-    adminSupabase.from("discount_codes").select("*").order("created_at", { ascending: false }),
+    supabase.from("discount_codes").select("*").order("created_at", { ascending: false }),
     adminSupabase
       .from("cart_sessions")
       .select("id", { count: "exact", head: true })
