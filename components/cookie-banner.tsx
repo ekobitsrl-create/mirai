@@ -142,11 +142,13 @@ export function CookieBanner() {
         <button
           type="button"
           onClick={acceptNecessary}
-          className="absolute right-2.5 top-2.5 sm:right-4 sm:top-4 flex h-10 w-10 sm:h-11 sm:w-11 items-center justify-center rounded-full border border-border bg-background/80 text-foreground transition-colors hover:bg-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+          className="absolute right-2 top-2 sm:right-3 sm:top-3 flex h-10 w-10 items-center justify-center rounded-full text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
           aria-label={t.cookies.closeNecessary}
           title={t.cookies.closeNecessary}
         >
-          <X className="h-5 w-5" aria-hidden="true" />
+          <span className="flex h-7 w-7 items-center justify-center rounded-full border border-border bg-background/80 transition-colors hover:bg-secondary">
+            <X className="h-3.5 w-3.5" aria-hidden="true" />
+          </span>
         </button>
 
         <div className="flex flex-col gap-3 sm:gap-4">
