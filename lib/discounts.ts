@@ -37,13 +37,28 @@ const FALLBACK_MIRAI10: DiscountCodeRow = {
   times_used: 0,
 }
 
+const FALLBACK_MIRACON15: DiscountCodeRow = {
+  code: "MIRACON15",
+  discount_type: "percentage",
+  value: 15,
+  active: true,
+  first_order_only: true,
+  minimum_subtotal: 0,
+  starts_at: null,
+  ends_at: null,
+  max_uses: null,
+  times_used: 0,
+}
+
+const BUILT_IN_DISCOUNTS = [FALLBACK_MIRAI10, FALLBACK_MIRACON15]
+
 function parseEnvironmentDiscountCodes() {
   const raw = process.env.MIRAI_DISCOUNT_CODES?.trim()
-  if (!raw) return [FALLBACK_MIRAI10]
+  if (!raw) return BUILT_IN_DISCOUNTS
 
   try {
     const parsed = JSON.parse(raw)
-    if (!Array.isArray(parsed)) return [FALLBACK_MIRAI10]
+    if (!Array.isArray(parsed)) return BUILT_IN_DISCOUNTS
 
     const configuredCodes = parsed.flatMap((entry): DiscountCodeRow[] => {
       if (!entry || typeof entry !== "object") return []
@@ -81,16 +96,17 @@ function parseEnvironmentDiscountCodes() {
       }]
     })
 
-    const configuredMirai10 = configuredCodes.find(
-      (discount) => discount.code === FALLBACK_MIRAI10.code,
-    )
     return [
-      configuredMirai10 || FALLBACK_MIRAI10,
-      ...configuredCodes.filter((discount) => discount.code !== FALLBACK_MIRAI10.code),
+      ...BUILT_IN_DISCOUNTS.map((fallback) => (
+        configuredCodes.find((discount) => discount.code === fallback.code) || fallback
+      )),
+      ...configuredCodes.filter(
+        (discount) => !BUILT_IN_DISCOUNTS.some((fallback) => fallback.code === discount.code),
+      ),
     ]
   } catch {
     console.error("MIRAI_DISCOUNT_CODES non contiene un JSON valido")
-    return [FALLBACK_MIRAI10]
+    return BUILT_IN_DISCOUNTS
   }
 }
 
@@ -136,6 +152,23 @@ function calculateDiscountCents(row: DiscountCodeRow, subtotalCents: number) {
   return Math.min(subtotalCents, Math.round(value * 100))
 }
 
+async function verifyMiracon15Delivery(supabase: SupabaseClient, email: string) {
+  const validSince = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()
+  const { data, error } = await supabase
+    .from("email_deliveries")
+    .select("event_key")
+    .eq("email", email)
+    .eq("status", "sent")
+    .like("event_key", "welcome-miracon15-%")
+    .gte("updated_at", validSince)
+    .order("updated_at", { ascending: false })
+    .limit(1)
+    .maybeSingle()
+
+  if (error) throw new Error("Non è stato possibile verificare la validità del codice")
+  if (!data) throw new Error("Questo codice non è associato alla tua email oppure è scaduto")
+}
+
 export async function validateDiscountCode({
   supabase,
   code,
@@ -148,6 +181,7 @@ export async function validateDiscountCode({
   subtotalCents: number
 }): Promise<AppliedDiscount> {
   const normalizedCode = normalizeDiscountCode(code)
+  const normalizedEmail = customerEmail.trim().toLowerCase()
   if (!normalizedCode) throw new Error("Inserisci un codice sconto")
   if (!Number.isInteger(subtotalCents) || subtotalCents <= 0) {
     throw new Error("Il carrello non contiene prodotti scontabili")
@@ -179,7 +213,6 @@ export async function validateDiscountCode({
   }
 
   if (discount.first_order_only) {
-    const normalizedEmail = customerEmail.trim().toLowerCase()
     const { count, error } = await supabase
       .from("orders")
       .select("id", { count: "exact", head: true })
@@ -190,6 +223,11 @@ export async function validateDiscountCode({
     if ((count || 0) > 0) {
       throw new Error("Questo codice è riservato al primo ordine")
     }
+  }
+
+  if (normalizedCode === "MIRACON15") {
+    if (!normalizedEmail) throw new Error("Inserisci l'email con cui hai ricevuto il codice")
+    await verifyMiracon15Delivery(supabase, normalizedEmail)
   }
 
   const discountCents = calculateDiscountCents(discount, subtotalCents)

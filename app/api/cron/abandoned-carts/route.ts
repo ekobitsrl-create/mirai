@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { sendAbandonedCartReminders } from "@/lib/email/abandoned-cart"
+import { sendWelcomeCouponEmails } from "@/lib/email/welcome-coupon"
 
 export const runtime = "nodejs"
 export const dynamic = "force-dynamic"
@@ -11,10 +12,16 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const result = await sendAbandonedCartReminders()
-    return NextResponse.json({ ok: true, ...result })
+    if (request.nextUrl.searchParams.get("dryRun") === "1") {
+      const welcomeCoupons = await sendWelcomeCouponEmails({ dryRun: true })
+      return NextResponse.json({ ok: true, welcomeCoupons })
+    }
+
+    const abandonedCarts = await sendAbandonedCartReminders()
+    const welcomeCoupons = await sendWelcomeCouponEmails()
+    return NextResponse.json({ ok: true, abandonedCarts, welcomeCoupons })
   } catch (error) {
-    console.error("Invio promemoria carrello non riuscito", error)
+    console.error("Automazione email MIRAI non riuscita", error)
     return NextResponse.json({ error: "Invio non riuscito" }, { status: 500 })
   }
 }

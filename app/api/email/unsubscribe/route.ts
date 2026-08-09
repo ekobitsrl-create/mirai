@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
-import { readUnsubscribeToken, unsubscribeAbandonedCart } from "@/lib/email/abandoned-cart"
+import { readUnsubscribeToken, unsubscribeMarketingEmail } from "@/lib/email/abandoned-cart"
 
 function page(title: string, message: string, status = 200) {
   return new NextResponse(`<!doctype html>
@@ -30,8 +30,8 @@ async function unsubscribe(request: NextRequest) {
   }
 
   try {
-    await unsubscribeAbandonedCart(email)
-    return page("Disiscrizione completata", "Non riceverai altri promemoria relativi al carrello MIRAI.")
+    await unsubscribeMarketingEmail(email)
+    return page("Disiscrizione completata", "Non riceverai altre email promozionali o promemoria MIRAI.")
   } catch (error) {
     console.error("Disiscrizione email non riuscita", error)
     return page("Operazione non riuscita", "Riprova tra qualche minuto o scrivi a info@mirailabstore.com.", 500)
@@ -46,7 +46,7 @@ export async function POST(request: NextRequest) {
   if (!email) return new NextResponse(null, { status: 400 })
 
   try {
-    await unsubscribeAbandonedCart(email)
+    await unsubscribeMarketingEmail(email)
     return new NextResponse(null, { status: 200 })
   } catch (error) {
     console.error("Disiscrizione one-click non riuscita", error)

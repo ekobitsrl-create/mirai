@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/client"
 import { Button } from "@/components/ui/button"
+import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import Link from "next/link"
@@ -22,6 +23,7 @@ function SignUpForm() {
   const [email, setEmail] = useState(() => searchParams.get("email") || "")
   const [password, setPassword] = useState("")
   const [repeatPassword, setRepeatPassword] = useState("")
+  const [marketingConsent, setMarketingConsent] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
 
@@ -59,6 +61,8 @@ function SignUpForm() {
             first_name: firstName,
             last_name: lastName,
             membership: "mirai-society",
+            marketing_consent: marketingConsent,
+            marketing_consent_at: marketingConsent ? new Date().toISOString() : null,
           },
         },
       })
@@ -126,6 +130,17 @@ function SignUpForm() {
                 <div className="flex flex-col gap-2">
                   <Label htmlFor="repeat-password" className="text-xs uppercase tracking-widest text-muted-foreground">Conferma Password</Label>
                   <Input id="repeat-password" type="password" required value={repeatPassword} onChange={(e) => setRepeatPassword(e.target.value)} className="bg-secondary border-border text-foreground" />
+                </div>
+                <div className="flex items-start gap-3 border-t border-border pt-5">
+                  <Checkbox
+                    id="signup-marketing-consent"
+                    checked={marketingConsent}
+                    onCheckedChange={(checked) => setMarketingConsent(checked === true)}
+                  />
+                  <Label htmlFor="signup-marketing-consent" className="cursor-pointer text-sm font-normal leading-5 text-muted-foreground">
+                    Desidero ricevere novità, offerte e vantaggi riservati della community MIRAI via email. Posso revocare il consenso in qualsiasi momento. Consulta la{" "}
+                    <Link href="/privacy" className="text-foreground underline underline-offset-4">Privacy Policy</Link>.
+                  </Label>
                 </div>
                 {error && <p className="text-sm text-destructive">{error}</p>}
                 <Button type="submit" className="h-11 w-full bg-primary text-xs uppercase tracking-widest text-primary-foreground hover:bg-primary/90" disabled={isLoading}>

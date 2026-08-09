@@ -223,3 +223,48 @@ export function abandonedCartTemplate(
     text: `Il tuo carrello MIRAI ti aspetta.\nRiprendi il checkout: ${SITE_URL}/checkout\n\nPer non ricevere altri promemoria: ${unsubscribeUrl}`,
   }
 }
+
+export function welcomeCouponTemplate(unsubscribeUrl: string): EmailContent {
+  const code = "MIRACON15"
+
+  return {
+    subject: "Il tuo -15% MIRAI è qui. Ma non per sempre.",
+    html: layout(
+      "Un vantaggio riservato alla community MIRAI sul tuo prossimo ordine.",
+      "WELCOME TO MIRAI.",
+      `<p style="margin:0 0 20px;color:#c9c2d2;line-height:1.7">Hai già fatto il primo passo entrando nella nostra community.<br>Ora vogliamo darti un motivo in più per trovare il tuo prossimo pezzo.</p>
+      <p style="margin:0 0 20px;color:#ffffff;line-height:1.7">Per te abbiamo riservato un <strong>15% DI SCONTO</strong> sul prossimo acquisto.</p>
+      <div style="margin:24px 0;padding:20px;border:1px solid #7c3aed;background:#0f0918;text-align:center">
+        <div style="color:#aaa1b8;font-size:11px;letter-spacing:2px;text-transform:uppercase">Codice</div>
+        <div style="margin-top:8px;color:#ffffff;font-size:28px;font-weight:800;letter-spacing:3px">${code}</div>
+      </div>
+      <p style="margin:0 0 20px;color:#c9c2d2;line-height:1.7">Usalo al checkout e scopri le ultime selezioni disponibili su MIRAI.</p>
+      <p style="margin:0 0 20px;color:#c9c2d2;line-height:1.7">Vale Forever, Minimal Couture, cap personalizzati e le nuove proposte selezionate da MIRAI.</p>
+      <p style="margin:0 0 26px;color:#ffffff;line-height:1.7">Non aspettare troppo: <strong>il codice è valido per 7 giorni</strong> dalla ricezione di questa email.</p>
+      <div>${button("Scopri le selezioni", `${SITE_URL}/collezioni`)}</div>
+      <p style="margin:28px 0 0;color:#ffffff;font-weight:700;letter-spacing:1px">MIRAI LAB STORE</p>
+      <p style="margin:6px 0 0;color:#a78bfa;font-style:italic">Different by design.</p>`,
+      `Hai ricevuto questa email perché hai scelto di ricevere novità e offerte MIRAI. <a href="${escapeHtml(unsubscribeUrl)}" style="color:#c4b5fd">Disiscriviti</a>.<br>MIRAI LAB STORE, Via Umberto 95, 95129 Catania.`,
+    ),
+    text: `WELCOME TO MIRAI.
+
+Hai già fatto il primo passo entrando nella nostra community.
+Ora vogliamo darti un motivo in più per trovare il tuo prossimo pezzo.
+
+Per te abbiamo riservato un 15% DI SCONTO sul prossimo acquisto.
+
+CODICE: ${code}
+
+Usalo al checkout e scopri le ultime selezioni disponibili su MIRAI.
+
+Vale Forever, Minimal Couture, cap personalizzati e le nuove proposte selezionate da MIRAI.
+
+Non aspettare troppo: il codice è valido per 7 giorni dalla ricezione di questa email.
+
+MIRAI LAB STORE
+Different by design.
+
+Scopri le selezioni: ${SITE_URL}/collezioni
+Disiscriviti: ${unsubscribeUrl}`,
+  }
+}

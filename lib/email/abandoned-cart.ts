@@ -107,19 +107,24 @@ export async function markCheckoutRecovered(input: {
   }
 }
 
-export async function unsubscribeAbandonedCart(email: string) {
+export async function unsubscribeMarketingEmail(email: string) {
   if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
     throw new Error("Servizio disiscrizione non configurato")
   }
 
   const supabase = await createClient()
-  const { error } = await supabase
-    .from("abandoned_checkouts")
-    .update({ status: "unsubscribed", updated_at: new Date().toISOString() })
-    .eq("email", normalizeEmail(email))
-    .in("status", ["active", "reminded"])
+  const normalizedEmail = normalizeEmail(email)
+  const [unsubscribeResult, abandonedResult] = await Promise.all([
+    supabase.from("email_unsubscribes").upsert({ email: normalizedEmail }, { onConflict: "email" }),
+    supabase
+      .from("abandoned_checkouts")
+      .update({ status: "unsubscribed", updated_at: new Date().toISOString() })
+      .eq("email", normalizedEmail)
+      .in("status", ["active", "reminded"]),
+  ])
 
-  if (error) throw error
+  if (unsubscribeResult.error) throw unsubscribeResult.error
+  if (abandonedResult.error) throw abandonedResult.error
 }
 
 export async function sendAbandonedCartReminders() {
@@ -148,8 +153,16 @@ export async function sendAbandonedCartReminders() {
 
   if (error) throw error
 
+  const candidateEmails = [...new Set((data || []).map((row) => normalizeEmail(row.email)))]
+  const { data: unsubscribes, error: unsubscribeError } = candidateEmails.length > 0
+    ? await supabase.from("email_unsubscribes").select("email").in("email", candidateEmails)
+    : { data: [], error: null }
+  if (unsubscribeError) throw unsubscribeError
+  const unsubscribedEmails = new Set((unsubscribes || []).map((row) => normalizeEmail(row.email)))
+
   let sent = 0
   for (const row of (data || []) as AbandonedCheckoutRow[]) {
+    if (unsubscribedEmails.has(normalizeEmail(row.email))) continue
     const token = createUnsubscribeToken(row.email)
     if (!token || !Array.isArray(row.items) || row.items.length === 0) continue
 
