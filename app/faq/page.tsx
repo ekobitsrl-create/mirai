@@ -51,11 +51,15 @@ const faqs = [
     questions: [
       {
         q: "Posso restituire un prodotto?",
-        a: "Si, hai 14 giorni dalla consegna per richiedere il reso. Il prodotto deve essere nelle condizioni originali, non indossato e con i cartellini. Consulta la pagina Resi e Rimborsi per i dettagli.",
+        a: "Sì. Per gli ordini consegnati in Italia hai 14 giorni di calendario dalla consegna per richiedere il reso. Il prodotto deve essere nelle condizioni originali, non indossato e con i cartellini. Consulta la pagina Resi e Rimborsi per i dettagli.",
       },
       {
         q: "Il reso e gratuito?",
-        a: "Si. Per ogni reso approvato, MIRAI invia un'etichetta prepagata e sostiene le spese di restituzione, secondo le condizioni indicate nella pagina Resi e Rimborsi.",
+        a: "Sì. Per ogni reso approvato in Italia, MIRAI invia un'etichetta prepagata e sostiene integralmente le spese di restituzione. Il costo per il cliente è 0,00 EUR e non è prevista alcuna commissione di restocking.",
+      },
+      {
+        q: "Come devo spedire il reso?",
+        a: "Il reso avviene per posta tramite spedizione tracciata. Dopo l'approvazione riceverai l'etichetta prepagata e le istruzioni per consegnare il pacco al corriere o al punto di consegna indicato.",
       },
       {
         q: "Quanto tempo ci vuole per il rimborso?",

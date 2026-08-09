@@ -8,15 +8,24 @@ import { COMPANY_INFO } from "@/lib/company-info"
 export const metadata: Metadata = {
   title: "Resi e Rimborsi - MIRAI",
   alternates: { canonical: "/resi" },
-  description: "Politica di reso e rimborso per gli acquisti effettuati su MIRAI.",
+  description: "Resi gratuiti in Italia entro 14 giorni dalla consegna, con etichetta prepagata e nessun costo di restocking.",
 }
 
 const returnSteps = [
-  `Scrivi entro 14 giorni dalla consegna a ${COMPANY_INFO.email} indicando numero ordine, email usata per l'acquisto e motivo del reso.`,
-  "Quando il reso e approvato, MIRAI sostiene le spese di spedizione e invia un'etichetta prepagata con le istruzioni di rientro.",
+  `Scrivi entro 14 giorni di calendario dalla consegna a ${COMPANY_INFO.email} indicando numero ordine, email usata per l'acquisto e articoli da restituire.`,
+  "Quando il reso è approvato, MIRAI sostiene le spese di restituzione e invia un'etichetta prepagata con le istruzioni di rientro.",
   "Imballa il prodotto in modo sicuro, preferibilmente nella confezione originale, con cartellini ed eventuali accessori.",
-  "Consegna il pacco al corriere o al punto indicato nelle istruzioni di reso.",
+  "Consegna il pacco al corriere o al punto di consegna indicato nelle istruzioni: il reso avviene per posta tramite spedizione tracciata.",
   "Dopo ricezione e verifica, il rimborso viene emesso entro 14 giorni sullo stesso metodo di pagamento usato dal cliente al checkout.",
+]
+
+const policyFacts = [
+  { label: "Paese", value: "Italia (IT)" },
+  { label: "Valuta", value: "Euro (EUR)" },
+  { label: "Finestra di reso", value: "14 giorni di calendario dalla consegna" },
+  { label: "Metodo", value: "Per posta, con consegna al corriere o al punto indicato" },
+  { label: "Costo del reso", value: "Gratuito: spese a carico di MIRAI" },
+  { label: "Costo di restocking", value: "Nessuno (0,00 EUR)" },
 ]
 
 const accepted = [
@@ -44,12 +53,12 @@ export default function ResiPage() {
             Torna alla Home
           </Link>
 
-          <p className="mb-3 text-xs font-bold uppercase tracking-[0.24em] text-primary">Policy separata e pubblica</p>
+          <p className="mb-3 text-xs font-bold uppercase tracking-[0.24em] text-primary">Politica di reso MIRAI</p>
           <h1 className="mb-4 font-[family-name:var(--font-space-grotesk)] text-3xl font-bold tracking-tight text-foreground text-balance md:text-4xl">
             Resi e Rimborsi
           </h1>
           <p className="mb-12 max-w-2xl text-lg text-muted-foreground text-pretty">
-            Questa pagina e accessibile senza login e riassume tempi, metodo di reso, costi e modalita di rimborso per gli ordini MIRAI.
+            Questa politica si applica agli ordini MIRAI consegnati in Italia e riassume tempi, metodo di reso, costi e modalità di rimborso.
           </p>
 
           <div className="mb-16 grid grid-cols-1 gap-4 md:grid-cols-3">
@@ -71,6 +80,26 @@ export default function ResiPage() {
           <div className="mb-16 h-px bg-border" />
 
           <div className="flex flex-col gap-10 text-muted-foreground">
+            <section className="flex flex-col gap-5" aria-labelledby="riepilogo-policy-resi">
+              <div>
+                <h2 id="riepilogo-policy-resi" className="font-[family-name:var(--font-space-grotesk)] text-2xl font-bold tracking-tight text-foreground">
+                  Riepilogo della politica di reso
+                </h2>
+                <p className="mt-2 leading-relaxed">
+                  Accettiamo resi sia per ripensamento sia per prodotti difettosi o non conformi, nel rispetto delle condizioni indicate qui sotto.
+                </p>
+              </div>
+              <dl className="grid grid-cols-1 gap-px overflow-hidden rounded-lg border border-border bg-border sm:grid-cols-2">
+                {policyFacts.map((fact) => (
+                  <div key={fact.label} className="bg-card p-5">
+                    <dt className="text-[10px] font-bold uppercase tracking-[0.2em] text-primary">{fact.label}</dt>
+                    <dd className="mt-2 text-sm leading-6 text-foreground">{fact.value}</dd>
+                  </div>
+                ))}
+              </dl>
+              <p className="text-xs text-muted-foreground">Ultimo aggiornamento: 9 agosto 2026.</p>
+            </section>
+
             <section className="flex flex-col gap-4">
               <h2 className="font-[family-name:var(--font-space-grotesk)] text-2xl font-bold tracking-tight text-foreground">
                 Come effettuare un reso
@@ -124,10 +153,10 @@ export default function ResiPage() {
                 Costi di restituzione
               </h2>
               <p className="leading-relaxed">
-                Per ogni reso approvato, MIRAI sostiene le spese di spedizione del reso e invia un'etichetta prepagata. Non spedire il prodotto prima di aver ricevuto le istruzioni via email.
+                Per ogni reso approvato in Italia, MIRAI sostiene integralmente le spese di restituzione e invia un'etichetta prepagata. Il costo per il cliente è 0,00 EUR e non viene detratto alcun importo dal rimborso. Non spedire il prodotto prima di aver ricevuto le istruzioni via email.
               </p>
               <p className="leading-relaxed">
-                MIRAI non applica costi di reintegro magazzino.
+                MIRAI non applica costi di reintegro magazzino o restocking fee: il costo è 0,00 EUR.
               </p>
             </section>
 

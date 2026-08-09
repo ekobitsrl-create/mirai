@@ -592,7 +592,7 @@ export function ProductDetail({
               </Details>
             )}
             <Details title="Spedizioni e resi">
-              Tempi previsti: {shippingEstimate}. Spedizione tracciata in Italia e in Europa. Puoi richiedere il reso entro 14 giorni dalla consegna, {returnCondition}. Consulta la pagina <Link href="/resi" className="text-[#9f86ff] underline underline-offset-4">Resi e Rimborsi</Link>.
+              Tempi previsti: {shippingEstimate}. Spedizione tracciata in Italia e in Europa. Per gli ordini consegnati in Italia il reso è gratuito: puoi richiederlo entro 14 giorni di calendario dalla consegna, {returnCondition}. MIRAI fornisce l'etichetta prepagata e non applica costi di restocking. Consulta la pagina <Link href="/resi" className="text-[#9f86ff] underline underline-offset-4">Resi e Rimborsi</Link>.
             </Details>
           </div>
           </section>

@@ -281,6 +281,7 @@ function renderReturnPolicy(baseUrl: string) {
     "        <g:window_days>14</g:window_days>",
     "        <g:window_type>FINITE_RETURN_WINDOW</g:window_type>",
     "        <g:method>BY_MAIL</g:method>",
+    "        <g:method>DROP_OFF_LOCATION</g:method>",
     "        <g:outcome>REFUND</g:outcome>",
     "        <g:shipping_fee>0.00 EUR</g:shipping_fee>",
     "        <g:shipping_fee_type>DEDUCTED_FROM_REFUND</g:shipping_fee_type>",

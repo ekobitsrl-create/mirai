@@ -152,6 +152,22 @@ window.gtag('consent', 'default', {
                 telephone: "+39 349 866 3584",
                 availableLanguage: "Italian",
               },
+              hasMerchantReturnPolicy: {
+                "@type": "MerchantReturnPolicy",
+                "@id": `${SITE_URL}/resi#return-policy`,
+                applicableCountry: "IT",
+                returnPolicyCategory: "https://schema.org/MerchantReturnFiniteReturnWindow",
+                merchantReturnDays: 14,
+                returnMethod: "https://schema.org/ReturnByMail",
+                returnFees: "https://schema.org/FreeReturn",
+                refundType: "https://schema.org/FullRefund",
+                restockingFee: {
+                  "@type": "MonetaryAmount",
+                  value: "0.00",
+                  currency: "EUR",
+                },
+                url: getAbsoluteUrl("/resi"),
+              },
               }),
             }}
           />

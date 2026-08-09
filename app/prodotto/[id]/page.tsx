@@ -193,6 +193,13 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
         merchantReturnDays: 14,
         returnMethod: "https://schema.org/ReturnByMail",
         returnFees: "https://schema.org/FreeReturn",
+        refundType: "https://schema.org/FullRefund",
+        restockingFee: {
+          "@type": "MonetaryAmount",
+          value: "0.00",
+          currency: "EUR",
+        },
+        url: getAbsoluteUrl("/resi"),
       },
     },
     category: product.category,
