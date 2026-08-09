@@ -33,6 +33,13 @@ function SignUpForm() {
     setIsLoading(true)
     setError(null)
 
+    const normalizedEmail = email.trim().toLowerCase()
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail)) {
+      setError("Inserisci un indirizzo email valido")
+      setIsLoading(false)
+      return
+    }
+
     if (password !== repeatPassword) {
       setError("Le password non corrispondono")
       setIsLoading(false)
@@ -53,7 +60,7 @@ function SignUpForm() {
       confirmationUrl.searchParams.set("next", nextPath)
 
       const { data, error } = await supabase.auth.signUp({
-        email,
+        email: normalizedEmail,
         password,
         options: {
           emailRedirectTo: confirmationUrl.toString(),

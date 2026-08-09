@@ -1,5 +1,6 @@
 create table if not exists public.profiles (
   id uuid primary key references auth.users(id) on delete cascade,
+  email text,
   first_name text,
   last_name text,
   role text not null default 'user' check (role in ('user', 'admin')),

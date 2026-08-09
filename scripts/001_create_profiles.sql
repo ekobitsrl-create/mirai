@@ -1,6 +1,7 @@
 -- Create profiles table
 create table if not exists public.profiles (
   id uuid primary key references auth.users(id) on delete cascade,
+  email text,
   first_name text,
   last_name text,
   role text not null default 'user' check (role in ('user', 'admin')),
@@ -39,9 +40,10 @@ security definer
 set search_path = public
 as $$
 begin
-  insert into public.profiles (id, first_name, last_name, role)
+  insert into public.profiles (id, email, first_name, last_name, role)
   values (
     new.id,
+    lower(new.email),
     coalesce(new.raw_user_meta_data ->> 'first_name', null),
     coalesce(new.raw_user_meta_data ->> 'last_name', null),
     'user'
