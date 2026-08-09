@@ -1,5 +1,5 @@
 import type Stripe from 'stripe'
-import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/server'
 import { stripe } from '@/lib/stripe'
 import { applyOrderInventory } from '@/lib/orders/apply-order-inventory'
 import { recordDiscountUsage } from '@/lib/discounts'
@@ -34,7 +34,7 @@ export async function saveStripeOrder(session: Stripe.Checkout.Session) {
     throw new Error('SUPABASE_SERVICE_ROLE_KEY non configurata')
   }
 
-  const supabase = await createClient()
+  const supabase = createAdminClient()
   const { data: existingOrder, error: existingOrderError } = await supabase
     .from('orders')
     .select('id')

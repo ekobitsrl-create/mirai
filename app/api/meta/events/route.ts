@@ -1,6 +1,12 @@
 import { NextRequest, NextResponse } from "next/server"
 import { z } from "zod"
 import { SITE_URL } from "@/lib/site-url"
+import {
+  consumeRateLimit,
+  isSameOriginRequest,
+  readJsonBody,
+  RequestBodyTooLargeError,
+} from "@/lib/request-security"
 
 export const runtime = "nodejs"
 
@@ -12,7 +18,6 @@ const eventNameSchema = z.enum([
   "ViewContent",
   "AddToCart",
   "InitiateCheckout",
-  "Purchase",
 ])
 
 const contentIdSchema = z.string().trim().min(1).max(200)
@@ -92,30 +97,23 @@ function getLimitedValue(value: string | undefined, maximumLength: number) {
 }
 
 export async function POST(request: NextRequest) {
+  if (!isSameOriginRequest(request)) {
+    return NextResponse.json({ error: "Origine non valida." }, { status: 403 })
+  }
   if (request.cookies.get("cookie_consent")?.value !== "all") {
     return NextResponse.json({ error: "Consenso marketing richiesto." }, { status: 403 })
   }
-
-  const contentLength = Number(request.headers.get("content-length"))
-  if (Number.isFinite(contentLength) && contentLength > MAX_BODY_BYTES) {
-    return NextResponse.json({ error: "Richiesta troppo grande." }, { status: 413 })
-  }
-
-  let rawBody: string
-  try {
-    rawBody = await request.text()
-  } catch {
-    return NextResponse.json({ error: "Richiesta non valida." }, { status: 400 })
-  }
-
-  if (new TextEncoder().encode(rawBody).byteLength > MAX_BODY_BYTES) {
-    return NextResponse.json({ error: "Richiesta troppo grande." }, { status: 413 })
+  if (!await consumeRateLimit({ bucket: "meta-events", limit: 120, windowSeconds: 600, request })) {
+    return NextResponse.json({ error: "Troppe richieste." }, { status: 429 })
   }
 
   let body: unknown
   try {
-    body = JSON.parse(rawBody) as unknown
-  } catch {
+    body = await readJsonBody(request, MAX_BODY_BYTES)
+  } catch (error) {
+    if (error instanceof RequestBodyTooLargeError) {
+      return NextResponse.json({ error: "Richiesta troppo grande." }, { status: 413 })
+    }
     return NextResponse.json({ error: "JSON non valido." }, { status: 400 })
   }
 
@@ -145,12 +143,18 @@ export async function POST(request: NextRequest) {
     ...(fbc ? { fbc } : {}),
   }
 
+  const safeEventSourceUrl = new URL(parsedEvent.data.event_source_url)
+  for (const key of ["session_id", "confirmation_token", "access_token", "refresh_token", "token", "code", "order_id"]) {
+    safeEventSourceUrl.searchParams.delete(key)
+  }
+  safeEventSourceUrl.hash = ""
+
   const metaPayload = {
     data: [{
       event_name: parsedEvent.data.event_name,
       event_time: Math.floor(Date.now() / 1_000),
       event_id: parsedEvent.data.event_id,
-      event_source_url: parsedEvent.data.event_source_url,
+      event_source_url: safeEventSourceUrl.toString(),
       action_source: "website" as const,
       user_data: userData,
       ...(parsedEvent.data.custom_data

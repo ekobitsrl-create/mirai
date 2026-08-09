@@ -10,6 +10,7 @@ import { createClient } from "@/lib/supabase/server"
 import { withDemoProducts } from "@/lib/products"
 import { HomeSeoContent } from "@/components/seo-content"
 import { buildSeoMetadata, createWebPageJsonLd } from "@/lib/seo"
+import { safeJsonLd } from "@/lib/json-ld"
 
 export const revalidate = 300
 
@@ -61,7 +62,7 @@ export default async function Home() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify(createWebPageJsonLd({ name: "Streetwear Catania - MIRAI LAB STORE", description: HOME_DESCRIPTION, path: "/" })),
+          __html: safeJsonLd(createWebPageJsonLd({ name: "Streetwear Catania - MIRAI LAB STORE", description: HOME_DESCRIPTION, path: "/" })),
         }}
       />
       <Navbar showPromo />

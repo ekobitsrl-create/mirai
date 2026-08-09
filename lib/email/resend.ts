@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server"
+import { createAdminClient } from "@/lib/supabase/server"
 
 export type EmailContent = {
   subject: string
@@ -39,7 +39,7 @@ async function recordDelivery(
   if (!process.env.SUPABASE_SERVICE_ROLE_KEY) return
 
   try {
-    const supabase = await createClient()
+    const supabase = createAdminClient()
     await supabase.from("email_deliveries").upsert({
       event_key: options.eventKey,
       email: options.to,
@@ -58,7 +58,7 @@ async function deliveryAlreadySent(eventKey: string) {
   if (!process.env.SUPABASE_SERVICE_ROLE_KEY) return false
 
   try {
-    const supabase = await createClient()
+    const supabase = createAdminClient()
     const { data } = await supabase
       .from("email_deliveries")
       .select("status")

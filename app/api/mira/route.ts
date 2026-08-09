@@ -2,6 +2,13 @@ import { NextRequest, NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
 import { isPrivateCheckoutProduct, withDemoProducts, type StoreProduct } from "@/lib/products"
 import { SHIPPING_CONFIG } from "@/lib/shipping"
+import {
+  consumeRateLimit,
+  contentLengthWithin,
+  isSameOriginRequest,
+  readJsonBody,
+  RequestBodyTooLargeError,
+} from "@/lib/request-security"
 
 export const runtime = "nodejs"
 export const maxDuration = 20
@@ -23,31 +30,6 @@ type OpenAIResponse = {
   error?: {
     message?: string
   }
-}
-
-type RateLimitEntry = {
-  count: number
-  resetAt: number
-}
-
-const globalForMira = globalThis as typeof globalThis & {
-  miraRateLimits?: Map<string, RateLimitEntry>
-}
-
-const rateLimits = globalForMira.miraRateLimits ?? new Map<string, RateLimitEntry>()
-globalForMira.miraRateLimits = rateLimits
-
-function isRateLimited(identifier: string) {
-  const now = Date.now()
-  const current = rateLimits.get(identifier)
-
-  if (!current || current.resetAt <= now) {
-    rateLimits.set(identifier, { count: 1, resetAt: now + 60_000 })
-    return false
-  }
-
-  current.count += 1
-  return current.count > 12
 }
 
 function sanitizeHistory(value: unknown): MiraTurn[] {
@@ -186,8 +168,13 @@ function getSuggestion(message: string, products: StoreProduct[]) {
 }
 
 export async function POST(request: NextRequest) {
-  const identifier = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "anonymous"
-  if (isRateLimited(identifier)) {
+  if (!isSameOriginRequest(request)) {
+    return NextResponse.json({ error: "Origine non valida." }, { status: 403 })
+  }
+  if (!contentLengthWithin(request, 32 * 1024)) {
+    return NextResponse.json({ error: "Richiesta troppo grande." }, { status: 413 })
+  }
+  if (!await consumeRateLimit({ bucket: "mira", limit: 12, windowSeconds: 60, request })) {
     return NextResponse.json({ error: "Troppe richieste. Riprova tra un minuto." }, { status: 429 })
   }
 
@@ -198,8 +185,11 @@ export async function POST(request: NextRequest) {
 
   let body: unknown
   try {
-    body = await request.json()
-  } catch {
+    body = await readJsonBody(request, 32 * 1024)
+  } catch (error) {
+    if (error instanceof RequestBodyTooLargeError) {
+      return NextResponse.json({ error: "Richiesta troppo grande." }, { status: 413 })
+    }
     return NextResponse.json({ error: "Richiesta non valida." }, { status: 400 })
   }
 

@@ -7,7 +7,6 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { User, Package, ArrowRight, LogOut } from "lucide-react"
 import { isAdminEmail } from "@/lib/admin"
-import { AdminPanel } from "@/components/admin-panel"
 import { CommunityPreview } from "@/components/mirai-community"
 import type { Session, User as SupabaseUser } from "@supabase/supabase-js"
 
@@ -71,6 +70,7 @@ export default function AccountPage() {
       if (isAdminEmail(currentUser.email)) {
         setIsAdmin(true)
         setLoading(false)
+        router.replace("/admin")
         return
       }
 
@@ -93,6 +93,7 @@ export default function AccountPage() {
         setProfile(typedProfile)
         setIsAdmin(true)
         setLoading(false)
+        router.replace("/admin")
         return
       }
 
@@ -145,7 +146,11 @@ export default function AccountPage() {
   if (!user) return null
 
   if (isAdmin) {
-    return <AdminPanel />
+    return (
+      <div className="min-h-svh bg-background flex items-center justify-center">
+        <div className="h-8 w-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+      </div>
+    )
   }
 
   // Normal user account page

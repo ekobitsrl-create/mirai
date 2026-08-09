@@ -1,5 +1,5 @@
 import type Stripe from "stripe"
-import { createClient } from "@/lib/supabase/server"
+import { createAdminClient } from "@/lib/supabase/server"
 import { sendEmailSafely } from "@/lib/email/resend"
 import {
   adminOrderNotificationTemplate,
@@ -35,7 +35,7 @@ type OrderRow = {
 async function loadOrder(orderId: string): Promise<EmailOrder | null> {
   if (!process.env.SUPABASE_SERVICE_ROLE_KEY) return null
 
-  const supabase = await createClient()
+  const supabase = createAdminClient()
   const { data, error } = await supabase
     .from("orders")
     .select(`

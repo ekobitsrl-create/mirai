@@ -10,6 +10,7 @@ import {
   META_PIXEL_READY_EVENT,
   trackMetaEvent,
 } from "@/lib/meta-pixel"
+import { sanitizedAnalyticsPath, sanitizedAnalyticsUrl } from "@/lib/safe-analytics-url"
 
 const GOOGLE_TAG_MANAGER_ID = "GTM-PRDL84CL"
 const TIKTOK_PIXEL_ID = "D9BLKH3C77UBS5FSCEK0"
@@ -56,8 +57,8 @@ export function MarketingPixels() {
       return
     }
 
-    const pagePath = `${pathname}${window.location.search}`
-    const pageUrl = window.location.href
+    const pageUrl = sanitizedAnalyticsUrl(window.location.href).toString()
+    const pagePath = sanitizedAnalyticsPath(pageUrl)
     const isInitialPageView = previousPath.current === null
     const isNewPageView = previousPath.current !== pagePath
 

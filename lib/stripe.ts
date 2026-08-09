@@ -5,7 +5,7 @@ const stripePublishableKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
 
 // A non-empty build key lets Next.js analyze API routes without contacting Stripe.
 // Requests still fail explicitly below when the real production key is missing.
-export const stripe = new Stripe(stripeSecretKey || 'sk_test_mirai_build_placeholder')
+export const stripe = new Stripe(stripeSecretKey || 'not_configured')
 
 export function assertStripeConfigured() {
   if (!stripeSecretKey) {

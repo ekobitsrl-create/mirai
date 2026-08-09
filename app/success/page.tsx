@@ -1,6 +1,6 @@
 "use client"
 
-import { Suspense, useEffect, useState } from "react"
+import { Suspense, useEffect, useLayoutEffect, useState } from "react"
 import { useSearchParams } from "next/navigation"
 import Link from "next/link"
 import { AlertCircle, ArrowRight, CheckCircle2, Package } from "lucide-react"
@@ -48,6 +48,7 @@ function formatPrice(value: number, currency: string) {
 function SuccessContent() {
   const searchParams = useSearchParams()
   const sessionId = searchParams.get("session_id")
+  const confirmationToken = searchParams.get("confirmation_token")
   const paymentMethod = searchParams.get("payment_method")
   const orderId = searchParams.get("order_id")
   const isCashOnDelivery = paymentMethod === "cash_on_delivery"
@@ -57,43 +58,76 @@ function SuccessContent() {
   const [cashPurchase, setCashPurchase] = useState<MetaCommerceParameters | null>(null)
   const [status, setStatus] = useState<"loading" | "pending" | "error" | "success" | "cash_on_delivery">("loading")
 
+  useLayoutEffect(() => {
+    if (window.location.search) window.history.replaceState(null, "", "/success")
+  }, [])
+
   useEffect(() => {
     if (isCashOnDelivery) {
-      if (orderId) {
-        try {
-          const storageKey = getGoogleReviewStorageKey(orderId)
-          const storedOrder = window.sessionStorage.getItem(storageKey)
-          if (storedOrder) {
-            const parsedOrder: unknown = JSON.parse(storedOrder)
-            if (isGoogleCustomerReviewOrder(parsedOrder) && parsedOrder.orderId === orderId) {
-              setReviewOrder(parsedOrder)
-            }
-            window.sessionStorage.removeItem(storageKey)
+      if (!orderId || !confirmationToken) {
+        setStatus("error")
+        return
+      }
+
+      let active = true
+      void fetch("/api/checkout/cash-confirmation", {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ orderId, confirmationToken }),
+      })
+        .then((response) => {
+          if (!active) return
+          if (!response.ok) {
+            setStatus("error")
+            return
           }
 
-          const storedPurchase = window.sessionStorage.getItem(getMetaPurchaseStorageKey(orderId))
-          if (storedPurchase) {
-            const parsedPurchase: unknown = JSON.parse(storedPurchase)
-            if (isMetaCommerceParameters(parsedPurchase)) {
-              setCashPurchase(parsedPurchase)
+          try {
+            const storageKey = getGoogleReviewStorageKey(orderId)
+            const storedOrder = window.sessionStorage.getItem(storageKey)
+            if (storedOrder) {
+              const parsedOrder: unknown = JSON.parse(storedOrder)
+              if (isGoogleCustomerReviewOrder(parsedOrder) && parsedOrder.orderId === orderId) {
+                setReviewOrder(parsedOrder)
+              }
+              window.sessionStorage.removeItem(storageKey)
             }
+
+            const storedPurchase = window.sessionStorage.getItem(getMetaPurchaseStorageKey(orderId))
+            if (storedPurchase) {
+              const parsedPurchase: unknown = JSON.parse(storedPurchase)
+              if (isMetaCommerceParameters(parsedPurchase)) {
+                setCashPurchase(parsedPurchase)
+              }
+            }
+          } catch {
+            // La conferma resta disponibile se lo storage e bloccato o non valido.
           }
-        } catch {
-          // La conferma resta disponibile se lo storage e bloccato o non valido.
-        }
+
+          clearCart()
+          setStatus("cash_on_delivery")
+        })
+        .catch(() => {
+          if (active) setStatus("error")
+        })
+
+      return () => {
+        active = false
       }
-      clearCart()
-      setStatus("cash_on_delivery")
-      return
     }
 
-    if (!sessionId) {
+    if (!sessionId || !confirmationToken) {
       setStatus("error")
       return
     }
 
     let active = true
-    void fetch(`/api/checkout/session?session_id=${encodeURIComponent(sessionId)}`, { credentials: "include" })
+    const query = new URLSearchParams({
+      session_id: sessionId,
+      confirmation_token: confirmationToken,
+    })
+    void fetch(`/api/checkout/session?${query.toString()}`, { credentials: "include" })
       .then(async (response) => {
         if (!active) return
         if (response.ok) {
@@ -112,7 +146,7 @@ function SuccessContent() {
     return () => {
       active = false
     }
-  }, [clearCart, isCashOnDelivery, orderId, sessionId])
+  }, [clearCart, confirmationToken, isCashOnDelivery, orderId, sessionId])
 
   if (status === "loading") {
     return (

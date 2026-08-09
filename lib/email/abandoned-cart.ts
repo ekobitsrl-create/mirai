@@ -1,5 +1,5 @@
 import { createHmac, timingSafeEqual } from "node:crypto"
-import { createClient } from "@/lib/supabase/server"
+import { createAdminClient } from "@/lib/supabase/server"
 import { SITE_URL } from "@/lib/site-url"
 import { sendEmailSafely } from "@/lib/email/resend"
 import { abandonedCartTemplate, type AbandonedCartItem } from "@/lib/email/templates"
@@ -63,7 +63,7 @@ export async function saveAbandonedCheckout(input: {
   if (!input.consent || !process.env.SUPABASE_SERVICE_ROLE_KEY) return
 
   try {
-    const supabase = await createClient()
+    const supabase = createAdminClient()
     const { error } = await supabase.from("abandoned_checkouts").upsert({
       checkout_session_id: input.checkoutSessionId,
       email: normalizeEmail(input.email),
@@ -86,7 +86,7 @@ export async function markCheckoutRecovered(input: {
   if (!process.env.SUPABASE_SERVICE_ROLE_KEY) return
 
   try {
-    const supabase = await createClient()
+    const supabase = createAdminClient()
     let query = supabase
       .from("abandoned_checkouts")
       .update({ status: "recovered", updated_at: new Date().toISOString() })
@@ -112,7 +112,7 @@ export async function unsubscribeMarketingEmail(email: string) {
     throw new Error("Servizio disiscrizione non configurato")
   }
 
-  const supabase = await createClient()
+  const supabase = createAdminClient()
   const normalizedEmail = normalizeEmail(email)
   const [unsubscribeResult, abandonedResult] = await Promise.all([
     supabase.from("email_unsubscribes").upsert({ email: normalizedEmail }, { onConflict: "email" }),
@@ -138,7 +138,7 @@ export async function sendAbandonedCartReminders() {
     throw new Error("EMAIL_UNSUBSCRIBE_SECRET o CRON_SECRET non configurato")
   }
 
-  const supabase = await createClient()
+  const supabase = createAdminClient()
   const cutoff = new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString()
   const oldest = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()
   const { data, error } = await supabase

@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation"
 import { isAdminEmail } from "@/lib/admin"
-import { getServerUserWithProfile, createClient, createUserClient } from "@/lib/supabase/server"
+import { getServerUserWithProfile, createAdminClient } from "@/lib/supabase/server"
 import { AdminDashboard } from "@/components/admin-dashboard"
 import { getEnvironmentDiscountCodes } from "@/lib/discounts"
 import { getDailyTimeWindow } from "@/lib/daily-time-window"
@@ -18,9 +18,7 @@ export default async function AdminPage() {
   if (!user) redirect("/auth/login?redirectTo=/admin")
   if (profile?.role !== "admin" && !isAdminEmail(user.email)) redirect("/account")
 
-  const supabase = await createUserClient()
-  if (!supabase) redirect("/auth/login?redirectTo=/admin")
-  const adminSupabase = await createClient()
+  const adminSupabase = createAdminClient()
 
   const abandonedBefore = new Date(Date.now() - 30 * 60 * 1000).toISOString()
   const cartCounterWindow = getDailyTimeWindow(new Date(), "Europe/Rome")
@@ -36,11 +34,11 @@ export default async function AdminPage() {
     cartsAbandonedRes,
     cookieDeclinesRes,
   ] = await Promise.all([
-    supabase.from("products").select("*").order("created_at", { ascending: false }),
-    supabase.from("categories").select("*").order("sort_order", { ascending: true }),
+    adminSupabase.from("products").select("*").order("created_at", { ascending: false }),
+    adminSupabase.from("categories").select("*").order("sort_order", { ascending: true }),
     adminSupabase.from("orders").select("*, order_items(*)").order("created_at", { ascending: false }),
-    supabase.from("profiles").select("*").order("created_at", { ascending: false }),
-    supabase.from("discount_codes").select("*").order("created_at", { ascending: false }),
+    adminSupabase.from("profiles").select("*").order("created_at", { ascending: false }),
+    adminSupabase.from("discount_codes").select("*").order("created_at", { ascending: false }),
     adminSupabase
       .from("cart_sessions")
       .select("id", { count: "exact", head: true })

@@ -3,6 +3,7 @@
 import Script from "next/script"
 import { usePathname } from "next/navigation"
 import { useCallback, useEffect, useRef } from "react"
+import { sanitizedAnalyticsPath, sanitizedAnalyticsUrl } from "@/lib/safe-analytics-url"
 
 const GOOGLE_ANALYTICS_ID = "G-CY0KQKG7VG"
 const GOOGLE_ADS_ID = "AW-18327352851"
@@ -55,13 +56,14 @@ export function GoogleIntegrations() {
   const trackPageView = useCallback((force = false) => {
     if (!hasAnalyticsConsent() || !window.gtag) return
 
-    const pagePath = `${window.location.pathname}${window.location.search}`
+    const safeUrl = sanitizedAnalyticsUrl(window.location.href)
+    const pagePath = sanitizedAnalyticsPath(safeUrl)
     if (!force && lastTrackedPath.current === pagePath) return
 
     lastTrackedPath.current = pagePath
     window.gtag("event", "page_view", {
       send_to: GOOGLE_ANALYTICS_ID,
-      page_location: window.location.href,
+      page_location: safeUrl.toString(),
       page_path: pagePath,
       page_title: document.title,
     })

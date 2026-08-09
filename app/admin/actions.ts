@@ -1,10 +1,6 @@
 "use server"
 
-import {
-  createClient as createServerClient,
-  createUserClient,
-  getServerUserWithProfile,
-} from "@/lib/supabase/server"
+import { createAdminClient, getServerUserWithProfile } from "@/lib/supabase/server"
 import { revalidatePath } from "next/cache"
 import { isBlackIslandProduct } from "@/lib/products"
 import { MIRAI_SUPPLIER_CATALOG } from "@/lib/mirai-supplier-catalog"
@@ -153,9 +149,7 @@ async function assertAdmin() {
   if (!user) throw new Error("Non autenticato")
   if (profile?.role !== "admin" && !isAdminEmail(user.email)) throw new Error("Non autorizzato")
 
-  // Use the signed-in admin session so product policies work even without a service key.
-  const supabase = await createUserClient()
-  if (!supabase) throw new Error("Sessione admin scaduta")
+  const supabase = createAdminClient()
   return { supabase, user }
 }
 
@@ -271,7 +265,7 @@ export async function deleteBlackIslandProducts() {
 
 export async function importMiraiSupplierCatalog() {
   await assertAdmin()
-  const supabase = await createServerClient()
+  const supabase = createAdminClient()
   const catalogSkus = MIRAI_SUPPLIER_CATALOG.map((product) => product.supplier_sku)
 
   const { data: existingProducts, error: existingProductsError } = await supabase
@@ -557,10 +551,16 @@ export async function deleteCategory(formData: FormData) {
 // --- Users ---
 
 export async function updateUserRole(formData: FormData) {
-  const { supabase } = await assertAdmin()
+  const { supabase, user } = await assertAdmin()
 
-  const id = formData.get("id") as string
-  const role = formData.get("role") as string
+  const id = String(formData.get("id") || "")
+  const role = String(formData.get("role") || "")
+  if (!/^[0-9a-f-]{36}$/i.test(id) || (role !== "user" && role !== "admin")) {
+    throw new Error("Ruolo non valido")
+  }
+  if (id === user.id && role !== "admin") {
+    throw new Error("Non puoi rimuovere il tuo stesso ruolo admin")
+  }
 
   const { error } = await supabase
     .from("profiles")

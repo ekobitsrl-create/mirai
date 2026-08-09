@@ -1,5 +1,5 @@
 import type { SupabaseClient, User } from "@supabase/supabase-js"
-import { createClient } from "@/lib/supabase/server"
+import { createAdminClient } from "@/lib/supabase/server"
 import { SITE_URL } from "@/lib/site-url"
 import { createUnsubscribeToken } from "@/lib/email/abandoned-cart"
 import { sendEmailSafely } from "@/lib/email/resend"
@@ -45,7 +45,7 @@ export async function sendWelcomeCouponEmails(options: { dryRun?: boolean } = {}
     throw new Error("RESEND_API_KEY non configurata")
   }
 
-  const supabase = await createClient()
+  const supabase = createAdminClient()
   const [users, ordersResult, consentResult, unsubscribesResult, deliveriesResult, profilesResult] = await Promise.all([
     listRegisteredUsers(supabase),
     supabase.from("orders").select("email, status"),

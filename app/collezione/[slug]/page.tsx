@@ -10,6 +10,7 @@ import { getAbsoluteUrl } from "@/lib/site-url"
 import type { SupabaseClient } from "@supabase/supabase-js"
 import { CategorySeoContent } from "@/components/seo-content"
 import { buildSeoMetadata, createBreadcrumbJsonLd, createWebPageJsonLd, getCategorySeo } from "@/lib/seo"
+import { safeJsonLd } from "@/lib/json-ld"
 
 export const revalidate = 300
 
@@ -168,7 +169,7 @@ export default async function CollezionePage({ params }: { params: Promise<{ slu
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify(createWebPageJsonLd({
+          __html: safeJsonLd(createWebPageJsonLd({
             type: "CollectionPage",
             name: seo?.title || category.name,
             description: seo?.description || category.description || `Collezione ${category.name} MIRAI.`,
@@ -179,7 +180,7 @@ export default async function CollezionePage({ params }: { params: Promise<{ slu
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify(createBreadcrumbJsonLd([
+          __html: safeJsonLd(createBreadcrumbJsonLd([
             { name: "Home", path: "/" },
             { name: "Collezioni", path: "/collezioni" },
             { name: category.name, path: `/collezione/${encodeURIComponent(slug)}` },

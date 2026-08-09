@@ -9,6 +9,7 @@ import {
   POSTHOG_READY_EVENT,
   hasPostHogConsent,
 } from "@/lib/posthog-events"
+import { sanitizedAnalyticsUrl } from "@/lib/safe-analytics-url"
 
 const projectToken = process.env.NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN?.trim() || ""
 const apiHost = process.env.NEXT_PUBLIC_POSTHOG_HOST?.trim() || ""
@@ -56,9 +57,7 @@ function PostHogPageViews({ ready }: { ready: boolean }) {
   useEffect(() => {
     if (!ready || !posthog.__loaded || !hasPostHogConsent()) return
 
-    const query = searchParams.toString()
-    const relativeUrl = query ? `${pathname}?${query}` : pathname
-    const currentUrl = new URL(relativeUrl, window.location.origin).toString()
+    const currentUrl = sanitizedAnalyticsUrl(window.location.href).toString()
     if (lastTrackedUrl.current === currentUrl) return
 
     lastTrackedUrl.current = currentUrl

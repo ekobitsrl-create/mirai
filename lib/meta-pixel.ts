@@ -1,4 +1,5 @@
 import { getCatalogItemId } from "@/lib/catalog-identifiers"
+import { sanitizedAnalyticsUrl } from "@/lib/safe-analytics-url"
 
 export const META_PIXEL_ID = process.env.NEXT_PUBLIC_META_PIXEL_ID?.trim() || ""
 export const META_CONSENT_EVENT = "mirai:cookie-consent"
@@ -76,21 +77,25 @@ export function trackMetaEvent(
   const resolvedEventId = eventId?.trim() || createMetaEventId(eventName)
   window.fbq("track", eventName, parameters || {}, { eventID: resolvedEventId })
 
-  void fetch("/api/meta/events", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      event_name: eventName,
-      event_id: resolvedEventId,
-      event_source_url: window.location.href,
-      ...(parameters ? { custom_data: parameters } : {}),
-    }),
-    credentials: "same-origin",
-    keepalive: true,
-    cache: "no-store",
-  }).catch(() => {
-    // Browser tracking must stay non-blocking if the server event is unavailable.
-  })
+  // Purchase CAPI events are emitted only by the trusted order confirmation
+  // paths. Other browser events can still be deduplicated with the Pixel.
+  if (eventName !== "Purchase") {
+    void fetch("/api/meta/events", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        event_name: eventName,
+        event_id: resolvedEventId,
+        event_source_url: sanitizedAnalyticsUrl(window.location.href).toString(),
+        ...(parameters ? { custom_data: parameters } : {}),
+      }),
+      credentials: "same-origin",
+      keepalive: true,
+      cache: "no-store",
+    }).catch(() => {
+      // Browser tracking must stay non-blocking if the server event is unavailable.
+    })
+  }
 
   return true
 }

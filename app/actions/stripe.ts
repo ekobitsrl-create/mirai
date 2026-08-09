@@ -2,7 +2,7 @@
 
 import type Stripe from 'stripe'
 import { assertStripeCheckoutConfigured, stripe } from '@/lib/stripe'
-import { createClient, getServerUser } from '@/lib/supabase/server'
+import { createAdminClient, getServerUser } from '@/lib/supabase/server'
 import { getDemoProduct, getSupplierProfile, isBlackIslandProduct, type StoreProduct } from '@/lib/products'
 import { getStripeShippingOptions, SHIPPING_CONFIG } from '@/lib/shipping'
 import { CASH_ON_DELIVERY_FEE_CENTS } from '@/lib/checkout-fees'
@@ -23,6 +23,13 @@ import {
   sanitizeCustomization,
 } from '@/lib/customization'
 import { getCatalogItemId } from '@/lib/catalog-identifiers'
+import {
+  CHECKOUT_CONFIRMATION_METADATA_KEY,
+  createCashOnDeliveryConfirmation,
+  createCheckoutConfirmation,
+} from '@/lib/checkout-confirmation'
+import { consumeRateLimit } from '@/lib/request-security'
+import { sendMetaPurchaseEvent } from '@/lib/meta-conversions-server'
 
 type CartLineItem = {
   productId: string
@@ -101,14 +108,17 @@ export async function validateCheckoutDiscount(
   guestEmail: string | undefined,
   discountCode: string,
 ) {
+  if (!await consumeRateLimit({ bucket: 'discount-validation', limit: 30, windowSeconds: 600 })) {
+    throw new Error('Troppe richieste. Riprova tra qualche minuto')
+  }
   const user = await getServerUser()
   const customerEmail = validEmail(user?.email || guestEmail)
   if (!customerEmail) {
     throw new Error('Inserisci un indirizzo email valido prima di applicare il codice')
   }
-  if (!cartItems.length) throw new Error('Il carrello è vuoto')
+  if (!cartItems.length || cartItems.length > 50) throw new Error('Il carrello non è valido')
 
-  const supabase = await createClient()
+  const supabase = createAdminClient()
   const productIds = [...new Set(cartItems.map((item) => item.productId))]
   const { data: products, error } = await supabase
     .from('products')
@@ -128,7 +138,7 @@ export async function validateCheckoutDiscount(
     if (!product) throw new Error(`Prodotto ${cartItem.productId} non trovato`)
 
     const quantity = Number(cartItem.quantity)
-    if (!Number.isInteger(quantity) || quantity < 1) {
+    if (!Number.isInteger(quantity) || quantity < 1 || quantity > 10) {
       throw new Error('Quantità non valida nel carrello')
     }
 
@@ -150,6 +160,9 @@ export async function createCheckoutSession(
   previousCheckoutSessionId?: string | null,
   discountCode?: string,
 ) {
+  if (!await consumeRateLimit({ bucket: 'stripe-checkout', limit: 20, windowSeconds: 600 })) {
+    throw new Error('Troppi tentativi di pagamento. Riprova tra qualche minuto')
+  }
   assertStripeCheckoutConfigured()
   const user = await getServerUser()
   const customerEmail = validEmail(user?.email || guestEmail)
@@ -160,11 +173,11 @@ export async function createCheckoutSession(
     throw new Error('Inserisci un indirizzo email valido per applicare il codice sconto')
   }
 
-  if (!cartItems.length) {
+  if (!cartItems.length || cartItems.length > 50) {
     throw new Error('Il carrello è vuoto')
   }
 
-  const supabase = await createClient()
+  const supabase = createAdminClient()
 
   const productIds = cartItems.map((item) => item.productId)
   let { data: products, error } = await supabase
@@ -201,7 +214,7 @@ export async function createCheckoutSession(
     }
 
     const requestedQuantity = Number(cartItem.quantity)
-    if (!Number.isInteger(requestedQuantity) || requestedQuantity < 1) {
+    if (!Number.isInteger(requestedQuantity) || requestedQuantity < 1 || requestedQuantity > 10) {
       throw new Error(`Quantità non valida per ${product.name}`)
     }
 
@@ -268,10 +281,11 @@ export async function createCheckoutSession(
     discountMetadata.subtotal_cents = String(appliedDiscount.subtotalCents)
   }
 
+  const confirmation = createCheckoutConfirmation()
   const sessionParams: Stripe.Checkout.SessionCreateParams = {
     ui_mode: 'embedded',
     redirect_on_completion: 'if_required',
-    return_url: `${baseUrl}/success?session_id={CHECKOUT_SESSION_ID}`,
+    return_url: `${baseUrl}/success?session_id={CHECKOUT_SESSION_ID}&confirmation_token=${encodeURIComponent(confirmation.token)}`,
     line_items: lineItems,
     mode: 'payment',
     customer_creation: 'if_required',
@@ -279,6 +293,7 @@ export async function createCheckoutSession(
     ...(user ? { client_reference_id: user.id } : {}),
     metadata: {
       order_item_count: String(cartItems.length),
+      [CHECKOUT_CONFIRMATION_METADATA_KEY]: confirmation.hash,
       ...(user ? { user_id: user.id } : {}),
       ...discountMetadata,
     },
@@ -330,6 +345,7 @@ export async function createCheckoutSession(
   return {
     clientSecret: session.client_secret,
     sessionId: session.id,
+    confirmationToken: confirmation.token,
     discount: appliedDiscount,
   }
 }
@@ -354,7 +370,7 @@ function isMissingDiscountOrderColumns(error: { code?: string; message?: string 
 export async function getCashOnDeliveryEligibility(cartItems: CartLineItem[]) {
   if (!cartItems.length) return { eligible: false }
 
-  const supabase = await createClient()
+  const supabase = createAdminClient()
   const productIds = [...new Set(cartItems.map((item) => item.productId))]
   const { data: products, error } = await supabase
     .from('products')
@@ -378,6 +394,9 @@ export async function getCashOnDeliveryEligibility(cartItems: CartLineItem[]) {
 }
 
 export async function createCashOnDeliveryOrder(cartItems: CartLineItem[], details: CashOnDeliveryDetails) {
+  if (!await consumeRateLimit({ bucket: 'cash-on-delivery', limit: 5, windowSeconds: 3600 })) {
+    throw new Error('Troppi tentativi di ordine. Riprova più tardi')
+  }
   if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
     throw new Error('Il servizio ordini non e configurato')
   }
@@ -395,7 +414,7 @@ export async function createCashOnDeliveryOrder(cartItems: CartLineItem[], detai
     throw new Error('Inserisci un indirizzo email valido per applicare il codice sconto')
   }
 
-  if (!cartItems.length) {
+  if (!cartItems.length || cartItems.length > 50) {
     throw new Error('Il carrello e vuoto')
   }
 
@@ -411,7 +430,7 @@ export async function createCashOnDeliveryOrder(cartItems: CartLineItem[], detai
     throw new Error('Inserisci un CAP italiano valido')
   }
 
-  const supabase = await createClient()
+  const supabase = createAdminClient()
   const productIds = [...new Set(cartItems.map((item) => item.productId))]
   let { data: products, error } = await supabase
     .from('products')
@@ -451,7 +470,7 @@ export async function createCashOnDeliveryOrder(cartItems: CartLineItem[], detai
     if (!product) throw new Error(`Prodotto ${cartItem.productId} non trovato`)
 
     const quantity = Number(cartItem.quantity)
-    if (!Number.isInteger(quantity) || quantity < 1) {
+    if (!Number.isInteger(quantity) || quantity < 1 || quantity > 10) {
       throw new Error(`Quantita non valida per ${product.name}`)
     }
 
@@ -568,9 +587,7 @@ export async function createCashOnDeliveryOrder(cartItems: CartLineItem[], detai
   }
   await sendOrderConfirmationEmail(order.id, 'cash_on_delivery')
 
-  return {
-    orderId: order.id,
-    meta: {
+  const meta = {
       content_ids: [...new Set(validatedItems.map(({ cartItem, product }) => (
         getCatalogItemId(product, cartItem.size || 'OS')
       )))],
@@ -583,7 +600,18 @@ export async function createCashOnDeliveryOrder(cartItems: CartLineItem[], detai
         item_price: Number(product.price),
       })),
       num_items: validatedItems.reduce((total, item) => total + item.quantity, 0),
-    },
+    }
+
+  await sendMetaPurchaseEvent({
+    eventId: order.id,
+    email: customerEmail,
+    customData: meta,
+  })
+
+  return {
+    orderId: order.id,
+    confirmationToken: createCashOnDeliveryConfirmation(order.id),
+    meta,
     review: {
       orderId: order.id,
       email: customerEmail || '',

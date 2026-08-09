@@ -1,52 +1,67 @@
-import { createClient as createSupabaseClient } from '@supabase/supabase-js'
-import { cookies } from 'next/headers'
+import "server-only"
 
-const SUPABASE_URL = 'https://xbendkxwuaqrxsyrmgye.supabase.co'
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhiZW5ka3h3dWFxcnhzeXJtZ3llIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE1MDE5NDYsImV4cCI6MjA4NzA3Nzk0Nn0.QAnZGtZy2ebu7RCdeWFJr5SQo3XXdJOL3aUe5MMJmb4'
-const SUPABASE_ADMIN_KEY =
-  process.env.SUPABASE_SECRET_KEY ||
-  process.env.SUPABASE_SERVICE_ROLE_KEY ||
-  ''
+import { createClient as createSupabaseClient, type SupabaseClient } from "@supabase/supabase-js"
+import { cookies } from "next/headers"
+
+type LooseDatabase = any
+
+function requiredEnvironment(name: string) {
+  const value = process.env[name]?.trim()
+  if (!value) throw new Error(`Variabile ambiente mancante: ${name}`)
+  return value
+}
+
+function getSupabaseUrl() {
+  return requiredEnvironment("NEXT_PUBLIC_SUPABASE_URL")
+}
+
+function getAnonKey() {
+  return requiredEnvironment("NEXT_PUBLIC_SUPABASE_ANON_KEY")
+}
+
+function getAdminKey() {
+  const key = process.env.SUPABASE_SECRET_KEY?.trim()
+    || process.env.SUPABASE_SERVICE_ROLE_KEY?.trim()
+  if (!key) throw new Error("SUPABASE_SERVICE_ROLE_KEY non configurata")
+  return key
+}
 
 async function getAccessToken() {
   const cookieStore = await cookies()
-  return cookieStore.get('sb-access-token')?.value || null
+  return cookieStore.get("sb-access-token")?.value || null
 }
 
-export async function createUserClient() {
-  const accessToken = await getAccessToken()
-  if (!accessToken) return null
-
-  if (SUPABASE_ADMIN_KEY) {
-    return createSupabaseClient(SUPABASE_URL, SUPABASE_ADMIN_KEY, {
-      auth: {
-        autoRefreshToken: false,
-        persistSession: false,
-      },
-    })
-  }
-
-  return createSupabaseClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-    global: {
-      headers: { Authorization: `Bearer ${accessToken}` },
-    },
+export function createPublicClient(): SupabaseClient<LooseDatabase> {
+  return createSupabaseClient<LooseDatabase>(getSupabaseUrl(), getAnonKey(), {
+    auth: { autoRefreshToken: false, persistSession: false },
   })
 }
 
+export function createAdminClient(): SupabaseClient<LooseDatabase> {
+  return createSupabaseClient<LooseDatabase>(getSupabaseUrl(), getAdminKey(), {
+    auth: { autoRefreshToken: false, persistSession: false },
+  })
+}
+
+export async function createUserClient(): Promise<SupabaseClient<LooseDatabase> | null> {
+  const accessToken = await getAccessToken()
+  if (!accessToken) return null
+
+  return createSupabaseClient<LooseDatabase>(getSupabaseUrl(), getAnonKey(), {
+    auth: { autoRefreshToken: false, persistSession: false },
+    global: { headers: { Authorization: `Bearer ${accessToken}` } },
+  })
+}
+
+// Backwards-compatible public server client. Privileged writes must explicitly use
+// createAdminClient(), so importing this helper can never silently bypass RLS.
 export async function createClient() {
-  const key = SUPABASE_ADMIN_KEY || SUPABASE_ANON_KEY
-  return createSupabaseClient(SUPABASE_URL, key)
+  return createPublicClient()
 }
 
 export async function getServerUser() {
-  const accessToken = await getAccessToken()
-  if (!accessToken) return null
-
-  const client = createSupabaseClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-    global: {
-      headers: { Authorization: `Bearer ${accessToken}` },
-    },
-  })
+  const client = await createUserClient()
+  if (!client) return null
 
   const { data: { user }, error } = await client.auth.getUser()
   if (error || !user) return null
@@ -54,22 +69,16 @@ export async function getServerUser() {
 }
 
 export async function getServerUserWithProfile() {
-  const accessToken = await getAccessToken()
-  if (!accessToken) return { user: null, profile: null }
-
-  const client = createSupabaseClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-    global: {
-      headers: { Authorization: `Bearer ${accessToken}` },
-    },
-  })
+  const client = await createUserClient()
+  if (!client) return { user: null, profile: null }
 
   const { data: { user }, error } = await client.auth.getUser()
   if (error || !user) return { user: null, profile: null }
 
   const { data: profile } = await client
-    .from('profiles')
-    .select('*')
-    .eq('id', user.id)
+    .from("profiles")
+    .select("*")
+    .eq("id", user.id)
     .single()
 
   return { user, profile }

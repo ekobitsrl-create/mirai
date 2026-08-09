@@ -1,15 +1,11 @@
 import { NextResponse } from "next/server"
-import { createClient } from "@/lib/supabase/server"
+import { consumeRateLimit, isSameOriginRequest } from "@/lib/request-security"
+import { createAdminClient } from "@/lib/supabase/server"
 
 export const dynamic = "force-dynamic"
 
-function isSameOrigin(request: Request) {
-  const origin = request.headers.get("origin")
-  return Boolean(origin && origin === new URL(request.url).origin)
-}
-
 export async function POST(request: Request) {
-  if (!isSameOrigin(request)) {
+  if (!isSameOriginRequest(request)) {
     return NextResponse.json({ error: "Invalid origin" }, { status: 403 })
   }
 
@@ -22,7 +18,11 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Consent choice missing" }, { status: 400 })
   }
 
-  const supabase = await createClient()
+  if (!await consumeRateLimit({ bucket: "cookie-decline", limit: 3, windowSeconds: 86_400, request })) {
+    return new NextResponse(null, { status: 204, headers: { "Cache-Control": "no-store" } })
+  }
+
+  const supabase = createAdminClient()
   const { error } = await supabase.rpc("increment_cookie_consent_necessary_count")
 
   if (error) {

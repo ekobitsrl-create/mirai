@@ -12,6 +12,7 @@ import {
   withDemoProducts,
 } from "@/lib/products"
 import { getAbsoluteUrl, SITE_URL } from "@/lib/site-url"
+import { safeJsonLd } from "@/lib/json-ld"
 
 export const revalidate = 300
 
@@ -234,11 +235,11 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
     <main className="relative min-h-screen overflow-hidden bg-[#15101d]">
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: safeJsonLd(jsonLd) }}
       />
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+        dangerouslySetInnerHTML={{ __html: safeJsonLd(breadcrumbJsonLd) }}
       />
       <Navbar />
       <div className="pointer-events-none absolute inset-x-0 top-20 h-[950px] overflow-hidden" aria-hidden="true">

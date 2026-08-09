@@ -1,0 +1,8 @@
+packages:
+  - "."
+
+overrides:
+  dompurify: ^3.4.13
+  lodash: ^4.17.24
+  qs: ^6.15.2
+  undici: ^6.28.0

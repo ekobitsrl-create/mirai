@@ -47,6 +47,7 @@ export default function CheckoutPage() {
   const [promoLoading, setPromoLoading] = useState(false)
   const [appliedDiscount, setAppliedDiscount] = useState<AppliedDiscount | null>(null)
   const sessionIdRef = useRef<string | null>(null)
+  const confirmationTokenRef = useRef<string | null>(null)
   const checkoutSessionRef = useRef<{ key: string; promise: Promise<string> } | null>(null)
 
   useEffect(() => {
@@ -146,6 +147,7 @@ export default function CheckoutPage() {
       .then((session) => {
         if (!session?.clientSecret) throw new Error(t.checkout.error)
         sessionIdRef.current = session.sessionId
+        confirmationTokenRef.current = session.confirmationToken
         return session.clientSecret
       })
       .catch((error) => {
@@ -163,12 +165,15 @@ export default function CheckoutPage() {
   const retryCardCheckout = () => {
     checkoutSessionRef.current = null
     sessionIdRef.current = null
+    confirmationTokenRef.current = null
     setCardError(null)
     setCardAttempt((attempt) => attempt + 1)
   }
 
   const resetCardCheckout = () => {
     checkoutSessionRef.current = null
+    sessionIdRef.current = null
+    confirmationTokenRef.current = null
     setCardError(null)
     setCardAttempt((attempt) => attempt + 1)
   }
@@ -240,7 +245,12 @@ export default function CheckoutPage() {
       } catch {}
 
       clearCart()
-      window.location.assign(`/success?payment_method=cash_on_delivery&order_id=${encodeURIComponent(order.orderId)}`)
+      const confirmationQuery = new URLSearchParams({
+        payment_method: "cash_on_delivery",
+        order_id: order.orderId,
+        confirmation_token: order.confirmationToken,
+      })
+      window.location.assign(`/success?${confirmationQuery.toString()}`)
     } catch (error) {
       setCashError(error instanceof Error ? error.message : "Non e stato possibile registrare l ordine")
       setCashSubmitting(false)
@@ -528,7 +538,12 @@ export default function CheckoutPage() {
                         onComplete: () => {
                           clearCart()
                           const sessionId = sessionIdRef.current
-                          window.location.assign(sessionId ? `/success?session_id=${encodeURIComponent(sessionId)}` : "/success")
+                          const confirmationToken = confirmationTokenRef.current
+                          window.location.assign(
+                            sessionId && confirmationToken
+                              ? `/success?session_id=${encodeURIComponent(sessionId)}&confirmation_token=${encodeURIComponent(confirmationToken)}`
+                              : "/success",
+                          )
                         },
                       }}
                     >

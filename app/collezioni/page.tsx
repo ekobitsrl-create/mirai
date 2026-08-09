@@ -5,6 +5,7 @@ import { ShopGrid } from "@/components/shop-grid"
 import { withDemoProducts } from "@/lib/products"
 import { CatalogSeoContent } from "@/components/seo-content"
 import { buildSeoMetadata, createWebPageJsonLd } from "@/lib/seo"
+import { safeJsonLd } from "@/lib/json-ld"
 
 export const revalidate = 300
 
@@ -50,7 +51,7 @@ export default async function CollezioniPage() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify(createWebPageJsonLd({
+          __html: safeJsonLd(createWebPageJsonLd({
             type: "CollectionPage",
             name: "Abbigliamento streetwear online",
             description: COLLECTIONS_DESCRIPTION,

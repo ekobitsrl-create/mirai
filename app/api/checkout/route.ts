@@ -11,6 +11,18 @@ import {
   sanitizeCustomization,
 } from '@/lib/customization'
 import { getCatalogItemId } from '@/lib/catalog-identifiers'
+import { SITE_URL } from '@/lib/site-url'
+import {
+  CHECKOUT_CONFIRMATION_METADATA_KEY,
+  createCheckoutConfirmation,
+} from '@/lib/checkout-confirmation'
+import {
+  consumeRateLimit,
+  contentLengthWithin,
+  isSameOriginRequest,
+  readJsonBody,
+  RequestBodyTooLargeError,
+} from '@/lib/request-security'
 
 type CheckoutCartItem = {
   productId: string
@@ -35,10 +47,27 @@ function validEmail(value: unknown) {
  */
 export async function POST(request: NextRequest) {
   try {
+    if (!isSameOriginRequest(request)) {
+      return NextResponse.json({ error: 'Origine non valida' }, { status: 403 })
+    }
+    if (!contentLengthWithin(request, 128 * 1024)) {
+      return NextResponse.json({ error: 'Richiesta troppo grande' }, { status: 413 })
+    }
+    if (!await consumeRateLimit({ bucket: 'checkout-api', limit: 20, windowSeconds: 600, request })) {
+      return NextResponse.json({ error: 'Troppi tentativi. Riprova più tardi' }, { status: 429 })
+    }
     assertStripeConfigured()
     const user = await getServerUser()
-    const body = await request.json()
-    const { items, priceId, paymentMethod, cancelPath, customerEmail: requestedEmail } = body
+    let body: Record<string, unknown>
+    try {
+      body = await readJsonBody<Record<string, unknown>>(request, 128 * 1024)
+    } catch (error) {
+      if (error instanceof RequestBodyTooLargeError) {
+        return NextResponse.json({ error: 'Richiesta troppo grande' }, { status: 413 })
+      }
+      return NextResponse.json({ error: 'Richiesta non valida' }, { status: 400 })
+    }
+    const { items, paymentMethod, cancelPath, customerEmail: requestedEmail } = body
     const customerEmail = validEmail(user?.email || requestedEmail)
     const accountMetadata: Stripe.MetadataParam = user ? { user_id: user.id } : {}
     const customerParams: Pick<
@@ -69,52 +98,24 @@ export async function POST(request: NextRequest) {
     }
 
     const paymentMethodParams: Pick<Stripe.Checkout.SessionCreateParams, 'payment_method_types'> | Record<string, never> = quickPaymentMethod
-      ? { payment_method_types: [quickPaymentMethod] }
+      ? {
+          // Scalapay is supported by Stripe Checkout, but this project's pinned
+          // Stripe SDK predates the corresponding TypeScript enum entry.
+          payment_method_types: [
+            quickPaymentMethod as Stripe.Checkout.SessionCreateParams.PaymentMethodType,
+          ],
+        }
       : {}
 
     // Base URL per i redirect
-    const configuredBaseUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_SITE_URL
-    const baseUrl = (configuredBaseUrl || request.nextUrl.origin).replace(/\/$/, '')
+    const baseUrl = SITE_URL
     const safeCancelPath =
       typeof cancelPath === 'string' && cancelPath.startsWith('/') && !cancelPath.startsWith('//')
         ? cancelPath
         : '/cancel'
 
-    // Se viene passato un priceId diretto (prodotto Stripe)
-    if (priceId) {
-      const price = await stripe.prices.retrieve(priceId)
-      if (price.unit_amount === null) {
-        throw new Error('Prezzo Stripe non valido')
-      }
-
-      const priceMetadata: Stripe.MetadataParam = { ...accountMetadata, order_item_count: '1' }
-      const session = await stripe.checkout.sessions.create({
-        mode: 'payment',
-        ...paymentMethodParams,
-        line_items: [
-          {
-            price: priceId,
-            quantity: 1,
-          },
-        ],
-        shipping_address_collection: {
-          allowed_countries: [...SHIPPING_CONFIG.allowedCountries],
-        },
-        phone_number_collection: {
-          enabled: true,
-        },
-        shipping_options: getStripeShippingOptions(price.unit_amount),
-        success_url: `${baseUrl}/success?session_id={CHECKOUT_SESSION_ID}`,
-        cancel_url: `${baseUrl}${safeCancelPath}`,
-        ...customerParams,
-        metadata: priceMetadata,
-      })
-
-      return NextResponse.json({ url: session.url })
-    }
-
     // Se vengono passati items dal carrello
-    if (!items || !Array.isArray(items) || items.length === 0) {
+    if (!items || !Array.isArray(items) || items.length === 0 || items.length > 50) {
       return NextResponse.json(
         { error: 'Carrello vuoto o dati non validi' },
         { status: 400 }
@@ -166,7 +167,7 @@ export async function POST(request: NextRequest) {
       }
 
       const requestedQuantity = Number(cartItem.quantity)
-      if (!Number.isInteger(requestedQuantity) || requestedQuantity < 1) {
+      if (!Number.isInteger(requestedQuantity) || requestedQuantity < 1 || requestedQuantity > 10) {
         throw new Error(`Quantità non valida per ${product.name}`)
       }
 
@@ -224,8 +225,10 @@ export async function POST(request: NextRequest) {
     })))
 
     // Crea la sessione Stripe Checkout
+    const confirmation = createCheckoutConfirmation()
     const sessionMetadata: Stripe.MetadataParam = {
       ...accountMetadata,
+      [CHECKOUT_CONFIRMATION_METADATA_KEY]: confirmation.hash,
       ...(compactOrderItems.length <= 500
         ? { order_items: compactOrderItems }
         : { order_item_count: String(items.length) }),
@@ -245,7 +248,7 @@ export async function POST(request: NextRequest) {
       },
       shipping_options: getStripeShippingOptions(subtotalCents),
       // URL di redirect
-      success_url: `${baseUrl}/success?session_id={CHECKOUT_SESSION_ID}`,
+      success_url: `${baseUrl}/success?session_id={CHECKOUT_SESSION_ID}&confirmation_token=${encodeURIComponent(confirmation.token)}`,
       cancel_url: `${baseUrl}${safeCancelPath}`,
       // Metadata per tracciamento ordine
       metadata: sessionMetadata,
