@@ -177,6 +177,7 @@ export const translations = {
     cookies: {
       title: "Questo sito utilizza i cookie",
       description: "Utilizziamo cookie tecnici necessari e, con il tuo consenso, cookie analitici e di marketing per misurare le visite e le campagne pubblicitarie. Puoi accettare tutti i cookie o scegliere solo quelli necessari. Per maggiori informazioni, consulta la nostra",
+      compactDescription: "Cookie necessari per il sito; con il tuo consenso usiamo anche Analytics e Marketing.",
       cookiePolicy: "Cookie Policy",
       and: "e la",
       privacyPolicy: "Privacy Policy",
@@ -360,6 +361,7 @@ export const translations = {
     cookies: {
       title: "This site uses cookies",
       description: "We use necessary technical cookies and, with your consent, analytics and marketing cookies to measure visits and advertising campaigns. You can accept all cookies or choose only necessary ones. For more information, see our",
+      compactDescription: "Necessary cookies keep the site working; with your consent we also use Analytics and Marketing.",
       cookiePolicy: "Cookie Policy",
       and: "and",
       privacyPolicy: "Privacy Policy",
@@ -543,6 +545,7 @@ export const translations = {
     cookies: {
       title: "Este sitio utiliza cookies",
       description: "Utilizamos cookies técnicas necesarias y, con tu consentimiento, cookies analíticas y de marketing para medir visitas y campañas publicitarias. Puedes aceptar todas las cookies o elegir solo las necesarias. Para más información, consulta nuestra",
+      compactDescription: "Las cookies necesarias permiten que el sitio funcione; con tu consentimiento usamos Analítica y Marketing.",
       cookiePolicy: "Política de Cookies",
       and: "y la",
       privacyPolicy: "Política de Privacidad",
@@ -726,6 +729,7 @@ export const translations = {
     cookies: {
       title: "Diese Website verwendet Cookies",
       description: "Wir verwenden notwendige technische Cookies und, mit deiner Einwilligung, Analyse- und Marketing-Cookies zur Messung von Besuchen und Werbekampagnen. Du kannst alle Cookies akzeptieren oder nur die notwendigen auswählen. Weitere Informationen findest du in unserer",
+      compactDescription: "Notwendige Cookies halten die Website funktionsfähig; mit deiner Einwilligung nutzen wir Analyse und Marketing.",
       cookiePolicy: "Cookie-Richtlinie",
       and: "und",
       privacyPolicy: "Datenschutzerklärung",
@@ -909,6 +913,7 @@ export const translations = {
     cookies: {
       title: "Ce site utilise des cookies",
       description: "Nous utilisons des cookies techniques nécessaires et, avec votre consentement, des cookies analytiques et marketing pour mesurer les visites et les campagnes publicitaires. Vous pouvez accepter tous les cookies ou choisir uniquement les cookies nécessaires. Pour plus d'informations, consultez notre",
+      compactDescription: "Les cookies nécessaires assurent le fonctionnement du site ; avec votre accord, nous utilisons aussi Analytics et Marketing.",
       cookiePolicy: "Politique de Cookies",
       and: "et notre",
       privacyPolicy: "Politique de Confidentialité",

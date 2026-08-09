@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import { X } from "lucide-react"
+import { usePathname } from "next/navigation"
 import { useLanguage } from "@/lib/language-context"
 
 type GoogleConsentValue = "granted" | "denied"
@@ -40,6 +41,7 @@ function recordNecessaryOnlyChoice() {
 }
 
 export function CookieBanner() {
+  const pathname = usePathname()
   const [visible, setVisible] = useState(false)
   const [showPreferences, setShowPreferences] = useState(false)
   const [analyticsEnabled, setAnalyticsEnabled] = useState(false)
@@ -122,20 +124,32 @@ export function CookieBanner() {
 
   if (!visible) return null
 
+  const isProductPage = pathname.startsWith("/prodotto/")
+
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-[9999] p-4 animate-fade-up">
-      <div className="relative max-h-[calc(100dvh-2rem)] max-w-4xl overflow-y-auto mx-auto bg-card border border-border rounded-xl p-5 sm:p-6 shadow-2xl shadow-background/80">
+    <div
+      className={`pointer-events-none fixed inset-x-0 z-[9999] px-2 pb-2 sm:p-4 animate-fade-up ${
+        isProductPage
+          ? "bottom-[calc(5.25rem+env(safe-area-inset-bottom))] md:bottom-0"
+          : "bottom-0"
+      }`}
+    >
+      <div
+        className={`pointer-events-auto relative mx-auto max-w-4xl overflow-y-auto bg-card border border-border rounded-xl p-3.5 sm:p-6 shadow-2xl shadow-background/80 ${
+          showPreferences ? "max-h-[min(68dvh,32rem)]" : "max-h-[min(48dvh,22rem)]"
+        }`}
+      >
         <button
           type="button"
           onClick={acceptNecessary}
-          className="absolute right-3 top-3 sm:right-4 sm:top-4 flex h-11 w-11 items-center justify-center rounded-full border border-border bg-background/70 text-foreground transition-colors hover:bg-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+          className="absolute right-2.5 top-2.5 sm:right-4 sm:top-4 flex h-10 w-10 sm:h-11 sm:w-11 items-center justify-center rounded-full border border-border bg-background/80 text-foreground transition-colors hover:bg-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
           aria-label={t.cookies.closeNecessary}
           title={t.cookies.closeNecessary}
         >
           <X className="h-5 w-5" aria-hidden="true" />
         </button>
 
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-3 sm:gap-4">
           {showPreferences ? (
             <>
               <div className="flex flex-col gap-2 pr-12">
@@ -145,7 +159,7 @@ export function CookieBanner() {
                 >
                   {t.cookies.preferencesTitle}
                 </h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">
+                <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
                   {t.cookies.preferencesDescription}
                 </p>
               </div>
@@ -172,18 +186,18 @@ export function CookieBanner() {
                 />
               </div>
 
-              <div className="flex flex-col-reverse sm:flex-row gap-3">
+              <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-row sm:gap-3">
                 <button
                   type="button"
                   onClick={savePreferences}
-                  className="h-11 px-6 border border-border text-foreground font-medium text-sm tracking-wide uppercase rounded-lg hover:bg-secondary transition-colors"
+                  className="min-h-11 px-3 sm:px-6 border border-border text-foreground font-medium text-[10px] sm:text-sm tracking-[0.08em] sm:tracking-wide uppercase rounded-lg hover:bg-secondary transition-colors"
                 >
                   {t.cookies.savePreferences}
                 </button>
                 <button
                   type="button"
                   onClick={acceptAll}
-                  className="h-11 px-6 bg-primary text-primary-foreground font-medium text-sm tracking-wide uppercase rounded-lg hover:bg-primary/90 transition-colors"
+                  className="min-h-11 px-3 sm:px-6 bg-primary text-primary-foreground font-medium text-[10px] sm:text-sm tracking-[0.08em] sm:tracking-wide uppercase rounded-lg hover:bg-primary/90 transition-colors"
                 >
                   {t.cookies.acceptAll}
                 </button>
@@ -198,7 +212,13 @@ export function CookieBanner() {
                 >
                   {t.cookies.title}
                 </h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">
+                <p className="text-xs text-muted-foreground leading-relaxed sm:hidden">
+                  {t.cookies.compactDescription}{" "}
+                  <Link href="/cookie-policy" className="text-primary hover:underline">
+                    {t.cookies.cookiePolicy}
+                  </Link>.
+                </p>
+                <p className="hidden text-sm text-muted-foreground leading-relaxed sm:block">
                   {t.cookies.description}{" "}
                   <Link href="/cookie-policy" className="text-primary hover:underline">
                     {t.cookies.cookiePolicy}
@@ -209,18 +229,18 @@ export function CookieBanner() {
                   </Link>.
                 </p>
               </div>
-              <div className="flex flex-col sm:flex-row gap-3">
+              <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-row sm:gap-3">
                 <button
                   type="button"
                   onClick={acceptAll}
-                  className="h-11 px-6 bg-primary text-primary-foreground font-medium text-sm tracking-wide uppercase rounded-lg hover:bg-primary/90 transition-colors"
+                  className="min-h-11 px-3 sm:px-6 bg-primary text-primary-foreground font-medium text-[10px] sm:text-sm tracking-[0.08em] sm:tracking-wide uppercase rounded-lg hover:bg-primary/90 transition-colors"
                 >
                   {t.cookies.acceptAll}
                 </button>
                 <button
                   type="button"
                   onClick={() => setShowPreferences(true)}
-                  className="h-11 px-6 border border-border text-foreground font-medium text-sm tracking-wide uppercase rounded-lg hover:bg-secondary transition-colors"
+                  className="min-h-11 px-3 sm:px-6 border border-border text-foreground font-medium text-[10px] sm:text-sm tracking-[0.08em] sm:tracking-wide uppercase rounded-lg hover:bg-secondary transition-colors"
                 >
                   {t.cookies.personalize}
                 </button>
@@ -251,7 +271,7 @@ function CookiePreferenceRow({
   onToggle,
 }: CookiePreferenceRowProps) {
   return (
-    <div className="flex items-start justify-between gap-4 rounded-lg border border-border bg-background/35 p-4">
+    <div className="flex items-start justify-between gap-3 rounded-lg border border-border bg-background/35 p-3 sm:gap-4 sm:p-4">
       <div className="min-w-0">
         <div className="flex flex-wrap items-center gap-2">
           <p className="text-sm font-semibold text-foreground">{title}</p>
