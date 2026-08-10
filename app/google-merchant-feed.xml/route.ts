@@ -185,19 +185,30 @@ function getSizes(product: StoreProduct) {
   return sizes.length > 0 ? sizes : ["OS"]
 }
 
+function normalizeInventoryQuantity(quantity: unknown) {
+  const value = Number(quantity ?? 0)
+  return Number.isFinite(value) ? Math.max(0, Math.floor(value)) : 0
+}
+
+function getProductInventory(product: StoreProduct) {
+  if (!product.stock_by_size) return product.in_stock ? 1 : 0
+
+  return getSizes(product).reduce(
+    (total, size) => total + normalizeInventoryQuantity(product.stock_by_size?.[size]),
+    0,
+  )
+}
+
 function getVariantInventory(product: StoreProduct, size: string) {
-  // The product-level switch is authoritative: when the product is disabled in
-  // the shop, Meta must not keep any of its variants available.
-  if (!product.in_stock) return 0
+  if (!product.stock_by_size) return getProductInventory(product)
 
-  if (!product.stock_by_size) return 1
-
-  const quantity = Number(product.stock_by_size[size] ?? 0)
-  return Number.isFinite(quantity) ? Math.max(0, Math.floor(quantity)) : 0
+  return normalizeInventoryQuantity(product.stock_by_size[size])
 }
 
 function getAvailability(product: StoreProduct, size: string) {
-  return getVariantInventory(product, size) > 0 ? "in_stock" : "out_of_stock"
+  const productInventory = getProductInventory(product)
+  const variantInventory = getVariantInventory(product, size)
+  return productInventory > 0 && variantInventory > 0 ? "in_stock" : "out_of_stock"
 }
 
 function getAdditionalImages(product: StoreProduct, baseUrl: string, primaryImage: string) {
