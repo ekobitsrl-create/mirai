@@ -185,10 +185,19 @@ function getSizes(product: StoreProduct) {
   return sizes.length > 0 ? sizes : ["OS"]
 }
 
+function getVariantInventory(product: StoreProduct, size: string) {
+  // The product-level switch is authoritative: when the product is disabled in
+  // the shop, Meta must not keep any of its variants available.
+  if (!product.in_stock) return 0
+
+  if (!product.stock_by_size) return 1
+
+  const quantity = Number(product.stock_by_size[size] ?? 0)
+  return Number.isFinite(quantity) ? Math.max(0, Math.floor(quantity)) : 0
+}
+
 function getAvailability(product: StoreProduct, size: string) {
-  if (!product.in_stock) return "out_of_stock"
-  if (!product.stock_by_size) return "in_stock"
-  return (product.stock_by_size[size] || 0) > 0 ? "in_stock" : "out_of_stock"
+  return getVariantInventory(product, size) > 0 ? "in_stock" : "out_of_stock"
 }
 
 function getAdditionalImages(product: StoreProduct, baseUrl: string, primaryImage: string) {
@@ -358,6 +367,7 @@ function renderProductVariant(product: StoreProduct, size: string, baseUrl: stri
     : null
   const productType = PRODUCT_TYPE_BY_STORE_CATEGORY[categoryKey] || `Abbigliamento > ${product.category}`
   const googleCategory = GOOGLE_CATEGORY_BY_STORE_CATEGORY[categoryKey] || "166"
+  const inventory = getVariantInventory(product, size)
   const availability = getAvailability(product, size)
   const isHeadwear = HEADWEAR_CATEGORIES.has(categoryKey)
   const googleAdsCampaignLabel = getGoogleAdsCampaignLabel(product)
@@ -371,6 +381,7 @@ function renderProductVariant(product: StoreProduct, size: string, baseUrl: stri
     `      <g:image_link>${escapeXml(primaryImage)}</g:image_link>`,
     ...additionalImages.map((image) => `      <g:additional_image_link>${escapeXml(image)}</g:additional_image_link>`),
     `      <g:availability>${availability}</g:availability>`,
+    ...(platform === "meta" ? [`      <g:inventory>${inventory}</g:inventory>`] : []),
     `      <g:price>${Number(product.price).toFixed(2)} EUR</g:price>`,
     "      <g:condition>new</g:condition>",
     `      <g:brand>${escapeXml(brand)}</g:brand>`,
