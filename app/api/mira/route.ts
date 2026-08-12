@@ -247,7 +247,7 @@ PAGINA ATTUALE: ${pathname}
 INFORMAZIONI NEGOZIO:
 - Spedizione standard gratuita, senza importo minimo: ${SHIPPING_CONFIG.standardDeliveryDays.minimum}-${SHIPPING_CONFIG.standardDeliveryDays.maximum} giorni lavorativi.
 - Contrassegno disponibile per consegne in Italia.
-- Per gli ordini consegnati in Italia, reso gratuito richiedibile entro 30 giorni di calendario dalla consegna. MIRAI invia l'etichetta prepagata, sostiene le spese di restituzione e non applica costi di restocking. Rimborso emesso entro 14 giorni dalla ricezione e verifica.
+- Per gli ordini consegnati in Italia, reso gratuito richiedibile entro 30 giorni di calendario dalla consegna. MIRAI invia l'etichetta prepagata, sostiene le spese di restituzione e non applica costi di restocking. Il rimborso viene elaborato entro 3 giorni dal ricevimento del reso.
 - Pagamenti gestiti tramite Stripe. I metodi effettivamente mostrati al checkout dipendono dalla configurazione attiva.
 - Custom Lab online: T-shirt heavyweight oversize personalizzabile con colore, taglia, stampa fronte o retro, testo o grafica. Prezzo 79 euro con una stampa inclusa. I prodotti personalizzati non sono restituibili salvo difetti.
 

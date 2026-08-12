@@ -50,6 +50,7 @@ export default function TerminiPage() {
             <section className="flex flex-col gap-3">
               <h2 className="font-[family-name:var(--font-space-grotesk)] text-xl font-bold text-foreground">5. Resi, recesso e rimborsi</h2>
               <p>Per gli ordini consegnati in Italia, il cliente consumatore può richiedere il reso entro 30 giorni di calendario dalla consegna, salvo esclusioni previste dalla legge e per prodotti personalizzati, se non difettosi o non conformi. Il reso avviene per posta, consegnando il pacco al corriere o al punto indicato nell'etichetta prepagata fornita da MIRAI. Le spese di restituzione sono interamente a carico di MIRAI, il costo per il cliente è 0,00 EUR e non viene applicato alcun costo di restocking. Metodo, condizioni e tempi di rimborso sono indicati nella pagina separata <Link href="/resi" className="text-primary hover:underline">Resi e Rimborsi</Link>.</p>
+              <p>Il rimborso viene elaborato entro 3 giorni dal ricevimento del reso sullo stesso metodo di pagamento usato al checkout. I tempi di accredito effettivi dipendono dal circuito di pagamento o dalla banca.</p>
             </section>
 
             <section className="flex flex-col gap-3">

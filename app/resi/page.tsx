@@ -16,7 +16,7 @@ const returnSteps = [
   "Quando il reso è approvato, MIRAI sostiene le spese di restituzione e invia un'etichetta prepagata con le istruzioni di rientro.",
   "Imballa il prodotto in modo sicuro, preferibilmente nella confezione originale, con cartellini ed eventuali accessori.",
   "Consegna il pacco al corriere o al punto di consegna indicato nelle istruzioni: il reso avviene per posta tramite spedizione tracciata.",
-  "Dopo ricezione e verifica, il rimborso viene emesso entro 14 giorni sullo stesso metodo di pagamento usato dal cliente al checkout.",
+  "Il rimborso viene elaborato entro 3 giorni dal ricevimento del reso sullo stesso metodo di pagamento usato dal cliente al checkout.",
 ]
 
 const policyFacts = [
@@ -65,7 +65,7 @@ export default function ResiPage() {
             {[
               { icon: Clock, title: "30 giorni", desc: "Puoi richiedere il reso dalla data di consegna." },
               { icon: RotateCcw, title: "Spese a carico MIRAI", desc: "Etichetta prepagata per ogni reso approvato." },
-              { icon: CheckCircle, title: "Rimborso entro 14 giorni", desc: "Sullo stesso metodo di pagamento usato al checkout." },
+              { icon: CheckCircle, title: "Elaborazione entro 3 giorni", desc: "Dal ricevimento del reso, sullo stesso metodo di pagamento." },
             ].map((item) => (
               <div key={item.title} className="rounded-lg border border-border bg-card p-6 text-center">
                 <div className="mx-auto mb-4 flex h-11 w-11 items-center justify-center rounded-full bg-primary/10 text-primary">
@@ -165,7 +165,7 @@ export default function ResiPage() {
                 Rimborsi
               </h2>
               <p className="leading-relaxed">
-                Dopo aver ricevuto e controllato il prodotto, emettiamo il rimborso entro 14 giorni sullo stesso metodo di pagamento usato dal cliente al checkout. I tempi di accredito effettivi dipendono dal circuito di pagamento o dalla banca.
+                Il rimborso viene elaborato entro 3 giorni dal ricevimento del reso sullo stesso metodo di pagamento usato dal cliente al checkout. I tempi di accredito effettivi dipendono dal circuito di pagamento o dalla banca.
               </p>
             </section>
 

@@ -198,7 +198,7 @@ function contextualFollowUp(message: string, context: MiraKnowledgeContext) {
     if (hasAny(message, ["gratis", "gratuito", "costa"])) {
       return answer("returns", "Per gli ordini consegnati in Italia il reso è gratuito entro 30 giorni dalla consegna: MIRAI invia l'etichetta prepagata, sostiene le spese di restituzione e non applica costi di restocking.", "/resi", "Dettagli reso")
     }
-    return answer("refund", "Dopo la ricezione e la verifica del reso, il rimborso viene elaborato entro 14 giorni sul metodo di pagamento usato dal cliente al checkout.", "/resi", "Dettagli rimborso")
+    return answer("refund", "Il rimborso viene elaborato entro 3 giorni dal ricevimento del reso sul metodo di pagamento usato dal cliente al checkout. I tempi di accredito effettivi dipendono dal circuito di pagamento o dalla banca.", "/resi", "Dettagli rimborso")
   }
 
   if (context.lastIntent === "customization") {
@@ -308,7 +308,7 @@ export function getMiraLocalReply(rawMessage: string, context: MiraKnowledgeCont
   }
 
   if (hasAny(message, ["rimborso", "soldi indietro", "riavere i soldi", "accredito"])) {
-    return answer("refund", "Il rimborso viene elaborato entro 14 giorni dalla ricezione e verifica del reso, sullo stesso metodo di pagamento usato dal cliente al checkout.", "/resi", "Dettagli rimborso")
+    return answer("refund", "Il rimborso viene elaborato entro 3 giorni dal ricevimento del reso, sullo stesso metodo di pagamento usato dal cliente al checkout. I tempi di accredito effettivi dipendono dal circuito di pagamento o dalla banca.", "/resi", "Dettagli rimborso")
   }
 
   if (asksReturns) {

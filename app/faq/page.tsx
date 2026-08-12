@@ -63,7 +63,7 @@ const faqs = [
       },
       {
         q: "Quanto tempo ci vuole per il rimborso?",
-        a: "Il rimborso viene emesso entro 14 giorni dalla ricezione e verifica del prodotto, sullo stesso metodo di pagamento utilizzato per l'acquisto.",
+        a: "Il rimborso viene elaborato entro 3 giorni dal ricevimento del reso, sullo stesso metodo di pagamento utilizzato per l'acquisto. I tempi di accredito effettivi dipendono dal circuito di pagamento o dalla banca.",
       },
     ],
   },
