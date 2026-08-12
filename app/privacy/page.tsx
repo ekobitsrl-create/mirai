@@ -65,7 +65,7 @@ export default function PrivacyPage() {
 
             <div className="flex flex-col gap-3">
               <h2 className="font-[family-name:var(--font-space-grotesk)] text-xl font-bold text-foreground">5. Conservazione dei Dati</h2>
-              <p>I dati personali vengono conservati per il tempo necessario alle finalita per cui sono stati raccolti. I dati relativi agli ordini vengono conservati per 10 anni per obblighi fiscali. I dati dell{"'"}account vengono eliminati su richiesta dell{"'"}utente. I promemoria del carrello vengono inviati una sola volta e possono essere disattivati in ogni momento tramite il link presente nell{"'"}email.</p>
+              <p>I dati personali vengono conservati per il tempo necessario alle finalita per cui sono stati raccolti. I dati relativi agli ordini vengono conservati per 10 anni per obblighi fiscali. I dati dell'account vengono eliminati su richiesta dell'utente. I promemoria del carrello vengono inviati una sola volta e possono essere disattivati in ogni momento tramite il link presente nell'email.</p>
             </div>
 
             <div className="flex flex-col gap-3">

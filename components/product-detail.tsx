@@ -192,6 +192,11 @@ export function ProductDetail({
   const gallery = useMemo(() => getGalleryViews(product, productCopy.gallery), [locale, product])
   const selectedImage = gallery[selectedImageIndex] || gallery[0]
   const displayTitle = localizedProduct.name
+
+  useEffect(() => {
+    const suffix = " | MIRAI"
+    document.title = `${displayTitle}${suffix}`
+  }, [displayTitle])
   const firstOrderPrice = Math.round(
     Number(product.price) * (1 - FIRST_ORDER_DISCOUNT_PERCENT / 100) * 100,
   ) / 100

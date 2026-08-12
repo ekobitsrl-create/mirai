@@ -15,9 +15,16 @@ export function SiteLocalizer() {
   const renderedText = useRef(new WeakMap<Text, string>())
   const originalAttributes = useRef(new WeakMap<Element, Map<string, string>>())
   const renderedAttributes = useRef(new WeakMap<Element, Map<string, string>>())
+  const originalTitle = useRef<string | null>(null)
+  const renderedTitle = useRef<string | null>(null)
 
   useEffect(() => {
     if (pathname.startsWith("/admin")) return
+
+    if (document.title !== renderedTitle.current) originalTitle.current = document.title
+    const nextTitle = translateSiteText(originalTitle.current || document.title, locale)
+    document.title = nextTitle
+    renderedTitle.current = nextTitle
 
     const isIgnored = (element: Element | null) => {
       if (!element) return true
@@ -70,6 +77,19 @@ export function SiteLocalizer() {
         if (current.nodeType === Node.TEXT_NODE) localizeTextNode(current as Text, force)
         else localizeAttributes(current as Element, force)
         current = walker.nextNode()
+      }
+
+      // React Server Components may split a visible sentence around links or
+      // escaped apostrophes. Translating the parent as one unit covers those
+      // fragments without changing the markup used by interactive elements.
+      const elements = root instanceof Element
+        ? [root, ...Array.from(root.querySelectorAll("p, li, dt, dd, h1, h2, h3, h4, blockquote"))]
+        : Array.from(document.body.querySelectorAll("p, li, dt, dd, h1, h2, h3, h4, blockquote"))
+      for (const element of elements) {
+        if (isIgnored(element) || element.children.length > 0) continue
+        const textNode = Array.from(element.childNodes).find((node) => node.nodeType === Node.TEXT_NODE) as Text | undefined
+        if (!textNode || element.childNodes.length !== 1) continue
+        localizeTextNode(textNode, force)
       }
     }
 

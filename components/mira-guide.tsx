@@ -15,7 +15,7 @@ import {
 import { getMiraLocalReply, setMiraCatalog, type MiraIntent } from "@/lib/mira-knowledge"
 import type { StoreProduct } from "@/lib/products"
 import { useLanguage } from "@/lib/language-context"
-import { localeTags } from "@/lib/site-localization"
+import { localeTags, translateSiteText } from "@/lib/site-localization"
 import type { Locale } from "@/lib/translations"
 
 type MiraVariant = "male" | "female"
@@ -209,6 +209,7 @@ function VariantCard({
 export function MiraGuide() {
   const pathname = usePathname()
   const { locale } = useLanguage()
+  const ui = (value: string) => translateSiteText(value, locale)
   const contextualPrompt = useMemo(() => getContextPrompt(pathname, locale), [locale, pathname])
   const [hydrated, setHydrated] = useState(false)
   const [variant, setVariant] = useState<MiraVariant>("male")
@@ -677,7 +678,7 @@ export function MiraGuide() {
       suppressClickRef.current = false
       return
     }
-    setReply({ text: "Yo, dimmi pure. Che cosa cerchi?" })
+    setReply({ text: ui("Yo, dimmi pure. Che cosa cerchi?") })
     setShowNudge(false)
     setExpanded(true)
   }
@@ -744,7 +745,7 @@ export function MiraGuide() {
           className="mira-selector-backdrop fixed inset-0 z-[90] flex items-end justify-center bg-black/65 p-4 backdrop-blur-md md:items-center"
           role="dialog"
           aria-modal="true"
-          aria-label="Scegli la tua MIRA"
+          aria-label={ui("Scegli la tua MIRA")}
         >
           <section className="mira-selector relative w-full max-w-xl overflow-hidden rounded-[28px] border border-primary/35 bg-[#120c1a]/95 p-5 text-white shadow-[0_0_80px_rgba(126,87,194,0.35)] md:p-6">
             <div className="pointer-events-none absolute inset-x-20 top-0 h-px bg-gradient-to-r from-transparent via-primary to-transparent shadow-[0_0_18px_rgba(159,134,255,0.95)]" />
@@ -753,7 +754,7 @@ export function MiraGuide() {
                 type="button"
                 onClick={() => setShowSelector(false)}
                 className="absolute right-4 top-4 flex h-9 w-9 items-center justify-center rounded-full text-white/45 transition-colors hover:bg-white/5 hover:text-white"
-                aria-label="Chiudi selezione MIRA"
+                aria-label={ui("Chiudi selezione MIRA")}
               >
                 <X className="h-4 w-4" />
               </button>
@@ -761,11 +762,11 @@ export function MiraGuide() {
             <div className="mb-5 pr-10">
               <div className="flex items-center gap-2 text-primary">
                 <Sparkles className="h-3.5 w-3.5" />
-                <p className="text-[9px] font-semibold uppercase tracking-[0.24em]">La tua guida</p>
+                <p className="text-[9px] font-semibold uppercase tracking-[0.24em]">{ui("La tua guida")}</p>
               </div>
-              <h2 className="mt-2 text-2xl font-medium tracking-[-0.04em]">Scegli la tua MIRA</h2>
+              <h2 className="mt-2 text-2xl font-medium tracking-[-0.04em]">{ui("Scegli la tua MIRA")}</h2>
               <p className="mt-1.5 text-xs leading-5 text-white/50">
-                Tienila premuta per spostarla. Toccala per scrivere o parlare.
+                {ui("Tienila premuta per spostarla. Toccala per scrivere o parlare.")}
               </p>
             </div>
             <div className="grid grid-cols-2 gap-3">
@@ -777,7 +778,7 @@ export function MiraGuide() {
               onClick={chooseVariant}
               className="mt-4 flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-primary px-5 text-[10px] font-bold uppercase tracking-[0.2em] text-primary-foreground shadow-[0_0_28px_rgba(159,134,255,0.35)] transition-all hover:brightness-110 hover:shadow-[0_0_38px_rgba(159,134,255,0.5)]"
             >
-              Continua con MIRA {pendingVariant === "female" ? "F" : "M"}
+              {ui("Continua con MIRA")} {pendingVariant === "female" ? "F" : "M"}
               <ArrowRight className="h-4 w-4" />
             </button>
           </section>
@@ -790,8 +791,8 @@ export function MiraGuide() {
           onClick={() => setMiraMinimized(false)}
           className={`mira-peek ${peekOnRight ? "mira-peek-right" : "mira-peek-left"}`}
           style={{ top: peekTop }}
-          aria-label="Mostra MIRA"
-          title="Mostra MIRA"
+          aria-label={ui("Mostra MIRA")}
+          title={ui("Mostra MIRA")}
         >
           <span className="absolute inset-0 bg-[#120c19]/88 backdrop-blur-md" />
           <span className="absolute left-1/2 top-0 h-40 w-20 -translate-x-1/2 md:h-48 md:w-24">
@@ -805,7 +806,7 @@ export function MiraGuide() {
             />
           </span>
           <span className="absolute inset-x-0 bottom-0 h-4 bg-gradient-to-t from-[#120c19] to-transparent" />
-          <span className="sr-only">Riapri MIRA</span>
+          <span className="sr-only">{ui("Riapri MIRA")}</span>
         </button>
       )}
 
@@ -814,7 +815,7 @@ export function MiraGuide() {
           ref={stageRef}
           className={`mira-presence ${isDragging ? "mira-is-dragging" : ""}`}
           style={{ left: position.x, top: position.y }}
-          aria-label="MIRA, guida del sito"
+          aria-label={ui("MIRA, guida del sito")}
         >
           {(expanded || showNudge) && !isDragging && (
             <section
@@ -841,7 +842,7 @@ export function MiraGuide() {
                       type="button"
                       onClick={closeBubble}
                       className="flex h-8 w-8 items-center justify-center rounded-full text-white/40 transition-colors hover:bg-white/5 hover:text-white"
-                      aria-label="Chiudi MIRA"
+                      aria-label={ui("Chiudi MIRA")}
                     >
                       <X className="h-3.5 w-3.5" />
                     </button>
@@ -871,10 +872,10 @@ export function MiraGuide() {
                       <input
                         value={input}
                         onChange={(event) => setInput(event.target.value)}
-                        placeholder={isListening ? "Ti ascolto…" : "Chiedi qualcosa a MIRA…"}
+                        placeholder={isListening ? ui("Ti ascolto…") : ui("Chiedi qualcosa a MIRA…")}
                         maxLength={240}
                         className="h-9 min-w-0 flex-1 bg-transparent px-2 text-xs text-white outline-none placeholder:text-white/30"
-                        aria-label="Richiesta per MIRA"
+                        aria-label={ui("Richiesta per MIRA")}
                       />
                       <button
                         type="button"
@@ -885,8 +886,8 @@ export function MiraGuide() {
                             ? "bg-red-500/90 text-white shadow-[0_0_18px_rgba(239,68,68,0.45)]"
                             : "bg-white/[0.07] text-white/55 hover:bg-primary/20 hover:text-primary disabled:cursor-not-allowed disabled:opacity-25"
                         }`}
-                        aria-label={isListening ? "Ferma ascolto" : "Parla con MIRA"}
-                        title={speechSupported ? "Parla con MIRA" : "Microfono non supportato da questo browser"}
+                        aria-label={isListening ? ui("Ferma ascolto") : ui("Parla con MIRA")}
+                        title={speechSupported ? ui("Parla con MIRA") : ui("Microfono non supportato da questo browser")}
                       >
                         {speechSupported ? <Mic className="h-3.5 w-3.5" /> : <MicOff className="h-3.5 w-3.5" />}
                       </button>
@@ -894,14 +895,14 @@ export function MiraGuide() {
                         type="submit"
                         disabled={!input.trim() || isThinking}
                         className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground transition-all hover:brightness-110 disabled:cursor-not-allowed disabled:bg-white/[0.08] disabled:text-white/25"
-                        aria-label="Invia richiesta a MIRA"
+                        aria-label={ui("Invia richiesta a MIRA")}
                       >
                         <Send className="h-3.5 w-3.5" />
                       </button>
                     </form>
 
                     <p className="mt-2 flex items-center justify-center gap-1.5 text-[8px] uppercase tracking-[0.12em] text-white/28">
-                      <Move className="h-3 w-3" /> Tieni premuto MIRA per spostarla
+                      <Move className="h-3 w-3" /> {ui("Tieni premuto MIRA per spostarla")}
                     </p>
                   </div>
                 </>
@@ -916,7 +917,7 @@ export function MiraGuide() {
                 >
                   <span className="block text-[8px] font-semibold uppercase tracking-[0.22em] text-primary">MIRA</span>
                   <span className="mt-1.5 block pr-3 text-[13px] font-medium leading-5 text-white/90">{contextualPrompt}</span>
-                  <span className="mt-2 block text-[8px] uppercase tracking-[0.14em] text-white/35">Tocca per chiedere</span>
+                  <span className="mt-2 block text-[8px] uppercase tracking-[0.14em] text-white/35">{ui("Tocca per chiedere")}</span>
                 </button>
               )}
             </section>
@@ -924,7 +925,7 @@ export function MiraGuide() {
 
           {isDragging && (
             <div className="mira-drag-label absolute -top-9 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full border border-primary/35 bg-[#120c19]/90 px-3 py-1.5 text-[8px] font-semibold uppercase tracking-[0.15em] text-white shadow-[0_0_24px_rgba(159,134,255,0.3)]">
-              Sposta MIRA
+              {ui("Sposta MIRA")}
             </div>
           )}
 
@@ -943,7 +944,7 @@ export function MiraGuide() {
               if (!isDragging) setLookOffset({ x: 0, y: 0 })
             }}
             className="mira-character-button group relative block touch-none select-none rounded-[45%] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary"
-            aria-label="Apri MIRA. Tieni premuto per spostarla"
+            aria-label={ui("Apri MIRA. Tieni premuto per spostarla")}
           >
             <span className="absolute inset-x-[12%] bottom-[6%] h-14 rounded-full border border-primary/22 bg-[#120c19]/45 shadow-[0_0_38px_rgba(159,134,255,0.34)] backdrop-blur-sm transition-all group-hover:border-primary/55 group-hover:shadow-[0_0_54px_rgba(159,134,255,0.55)]" />
             <div
@@ -961,7 +962,7 @@ export function MiraGuide() {
             type="button"
             onClick={openSelector}
             className="mira-avatar-switch absolute -bottom-1 right-0 flex h-8 w-8 items-center justify-center rounded-full border border-primary/25 bg-[#120c19]/85 text-white/45 shadow-[0_0_18px_rgba(159,134,255,0.2)] backdrop-blur-md transition-all hover:border-primary/60 hover:text-white"
-            aria-label="Cambia avatar MIRA"
+            aria-label={ui("Cambia avatar MIRA")}
           >
             <UserRoundCog className="h-3.5 w-3.5" />
           </button>
@@ -970,8 +971,8 @@ export function MiraGuide() {
             type="button"
             onClick={() => setMiraMinimized(true)}
             className="absolute -right-1 top-0 z-20 flex h-8 w-8 items-center justify-center rounded-full border border-white/15 bg-black/80 text-white/70 shadow-[0_0_18px_rgba(0,0,0,0.55)] backdrop-blur-md transition-all hover:border-primary/60 hover:bg-primary hover:text-primary-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
-            aria-label="Nascondi MIRA sul bordo"
-            title="Nascondi MIRA"
+            aria-label={ui("Nascondi MIRA sul bordo")}
+            title={ui("Nascondi MIRA")}
           >
             <X className="h-4 w-4" />
           </button>

@@ -54,7 +54,7 @@ export default function ContattiPage() {
               Scrivici un Messaggio
             </h2>
             <p className="text-muted-foreground leading-relaxed">
-              Compila il form qui sotto e ti risponderemo il prima possibile. Per ordini esistenti, includi il numero d{"'"}ordine nel messaggio.
+              Compila il form qui sotto e ti risponderemo il prima possibile. Per ordini esistenti, includi il numero d'ordine nel messaggio.
             </p>
             <form className="flex flex-col gap-4 max-w-lg">
               <div className="flex flex-col gap-2">

@@ -66,6 +66,10 @@ export function CollectionProducts({
   const { locale } = useLanguage()
   const categoryName = translateCategory(category.slug, category.name, locale)
 
+  useEffect(() => {
+    document.title = `${categoryName} | MIRAI`
+  }, [categoryName])
+
   // Initialize activeSubcategory from URL parameter
   useEffect(() => {
     if (subParam && subcategories.some(s => s.slug === subParam)) {
