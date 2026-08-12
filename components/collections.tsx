@@ -28,7 +28,12 @@ export function Collections({ categories = [] }: { categories?: Category[] }) {
   if (categories.length === 0) return null
 
   return (
-    <section id="collezioni" className="mirai-neon-divider relative overflow-hidden bg-secondary/20 py-16 md:py-24" ref={ref}>
+    <section
+      id="collezioni"
+      data-no-localize
+      className="mirai-neon-divider relative overflow-hidden bg-secondary/20 py-16 md:py-24"
+      ref={ref}
+    >
       <div className="mirai-aurora-orb -left-40 top-1/3 h-96 w-96" />
       <div className="relative max-w-7xl mx-auto px-6">
         {/* Header */}

@@ -37,7 +37,10 @@ export function SiteLocalizer() {
 
       const current = node.nodeValue || ""
       const lastRendered = renderedText.current.get(node)
-      if (!force && current !== lastRendered) originalText.current.set(node, current)
+      // A component that already uses useLanguage can re-render its own
+      // translated copy before this effect runs. Treat that new value as the
+      // source instead of restoring the Italian text cached on first render.
+      if (current !== lastRendered) originalText.current.set(node, current)
       const source = originalText.current.get(node) ?? current
       originalText.current.set(node, source)
       const translated = translateSiteText(source, locale)
@@ -53,7 +56,8 @@ export function SiteLocalizer() {
       for (const attribute of translatedAttributes) {
         const current = element.getAttribute(attribute)
         if (current === null) continue
-        if (!force && current !== rendered.get(attribute)) sources.set(attribute, current)
+        // Keep attributes managed by React in the selected language too.
+        if (current !== rendered.get(attribute)) sources.set(attribute, current)
         const source = sources.get(attribute) ?? current
         const translated = translateSiteText(source, locale)
         rendered.set(attribute, translated)
