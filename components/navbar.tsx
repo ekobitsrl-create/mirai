@@ -9,6 +9,7 @@ import { useCart } from "@/lib/cart-context"
 import { useLanguage } from "@/lib/language-context"
 import { LanguageSwitcher } from "@/components/language-switcher"
 import { MarqueeBanner } from "@/components/marquee-banner"
+import { translateCategory } from "@/lib/site-localization"
 
 type CategoryNode = {
   id: string
@@ -268,7 +269,7 @@ export function Navbar({ showPromo = false }: { showPromo?: boolean }) {
                               className="mb-2.5 block text-xs font-bold uppercase tracking-[0.2em] text-white hover:text-primary transition-colors"
                               onClick={() => setDropdownOpen(false)}
                             >
-                              {parent.name}
+                              {translateCategory(parent.slug, parent.name, locale)}
                             </Link>
                             {parent.children.length > 0 && (
                               <div className="flex flex-col gap-1">
@@ -279,7 +280,7 @@ export function Navbar({ showPromo = false }: { showPromo?: boolean }) {
                                     className="text-sm text-white/45 hover:pl-1 hover:text-white transition-all duration-200"
                                     onClick={() => setDropdownOpen(false)}
                                   >
-                                    {sub.name}
+                                    {translateCategory(sub.slug, sub.name, locale)}
                                   </Link>
                                 ))}
                               </div>
@@ -412,7 +413,7 @@ export function Navbar({ showPromo = false }: { showPromo?: boolean }) {
                         className="mb-1.5 block text-xs font-bold uppercase tracking-[0.15em] text-white"
                         onClick={() => setMobileOpen(false)}
                       >
-                        {parent.name}
+                        {translateCategory(parent.slug, parent.name, locale)}
                       </Link>
                       {parent.children.length > 0 && (
                         <div className="ml-3 flex flex-col gap-1">
@@ -423,7 +424,7 @@ export function Navbar({ showPromo = false }: { showPromo?: boolean }) {
                               className="text-sm text-white/45 hover:text-white transition-colors"
                               onClick={() => setMobileOpen(false)}
                             >
-                              {sub.name}
+                              {translateCategory(sub.slug, sub.name, locale)}
                             </Link>
                           ))}
                         </div>

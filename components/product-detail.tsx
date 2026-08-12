@@ -105,7 +105,7 @@ export function ProductDetail({
   const maxQuantity = selectedStock ?? 10
   const productCopy = {
     it: {
-      gallery: ["Vista completa", "Retro", "Dettaglio", "Indossata", "Finiture", "Vista"], defaultColor: "Multicolor", defaultFit: "Consulta la guida alle taglie prima di scegliere.",
+      gallery: ["Vista completa", "Retro", "Dettaglio", "Indossata", "Finiture", "Vista"], newProduct: "Novità", defaultColor: "Multicolor", defaultFit: "Consulta la guida alle taglie prima di scegliere.",
       garmentCondition: "purché il capo sia integro e con i cartellini originali", fragranceCondition: "purché il prodotto sia integro e nella confezione originale",
       delivery: "consegna stimata", workingDays: "giorni lavorativi", sold: "Venduti questo mese", firstOrder: "Primo ordine", withCode: "con MIRAI10",
       tax: "IVA inclusa", save: "risparmi", checkoutCode: "applicando il codice nel checkout", color: "Colore", variant: "Variante", size: "Taglia", sizeGuide: "Guida alle taglie",
@@ -119,7 +119,7 @@ export function ProductDetail({
       chest: "Torace", length: "Lunghezza", sleeve: "Manica", close: "Chiudi", understood: "Ho capito", precise: "Le misure precise possono variare in base al modello. Per una verifica prima dell'acquisto contatta l'assistenza indicando il codice",
     },
     en: {
-      gallery: ["Full view", "Back", "Detail", "Worn", "Finishes", "View"], defaultColor: "Multicolour", defaultFit: "Check the size guide before choosing.",
+      gallery: ["Full view", "Back", "Detail", "Worn", "Finishes", "View"], newProduct: "New", defaultColor: "Multicolour", defaultFit: "Check the size guide before choosing.",
       garmentCondition: "provided the garment is intact with its original tags", fragranceCondition: "provided the product is unopened and in its original packaging",
       delivery: "estimated delivery in", workingDays: "business days", sold: "Sold this month", firstOrder: "First order", withCode: "with MIRAI10",
       tax: "VAT included", save: "save", checkoutCode: "by applying the code at checkout", color: "Colour", variant: "Variant", size: "Size", sizeGuide: "Size guide",
@@ -133,7 +133,7 @@ export function ProductDetail({
       chest: "Chest", length: "Length", sleeve: "Sleeve", close: "Close", understood: "Got it", precise: "Measurements may vary by style. To check before buying, contact support and quote code",
     },
     es: {
-      gallery: ["Vista completa", "Parte trasera", "Detalle", "Puesto", "Acabados", "Vista"], defaultColor: "Multicolor", defaultFit: "Consulta la guía de tallas antes de elegir.",
+      gallery: ["Vista completa", "Parte trasera", "Detalle", "Puesto", "Acabados", "Vista"], newProduct: "Nuevo", defaultColor: "Multicolor", defaultFit: "Consulta la guía de tallas antes de elegir.",
       garmentCondition: "siempre que la prenda esté intacta y conserve las etiquetas originales", fragranceCondition: "siempre que el producto esté intacto y en su embalaje original",
       delivery: "entrega estimada en", workingDays: "días laborables", sold: "Vendidos este mes", firstOrder: "Primer pedido", withCode: "con MIRAI10",
       tax: "IVA incluido", save: "ahorras", checkoutCode: "aplicando el código en el checkout", color: "Color", variant: "Variante", size: "Talla", sizeGuide: "Guía de tallas",
@@ -147,7 +147,7 @@ export function ProductDetail({
       chest: "Pecho", length: "Largo", sleeve: "Manga", close: "Cerrar", understood: "Entendido", precise: "Las medidas pueden variar según el modelo. Para comprobarlas antes de comprar, contacta con asistencia indicando el código",
     },
     de: {
-      gallery: ["Gesamtansicht", "Rückseite", "Detail", "Getragen", "Verarbeitung", "Ansicht"], defaultColor: "Mehrfarbig", defaultFit: "Bitte prüfe vor der Auswahl die Größentabelle.",
+      gallery: ["Gesamtansicht", "Rückseite", "Detail", "Getragen", "Verarbeitung", "Ansicht"], newProduct: "Neu", defaultColor: "Mehrfarbig", defaultFit: "Bitte prüfe vor der Auswahl die Größentabelle.",
       garmentCondition: "sofern das Kleidungsstück unversehrt ist und die Originaletiketten trägt", fragranceCondition: "sofern das Produkt unversehrt und originalverpackt ist",
       delivery: "voraussichtliche Lieferung in", workingDays: "Werktagen", sold: "Diesen Monat verkauft", firstOrder: "Erste Bestellung", withCode: "mit MIRAI10",
       tax: "inkl. MwSt.", save: "du sparst", checkoutCode: "bei Eingabe des Codes an der Kasse", color: "Farbe", variant: "Variante", size: "Größe", sizeGuide: "Größentabelle",
@@ -161,7 +161,7 @@ export function ProductDetail({
       chest: "Brust", length: "Länge", sleeve: "Ärmel", close: "Schließen", understood: "Verstanden", precise: "Die Maße können je nach Modell variieren. Kontaktiere vor dem Kauf den Support und nenne den Code",
     },
     fr: {
-      gallery: ["Vue complète", "Dos", "Détail", "Porté", "Finitions", "Vue"], defaultColor: "Multicolore", defaultFit: "Consultez le guide des tailles avant de choisir.",
+      gallery: ["Vue complète", "Dos", "Détail", "Porté", "Finitions", "Vue"], newProduct: "Nouveau", defaultColor: "Multicolore", defaultFit: "Consultez le guide des tailles avant de choisir.",
       garmentCondition: "à condition que le vêtement soit intact et conserve ses étiquettes d’origine", fragranceCondition: "à condition que le produit soit intact et dans son emballage d’origine",
       delivery: "livraison estimée sous", workingDays: "jours ouvrés", sold: "Vendus ce mois-ci", firstOrder: "Première commande", withCode: "avec MIRAI10",
       tax: "TVA incluse", save: "économisez", checkoutCode: "en appliquant le code au paiement", color: "Couleur", variant: "Variante", size: "Taille", sizeGuide: "Guide des tailles",
@@ -432,7 +432,7 @@ export function ProductDetail({
               <ZoomIn className="h-4 w-4" />
             </span>
             {product.is_new && (
-              <span className="absolute left-4 top-4 bg-[#9f86ff] px-3 py-1.5 text-[9px] font-bold uppercase tracking-[0.2em] text-black">Novità</span>
+              <span className="absolute left-4 top-4 bg-[#9f86ff] px-3 py-1.5 text-[9px] font-bold uppercase tracking-[0.2em] text-black">{productCopy.newProduct}</span>
             )}
             {selectedImage && (
               <span className="absolute bottom-4 left-4 rounded-full border border-white/15 bg-black/65 px-3 py-1.5 text-[8px] font-semibold uppercase tracking-[0.16em] text-white/75 backdrop-blur-md">

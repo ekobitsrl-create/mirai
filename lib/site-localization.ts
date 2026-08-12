@@ -648,10 +648,29 @@ const categoryCopy: Record<string, Record<Locale, string>> = {
   sunglasses: { it: "Occhiali da sole", en: "Sunglasses", es: "Gafas de sol", de: "Sonnenbrillen", fr: "Lunettes de soleil" },
   "mirai-parfum-exlusive": { it: "Profumi", en: "Fragrances", es: "Perfumes", de: "Düfte", fr: "Parfums" },
   sweatshirts: { it: "Felpe", en: "Sweatshirts", es: "Sudaderas", de: "Sweatshirts", fr: "Sweatshirts" },
+  "cappelli-custom-ny": { it: "Cappelli Custom NY", en: "Custom NY Caps", es: "Gorras Custom NY", de: "Custom NY Caps", fr: "Casquettes Custom NY" },
+  "cappelli-custom": { it: "Cappelli Custom", en: "Custom Caps", es: "Gorras Custom", de: "Custom Caps", fr: "Casquettes Custom" },
+  "tee-shorts": { it: "Tee & Shorts", en: "T-shirts & Shorts", es: "Camisetas y bermudas", de: "T-Shirts & Shorts", fr: "T-shirts et shorts" },
+  "tee&shorts": { it: "Tee & Shorts", en: "T-shirts & Shorts", es: "Camisetas y bermudas", de: "T-Shirts & Shorts", fr: "T-shirts et shorts" },
+}
+
+const categoryWordCopy: Record<Exclude<Locale, "it">, Array<readonly [RegExp, string]>> = {
+  en: [[/\bcappelli?\b/gi, "Caps"], [/\bcanotte?\b/gi, "Tank tops"], [/\bcamicie?\b/gi, "Shirts"], [/\bprofumi?\b/gi, "Fragrances"], [/\bfelpe?\b/gi, "Hoodies"], [/\btute?\b/gi, "Tracksuits"], [/\bpantaloni?\b/gi, "Trousers"], [/\bbermuda\b/gi, "Shorts"], [/\bocchiali da sole\b/gi, "Sunglasses"], [/\bnuovi arrivi\b/gi, "New arrivals"]],
+  es: [[/\bcappelli?\b/gi, "Gorras"], [/\bcanotte?\b/gi, "Camisetas sin mangas"], [/\bcamicie?\b/gi, "Camisas"], [/\bprofumi?\b/gi, "Perfumes"], [/\bfelpe?\b/gi, "Sudaderas"], [/\btute?\b/gi, "Chándales"], [/\bpantaloni?\b/gi, "Pantalones"], [/\bbermuda\b/gi, "Bermudas"], [/\bocchiali da sole\b/gi, "Gafas de sol"], [/\bnuovi arrivi\b/gi, "Novedades"]],
+  de: [[/\bcappelli?\b/gi, "Caps"], [/\bcanotte?\b/gi, "Tank-Tops"], [/\bcamicie?\b/gi, "Hemden"], [/\bprofumi?\b/gi, "Düfte"], [/\bfelpe?\b/gi, "Hoodies"], [/\btute?\b/gi, "Trainingsanzüge"], [/\bpantaloni?\b/gi, "Hosen"], [/\bbermuda\b/gi, "Shorts"], [/\bocchiali da sole\b/gi, "Sonnenbrillen"], [/\bnuovi arrivi\b/gi, "Neuheiten"]],
+  fr: [[/\bcappelli?\b/gi, "Casquettes"], [/\bcanotte?\b/gi, "Débardeurs"], [/\bcamicie?\b/gi, "Chemises"], [/\bprofumi?\b/gi, "Parfums"], [/\bfelpe?\b/gi, "Sweats"], [/\btute?\b/gi, "Survêtements"], [/\bpantaloni?\b/gi, "Pantalons"], [/\bbermuda\b/gi, "Shorts"], [/\bocchiali da sole\b/gi, "Lunettes de soleil"], [/\bnuovi arrivi\b/gi, "Nouveautés"]],
 }
 
 export function translateCategory(slug: string, fallback: string, locale: Locale) {
-  return categoryCopy[slug.trim().toLowerCase()]?.[locale] || fallback
+  const normalizedSlug = slug.trim().toLowerCase()
+  const exact = categoryCopy[normalizedSlug]?.[locale]
+  if (exact || locale === "it") return exact || fallback
+
+  const source = fallback || slug.replace(/-/g, " ")
+  return categoryWordCopy[locale].reduce(
+    (translated, [pattern, replacement]) => translated.replace(pattern, replacement),
+    source,
+  )
 }
 
 const catalogExactRows: PhraseRow[] = [

@@ -71,9 +71,8 @@ export function localizeColor(value: string | null | undefined, locale: Locale) 
 }
 
 function translateCommercialTerms(value: string, locale: ForeignLocale) {
-  if (locale === "en") return value
   const rules: Record<ForeignLocale, Array<[RegExp, string]>> = {
-    en: [],
+    en: [[/\bCappello\b/gi, "Cap"], [/\bCappelli\b/gi, "Caps"], [/\bCamicia\b/gi, "Shirt"], [/\bCamicie\b/gi, "Shirts"], [/\bCanotta\b/gi, "Tank Top"], [/\bCanotte\b/gi, "Tank Tops"], [/\bFelpa\b/gi, "Hoodie"], [/\bBermuda\b/gi, "Shorts"], [/\bPantaloni\b/gi, "Trousers"], [/\bMaglietta\b/gi, "T-shirt"]],
     es: [[/\bZip Up Hoodie\b/gi, "Sudadera con cremallera"], [/\bZip Hoodie\b/gi, "Sudadera con cremallera"], [/\bSleeveless\b/gi, "Sin mangas"], [/\bTee\b/gi, "Camiseta"], [/\bT-shirt\b/gi, "Camiseta"], [/\bJorts\b/gi, "Bermudas vaqueras"], [/\bShorts\b/gi, "Bermudas"], [/\bJeans\b/gi, "Vaqueros"]],
     de: [[/\bZip Up Hoodie\b/gi, "Zip-Hoodie"], [/\bZip Hoodie\b/gi, "Zip-Hoodie"], [/\bSleeveless\b/gi, "Ärmellos"], [/\bTee\b/gi, "T-Shirt"], [/\bJorts\b/gi, "Jeansshorts"], [/\bShorts\b/gi, "Shorts"]],
     fr: [[/\bZip Up Hoodie\b/gi, "Sweat zippé"], [/\bZip Hoodie\b/gi, "Sweat zippé"], [/\bSleeveless\b/gi, "Sans manches"], [/\bTee\b/gi, "T-shirt"], [/\bJorts\b/gi, "Bermuda en jean"], [/\bShorts\b/gi, "Bermuda"], [/\bJeans\b/gi, "Jean"]],
@@ -106,7 +105,16 @@ const categoryDescriptions: Record<string, Record<Locale, string>> = {
 }
 
 export function translateCategoryDescription(slug: string, fallback: string | null | undefined, locale: Locale) {
-  return categoryDescriptions[slug.toLowerCase()]?.[locale] || fallback || ""
+  const exact = categoryDescriptions[slug.toLowerCase()]?.[locale]
+  if (exact || locale === "it") return exact || fallback || ""
+
+  const generic: Record<ForeignLocale, string> = {
+    en: "Explore this MIRAI selection, curated for contemporary streetwear outfits with distinctive fits, materials and details.",
+    es: "Descubre esta selección MIRAI, elegida para looks streetwear contemporáneos con cortes, materiales y detalles distintivos.",
+    de: "Entdecke diese MIRAI-Auswahl für zeitgemäße Streetwear-Looks mit markanten Passformen, Materialien und Details.",
+    fr: "Découvrez cette sélection MIRAI, pensée pour des looks streetwear contemporains aux coupes, matières et détails distinctifs.",
+  }
+  return generic[locale]
 }
 
 type CategoryGuide = {
