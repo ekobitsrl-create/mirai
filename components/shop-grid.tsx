@@ -20,6 +20,7 @@ import { useCart } from "@/lib/cart-context"
 import type { StoreProduct } from "@/lib/products"
 import { useLanguage } from "@/lib/language-context"
 import { getCatalogItemId } from "@/lib/catalog-identifiers"
+import { formatLocalizedPrice, translateCatalogText, translateCategory } from "@/lib/site-localization"
 
 type Category = {
   id: string
@@ -57,6 +58,7 @@ const shopCopy = {
     selectSize: "Seleziona taglia",
     productDetails: "Dettagli prodotto",
     addToCart: "Aggiungi al carrello",
+    refine: "Affina la selezione", filters: "Filtri", closeFilters: "Chiudi filtri", category: "Categoria", size: "Taglia", availability: "Disponibilità", all: "Tutti", available: "Disponibili", soldOutPlural: "Esauriti", maxPrice: "Prezzo massimo", upTo: "Fino a", reset: "Azzera", show: "Mostra", products: "prodotti", oneSize: "Taglia unica", close: "Chiudi",
   },
   en: {
     eyebrow: "Collection 01 / Shop all",
@@ -72,6 +74,7 @@ const shopCopy = {
     selectSize: "Select size",
     productDetails: "Product details",
     addToCart: "Add to cart",
+    refine: "Refine your selection", filters: "Filters", closeFilters: "Close filters", category: "Category", size: "Size", availability: "Availability", all: "All", available: "Available", soldOutPlural: "Sold out", maxPrice: "Maximum price", upTo: "Up to", reset: "Reset", show: "Show", products: "products", oneSize: "One size", close: "Close",
   },
   es: {
     eyebrow: "Colección 01 / Ver todo",
@@ -87,6 +90,7 @@ const shopCopy = {
     selectSize: "Selecciona talla",
     productDetails: "Detalles del producto",
     addToCart: "Añadir al carrito",
+    refine: "Afina tu selección", filters: "Filtros", closeFilters: "Cerrar filtros", category: "Categoría", size: "Talla", availability: "Disponibilidad", all: "Todos", available: "Disponibles", soldOutPlural: "Agotados", maxPrice: "Precio máximo", upTo: "Hasta", reset: "Restablecer", show: "Mostrar", products: "productos", oneSize: "Talla única", close: "Cerrar",
   },
   de: {
     eyebrow: "Kollektion 01 / Alles ansehen",
@@ -102,6 +106,7 @@ const shopCopy = {
     selectSize: "Größe wählen",
     productDetails: "Produktdetails",
     addToCart: "In den Warenkorb",
+    refine: "Auswahl verfeinern", filters: "Filter", closeFilters: "Filter schließen", category: "Kategorie", size: "Größe", availability: "Verfügbarkeit", all: "Alle", available: "Verfügbar", soldOutPlural: "Ausverkauft", maxPrice: "Höchstpreis", upTo: "Bis", reset: "Zurücksetzen", show: "Zeige", products: "Produkte", oneSize: "Einheitsgröße", close: "Schließen",
   },
   fr: {
     eyebrow: "Collection 01 / Tout voir",
@@ -117,18 +122,12 @@ const shopCopy = {
     selectSize: "Choisir la taille",
     productDetails: "Détails du produit",
     addToCart: "Ajouter au panier",
+    refine: "Affinez votre sélection", filters: "Filtres", closeFilters: "Fermer les filtres", category: "Catégorie", size: "Taille", availability: "Disponibilité", all: "Tous", available: "Disponibles", soldOutPlural: "Épuisés", maxPrice: "Prix maximum", upTo: "Jusqu’à", reset: "Réinitialiser", show: "Afficher", products: "produits", oneSize: "Taille unique", close: "Fermer",
   },
 } as const
 
 function formatCategory(slug: string) {
   return slug.replace(/-/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase())
-}
-
-function formatPrice(price: number) {
-  return new Intl.NumberFormat("it-IT", {
-    style: "currency",
-    currency: "EUR",
-  }).format(Number(price))
 }
 
 function isSizeAvailable(product: StoreProduct, size: string) {
@@ -189,10 +188,10 @@ export function ShopGrid({
   }, [filtersOpen, quickAddProduct])
 
   const categoryLabels = useMemo(() => {
-    const labels = new Map(subcategories.map((category) => [category.slug, category.name]))
-    parentCategories.forEach((category) => labels.set(category.slug, category.name))
+    const labels = new Map(subcategories.map((category) => [category.slug, translateCategory(category.slug, category.name, locale)]))
+    parentCategories.forEach((category) => labels.set(category.slug, translateCategory(category.slug, category.name, locale)))
     return labels
-  }, [parentCategories, subcategories])
+  }, [locale, parentCategories, subcategories])
 
   const categories = useMemo(() => {
     const counts = new Map<string, number>()
@@ -205,8 +204,8 @@ export function ShopGrid({
         name: categoryLabels.get(slug) || formatCategory(slug),
         count,
       }))
-      .sort((a, b) => a.name.localeCompare(b.name, "it"))
-  }, [categoryLabels, products])
+      .sort((a, b) => a.name.localeCompare(b.name, locale))
+  }, [categoryLabels, locale, products])
 
   const sizes = useMemo(
     () =>
@@ -217,13 +216,13 @@ export function ShopGrid({
   )
 
   const filteredProducts = useMemo(() => {
-    const normalizedQuery = query.trim().toLocaleLowerCase("it")
+    const normalizedQuery = query.trim().toLocaleLowerCase(locale)
     const result = products.filter((product) => {
       const categoryName = categoryLabels.get(product.category) || formatCategory(product.category)
       const matchesQuery =
         !normalizedQuery ||
         `${product.name} ${product.description || ""} ${product.category} ${categoryName}`
-          .toLocaleLowerCase("it")
+          .toLocaleLowerCase(locale)
           .includes(normalizedQuery)
       const matchesCategory =
         selectedCategories.length === 0 || selectedCategories.includes(product.category)
@@ -241,10 +240,10 @@ export function ShopGrid({
     return [...result].sort((a, b) => {
       if (sort === "price-asc") return Number(a.price) - Number(b.price)
       if (sort === "price-desc") return Number(b.price) - Number(a.price)
-      if (sort === "name") return a.name.localeCompare(b.name, "it")
+      if (sort === "name") return a.name.localeCompare(b.name, locale)
       return new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
     })
-  }, [availability, categoryLabels, maxPrice, products, query, selectedCategories, selectedSizes, sort])
+  }, [availability, categoryLabels, locale, maxPrice, products, query, selectedCategories, selectedSizes, sort])
 
   const catalogMaxPrice = useMemo(
     () => Math.ceil(Math.max(100, ...products.map((product) => Number(product.price))) / 10) * 10,
@@ -463,7 +462,7 @@ export function ShopGrid({
                 key={product.id}
                 product={product}
                 index={index}
-                categoryName={categoryLabels.get(product.category) || formatCategory(product.category)}
+                categoryName={categoryLabels.get(product.category) || translateCategory(product.category, formatCategory(product.category), locale)}
                 wished={wishlist.includes(product.id)}
                 onWishlist={() => toggleWishlist(product.id)}
                 onQuickAdd={() => openQuickAdd(product)}
@@ -589,11 +588,11 @@ function ProductCard({
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
             <p className="mb-1 text-[8px] font-semibold uppercase tracking-[0.25em] text-primary md:text-[9px]">{categoryName}</p>
-            <h2 className="truncate text-xs font-medium text-white transition-colors group-hover:text-primary md:text-sm">{product.name}</h2>
+            <h2 className="truncate text-xs font-medium text-white transition-colors group-hover:text-primary md:text-sm">{translateCatalogText(product.name, locale)}</h2>
           </div>
-          <p className="shrink-0 text-xs font-medium text-white md:text-sm">{formatPrice(product.price)}</p>
+          <p className="shrink-0 text-xs font-medium text-white md:text-sm">{formatLocalizedPrice(product.price, locale)}</p>
         </div>
-        <p className="mt-2 hidden text-[10px] text-white/35 sm:block">{product.sizes?.join(" · ") || "Taglia unica"}</p>
+        <p className="mt-2 hidden text-[10px] text-white/35 sm:block">{product.sizes?.join(" · ") || labels.oneSize}</p>
       </Link>
     </article>
   )
@@ -638,19 +637,22 @@ function FilterDrawer({
   onReset: () => void
   onClose: () => void
 }) {
+  const { locale } = useLanguage()
+  const labels = shopCopy[locale]
+
   return (
     <div className="fixed inset-0 z-[60]">
-      <button type="button" className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} aria-label="Chiudi filtri" />
+      <button type="button" className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} aria-label={labels.closeFilters} />
       <aside className="absolute right-0 top-0 flex h-full w-full max-w-md flex-col border-l border-white/10 bg-card text-white shadow-2xl animate-in slide-in-from-right duration-300">
         <div className="flex items-center justify-between border-b border-white/10 px-6 py-5">
           <div>
-            <p className="text-[9px] uppercase tracking-[0.28em] text-primary">Refine your selection</p>
-            <h2 className="mt-1 text-xl font-medium">Filtri</h2>
+            <p className="text-[9px] uppercase tracking-[0.28em] text-primary">{labels.refine}</p>
+            <h2 className="mt-1 text-xl font-medium">{labels.filters}</h2>
           </div>
-          <button type="button" onClick={onClose} className="p-2 text-white/50 hover:text-white" aria-label="Chiudi filtri"><X className="h-5 w-5" /></button>
+          <button type="button" onClick={onClose} className="p-2 text-white/50 hover:text-white" aria-label={labels.closeFilters}><X className="h-5 w-5" /></button>
         </div>
         <div className="flex-1 overflow-y-auto px-6">
-          <FilterSection title="Categoria">
+          <FilterSection title={labels.category}>
             <div className="space-y-1">
               {categories.map((category) => (
                 <label key={category.slug} className="flex cursor-pointer items-center justify-between py-2 text-sm text-white/60 hover:text-white">
@@ -668,7 +670,7 @@ function FilterDrawer({
               ))}
             </div>
           </FilterSection>
-          <FilterSection title="Taglia">
+          <FilterSection title={labels.size}>
             <div className="flex flex-wrap gap-2">
               {sizes.map((size) => (
                 <button
@@ -682,7 +684,7 @@ function FilterDrawer({
               ))}
             </div>
           </FilterSection>
-          <FilterSection title="Disponibilità">
+          <FilterSection title={labels.availability}>
             <div className="grid grid-cols-3 gap-2">
               {(["all", "available", "sold-out"] as Availability[]).map((value) => (
                 <button
@@ -691,13 +693,13 @@ function FilterDrawer({
                   onClick={() => onAvailability(value)}
                   className={`border px-2 py-3 text-[9px] uppercase tracking-[0.12em] transition-colors ${availability === value ? "border-white bg-white text-black" : "border-white/15 text-white/50 hover:text-white"}`}
                 >
-                  {value === "all" ? "Tutti" : value === "available" ? "Disponibili" : "Esauriti"}
+                  {value === "all" ? labels.all : value === "available" ? labels.available : labels.soldOutPlural}
                 </button>
               ))}
             </div>
           </FilterSection>
-          <FilterSection title="Prezzo massimo">
-            <div className="flex items-center justify-between text-sm"><span className="text-white/45">Fino a</span><span>{formatPrice(maxPrice)}</span></div>
+          <FilterSection title={labels.maxPrice}>
+            <div className="flex items-center justify-between text-sm"><span className="text-white/45">{labels.upTo}</span><span>{formatLocalizedPrice(maxPrice, locale)}</span></div>
             <input
               type="range"
               min="0"
@@ -706,13 +708,13 @@ function FilterDrawer({
               value={maxPrice}
               onChange={(event) => onMaxPrice(Number(event.target.value))}
               className="mt-5 w-full accent-primary"
-              aria-label="Prezzo massimo"
+              aria-label={labels.maxPrice}
             />
           </FilterSection>
         </div>
         <div className="grid grid-cols-[auto_1fr] gap-3 border-t border-white/10 p-5">
-          <button type="button" onClick={onReset} className="px-4 text-[9px] font-semibold uppercase tracking-[0.18em] text-white/45 hover:text-white">Azzera</button>
-          <button type="button" onClick={onClose} className="bg-white px-5 py-4 text-[10px] font-bold uppercase tracking-[0.2em] text-black hover:bg-primary hover:text-primary-foreground">Mostra {resultCount} prodotti</button>
+          <button type="button" onClick={onReset} className="px-4 text-[9px] font-semibold uppercase tracking-[0.18em] text-white/45 hover:text-white">{labels.reset}</button>
+          <button type="button" onClick={onClose} className="bg-white px-5 py-4 text-[10px] font-bold uppercase tracking-[0.2em] text-black hover:bg-primary hover:text-primary-foreground">{labels.show} {resultCount} {labels.products}</button>
         </div>
       </aside>
     </div>
@@ -756,10 +758,10 @@ function QuickAdd({
             <div className="flex items-start justify-between gap-4">
               <div>
                 <p className="text-[9px] uppercase tracking-[0.24em] text-primary">{labels.quickAdd}</p>
-                <h2 className="mt-1 text-lg font-medium">{product.name}</h2>
-                <p className="mt-1 text-sm text-white/55">{formatPrice(product.price)}</p>
+                <h2 className="mt-1 text-lg font-medium">{translateCatalogText(product.name, locale)}</h2>
+                <p className="mt-1 text-sm text-white/55">{formatLocalizedPrice(product.price, locale)}</p>
               </div>
-              <button type="button" onClick={onClose} className="p-1.5 text-white/40 hover:text-white" aria-label="Chiudi"><X className="h-5 w-5" /></button>
+              <button type="button" onClick={onClose} className="p-1.5 text-white/40 hover:text-white" aria-label={labels.close}><X className="h-5 w-5" /></button>
             </div>
           </div>
         </div>

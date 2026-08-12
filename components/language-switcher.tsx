@@ -23,7 +23,7 @@ export function LanguageSwitcher() {
   }, [])
 
   return (
-    <div className="relative" ref={dropdownRef}>
+    <div className="relative" ref={dropdownRef} data-no-localize>
       <button
         onClick={() => setOpen(!open)}
         aria-label={t.common.language}

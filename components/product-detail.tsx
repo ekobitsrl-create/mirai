@@ -33,16 +33,16 @@ import { getProductVariantKey } from "@/lib/product-titles"
 import { getCatalogItemId } from "@/lib/catalog-identifiers"
 import { MetaPixelEvent } from "@/components/meta-pixel-event"
 import { PostHogCommerceEvent } from "@/components/posthog-commerce-event"
+import { useLanguage } from "@/lib/language-context"
+import type { Locale } from "@/lib/translations"
+import {
+  formatLocalizedPrice,
+  translateCatalogText,
+  translateCategory,
+} from "@/lib/site-localization"
 
 function formatCategory(slug: string) {
   return slug.replace(/-/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase())
-}
-
-function formatPrice(price: number) {
-  return new Intl.NumberFormat("it-IT", {
-    style: "currency",
-    currency: "EUR",
-  }).format(Number(price))
 }
 
 const FIRST_ORDER_DISCOUNT_PERCENT = 10
@@ -64,7 +64,7 @@ type ProductGalleryView = StoreProductImage & {
   label: string
 }
 
-function getGalleryViews(product: StoreProduct): ProductGalleryView[] {
+function getGalleryViews(product: StoreProduct, labels: string[]): ProductGalleryView[] {
   const originalGallery = product.image_gallery?.length
     ? product.image_gallery
     : product.image_url
@@ -73,10 +73,9 @@ function getGalleryViews(product: StoreProduct): ProductGalleryView[] {
 
   if (!originalGallery.length) return []
 
-  const realViewLabels = ["Vista completa", "Retro", "Dettaglio", "Indossata", "Finiture"]
   return originalGallery.map((image, index) => ({
     ...image,
-    label: realViewLabels[index] || `Vista ${index + 1}`,
+    label: labels[index] || `${labels[5]} ${index + 1}`,
   }))
 }
 
@@ -88,6 +87,7 @@ export function ProductDetail({
   relatedProducts: StoreProduct[]
 }) {
   const { addItem, items: cartItems, updateQuantity } = useCart()
+  const { locale } = useLanguage()
   const router = useRouter()
   const [selectedSize, setSelectedSize] = useState<string | null>(null)
   const [quantity, setQuantity] = useState(1)
@@ -103,23 +103,94 @@ export function ProductDetail({
   const sizes = product.sizes || []
   const selectedStock = selectedSize ? product.stock_by_size?.[selectedSize] : undefined
   const maxQuantity = selectedStock ?? 10
-  const colorName = product.color_name || "Multicolor"
-  const fitNote = product.fit_note || "Consulta la guida alle taglie prima di scegliere."
+  const productCopy = {
+    it: {
+      gallery: ["Vista completa", "Retro", "Dettaglio", "Indossata", "Finiture", "Vista"], defaultColor: "Multicolor", defaultFit: "Consulta la guida alle taglie prima di scegliere.",
+      garmentCondition: "purché il capo sia integro e con i cartellini originali", fragranceCondition: "purché il prodotto sia integro e nella confezione originale",
+      delivery: "consegna stimata", workingDays: "giorni lavorativi", sold: "Venduti questo mese", firstOrder: "Primo ordine", withCode: "con MIRAI10",
+      tax: "IVA inclusa", save: "risparmi", checkoutCode: "applicando il codice nel checkout", color: "Colore", variant: "Variante", size: "Taglia", sizeGuide: "Guida alle taglie",
+      sizeSoldOut: "Questa taglia è esaurita. Scegline un'altra.", selectSize: "Seleziona una taglia prima di continuare.", available: "Disponibile", availability: "Disponibilità", piece: "pezzo", pieces: "pezzi",
+      added: "Aggiunto", add: "Aggiungi al carrello", soldOut: "Esaurito", productCode: "Codice prodotto", chooseCheckout: "scegli il metodo nel checkout",
+      discountBeforePay: "Prima puoi applicare MIRAI10 o un altro codice sconto, poi scegliere il metodo di pagamento.", unavailable: "Momentaneamente non disponibile",
+      freeShipping: "Spedizione gratuita", always: "Sempre", easyReturn: "Reso facile", within14: "Entro 14 giorni", payment: "Pagamento", stripe: "Protetto da Stripe",
+      details: "Dettagli prodotto", composition: "Composizione e cura", shippingReturns: "Spedizioni e resi", expected: "Tempi previsti", tracked: "Spedizione tracciata in Italia e in Europa.",
+      returnText: "Per gli ordini consegnati in Italia il reso è gratuito: puoi richiederlo entro 14 giorni di calendario dalla consegna", returnEnd: "MIRAI fornisce l'etichetta prepagata e non applica costi di restocking. Consulta la pagina", returns: "Resi e Rimborsi",
+      complete: "Complete the look", mayLike: "Potrebbe piacerti", shopAll: "Shop all", closeImage: "Chiudi immagine", chooseSize: "Scegli taglia", fitGuide: "MIRAI fit guide", availableSizes: "Taglie disponibili",
+      chest: "Torace", length: "Lunghezza", sleeve: "Manica", close: "Chiudi", understood: "Ho capito", precise: "Le misure precise possono variare in base al modello. Per una verifica prima dell'acquisto contatta l'assistenza indicando il codice",
+    },
+    en: {
+      gallery: ["Full view", "Back", "Detail", "Worn", "Finishes", "View"], defaultColor: "Multicolour", defaultFit: "Check the size guide before choosing.",
+      garmentCondition: "provided the garment is intact with its original tags", fragranceCondition: "provided the product is unopened and in its original packaging",
+      delivery: "estimated delivery in", workingDays: "business days", sold: "Sold this month", firstOrder: "First order", withCode: "with MIRAI10",
+      tax: "VAT included", save: "save", checkoutCode: "by applying the code at checkout", color: "Colour", variant: "Variant", size: "Size", sizeGuide: "Size guide",
+      sizeSoldOut: "This size is sold out. Choose another one.", selectSize: "Select a size before continuing.", available: "Available", availability: "Availability", piece: "item", pieces: "items",
+      added: "Added", add: "Add to cart", soldOut: "Sold out", productCode: "Product code", chooseCheckout: "choose the method at checkout",
+      discountBeforePay: "Apply MIRAI10 or another discount code first, then choose your payment method.", unavailable: "Temporarily unavailable",
+      freeShipping: "Free shipping", always: "Always", easyReturn: "Easy return", within14: "Within 14 days", payment: "Payment", stripe: "Secured by Stripe",
+      details: "Product details", composition: "Composition and care", shippingReturns: "Shipping and returns", expected: "Expected timing", tracked: "Tracked shipping in Italy and across Europe.",
+      returnText: "Returns are free for orders delivered in Italy: request one within 14 calendar days of delivery", returnEnd: "MIRAI provides a prepaid label and charges no restocking fee. See", returns: "Returns and Refunds",
+      complete: "Complete the look", mayLike: "You may also like", shopAll: "Shop all", closeImage: "Close image", chooseSize: "Choose size", fitGuide: "MIRAI fit guide", availableSizes: "Available sizes",
+      chest: "Chest", length: "Length", sleeve: "Sleeve", close: "Close", understood: "Got it", precise: "Measurements may vary by style. To check before buying, contact support and quote code",
+    },
+    es: {
+      gallery: ["Vista completa", "Parte trasera", "Detalle", "Puesto", "Acabados", "Vista"], defaultColor: "Multicolor", defaultFit: "Consulta la guía de tallas antes de elegir.",
+      garmentCondition: "siempre que la prenda esté intacta y conserve las etiquetas originales", fragranceCondition: "siempre que el producto esté intacto y en su embalaje original",
+      delivery: "entrega estimada en", workingDays: "días laborables", sold: "Vendidos este mes", firstOrder: "Primer pedido", withCode: "con MIRAI10",
+      tax: "IVA incluido", save: "ahorras", checkoutCode: "aplicando el código en el checkout", color: "Color", variant: "Variante", size: "Talla", sizeGuide: "Guía de tallas",
+      sizeSoldOut: "Esta talla está agotada. Elige otra.", selectSize: "Selecciona una talla antes de continuar.", available: "Disponible", availability: "Disponibilidad", piece: "unidad", pieces: "unidades",
+      added: "Añadido", add: "Añadir al carrito", soldOut: "Agotado", productCode: "Código de producto", chooseCheckout: "elige el método en el checkout",
+      discountBeforePay: "Primero aplica MIRAI10 u otro código de descuento y después elige el método de pago.", unavailable: "No disponible temporalmente",
+      freeShipping: "Envío gratuito", always: "Siempre", easyReturn: "Devolución fácil", within14: "En 14 días", payment: "Pago", stripe: "Protegido por Stripe",
+      details: "Detalles del producto", composition: "Composición y cuidado", shippingReturns: "Envíos y devoluciones", expected: "Plazo previsto", tracked: "Envío con seguimiento en Italia y Europa.",
+      returnText: "Las devoluciones son gratuitas para los pedidos entregados en Italia: solicítala en los 14 días naturales siguientes a la entrega", returnEnd: "MIRAI proporciona una etiqueta prepagada y no cobra gastos de reposición. Consulta", returns: "Devoluciones y reembolsos",
+      complete: "Completa el look", mayLike: "También te puede gustar", shopAll: "Ver todo", closeImage: "Cerrar imagen", chooseSize: "Elegir talla", fitGuide: "Guía de tallas MIRAI", availableSizes: "Tallas disponibles",
+      chest: "Pecho", length: "Largo", sleeve: "Manga", close: "Cerrar", understood: "Entendido", precise: "Las medidas pueden variar según el modelo. Para comprobarlas antes de comprar, contacta con asistencia indicando el código",
+    },
+    de: {
+      gallery: ["Gesamtansicht", "Rückseite", "Detail", "Getragen", "Verarbeitung", "Ansicht"], defaultColor: "Mehrfarbig", defaultFit: "Bitte prüfe vor der Auswahl die Größentabelle.",
+      garmentCondition: "sofern das Kleidungsstück unversehrt ist und die Originaletiketten trägt", fragranceCondition: "sofern das Produkt unversehrt und originalverpackt ist",
+      delivery: "voraussichtliche Lieferung in", workingDays: "Werktagen", sold: "Diesen Monat verkauft", firstOrder: "Erste Bestellung", withCode: "mit MIRAI10",
+      tax: "inkl. MwSt.", save: "du sparst", checkoutCode: "bei Eingabe des Codes an der Kasse", color: "Farbe", variant: "Variante", size: "Größe", sizeGuide: "Größentabelle",
+      sizeSoldOut: "Diese Größe ist ausverkauft. Wähle eine andere.", selectSize: "Wähle eine Größe, bevor du fortfährst.", available: "Verfügbar", availability: "Verfügbarkeit", piece: "Stück", pieces: "Stück",
+      added: "Hinzugefügt", add: "In den Warenkorb", soldOut: "Ausverkauft", productCode: "Produktcode", chooseCheckout: "Zahlungsart an der Kasse wählen",
+      discountBeforePay: "Wende zuerst MIRAI10 oder einen anderen Rabattcode an und wähle dann die Zahlungsart.", unavailable: "Vorübergehend nicht verfügbar",
+      freeShipping: "Kostenloser Versand", always: "Immer", easyReturn: "Einfache Rückgabe", within14: "Innerhalb von 14 Tagen", payment: "Zahlung", stripe: "Durch Stripe geschützt",
+      details: "Produktdetails", composition: "Material und Pflege", shippingReturns: "Versand und Rückgabe", expected: "Voraussichtliche Dauer", tracked: "Sendungsverfolgter Versand in Italien und Europa.",
+      returnText: "Für nach Italien gelieferte Bestellungen ist die Rückgabe kostenlos: Beantrage sie innerhalb von 14 Kalendertagen nach Zustellung", returnEnd: "MIRAI stellt ein vorausbezahltes Etikett bereit und erhebt keine Wiedereinlagerungsgebühr. Siehe", returns: "Rückgabe und Erstattung",
+      complete: "Vervollständige den Look", mayLike: "Das könnte dir gefallen", shopAll: "Alle ansehen", closeImage: "Bild schließen", chooseSize: "Größe wählen", fitGuide: "MIRAI Fit-Guide", availableSizes: "Verfügbare Größen",
+      chest: "Brust", length: "Länge", sleeve: "Ärmel", close: "Schließen", understood: "Verstanden", precise: "Die Maße können je nach Modell variieren. Kontaktiere vor dem Kauf den Support und nenne den Code",
+    },
+    fr: {
+      gallery: ["Vue complète", "Dos", "Détail", "Porté", "Finitions", "Vue"], defaultColor: "Multicolore", defaultFit: "Consultez le guide des tailles avant de choisir.",
+      garmentCondition: "à condition que le vêtement soit intact et conserve ses étiquettes d’origine", fragranceCondition: "à condition que le produit soit intact et dans son emballage d’origine",
+      delivery: "livraison estimée sous", workingDays: "jours ouvrés", sold: "Vendus ce mois-ci", firstOrder: "Première commande", withCode: "avec MIRAI10",
+      tax: "TVA incluse", save: "économisez", checkoutCode: "en appliquant le code au paiement", color: "Couleur", variant: "Variante", size: "Taille", sizeGuide: "Guide des tailles",
+      sizeSoldOut: "Cette taille est épuisée. Choisissez-en une autre.", selectSize: "Sélectionnez une taille avant de continuer.", available: "Disponible", availability: "Disponibilité", piece: "article", pieces: "articles",
+      added: "Ajouté", add: "Ajouter au panier", soldOut: "Épuisé", productCode: "Code produit", chooseCheckout: "choisissez le mode au paiement",
+      discountBeforePay: "Appliquez d’abord MIRAI10 ou un autre code promo, puis choisissez le mode de paiement.", unavailable: "Temporairement indisponible",
+      freeShipping: "Livraison gratuite", always: "Toujours", easyReturn: "Retour facile", within14: "Sous 14 jours", payment: "Paiement", stripe: "Protégé par Stripe",
+      details: "Détails du produit", composition: "Composition et entretien", shippingReturns: "Livraison et retours", expected: "Délai prévu", tracked: "Livraison suivie en Italie et en Europe.",
+      returnText: "Les retours sont gratuits pour les commandes livrées en Italie : faites-en la demande dans les 14 jours calendaires suivant la livraison", returnEnd: "MIRAI fournit une étiquette prépayée et ne facture aucun frais de restockage. Consultez", returns: "Retours et remboursements",
+      complete: "Complétez le look", mayLike: "Vous aimerez aussi", shopAll: "Tout voir", closeImage: "Fermer l’image", chooseSize: "Choisir la taille", fitGuide: "Guide de coupe MIRAI", availableSizes: "Tailles disponibles",
+      chest: "Poitrine", length: "Longueur", sleeve: "Manche", close: "Fermer", understood: "Compris", precise: "Les mesures peuvent varier selon le modèle. Pour les vérifier avant l’achat, contactez le support en indiquant le code",
+    },
+  }[locale]
+  const formatPrice = (price: number) => formatLocalizedPrice(price, locale)
+  const colorName = translateCatalogText(product.color_name, locale) || productCopy.defaultColor
+  const fitNote = translateCatalogText(product.fit_note, locale) || productCopy.defaultFit
   const supplierSettings = getProductSupplierSettings(product)
   const isUnlimitedStock = supplierSettings.profile === "mirai"
   const isFragrance = ["profumi", "profumo", "fragrance", "fragrances"].includes(
     product.category.trim().toLowerCase(),
   )
-  const returnCondition = isFragrance
-    ? "purché il prodotto sia integro e nella confezione originale"
-    : "purché il capo sia integro e con i cartellini originali"
+  const returnCondition = isFragrance ? productCopy.fragranceCondition : productCopy.garmentCondition
   const shippingEstimate = supplierSettings.shippingMinDays !== undefined && supplierSettings.shippingMaxDays !== undefined
-    ? `consegna stimata in ${supplierSettings.shippingMinDays}–${supplierSettings.shippingMaxDays} giorni lavorativi`
-    : "consegna stimata in 3–5 giorni lavorativi"
-  const detailItems = product.detail_items || []
-  const gallery = useMemo(() => getGalleryViews(product), [product])
+    ? `${productCopy.delivery} ${supplierSettings.shippingMinDays}–${supplierSettings.shippingMaxDays} ${productCopy.workingDays}`
+    : `${productCopy.delivery} 3–5 ${productCopy.workingDays}`
+  const detailItems = (product.detail_items || []).map((detail) => translateCatalogText(detail, locale))
+  const gallery = useMemo(() => getGalleryViews(product, productCopy.gallery), [locale, product])
   const selectedImage = gallery[selectedImageIndex] || gallery[0]
-  const displayTitle = product.name
+  const displayTitle = translateCatalogText(product.name, locale)
   const firstOrderPrice = Math.round(
     Number(product.price) * (1 - FIRST_ORDER_DISCOUNT_PERCENT / 100) * 100,
   ) / 100
@@ -136,9 +207,9 @@ export function ProductDetail({
       .sort((left, right) => {
         if (left.id === product.id) return -1
         if (right.id === product.id) return 1
-        return (left.color_name || left.name).localeCompare(right.color_name || right.name, "it")
+        return (left.color_name || left.name).localeCompare(right.color_name || right.name, locale)
       }),
-    [currentVariantKey, product, relatedProducts],
+    [currentVariantKey, locale, product, relatedProducts],
   )
   const suggestedProducts = useMemo(() => {
     const nonVariants = relatedProducts.filter(
@@ -300,7 +371,7 @@ export function ProductDetail({
         <ChevronRight className="h-3 w-3 shrink-0" />
         <Link href="/collezioni" className="shrink-0 hover:text-white">Shop</Link>
         <ChevronRight className="h-3 w-3 shrink-0" />
-        <Link href={`/collezione/${product.category}`} className="shrink-0 hover:text-white">{formatCategory(product.category)}</Link>
+        <Link href={`/collezione/${product.category}`} className="shrink-0 hover:text-white">{translateCategory(product.category, formatCategory(product.category), locale)}</Link>
         <ChevronRight className="h-3 w-3 shrink-0" />
         <span className="truncate text-white/85">{displayTitle}</span>
       </nav>
@@ -374,25 +445,25 @@ export function ProductDetail({
           <p className="mb-3 flex items-center gap-2 px-1 text-base font-medium text-white/85 sm:mb-4 sm:px-2">
             <TrendingUp className="h-5 w-5 text-[#bcaeff]" />
             <span>
-              Venduti questo mese: <strong className="font-semibold text-white">{monthlySoldCount}</strong>
+              {productCopy.sold}: <strong className="font-semibold text-white">{monthlySoldCount}</strong>
             </span>
           </p>
 
           <section className="mirai-neon-card relative overflow-hidden rounded-[1.75rem] p-5 sm:p-7 lg:p-7">
           <div className="relative sm:flex sm:items-start sm:justify-between sm:gap-6">
             <div className="min-w-0 flex-1">
-              <p className="pr-20 text-[9px] font-semibold uppercase tracking-[0.3em] text-[#9f86ff] sm:pr-0">MIRAI LAB / {product.brand || formatCategory(product.category)}</p>
+              <p className="pr-20 text-[9px] font-semibold uppercase tracking-[0.3em] text-[#9f86ff] sm:pr-0">MIRAI LAB / {product.brand || translateCategory(product.category, formatCategory(product.category), locale)}</p>
               <h1 className="mt-5 max-w-xl text-xl font-medium leading-[1.08] tracking-[-0.035em] text-white sm:mt-3 sm:text-3xl lg:text-[2rem]">{displayTitle}</h1>
               <div className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-2">
                 <p className="text-xl font-semibold">{formatPrice(product.price)}</p>
                 <p className="inline-flex items-center gap-1.5 rounded-full border border-[#9f86ff]/45 bg-[#9f86ff]/10 px-3 py-1.5 text-[10px] text-white/75">
-                  <span>Primo ordine</span>
+                  <span>{productCopy.firstOrder}</span>
                   <strong className="text-xs font-semibold text-white">{formatPrice(firstOrderPrice)}</strong>
-                  <span className="font-semibold text-[#bcaeff]">con MIRAI10</span>
+                  <span className="font-semibold text-[#bcaeff]">{productCopy.withCode}</span>
                 </p>
               </div>
               <p className="mt-1 text-[10px] text-white/55">
-                IVA inclusa · risparmi {formatPrice(firstOrderSavings)} (-{FIRST_ORDER_DISCOUNT_PERCENT}%) applicando il codice nel checkout
+                {productCopy.tax} · {productCopy.save} {formatPrice(firstOrderSavings)} (-{FIRST_ORDER_DISCOUNT_PERCENT}%) {productCopy.checkoutCode}
               </p>
             </div>
             <div className="absolute right-0 top-0 flex shrink-0 items-center gap-1 sm:static">
@@ -405,10 +476,10 @@ export function ProductDetail({
 
           <div className="mt-5 border-t border-white/15 pt-4 sm:mt-6 sm:pt-5">
             <div className="flex items-center justify-between">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.22em]">Colore</p>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.22em]">{productCopy.color}</p>
               <span className="text-xs text-white/65">{colorName}</span>
             </div>
-            <div className="mt-3 flex flex-wrap gap-2" aria-label="Varianti colore">
+            <div className="mt-3 flex flex-wrap gap-2" aria-label={productCopy.variant}>
               {variants.map((variant) => {
                 const priceDifference = Number(variant.price) - Number(product.price)
                 const isCurrent = variant.id === product.id
@@ -436,7 +507,7 @@ export function ProductDetail({
                     />
                     <span className="min-w-0">
                       <span className="block truncate text-[10px] font-medium text-white/90">
-                        {variant.color_name || "Variante"}
+                        {translateCatalogText(variant.color_name, locale) || productCopy.variant}
                       </span>
                       <span className="block text-[9px] text-white/50">
                         {formatPrice(variant.price)}
@@ -454,9 +525,9 @@ export function ProductDetail({
           {sizes.length > 0 && (
             <div ref={purchaseRef} className="mt-5 sm:mt-6">
               <div className="flex items-center justify-between">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.22em]">Taglia</p>
+                <p className="text-[10px] font-semibold uppercase tracking-[0.22em]">{productCopy.size}</p>
                 <button type="button" onClick={() => setSizeGuideOpen(true)} className="flex items-center gap-1.5 text-[10px] text-white/60 underline decoration-primary/40 underline-offset-4 hover:text-white">
-                  <Ruler className="h-3.5 w-3.5" /> Guida alle taglie
+                  <Ruler className="h-3.5 w-3.5" /> {productCopy.sizeGuide}
                 </button>
               </div>
               <div className="mt-3 grid grid-cols-4 gap-2 sm:grid-cols-5">
@@ -486,12 +557,12 @@ export function ProductDetail({
               <p className={`mt-2 min-h-4 text-[10px] transition-colors ${sizeError ? "text-[#ff9b9b]" : "text-white/50"}`}>
                 {sizeError
                   ? selectedStock !== undefined && selectedStock <= 0
-                    ? "Questa taglia è esaurita. Scegline un'altra."
-                    : "Seleziona una taglia prima di continuare."
+                    ? productCopy.sizeSoldOut
+                    : productCopy.selectSize
                   : isUnlimitedStock
-                    ? `${fitNote} Disponibile.`
+                    ? `${fitNote} ${productCopy.available}.`
                     : selectedStock !== undefined
-                      ? `${fitNote} Disponibilità: ${selectedStock} ${selectedStock === 1 ? "pezzo" : "pezzi"}.`
+                      ? `${fitNote} ${productCopy.availability}: ${selectedStock} ${selectedStock === 1 ? productCopy.piece : productCopy.pieces}.`
                       : fitNote}
               </p>
             </div>
@@ -509,14 +580,14 @@ export function ProductDetail({
               disabled={!product.in_stock}
               className={`order-1 flex min-h-16 w-full items-center justify-center gap-2 px-5 text-xs font-bold uppercase tracking-[0.2em] transition-all sm:order-2 sm:min-h-14 sm:text-[10px] sm:tracking-[0.22em] ${added ? "bg-emerald-400 text-black" : product.in_stock ? "bg-primary text-primary-foreground shadow-[0_0_34px_rgba(159,134,255,0.46)] hover:-translate-y-0.5 hover:brightness-110 hover:shadow-[0_0_42px_rgba(159,134,255,0.55)]" : "cursor-not-allowed bg-white/10 text-white/30"}`}
             >
-              {added ? <><Check className="h-4 w-4" /> Aggiunto</> : product.in_stock ? <><ShoppingBag className="h-4 w-4" /> Aggiungi al carrello</> : "Esaurito"}
+              {added ? <><Check className="h-4 w-4" /> {productCopy.added}</> : product.in_stock ? <><ShoppingBag className="h-4 w-4" /> {productCopy.add}</> : productCopy.soldOut}
             </button>
           </div>
 
-          {product.description && <p className="mt-6 max-w-xl text-sm leading-6 text-white/70">{product.description}</p>}
+          {product.description && <p className="mt-6 max-w-xl text-sm leading-6 text-white/70">{translateCatalogText(product.description, locale)}</p>}
           {product.supplier_sku && (
             <p className="mt-3 text-[9px] uppercase tracking-[0.2em] text-white/40">
-              Codice prodotto {product.supplier_sku}
+              {productCopy.productCode} {product.supplier_sku}
             </p>
           )}
 
@@ -525,7 +596,7 @@ export function ProductDetail({
               <div className="mb-3 flex items-center gap-3">
                 <span className="h-px flex-1 bg-white/10" />
                 <span className="text-[9px] font-semibold uppercase tracking-[0.2em] text-white/55">
-                  scegli il metodo nel checkout
+                  {productCopy.chooseCheckout}
                 </span>
                 <span className="h-px flex-1 bg-white/10" />
               </div>
@@ -559,7 +630,7 @@ export function ProductDetail({
                 </button>
               </div>
               <p className="mt-2 text-center text-[9px] leading-4 text-white/50">
-                Prima puoi applicare MIRAI10 o un altro codice sconto, poi scegliere il metodo di pagamento.
+                {productCopy.discountBeforePay}
               </p>
             </div>
           )}
@@ -567,32 +638,32 @@ export function ProductDetail({
           <div className="mt-4 flex items-center gap-2 text-[10px] text-white/60">
             <PackageCheck className="h-4 w-4 text-emerald-400" />
             {product.in_stock
-              ? `Disponibile — ${shippingEstimate}`
-              : `Momentaneamente non disponibile — ${shippingEstimate}`}
+              ? `${productCopy.available} — ${shippingEstimate}`
+              : `${productCopy.unavailable} — ${shippingEstimate}`}
           </div>
 
           <div className="mt-8 grid grid-cols-3 border-y border-white/15 bg-white/[0.025] py-5">
-            <TrustItem icon={Truck} title="Spedizione gratuita" detail="Sempre" />
-            <TrustItem icon={RotateCcw} title="Reso facile" detail="Entro 14 giorni" bordered />
-            <TrustItem icon={ShieldCheck} title="Pagamento" detail="Protetto da Stripe" />
+            <TrustItem icon={Truck} title={productCopy.freeShipping} detail={productCopy.always} />
+            <TrustItem icon={RotateCcw} title={productCopy.easyReturn} detail={productCopy.within14} bordered />
+            <TrustItem icon={ShieldCheck} title={productCopy.payment} detail={productCopy.stripe} />
           </div>
 
           <div className="mt-1">
-            <Details title="Dettagli prodotto" open>
+            <Details title={productCopy.details} open>
               {detailItems.length > 0 ? (
                 <ul className="space-y-1.5">
                   {detailItems.map((detail) => <li key={detail}>• {detail}</li>)}
                 </ul>
-              ) : product.description}
+              ) : translateCatalogText(product.description, locale)}
             </Details>
             {(product.composition || product.care) && (
-              <Details title="Composizione e cura">
-                {product.composition && <p>{product.composition}</p>}
-                {product.care && <p className={product.composition ? "mt-2" : undefined}>{product.care}</p>}
+              <Details title={productCopy.composition}>
+                {product.composition && <p>{translateCatalogText(product.composition, locale)}</p>}
+                {product.care && <p className={product.composition ? "mt-2" : undefined}>{translateCatalogText(product.care, locale)}</p>}
               </Details>
             )}
-            <Details title="Spedizioni e resi">
-              Tempi previsti: {shippingEstimate}. Spedizione tracciata in Italia e in Europa. Per gli ordini consegnati in Italia il reso è gratuito: puoi richiederlo entro 14 giorni di calendario dalla consegna, {returnCondition}. MIRAI fornisce l'etichetta prepagata e non applica costi di restocking. Consulta la pagina <Link href="/resi" className="text-[#9f86ff] underline underline-offset-4">Resi e Rimborsi</Link>.
+            <Details title={productCopy.shippingReturns}>
+              {productCopy.expected}: {shippingEstimate}. {productCopy.tracked} {productCopy.returnText}, {returnCondition}. {productCopy.returnEnd} <Link href="/resi" className="text-[#9f86ff] underline underline-offset-4">{productCopy.returns}</Link>.
             </Details>
           </div>
           </section>
@@ -603,10 +674,10 @@ export function ProductDetail({
         <section className="mt-24 border-t border-primary/25 pt-12 md:mt-32 md:pt-16">
           <div className="mb-8 flex items-end justify-between">
             <div>
-              <p className="text-[9px] font-semibold uppercase tracking-[0.28em] text-[#9f86ff]">Complete the look</p>
-              <h2 className="mt-2 text-3xl font-medium tracking-[-0.035em]">Potrebbe piacerti</h2>
+              <p className="text-[9px] font-semibold uppercase tracking-[0.28em] text-[#9f86ff]">{productCopy.complete}</p>
+              <h2 className="mt-2 text-3xl font-medium tracking-[-0.035em]">{productCopy.mayLike}</h2>
             </div>
-            <Link href="/collezioni" className="hidden border-b border-white/30 pb-1 text-[9px] uppercase tracking-[0.2em] text-white/50 hover:text-white sm:block">Shop all</Link>
+            <Link href="/collezioni" className="hidden border-b border-white/30 pb-1 text-[9px] uppercase tracking-[0.2em] text-white/50 hover:text-white sm:block">{productCopy.shopAll}</Link>
           </div>
           <div className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-5">
             {suggestedProducts.map((item) => (
@@ -627,7 +698,7 @@ export function ProductDetail({
           <div className="min-w-0 shrink-0">
             <p className="text-base font-semibold leading-none text-white">{formatPrice(product.price)}</p>
             <p className="mt-1 text-[9px] text-[#bcaeff]">
-              {formatPrice(firstOrderPrice)} con MIRAI10 · -{FIRST_ORDER_DISCOUNT_PERCENT}%
+              {formatPrice(firstOrderPrice)} {productCopy.withCode} · -{FIRST_ORDER_DISCOUNT_PERCENT}%
             </p>
           </div>
           <button
@@ -643,12 +714,12 @@ export function ProductDetail({
             <ShoppingBag className="h-4 w-4 shrink-0" />
             <span className="truncate">
               {!product.in_stock
-                ? "Esaurito"
+                ? productCopy.soldOut
                 : sizes.length > 0 && !selectedSize
-                  ? "Scegli taglia"
+                  ? productCopy.chooseSize
                   : added
-                    ? "Aggiunto"
-                    : "Aggiungi al carrello"}
+                    ? productCopy.added
+                    : productCopy.add}
             </span>
           </button>
         </div>
@@ -656,7 +727,7 @@ export function ProductDetail({
 
       {zoomOpen && selectedImage && (
         <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/95 p-4 md:p-10">
-          <button type="button" onClick={() => setZoomOpen(false)} className="absolute right-5 top-5 z-10 flex h-11 w-11 items-center justify-center rounded-full bg-white text-black" aria-label="Chiudi immagine"><X className="h-5 w-5" /></button>
+          <button type="button" onClick={() => setZoomOpen(false)} className="absolute right-5 top-5 z-10 flex h-11 w-11 items-center justify-center rounded-full bg-white text-black" aria-label={productCopy.closeImage}><X className="h-5 w-5" /></button>
           <div className="relative h-full w-full max-w-6xl overflow-hidden">
             <Image
               src={selectedImage.src}
@@ -672,7 +743,7 @@ export function ProductDetail({
       )}
 
       {sizeGuideOpen && (
-        <SizeGuide product={product} onClose={() => setSizeGuideOpen(false)} />
+        <SizeGuide product={product} onClose={() => setSizeGuideOpen(false)} copy={productCopy} locale={locale} />
       )}
     </div>
   )
@@ -700,7 +771,23 @@ function Details({ title, children, open = false }: { title: string; children: R
   )
 }
 
-function SizeGuide({ product, onClose }: { product: StoreProduct; onClose: () => void }) {
+type SizeGuideCopy = {
+  fitGuide: string
+  sizeGuide: string
+  close: string
+  defaultFit: string
+  size: string
+  chest: string
+  length: string
+  sleeve: string
+  availableSizes: string
+  piece: string
+  pieces: string
+  precise: string
+  understood: string
+}
+
+function SizeGuide({ product, onClose, copy, locale }: { product: StoreProduct; onClose: () => void; copy: SizeGuideCopy; locale: Locale }) {
   const rows = [
     ["S", "52", "69", "22"],
     ["M", "55", "71", "23"],
@@ -709,34 +796,34 @@ function SizeGuide({ product, onClose }: { product: StoreProduct; onClose: () =>
   ]
   return (
     <div className="fixed inset-0 z-[75] flex items-end justify-center md:items-center md:p-6">
-      <button type="button" className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={onClose} aria-label="Chiudi guida taglie" />
+      <button type="button" className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={onClose} aria-label={copy.close} />
       <div className="relative w-full max-w-2xl bg-[#141416] p-6 text-white shadow-2xl md:p-9">
         <div className="flex items-start justify-between gap-4">
-          <div><p className="text-[9px] uppercase tracking-[0.26em] text-[#9f86ff]">MIRAI fit guide</p><h2 className="mt-2 text-2xl font-medium">Guida alle taglie</h2></div>
-          <button type="button" onClick={onClose} className="p-1 text-white/40 hover:text-white" aria-label="Chiudi"><X className="h-5 w-5" /></button>
+          <div><p className="text-[9px] uppercase tracking-[0.26em] text-[#9f86ff]">{copy.fitGuide}</p><h2 className="mt-2 text-2xl font-medium">{copy.sizeGuide}</h2></div>
+          <button type="button" onClick={onClose} className="p-1 text-white/40 hover:text-white" aria-label={copy.close}><X className="h-5 w-5" /></button>
         </div>
-        <p className="mt-5 text-xs leading-6 text-white/45">{product.fit_note || "Scegli la tua taglia abituale."}</p>
+        <p className="mt-5 text-xs leading-6 text-white/45">{translateCatalogText(product.fit_note, locale) || copy.defaultFit}</p>
         {product.id === "71a11e7e-5b68-4e2c-9f65-0dca2b967104" ? (
           <div className="mt-6 overflow-x-auto">
             <table className="w-full min-w-[480px] text-left text-xs">
-              <thead className="border-b border-white/15 text-[9px] uppercase tracking-[0.16em] text-white/35"><tr><th className="py-3">Taglia</th><th className="py-3">Torace</th><th className="py-3">Lunghezza</th><th className="py-3">Manica</th></tr></thead>
+              <thead className="border-b border-white/15 text-[9px] uppercase tracking-[0.16em] text-white/35"><tr><th className="py-3">{copy.size}</th><th className="py-3">{copy.chest}</th><th className="py-3">{copy.length}</th><th className="py-3">{copy.sleeve}</th></tr></thead>
               <tbody>{rows.map((row) => <tr key={row[0]} className="border-b border-white/10">{row.map((value) => <td key={value} className="py-4">{value}</td>)}</tr>)}</tbody>
             </table>
           </div>
         ) : (
           <div className="mt-6">
-            <p className="text-[9px] uppercase tracking-[0.2em] text-white/35">Taglie disponibili</p>
+            <p className="text-[9px] uppercase tracking-[0.2em] text-white/35">{copy.availableSizes}</p>
             <div className="mt-3 flex flex-wrap gap-2">
               {product.sizes.map((size) => (
                 <span key={size} className="border border-white/15 px-4 py-3 text-xs">
-                  {size}{product.stock_by_size?.[size] !== undefined ? ` · ${product.stock_by_size[size]} pz` : ""}
+                  {size}{product.stock_by_size?.[size] !== undefined ? ` · ${product.stock_by_size[size]} ${product.stock_by_size[size] === 1 ? copy.piece : copy.pieces}` : ""}
                 </span>
               ))}
             </div>
-            <p className="mt-5 text-[10px] leading-5 text-white/40">Le misure precise possono variare in base al modello. Per una verifica prima dell'acquisto contatta l'assistenza indicando il codice {product.supplier_sku || product.id}.</p>
+            <p className="mt-5 text-[10px] leading-5 text-white/40">{copy.precise} {product.supplier_sku || product.id}.</p>
           </div>
         )}
-        <button type="button" onClick={onClose} className="mt-7 w-full bg-white py-4 text-[10px] font-bold uppercase tracking-[0.2em] text-black hover:bg-[#9f86ff]">Ho capito</button>
+        <button type="button" onClick={onClose} className="mt-7 w-full bg-white py-4 text-[10px] font-bold uppercase tracking-[0.2em] text-black hover:bg-[#9f86ff]">{copy.understood}</button>
       </div>
     </div>
   )

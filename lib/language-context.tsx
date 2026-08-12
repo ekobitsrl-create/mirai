@@ -36,6 +36,10 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     }
   }, [])
 
+  useEffect(() => {
+    document.documentElement.lang = locale
+  }, [locale])
+
   const setLocale = (newLocale: Locale) => {
     setLocaleState(newLocale)
     try {
@@ -43,8 +47,6 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     } catch {
       // Keep the selected language for the current session when storage is blocked.
     }
-    // Update HTML lang attribute
-    document.documentElement.lang = newLocale
   }
 
   const t = translations[locale]

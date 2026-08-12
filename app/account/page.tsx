@@ -9,6 +9,8 @@ import { User, Package, ArrowRight, LogOut } from "lucide-react"
 import { isAdminEmail } from "@/lib/admin"
 import { CommunityPreview } from "@/components/mirai-community"
 import type { Session, User as SupabaseUser } from "@supabase/supabase-js"
+import { useLanguage } from "@/lib/language-context"
+import { formatLocalizedPrice, localeTags, translateSiteText } from "@/lib/site-localization"
 
 type AccountOrder = {
   id: string
@@ -28,6 +30,8 @@ const orderStatusLabels: Record<string, string> = {
 }
 
 export default function AccountPage() {
+  const { locale } = useLanguage()
+  const ui = (value: string) => translateSiteText(value, locale)
   const supabase = createClient()
   const router = useRouter()
   const [user, setUser] = useState<any>(null)
@@ -214,7 +218,7 @@ export default function AccountPage() {
               <div>
                 <p className="text-xs uppercase tracking-widest text-muted-foreground mb-1">Membro dal</p>
                 <p className="text-sm text-foreground">
-                  {new Date(user.created_at).toLocaleDateString("it-IT", {
+                  {new Date(user.created_at).toLocaleDateString(localeTags[locale], {
                     year: "numeric",
                     month: "long",
                     day: "numeric",
@@ -256,13 +260,13 @@ export default function AccountPage() {
                         <div>
                           <p className="font-mono text-sm text-foreground">#{order.id.slice(0, 8).toUpperCase()}</p>
                           <p className="mt-1 text-xs text-muted-foreground">
-                            {new Date(order.created_at).toLocaleDateString("it-IT", { day: "2-digit", month: "short", year: "numeric" })}
-                            {" - "}{order.order_items?.length || 0} articoli
+                          {new Date(order.created_at).toLocaleDateString(localeTags[locale], { day: "2-digit", month: "short", year: "numeric" })}
+                            {" - "}{ui(`${order.order_items?.length || 0} articoli`)}
                           </p>
                         </div>
                         <div className="text-right">
-                          <p className="font-mono text-sm text-foreground">{"\u20AC"}{Number(order.total).toFixed(2)}</p>
-                          <p className="mt-1 text-[10px] uppercase tracking-widest text-primary">{orderStatusLabels[order.status] || order.status}</p>
+                          <p className="font-mono text-sm text-foreground">{formatLocalizedPrice(Number(order.total), locale)}</p>
+                          <p className="mt-1 text-[10px] uppercase tracking-widest text-primary">{ui(orderStatusLabels[order.status] || order.status)}</p>
                         </div>
                       </div>
                     </div>

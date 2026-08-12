@@ -19,6 +19,7 @@ import { MetaPixelEvent } from "@/components/meta-pixel-event"
 import { buildMetaCartParameters, getMetaPurchaseStorageKey } from "@/lib/meta-pixel"
 import { PostHogCommerceEvent } from "@/components/posthog-commerce-event"
 import { getCatalogItemId } from "@/lib/catalog-identifiers"
+import { formatLocalizedPrice, translateSiteText } from "@/lib/site-localization"
 
 const stripePublishableKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
 const stripePromise = stripePublishableKey ? loadStripe(stripePublishableKey) : null
@@ -26,7 +27,9 @@ const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 export default function CheckoutPage() {
   const { items, getTotal, clearCart, hydrated } = useCart()
-  const { t } = useLanguage()
+  const { t, locale } = useLanguage()
+  const ui = (source: string) => translateSiteText(source, locale)
+  const money = (cents: number) => formatLocalizedPrice(cents / 100, locale)
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null)
   const [accountEmail, setAccountEmail] = useState("")
   const [guestEmail, setGuestEmail] = useState("")
@@ -131,7 +134,7 @@ export default function CheckoutPage() {
 
     if (checkoutEmail && !emailPattern.test(checkoutEmail)) {
       const error = new Error("L'indirizzo email inserito non è valido.")
-      setCardError(error.message)
+      setCardError(ui(error.message))
       return Promise.reject(error)
     }
 
@@ -153,7 +156,7 @@ export default function CheckoutPage() {
       .catch((error) => {
         checkoutSessionRef.current = null
         const message = error instanceof Error ? error.message : t.checkout.error
-        setCardError(message)
+        setCardError(ui(message))
         throw error
       })
       .finally(() => setCardLoading(false))
@@ -182,7 +185,7 @@ export default function CheckoutPage() {
     event.preventDefault()
     setPromoError(null)
     if (!emailPattern.test(checkoutEmail)) {
-      setPromoError("Inserisci prima un indirizzo email valido.")
+      setPromoError(ui("Inserisci prima un indirizzo email valido."))
       return
     }
 
@@ -194,7 +197,7 @@ export default function CheckoutPage() {
       resetCardCheckout()
     } catch (error) {
       setAppliedDiscount(null)
-      setPromoError(error instanceof Error ? error.message : "Codice sconto non valido")
+      setPromoError(error instanceof Error ? ui(error.message) : ui("Codice sconto non valido"))
       resetCardCheckout()
     } finally {
       setPromoLoading(false)
@@ -210,7 +213,7 @@ export default function CheckoutPage() {
 
   const beginGuestCheckout = () => {
     if (guestEmail.trim() && !emailPattern.test(guestEmail.trim())) {
-      setGuestError("L'indirizzo email inserito non è valido.")
+      setGuestError(ui("L'indirizzo email inserito non è valido."))
       return
     }
     setGuestError(null)
@@ -252,7 +255,7 @@ export default function CheckoutPage() {
       })
       window.location.assign(`/success?${confirmationQuery.toString()}`)
     } catch (error) {
-      setCashError(error instanceof Error ? error.message : "Non e stato possibile registrare l ordine")
+      setCashError(error instanceof Error ? ui(error.message) : ui("Non è stato possibile registrare l'ordine"))
       setCashSubmitting(false)
     }
   }
@@ -319,22 +322,22 @@ export default function CheckoutPage() {
             {appliedDiscount ? (
               <div>
                 <p className="text-xs text-muted-foreground">
-                  Subtotale <span className="line-through">{"\u20AC"}{(appliedDiscount.subtotalCents / 100).toFixed(2)}</span>
+                  {ui("Subtotale")} <span className="line-through">{money(appliedDiscount.subtotalCents)}</span>
                 </p>
                 <p className="mt-1 text-xs font-semibold text-emerald-400">
-                  -{"\u20AC"}{(appliedDiscount.discountCents / 100).toFixed(2)} con {appliedDiscount.code}
+                  -{money(appliedDiscount.discountCents)} {ui("con")} {appliedDiscount.code}
                 </p>
               </div>
             ) : (
-              <p className="text-sm text-muted-foreground">Prodotti {"\u20AC"}{getTotal().toFixed(2)}</p>
+              <p className="text-sm text-muted-foreground">{ui("Prodotti")} {formatLocalizedPrice(getTotal(), locale)}</p>
             )}
             {selectedPaymentFeeCents > 0 && (
               <p className="mt-1 text-xs font-semibold text-amber-400">
-                Supplemento contrassegno +{"\u20AC"}{(selectedPaymentFeeCents / 100).toFixed(2)}
+                {ui("Supplemento contrassegno")} +{money(selectedPaymentFeeCents)}
               </p>
             )}
             <p className="mt-1 text-2xl font-bold text-foreground">
-              {"\u20AC"}{(checkoutTotalCents / 100).toFixed(2)}
+              {money(checkoutTotalCents)}
             </p>
           </div>
         </div>

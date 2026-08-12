@@ -21,6 +21,8 @@ import {
   type MetaCommerceParameters,
 } from "@/lib/meta-pixel"
 import { PostHogCommerceEvent } from "@/components/posthog-commerce-event"
+import { useLanguage } from "@/lib/language-context"
+import { formatLocalizedPrice, translateCatalogText, translateSiteText } from "@/lib/site-localization"
 
 type OrderSummary = {
   id: string
@@ -38,14 +40,10 @@ type OrderSummary = {
   items: Array<{ name: string; quantity: number; amount: number; contentId: string }>
 }
 
-function formatPrice(value: number, currency: string) {
-  return new Intl.NumberFormat("it-IT", {
-    style: "currency",
-    currency: currency.toUpperCase(),
-  }).format(value)
-}
-
 function SuccessContent() {
+  const { locale } = useLanguage()
+  const ui = (value: string) => translateSiteText(value, locale)
+  const formatPrice = (value: number, currency: string) => formatLocalizedPrice(value, locale, currency)
   const searchParams = useSearchParams()
   const sessionId = searchParams.get("session_id")
   const confirmationToken = searchParams.get("confirmation_token")
@@ -322,7 +320,7 @@ function SuccessContent() {
           <div className="divide-y divide-border px-6">
             {order.items.map((item, index) => (
               <div key={`${item.name}-${index}`} className="flex items-center justify-between gap-6 py-4 text-sm">
-                <p className="min-w-0 text-foreground">{item.name} <span className="text-muted-foreground">x{item.quantity}</span></p>
+                <p className="min-w-0 text-foreground">{translateCatalogText(item.name, locale)} <span className="text-muted-foreground">x{item.quantity}</span></p>
                 <p className="shrink-0 text-muted-foreground">{formatPrice(item.amount, order.currency)}</p>
               </div>
             ))}

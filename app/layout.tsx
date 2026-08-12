@@ -9,6 +9,7 @@ import { CookieBanner } from '@/components/cookie-banner'
 import { WhatsAppButton } from '@/components/whatsapp-button'
 import { BackgroundMusic } from '@/components/background-music'
 import { SiteIntro } from '@/components/site-intro'
+import { SiteLocalizer } from '@/components/site-localizer'
 import { MiraGuide } from '@/components/mira-guide'
 import { MarketingPixels } from '@/components/marketing-pixels'
 import { GoogleIntegrations } from '@/components/google-integrations'
@@ -188,6 +189,7 @@ window.gtag('consent', 'default', {
           />
           <SiteIntro />
           <LanguageProvider>
+            <SiteLocalizer />
             <CartProvider>
               {children}
               <CartAddedBanner />

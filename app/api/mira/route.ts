@@ -9,6 +9,7 @@ import {
   readJsonBody,
   RequestBodyTooLargeError,
 } from "@/lib/request-security"
+import type { Locale } from "@/lib/translations"
 
 export const runtime = "nodejs"
 export const maxDuration = 20
@@ -127,20 +128,27 @@ function normalize(value: string) {
     .toLocaleLowerCase("it-IT")
 }
 
-function getSuggestion(message: string, products: StoreProduct[]) {
+function getSuggestion(message: string, products: StoreProduct[], locale: Locale) {
   const normalized = normalize(message)
+  const labels = {
+    it: { shipping: "Dettagli spedizioni", returns: "Come fare un reso", payments: "FAQ pagamenti", custom: "Apri il Custom Lab", search: "Cerca nello shop", view: "Guarda" },
+    en: { shipping: "Shipping details", returns: "How to make a return", payments: "Payment FAQ", custom: "Open Custom Lab", search: "Search the shop", view: "View" },
+    es: { shipping: "Detalles del envío", returns: "Cómo realizar una devolución", payments: "Preguntas sobre pagos", custom: "Abrir Custom Lab", search: "Buscar en la tienda", view: "Ver" },
+    de: { shipping: "Versanddetails", returns: "Rückgabe durchführen", payments: "FAQ zur Zahlung", custom: "Custom Lab öffnen", search: "Im Shop suchen", view: "Ansehen" },
+    fr: { shipping: "Détails de livraison", returns: "Effectuer un retour", payments: "FAQ sur le paiement", custom: "Ouvrir le Custom Lab", search: "Rechercher dans la boutique", view: "Voir" },
+  }[locale]
 
   if (/sped|consegna|corriere|tracking/.test(normalized)) {
-    return { href: "/spedizioni", label: "Dettagli spedizioni" }
+    return { href: "/spedizioni", label: labels.shipping }
   }
   if (/reso|rimbor/.test(normalized)) {
-    return { href: "/resi", label: "Come fare un reso" }
+    return { href: "/resi", label: labels.returns }
   }
   if (/pagament|paypal|klarna|carta|apple pay|google pay/.test(normalized)) {
-    return { href: "/faq", label: "FAQ pagamenti" }
+    return { href: "/faq", label: labels.payments }
   }
   if (/custom|personalizz|stampa|grafica/.test(normalized)) {
-    return { href: "/custom-lab#editor", label: "Apri il Custom Lab" }
+    return { href: "/custom-lab#editor", label: labels.custom }
   }
 
   const availableProducts = products.filter((product) => product.in_stock)
@@ -156,12 +164,12 @@ function getSuggestion(message: string, products: StoreProduct[]) {
   if (matchedProduct) {
     return {
       href: `/prodotto/${matchedProduct.id}`,
-      label: `Guarda ${matchedProduct.name}`,
+      label: `${labels.view} ${matchedProduct.name}`,
     }
   }
 
   if (/shop|prodot|capo|magli|t-shirt|felpa|pantalon|cappell|tagli|fit|misur/.test(normalized)) {
-    return { href: "/collezioni#shop-search", label: "Cerca nello shop" }
+    return { href: "/collezioni#shop-search", label: labels.search }
   }
 
   return undefined
@@ -193,10 +201,20 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Richiesta non valida." }, { status: 400 })
   }
 
-  const candidate = body as { message?: unknown; pathname?: unknown; history?: unknown }
+  const candidate = body as { message?: unknown; pathname?: unknown; history?: unknown; locale?: unknown }
   const message = typeof candidate.message === "string" ? candidate.message.trim().slice(0, 500) : ""
   const pathname = typeof candidate.pathname === "string" ? candidate.pathname.slice(0, 180) : "/"
   const history = sanitizeHistory(candidate.history)
+  const locale: Locale = ["it", "en", "es", "de", "fr"].includes(String(candidate.locale))
+    ? candidate.locale as Locale
+    : "it"
+  const responseLanguages: Record<Locale, string> = {
+    it: "italiano",
+    en: "inglese",
+    es: "spagnolo",
+    de: "tedesco",
+    fr: "francese",
+  }
 
   if (!message) {
     return NextResponse.json({ error: "Scrivi una richiesta per MIRA." }, { status: 400 })
@@ -206,7 +224,7 @@ export async function POST(request: NextRequest) {
   const systemPrompt = `Sei MIRA, la guida digitale di MIRAI LAB STORE, un negozio streetwear italiano.
 
 STILE:
-- Rispondi sempre in italiano, in modo amichevole, sicuro e conciso.
+- Rispondi sempre in ${responseLanguages[locale]}, la lingua selezionata dall'utente, in modo amichevole, sicuro e conciso.
 - Puoi usare ogni tanto "Yo" o "Bro", senza forzare lo slang.
 - Non usare la parola "drop".
 - Massimo 2-3 frasi e circa 60 parole.
@@ -261,7 +279,7 @@ ${JSON.stringify(catalogForPrompt(products))}`
     return NextResponse.json({
       configured: true,
       reply,
-      ...getSuggestion(message, products),
+      ...getSuggestion(message, products, locale),
     })
   } catch (error) {
     console.error("[MIRA] OpenAI connection failed:", error)

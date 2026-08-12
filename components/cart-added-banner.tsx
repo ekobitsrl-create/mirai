@@ -7,10 +7,14 @@ import {
   CART_ITEM_ADDED_EVENT,
   type CartItemAddedDetail,
 } from "@/lib/cart-context"
+import { useLanguage } from "@/lib/language-context"
+import { translateCatalogText, translateSiteText } from "@/lib/site-localization"
 
 const AUTO_CLOSE_MS = 7000
 
 export function CartAddedBanner() {
+  const { locale } = useLanguage()
+  const ui = (value: string) => translateSiteText(value, locale)
   const [addedItem, setAddedItem] = useState<CartItemAddedDetail | null>(null)
   const closeTimerRef = useRef<number | null>(null)
 
@@ -43,13 +47,13 @@ export function CartAddedBanner() {
 
   return (
     <aside
-      aria-label="Prodotto aggiunto al carrello"
+      aria-label={ui("Prodotto aggiunto al carrello")}
       className="fixed inset-x-4 bottom-4 z-[10020] mx-auto max-w-md animate-fade-up border border-primary/50 bg-[#120b1d]/98 p-4 shadow-2xl shadow-black/70 backdrop-blur-xl sm:inset-x-auto sm:bottom-6 sm:right-6 sm:w-[420px]"
     >
       <button
         type="button"
         onClick={() => setAddedItem(null)}
-        aria-label="Chiudi notifica"
+        aria-label={ui("Chiudi notifica")}
         className="absolute right-3 top-3 rounded-full p-1 text-white/50 transition-colors hover:bg-white/10 hover:text-white"
       >
         <X className="h-4 w-4" />
@@ -61,11 +65,11 @@ export function CartAddedBanner() {
         </span>
         <div className="min-w-0">
           <p className="text-xs font-bold uppercase tracking-[0.16em] text-emerald-400">
-            Prodotto aggiunto al carrello
+            {ui("Prodotto aggiunto al carrello")}
           </p>
           <p className="mt-1 line-clamp-2 text-sm font-medium leading-5 text-white">
             {addedItem.quantity > 1 && `${addedItem.quantity}× `}
-            {addedItem.name}
+            {translateCatalogText(addedItem.name, locale)}
           </p>
         </div>
       </div>
@@ -75,7 +79,7 @@ export function CartAddedBanner() {
         onClick={() => setAddedItem(null)}
         className="mt-4 flex min-h-11 w-full items-center justify-center gap-2 bg-primary px-5 text-xs font-bold uppercase tracking-[0.14em] text-primary-foreground transition-colors hover:bg-primary/90"
       >
-        Vai al checkout
+        {ui("Vai al checkout")}
         <ArrowRight className="h-4 w-4" />
       </Link>
     </aside>

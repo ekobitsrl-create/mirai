@@ -9,6 +9,7 @@ import { useCart } from "@/lib/cart-context"
 import { useLanguage } from "@/lib/language-context"
 import { getCategoryImage } from "@/lib/category-images"
 import { getCatalogItemId } from "@/lib/catalog-identifiers"
+import { formatLocalizedPrice, translateCatalogText, translateCategory } from "@/lib/site-localization"
 
 type Product = {
   id: string
@@ -61,7 +62,8 @@ export function CollectionProducts({
   const [wishlist, setWishlist] = useState<string[]>([])
   const [activeSubcategory, setActiveSubcategory] = useState<string | null>(null)
   const { addItem } = useCart()
-  const { t } = useLanguage()
+  const { locale } = useLanguage()
+  const categoryName = translateCategory(category.slug, category.name, locale)
 
   // Initialize activeSubcategory from URL parameter
   useEffect(() => {
@@ -102,7 +104,7 @@ export function CollectionProducts({
           />
           <Image
             src={categoryImage}
-            alt={category.name}
+            alt={categoryName}
             fill
             className="object-contain object-center p-1 sm:p-2 md:p-3"
             sizes="100vw"
@@ -121,15 +123,15 @@ export function CollectionProducts({
             className="text-3xl font-bold tracking-tight text-foreground md:text-4xl"
             style={{ fontFamily: "var(--font-space-grotesk)" }}
           >
-            {category.name}
+            {categoryName}
           </h1>
           {category.description && (
             <p className="text-muted-foreground mt-2 text-lg">
-              {category.description}
+              {translateCatalogText(category.description, locale)}
             </p>
           )}
           <p className="text-sm text-primary mt-2">
-            {filteredProducts.length} prodott{filteredProducts.length === 1 ? "o" : "i"}
+            {filteredProducts.length} {locale === "it" ? `prodott${filteredProducts.length === 1 ? "o" : "i"}` : locale === "en" ? (filteredProducts.length === 1 ? "product" : "products") : locale === "es" ? (filteredProducts.length === 1 ? "producto" : "productos") : locale === "de" ? (filteredProducts.length === 1 ? "Produkt" : "Produkte") : (filteredProducts.length === 1 ? "produit" : "produits")}
           </p>
         </div>
       </section>
@@ -140,7 +142,7 @@ export function CollectionProducts({
           <aside className="lg:w-56 shrink-0">
             {/* Parent categories navigation */}
             <h3 className="text-xs tracking-[0.3em] uppercase text-muted-foreground mb-4">
-              Collezioni
+              {locale === "it" ? "Collezioni" : locale === "en" ? "Collections" : locale === "es" ? "Colecciones" : locale === "de" ? "Kollektionen" : "Collections"}
             </h3>
             <nav className="flex flex-row lg:flex-col gap-1.5 overflow-x-auto lg:overflow-visible pb-2 lg:pb-0 mb-8">
               {parentCategories.map((cat) => (
@@ -153,7 +155,7 @@ export function CollectionProducts({
                       : "text-muted-foreground hover:text-foreground hover:bg-secondary"
                   }`}
                 >
-                  {cat.name}
+                  {translateCategory(cat.slug, cat.name, locale)}
                 </Link>
               ))}
             </nav>
@@ -162,7 +164,7 @@ export function CollectionProducts({
             {isParent && subcategories.length > 0 && (
               <>
                 <h3 className="text-xs tracking-[0.3em] uppercase text-muted-foreground mb-4">
-                  Sottocategorie
+                  {locale === "it" ? "Sottocategorie" : locale === "en" ? "Subcategories" : locale === "es" ? "Subcategorías" : locale === "de" ? "Unterkategorien" : "Sous-catégories"}
                 </h3>
                 <nav className="flex flex-row lg:flex-col gap-1.5 overflow-x-auto lg:overflow-visible pb-2 lg:pb-0">
                   <button
@@ -173,7 +175,7 @@ export function CollectionProducts({
                         : "text-muted-foreground hover:text-foreground hover:bg-secondary"
                     }`}
                   >
-                    Tutti ({products.length})
+                    {locale === "it" ? "Tutti" : locale === "en" ? "All" : locale === "es" ? "Todos" : locale === "de" ? "Alle" : "Tous"} ({products.length})
                   </button>
                   {subcategories.map((sub) => {
                     const count = products.filter(
@@ -193,7 +195,7 @@ export function CollectionProducts({
                             : "text-muted-foreground hover:text-foreground hover:bg-secondary"
                         }`}
                       >
-                        {sub.name} ({count})
+                        {translateCategory(sub.slug, sub.name, locale)} ({count})
                       </button>
                     )
                   })}
@@ -207,7 +209,7 @@ export function CollectionProducts({
             {filteredProducts.length === 0 ? (
               <div className="text-center py-20">
                 <p className="text-muted-foreground text-lg">
-                  Nessun prodotto in questa collezione.
+                  {locale === "it" ? "Nessun prodotto in questa collezione." : locale === "en" ? "No products in this collection." : locale === "es" ? "No hay productos en esta colección." : locale === "de" ? "Keine Produkte in dieser Kollektion." : "Aucun produit dans cette collection."}
                 </p>
                 <Link
                   href="/"
@@ -237,12 +239,12 @@ export function CollectionProducts({
                         />
                         {product.is_new && (
                           <span className="absolute top-4 left-4 px-3 py-1 bg-primary text-primary-foreground text-[10px] font-bold tracking-widest uppercase rounded-sm">
-                            Nuovo
+                            {locale === "it" ? "Nuovo" : locale === "en" ? "New" : locale === "es" ? "Nuevo" : locale === "de" ? "Neu" : "Nouveau"}
                           </span>
                         )}
                         {!product.in_stock && (
                           <span className="absolute top-4 left-4 px-3 py-1 bg-secondary text-muted-foreground text-[10px] font-bold tracking-widest uppercase rounded-sm">
-                            Esaurito
+                            {locale === "it" ? "Esaurito" : locale === "en" ? "Sold out" : locale === "es" ? "Agotado" : locale === "de" ? "Ausverkauft" : "Épuisé"}
                           </span>
                         )}
                         <button
@@ -284,7 +286,7 @@ export function CollectionProducts({
                               }}
                               className="w-full py-3 bg-primary text-primary-foreground text-xs font-bold tracking-widest uppercase rounded-sm hover:bg-primary/90 hover:shadow-[0_0_20px_rgba(168,85,247,0.25)] transition-all duration-300"
                             >
-                              Aggiungi al Carrello
+                              {locale === "it" ? "Aggiungi al carrello" : locale === "en" ? "Add to cart" : locale === "es" ? "Añadir al carrito" : locale === "de" ? "In den Warenkorb" : "Ajouter au panier"}
                             </button>
                           </div>
                         )}
@@ -295,12 +297,11 @@ export function CollectionProducts({
                             {"MIR\u039BI"}
                           </p>
                           <h3 className="text-sm font-medium text-foreground group-hover:text-primary transition-colors duration-300">
-                            {product.name}
+                            {translateCatalogText(product.name, locale)}
                           </h3>
                         </div>
                         <p className="text-sm font-semibold text-foreground">
-                          {"\u20AC"}
-                          {Number(product.price).toFixed(2)}
+                          {formatLocalizedPrice(Number(product.price), locale)}
                         </p>
                       </div>
                     </Link>

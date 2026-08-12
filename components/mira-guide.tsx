@@ -14,6 +14,9 @@ import {
 } from "react"
 import { getMiraLocalReply, setMiraCatalog, type MiraIntent } from "@/lib/mira-knowledge"
 import type { StoreProduct } from "@/lib/products"
+import { useLanguage } from "@/lib/language-context"
+import { localeTags } from "@/lib/site-localization"
+import type { Locale } from "@/lib/translations"
 
 type MiraVariant = "male" | "female"
 type MiraAssetPose = "idle" | "listening" | "speaking"
@@ -86,16 +89,23 @@ const VARIANT_STORAGE_KEY = "mirai-mira-variant-v1"
 const POSITION_STORAGE_KEY = "mirai-mira-position-v1"
 const MINIMIZED_STORAGE_KEY = "mirai-mira-minimized-v1"
 
-function getContextPrompt(pathname: string) {
-  if (pathname.startsWith("/prodotto/")) return "Yo, dubbi su questo capo? Chiedimi pure."
+function getContextPrompt(pathname: string, locale: Locale) {
+  const prompts = {
+    it: { product: "Yo, dubbi su questo capo? Chiedimi pure.", collection: "Bro, cosa cerchi? Ti aiuto a trovare il capo giusto.", checkout: "Ci siamo quasi. Serve una mano con ordine o consegna?", custom: "Yo, vuoi creare la tua tee? Ti guido io nel Custom Lab.", shipping: "La spedizione standard è gratuita. Vuoi sapere i tempi?", returns: "Hai un dubbio sul reso? Dimmi pure.", fallback: "Yo, serve una mano per un capo?" },
+    en: { product: "Questions about this item? Ask me.", collection: "What are you looking for? I’ll help you find the right piece.", checkout: "Almost there. Need help with your order or delivery?", custom: "Want to create your own tee? I’ll guide you through Custom Lab.", shipping: "Standard shipping is free. Want to know the timing?", returns: "Questions about a return? Ask me.", fallback: "Need help finding an item?" },
+    es: { product: "¿Dudas sobre esta prenda? Pregúntame.", collection: "¿Qué buscas? Te ayudo a encontrar la prenda adecuada.", checkout: "Ya casi está. ¿Necesitas ayuda con el pedido o la entrega?", custom: "¿Quieres crear tu camiseta? Te guío en Custom Lab.", shipping: "El envío estándar es gratuito. ¿Quieres saber los plazos?", returns: "¿Dudas sobre una devolución? Pregúntame.", fallback: "¿Necesitas ayuda para encontrar una prenda?" },
+    de: { product: "Fragen zu diesem Artikel? Frag mich.", collection: "Was suchst du? Ich helfe dir, das passende Teil zu finden.", checkout: "Fast geschafft. Brauchst du Hilfe bei Bestellung oder Lieferung?", custom: "Möchtest du dein eigenes T-Shirt gestalten? Ich führe dich durchs Custom Lab.", shipping: "Der Standardversand ist kostenlos. Möchtest du die Lieferzeit wissen?", returns: "Fragen zur Rückgabe? Frag mich.", fallback: "Brauchst du Hilfe bei der Artikelsuche?" },
+    fr: { product: "Une question sur cet article ? Demandez-moi.", collection: "Que cherchez-vous ? Je vous aide à trouver la bonne pièce.", checkout: "Vous y êtes presque. Besoin d’aide pour la commande ou la livraison ?", custom: "Vous voulez créer votre propre t-shirt ? Je vous guide dans le Custom Lab.", shipping: "La livraison standard est gratuite. Vous voulez connaître les délais ?", returns: "Une question sur un retour ? Demandez-moi.", fallback: "Besoin d’aide pour trouver un article ?" },
+  }[locale]
+  if (pathname.startsWith("/prodotto/")) return prompts.product
   if (pathname.startsWith("/collezioni") || pathname.startsWith("/collezione/")) {
-    return "Bro, cosa cerchi? Ti aiuto a trovare il capo giusto."
+    return prompts.collection
   }
-  if (pathname.startsWith("/checkout")) return "Ci siamo quasi. Serve una mano con ordine o consegna?"
-  if (pathname.startsWith("/custom-lab")) return "Yo, vuoi creare la tua tee? Ti guido io nel Custom Lab."
-  if (pathname.startsWith("/spedizioni")) return "La spedizione standard è gratuita. Vuoi sapere i tempi?"
-  if (pathname.startsWith("/resi")) return "Hai un dubbio sul reso? Dimmi pure."
-  return "Yo, serve una mano per un capo?"
+  if (pathname.startsWith("/checkout")) return prompts.checkout
+  if (pathname.startsWith("/custom-lab")) return prompts.custom
+  if (pathname.startsWith("/spedizioni")) return prompts.shipping
+  if (pathname.startsWith("/resi")) return prompts.returns
+  return prompts.fallback
 }
 
 function getStageSize() {
@@ -198,7 +208,8 @@ function VariantCard({
 
 export function MiraGuide() {
   const pathname = usePathname()
-  const contextualPrompt = useMemo(() => getContextPrompt(pathname), [pathname])
+  const { locale } = useLanguage()
+  const contextualPrompt = useMemo(() => getContextPrompt(pathname, locale), [locale, pathname])
   const [hydrated, setHydrated] = useState(false)
   const [variant, setVariant] = useState<MiraVariant>("male")
   const [pendingVariant, setPendingVariant] = useState<MiraVariant>("male")
@@ -429,7 +440,7 @@ export function MiraGuide() {
     if (!("speechSynthesis" in window)) return
     window.speechSynthesis.cancel()
     const utterance = new SpeechSynthesisUtterance(text)
-    utterance.lang = "it-IT"
+    utterance.lang = localeTags[locale]
     utterance.rate = 0.98
     utterance.pitch = 1.04
     window.speechSynthesis.speak(utterance)
@@ -449,7 +460,9 @@ export function MiraGuide() {
     setInput("")
     setIsThinking(true)
     setIsSpeaking(false)
-    setReply({ text: "Un attimo, ci penso io…" })
+    setReply({
+      text: locale === "it" ? "Un attimo, ci penso io…" : locale === "en" ? "One moment, I’m on it…" : locale === "es" ? "Un momento, me ocupo…" : locale === "de" ? "Einen Moment, ich kümmere mich…" : "Un instant, je m’en occupe…",
+    })
 
     const fallbackReply = getMiraLocalReply(cleanMessage, {
       pathname,
@@ -458,7 +471,9 @@ export function MiraGuide() {
     })
     lastLocalIntentRef.current = fallbackReply.intent
     if (fallbackReply.productId) lastLocalProductRef.current = fallbackReply.productId
-    let nextReply: MiraReply = fallbackReply
+    let nextReply: MiraReply = locale === "it"
+      ? fallbackReply
+      : { text: contextualPrompt, href: fallbackReply.href, label: fallbackReply.label }
     const timeout = window.setTimeout(() => controller.abort(), 17_000)
 
     try {
@@ -469,6 +484,7 @@ export function MiraGuide() {
           body: JSON.stringify({
             message: cleanMessage,
             pathname,
+            locale,
             history: conversationRef.current,
           }),
           signal: controller.signal,
@@ -522,13 +538,13 @@ export function MiraGuide() {
 
     const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition
     if (!Recognition) {
-      setReply({ text: "Il microfono vocale non è supportato da questo browser. Puoi scrivermi qui sotto." })
+      setReply({ text: locale === "it" ? "Il microfono vocale non è supportato da questo browser. Puoi scrivermi qui sotto." : locale === "en" ? "Voice input isn’t supported by this browser. You can type below." : locale === "es" ? "Este navegador no admite entrada de voz. Puedes escribir abajo." : locale === "de" ? "Dieser Browser unterstützt keine Spracheingabe. Du kannst unten schreiben." : "Ce navigateur ne prend pas en charge la saisie vocale. Vous pouvez écrire ci-dessous." })
       return
     }
 
     const recognition = new Recognition()
     recognitionRef.current = recognition
-    recognition.lang = "it-IT"
+    recognition.lang = localeTags[locale]
     recognition.interimResults = true
     recognition.continuous = false
     let finalTranscript = ""
@@ -538,7 +554,7 @@ export function MiraGuide() {
       setShowNudge(false)
       setIsListening(true)
       setIsSpeaking(false)
-      setReply({ text: "Ti ascolto… parla pure." })
+      setReply({ text: locale === "it" ? "Ti ascolto… parla pure." : locale === "en" ? "I’m listening… go ahead." : locale === "es" ? "Te escucho… adelante." : locale === "de" ? "Ich höre zu… sprich ruhig." : "Je vous écoute… allez-y." })
     }
 
     recognition.onresult = (event) => {
@@ -553,7 +569,7 @@ export function MiraGuide() {
     recognition.onerror = () => {
       finalTranscript = ""
       setIsListening(false)
-      setReply({ text: "Non ti ho sentito bene. Riprova oppure scrivimi la richiesta." })
+      setReply({ text: locale === "it" ? "Non ti ho sentito bene. Riprova oppure scrivimi la richiesta." : locale === "en" ? "I couldn’t hear you clearly. Try again or type your request." : locale === "es" ? "No te he oído bien. Inténtalo de nuevo o escribe tu solicitud." : locale === "de" ? "Ich habe dich nicht gut verstanden. Versuche es erneut oder schreibe deine Anfrage." : "Je ne vous ai pas bien entendu. Réessayez ou écrivez votre demande." })
     }
 
     recognition.onend = () => {
