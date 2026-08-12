@@ -8,7 +8,8 @@ import {
   type CartItemAddedDetail,
 } from "@/lib/cart-context"
 import { useLanguage } from "@/lib/language-context"
-import { translateCatalogText, translateSiteText } from "@/lib/site-localization"
+import { translateSiteText } from "@/lib/site-localization"
+import { translateProductName } from "@/lib/catalog-localization"
 
 const AUTO_CLOSE_MS = 7000
 
@@ -69,7 +70,7 @@ export function CartAddedBanner() {
           </p>
           <p className="mt-1 line-clamp-2 text-sm font-medium leading-5 text-white">
             {addedItem.quantity > 1 && `${addedItem.quantity}× `}
-            {translateCatalogText(addedItem.name, locale)}
+            {translateProductName(addedItem.name, locale)}
           </p>
         </div>
       </div>

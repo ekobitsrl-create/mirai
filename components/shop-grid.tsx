@@ -20,7 +20,8 @@ import { useCart } from "@/lib/cart-context"
 import type { StoreProduct } from "@/lib/products"
 import { useLanguage } from "@/lib/language-context"
 import { getCatalogItemId } from "@/lib/catalog-identifiers"
-import { formatLocalizedPrice, translateCatalogText, translateCategory } from "@/lib/site-localization"
+import { formatLocalizedPrice, translateCategory } from "@/lib/site-localization"
+import { localizeProduct, translateProductName } from "@/lib/catalog-localization"
 
 type Category = {
   id: string
@@ -58,6 +59,7 @@ const shopCopy = {
     selectSize: "Seleziona taglia",
     productDetails: "Dettagli prodotto",
     addToCart: "Aggiungi al carrello",
+    addedToCart: "aggiunto al carrello",
     refine: "Affina la selezione", filters: "Filtri", closeFilters: "Chiudi filtri", category: "Categoria", size: "Taglia", availability: "Disponibilità", all: "Tutti", available: "Disponibili", soldOutPlural: "Esauriti", maxPrice: "Prezzo massimo", upTo: "Fino a", reset: "Azzera", show: "Mostra", products: "prodotti", oneSize: "Taglia unica", close: "Chiudi",
   },
   en: {
@@ -74,6 +76,7 @@ const shopCopy = {
     selectSize: "Select size",
     productDetails: "Product details",
     addToCart: "Add to cart",
+    addedToCart: "added to cart",
     refine: "Refine your selection", filters: "Filters", closeFilters: "Close filters", category: "Category", size: "Size", availability: "Availability", all: "All", available: "Available", soldOutPlural: "Sold out", maxPrice: "Maximum price", upTo: "Up to", reset: "Reset", show: "Show", products: "products", oneSize: "One size", close: "Close",
   },
   es: {
@@ -90,6 +93,7 @@ const shopCopy = {
     selectSize: "Selecciona talla",
     productDetails: "Detalles del producto",
     addToCart: "Añadir al carrito",
+    addedToCart: "añadido al carrito",
     refine: "Afina tu selección", filters: "Filtros", closeFilters: "Cerrar filtros", category: "Categoría", size: "Talla", availability: "Disponibilidad", all: "Todos", available: "Disponibles", soldOutPlural: "Agotados", maxPrice: "Precio máximo", upTo: "Hasta", reset: "Restablecer", show: "Mostrar", products: "productos", oneSize: "Talla única", close: "Cerrar",
   },
   de: {
@@ -106,6 +110,7 @@ const shopCopy = {
     selectSize: "Größe wählen",
     productDetails: "Produktdetails",
     addToCart: "In den Warenkorb",
+    addedToCart: "zum Warenkorb hinzugefügt",
     refine: "Auswahl verfeinern", filters: "Filter", closeFilters: "Filter schließen", category: "Kategorie", size: "Größe", availability: "Verfügbarkeit", all: "Alle", available: "Verfügbar", soldOutPlural: "Ausverkauft", maxPrice: "Höchstpreis", upTo: "Bis", reset: "Zurücksetzen", show: "Zeige", products: "Produkte", oneSize: "Einheitsgröße", close: "Schließen",
   },
   fr: {
@@ -122,6 +127,7 @@ const shopCopy = {
     selectSize: "Choisir la taille",
     productDetails: "Détails du produit",
     addToCart: "Ajouter au panier",
+    addedToCart: "ajouté au panier",
     refine: "Affinez votre sélection", filters: "Filtres", closeFilters: "Fermer les filtres", category: "Catégorie", size: "Taille", availability: "Disponibilité", all: "Tous", available: "Disponibles", soldOutPlural: "Épuisés", maxPrice: "Prix maximum", upTo: "Jusqu’à", reset: "Réinitialiser", show: "Afficher", products: "produits", oneSize: "Taille unique", close: "Fermer",
   },
 } as const
@@ -221,7 +227,7 @@ export function ShopGrid({
       const categoryName = categoryLabels.get(product.category) || formatCategory(product.category)
       const matchesQuery =
         !normalizedQuery ||
-        `${product.name} ${product.description || ""} ${product.category} ${categoryName}`
+        `${product.name} ${product.description || ""} ${localizeProduct(product, locale).name} ${localizeProduct(product, locale).description} ${product.category} ${categoryName}`
           .toLocaleLowerCase(locale)
           .includes(normalizedQuery)
       const matchesCategory =
@@ -301,7 +307,7 @@ export function ShopGrid({
     })
     setQuickAddProduct(null)
     setQuickAddSize(null)
-    setNotice(`${product.name} · ${size} aggiunta al carrello`)
+    setNotice(`${translateProductName(product.name, locale)} · ${size} ${shopCopy[locale].addedToCart}`)
   }
 
   return (
@@ -548,7 +554,7 @@ function ProductCard({
           {product.image_url ? (
             <Image
               src={product.image_url}
-              alt={product.name}
+              alt={translateProductName(product.name, locale)}
               fill
               className="object-cover object-center transition-transform duration-700 ease-out group-hover:scale-[1.035]"
               sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
@@ -588,7 +594,7 @@ function ProductCard({
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
             <p className="mb-1 text-[8px] font-semibold uppercase tracking-[0.25em] text-primary md:text-[9px]">{categoryName}</p>
-            <h2 className="truncate text-xs font-medium text-white transition-colors group-hover:text-primary md:text-sm">{translateCatalogText(product.name, locale)}</h2>
+            <h2 className="truncate text-xs font-medium text-white transition-colors group-hover:text-primary md:text-sm">{translateProductName(product.name, locale)}</h2>
           </div>
           <p className="shrink-0 text-xs font-medium text-white md:text-sm">{formatLocalizedPrice(product.price, locale)}</p>
         </div>
@@ -752,13 +758,13 @@ function QuickAdd({
       <div className="relative w-full max-w-xl border border-white/10 bg-card p-5 text-white shadow-2xl animate-in slide-in-from-bottom-5 duration-300 md:p-7">
         <div className="flex gap-4">
           <div className="relative h-28 w-24 shrink-0 overflow-hidden bg-white/5">
-            {product.image_url && <Image src={product.image_url} alt={product.name} fill className="object-cover" sizes="96px" />}
+            {product.image_url && <Image src={product.image_url} alt={translateProductName(product.name, locale)} fill className="object-cover" sizes="96px" />}
           </div>
           <div className="min-w-0 flex-1">
             <div className="flex items-start justify-between gap-4">
               <div>
                 <p className="text-[9px] uppercase tracking-[0.24em] text-primary">{labels.quickAdd}</p>
-                <h2 className="mt-1 text-lg font-medium">{translateCatalogText(product.name, locale)}</h2>
+                <h2 className="mt-1 text-lg font-medium">{translateProductName(product.name, locale)}</h2>
                 <p className="mt-1 text-sm text-white/55">{formatLocalizedPrice(product.price, locale)}</p>
               </div>
               <button type="button" onClick={onClose} className="p-1.5 text-white/40 hover:text-white" aria-label={labels.close}><X className="h-5 w-5" /></button>

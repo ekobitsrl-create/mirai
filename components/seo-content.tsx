@@ -1,6 +1,10 @@
+"use client"
+
 import Link from "next/link"
 import { ArrowRight, MapPin, Sparkles } from "lucide-react"
 import type { CategorySeo } from "@/lib/seo"
+import { useLanguage } from "@/lib/language-context"
+import { localizeCategoryGuide } from "@/lib/catalog-localization"
 
 const HOME_PILLARS = [
   {
@@ -108,16 +112,18 @@ export function CatalogSeoContent() {
 }
 
 export function CategorySeoContent({ seo }: { seo: CategorySeo }) {
+  const { locale } = useLanguage()
+  const content = localizeCategoryGuide(seo.primaryKeyword, locale)
   return (
     <section className="border-t border-border bg-card/35 px-6 py-16 md:py-20">
       <div className="mx-auto max-w-5xl">
-        <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-primary">Guida alla categoria</p>
+        <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-primary">{content.label}</p>
         <h2 className="mt-4 max-w-3xl font-[family-name:var(--font-space-grotesk)] text-2xl font-bold tracking-[-0.035em] text-foreground sm:text-4xl">
-          {seo.heading}
+          {content.heading}
         </h2>
-        <p className="mt-5 max-w-3xl text-sm leading-7 text-muted-foreground sm:text-base">{seo.intro}</p>
+        <p className="mt-5 max-w-3xl text-sm leading-7 text-muted-foreground sm:text-base">{content.intro}</p>
         <div className="mt-10 grid gap-4 md:grid-cols-2">
-          {seo.details.map((detail) => (
+          {content.details.map((detail) => (
             <article key={detail.title} className="rounded-2xl border border-border bg-background/45 p-6 sm:p-7">
               <h3 className="text-sm font-bold uppercase tracking-[0.12em] text-foreground">{detail.title}</h3>
               <p className="mt-3 text-sm leading-6 text-muted-foreground">{detail.text}</p>
@@ -125,7 +131,7 @@ export function CategorySeoContent({ seo }: { seo: CategorySeo }) {
           ))}
         </div>
         <p className="mt-8 text-xs leading-6 text-muted-foreground">
-          Vuoi capire meglio fit, materiali e abbinamenti? Consulta le nostre <Link href="/guide" className="font-semibold text-primary underline decoration-primary/30 underline-offset-4 hover:text-foreground">guide streetwear</Link>.
+          {content.footer} <Link href="/guide" className="font-semibold text-primary underline decoration-primary/30 underline-offset-4 hover:text-foreground">{content.link}</Link>.
         </p>
       </div>
     </section>

@@ -9,6 +9,8 @@ import {
   hasFittedCategoryCardImage,
 } from "@/lib/category-images"
 import { ArrowRight } from "lucide-react"
+import { translateCategoryDescription } from "@/lib/catalog-localization"
+import { translateCategory } from "@/lib/site-localization"
 
 type Category = {
   id: string
@@ -21,7 +23,7 @@ type Category = {
 
 export function Collections({ categories = [] }: { categories?: Category[] }) {
   const { ref, isVisible } = useScrollAnimation(0.1)
-  const { t } = useLanguage()
+  const { t, locale } = useLanguage()
 
   if (categories.length === 0) return null
 
@@ -62,7 +64,7 @@ export function Collections({ categories = [] }: { categories?: Category[] }) {
                 />
                 <Image
                   src={cardImage}
-                  alt={cat.name}
+                  alt={translateCategory(cat.slug, cat.name, locale)}
                   fill
                   className={`${
                     hasFittedCategoryCardImage(cat.slug)
@@ -81,10 +83,10 @@ export function Collections({ categories = [] }: { categories?: Category[] }) {
                     className="text-xl md:text-2xl font-bold text-white mb-1"
                     style={{ fontFamily: "var(--font-space-grotesk)" }}
                   >
-                    {cat.name}
+                    {translateCategory(cat.slug, cat.name, locale)}
                   </h3>
                   {cat.description && (
-                    <p className="text-white/70 text-sm mb-3 line-clamp-2">{cat.description}</p>
+                    <p className="text-white/70 text-sm mb-3 line-clamp-2">{translateCategoryDescription(cat.slug, cat.description, locale)}</p>
                   )}
                   <span className="inline-flex items-center gap-2 text-xs font-semibold tracking-widest uppercase text-white group-hover:text-primary transition-colors duration-300">
                     {t.collections.shopNow}

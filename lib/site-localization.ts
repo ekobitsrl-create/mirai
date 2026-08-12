@@ -646,6 +646,8 @@ const categoryCopy: Record<string, Record<Locale, string>> = {
   "t-shirt": { it: "T-shirt", en: "T-shirts", es: "Camisetas", de: "T-Shirts", fr: "T-shirts" },
   tracksuits: { it: "Tute", en: "Tracksuits", es: "Chándales", de: "Trainingsanzüge", fr: "Survêtements" },
   sunglasses: { it: "Occhiali da sole", en: "Sunglasses", es: "Gafas de sol", de: "Sonnenbrillen", fr: "Lunettes de soleil" },
+  "mirai-parfum-exlusive": { it: "Profumi", en: "Fragrances", es: "Perfumes", de: "Düfte", fr: "Parfums" },
+  sweatshirts: { it: "Felpe", en: "Sweatshirts", es: "Sudaderas", de: "Sweatshirts", fr: "Sweatshirts" },
 }
 
 export function translateCategory(slug: string, fallback: string, locale: Locale) {

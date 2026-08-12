@@ -10,6 +10,7 @@ import {
   RequestBodyTooLargeError,
 } from "@/lib/request-security"
 import type { Locale } from "@/lib/translations"
+import { localizeProduct } from "@/lib/catalog-localization"
 
 export const runtime = "nodejs"
 export const maxDuration = 20
@@ -68,14 +69,17 @@ async function getCatalog() {
 
 // Lightweight catalog endpoint consumed client-side by the MIRA guide widget to
 // power its offline fallback answers (product names, sizes, fit, care, colors).
-export async function GET() {
+export async function GET(request: NextRequest) {
   const products = await getCatalog()
+  const locale = (request.nextUrl.searchParams.get("locale") || "it") as Locale
   return NextResponse.json(
     {
-      products: products.map((product) => ({
+      products: products.map((product) => {
+        const localized = localizeProduct(product, locale)
+        return ({
         id: product.id,
-        name: product.name,
-        description: product.description,
+        name: localized.name,
+        description: localized.description,
         price: Number(product.price),
         category: product.category,
         image_url: product.image_url,
@@ -83,10 +87,10 @@ export async function GET() {
         in_stock: Boolean(product.in_stock),
         is_new: Boolean(product.is_new),
         created_at: product.created_at,
-        fit_note: product.fit_note,
-        color_name: product.color_name,
-        care: product.care,
-      })),
+        fit_note: localized.fitNote,
+        color_name: localized.colorName,
+        care: localized.care,
+      })}),
     },
     {
       headers: {
@@ -96,15 +100,17 @@ export async function GET() {
   )
 }
 
-function catalogForPrompt(products: StoreProduct[]) {
-  return products.map((product) => ({
-    name: product.name,
+function catalogForPrompt(products: StoreProduct[], locale: Locale) {
+  return products.map((product) => {
+    const localized = localizeProduct(product, locale)
+    return ({
+    name: localized.name,
     category: product.category,
     price_eur: Number(product.price),
     sizes: product.sizes || [],
     available: Boolean(product.in_stock),
-    description: product.description || "",
-  }))
+    description: localized.description,
+  })})
 }
 
 function extractText(response: OpenAIResponse) {
@@ -246,7 +252,7 @@ INFORMAZIONI NEGOZIO:
 - Custom Lab online: T-shirt heavyweight oversize personalizzabile con colore, taglia, stampa fronte o retro, testo o grafica. Prezzo 79 euro con una stampa inclusa. I prodotti personalizzati non sono restituibili salvo difetti.
 
 CATALOGO ATTUALE:
-${JSON.stringify(catalogForPrompt(products))}`
+${JSON.stringify(catalogForPrompt(products, locale))}`
 
   try {
     const openAIResponse = await fetch("https://api.openai.com/v1/responses", {

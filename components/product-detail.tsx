@@ -37,9 +37,9 @@ import { useLanguage } from "@/lib/language-context"
 import type { Locale } from "@/lib/translations"
 import {
   formatLocalizedPrice,
-  translateCatalogText,
   translateCategory,
 } from "@/lib/site-localization"
+import { localizeColor, localizeProduct, translateProductName } from "@/lib/catalog-localization"
 
 function formatCategory(slug: string) {
   return slug.replace(/-/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase())
@@ -175,9 +175,10 @@ export function ProductDetail({
       chest: "Poitrine", length: "Longueur", sleeve: "Manche", close: "Fermer", understood: "Compris", precise: "Les mesures peuvent varier selon le modèle. Pour les vérifier avant l’achat, contactez le support en indiquant le code",
     },
   }[locale]
+  const localizedProduct = useMemo(() => localizeProduct(product, locale), [locale, product])
   const formatPrice = (price: number) => formatLocalizedPrice(price, locale)
-  const colorName = translateCatalogText(product.color_name, locale) || productCopy.defaultColor
-  const fitNote = translateCatalogText(product.fit_note, locale) || productCopy.defaultFit
+  const colorName = localizedProduct.colorName || productCopy.defaultColor
+  const fitNote = localizedProduct.fitNote || productCopy.defaultFit
   const supplierSettings = getProductSupplierSettings(product)
   const isUnlimitedStock = supplierSettings.profile === "mirai"
   const isFragrance = ["profumi", "profumo", "fragrance", "fragrances"].includes(
@@ -187,10 +188,10 @@ export function ProductDetail({
   const shippingEstimate = supplierSettings.shippingMinDays !== undefined && supplierSettings.shippingMaxDays !== undefined
     ? `${productCopy.delivery} ${supplierSettings.shippingMinDays}–${supplierSettings.shippingMaxDays} ${productCopy.workingDays}`
     : `${productCopy.delivery} 3–5 ${productCopy.workingDays}`
-  const detailItems = (product.detail_items || []).map((detail) => translateCatalogText(detail, locale))
+  const detailItems = localizedProduct.detailItems
   const gallery = useMemo(() => getGalleryViews(product, productCopy.gallery), [locale, product])
   const selectedImage = gallery[selectedImageIndex] || gallery[0]
-  const displayTitle = translateCatalogText(product.name, locale)
+  const displayTitle = localizedProduct.name
   const firstOrderPrice = Math.round(
     Number(product.price) * (1 - FIRST_ORDER_DISCOUNT_PERCENT / 100) * 100,
   ) / 100
@@ -507,7 +508,7 @@ export function ProductDetail({
                     />
                     <span className="min-w-0">
                       <span className="block truncate text-[10px] font-medium text-white/90">
-                        {translateCatalogText(variant.color_name, locale) || productCopy.variant}
+                        {localizeColor(variant.color_name, locale) || productCopy.variant}
                       </span>
                       <span className="block text-[9px] text-white/50">
                         {formatPrice(variant.price)}
@@ -584,7 +585,7 @@ export function ProductDetail({
             </button>
           </div>
 
-          {product.description && <p className="mt-6 max-w-xl text-sm leading-6 text-white/70">{translateCatalogText(product.description, locale)}</p>}
+          {localizedProduct.description && <p className="mt-6 max-w-xl text-sm leading-6 text-white/70">{localizedProduct.description}</p>}
           {product.supplier_sku && (
             <p className="mt-3 text-[9px] uppercase tracking-[0.2em] text-white/40">
               {productCopy.productCode} {product.supplier_sku}
@@ -654,12 +655,12 @@ export function ProductDetail({
                 <ul className="space-y-1.5">
                   {detailItems.map((detail) => <li key={detail}>• {detail}</li>)}
                 </ul>
-              ) : translateCatalogText(product.description, locale)}
+              ) : localizedProduct.description}
             </Details>
             {(product.composition || product.care) && (
               <Details title={productCopy.composition}>
-                {product.composition && <p>{translateCatalogText(product.composition, locale)}</p>}
-                {product.care && <p className={product.composition ? "mt-2" : undefined}>{translateCatalogText(product.care, locale)}</p>}
+                {localizedProduct.composition && <p>{localizedProduct.composition}</p>}
+                {localizedProduct.care && <p className={localizedProduct.composition ? "mt-2" : undefined}>{localizedProduct.care}</p>}
               </Details>
             )}
             <Details title={productCopy.shippingReturns}>
@@ -683,9 +684,9 @@ export function ProductDetail({
             {suggestedProducts.map((item) => (
               <Link key={item.id} href={`/prodotto/${item.id}`} className="group min-w-0">
                 <div className="mirai-neon-frame mirai-neon-lift relative mb-3 aspect-[4/5] overflow-hidden rounded-2xl bg-white/5">
-                  {item.image_url && <Image src={item.image_url} alt={item.name} fill className="object-cover transition-transform duration-700 group-hover:scale-[1.035]" sizes="(max-width: 768px) 50vw, 25vw" />}
+                  {item.image_url && <Image src={item.image_url} alt={translateProductName(item.name, locale)} fill className="object-cover transition-transform duration-700 group-hover:scale-[1.035]" sizes="(max-width: 768px) 50vw, 25vw" />}
                 </div>
-                <h3 className="truncate text-xs font-medium group-hover:text-[#9f86ff]">{item.name}</h3>
+                <h3 className="truncate text-xs font-medium group-hover:text-[#9f86ff]">{translateProductName(item.name, locale)}</h3>
                 <p className="mt-1 text-xs text-white/45">{formatPrice(item.price)}</p>
               </Link>
             ))}
@@ -743,7 +744,7 @@ export function ProductDetail({
       )}
 
       {sizeGuideOpen && (
-        <SizeGuide product={product} onClose={() => setSizeGuideOpen(false)} copy={productCopy} locale={locale} />
+        <SizeGuide product={product} fitNote={fitNote} onClose={() => setSizeGuideOpen(false)} copy={productCopy} />
       )}
     </div>
   )
@@ -787,7 +788,7 @@ type SizeGuideCopy = {
   understood: string
 }
 
-function SizeGuide({ product, onClose, copy, locale }: { product: StoreProduct; onClose: () => void; copy: SizeGuideCopy; locale: Locale }) {
+function SizeGuide({ product, fitNote, onClose, copy }: { product: StoreProduct; fitNote: string; onClose: () => void; copy: SizeGuideCopy }) {
   const rows = [
     ["S", "52", "69", "22"],
     ["M", "55", "71", "23"],
@@ -802,7 +803,7 @@ function SizeGuide({ product, onClose, copy, locale }: { product: StoreProduct; 
           <div><p className="text-[9px] uppercase tracking-[0.26em] text-[#9f86ff]">{copy.fitGuide}</p><h2 className="mt-2 text-2xl font-medium">{copy.sizeGuide}</h2></div>
           <button type="button" onClick={onClose} className="p-1 text-white/40 hover:text-white" aria-label={copy.close}><X className="h-5 w-5" /></button>
         </div>
-        <p className="mt-5 text-xs leading-6 text-white/45">{translateCatalogText(product.fit_note, locale) || copy.defaultFit}</p>
+        <p className="mt-5 text-xs leading-6 text-white/45">{fitNote || copy.defaultFit}</p>
         {product.id === "71a11e7e-5b68-4e2c-9f65-0dca2b967104" ? (
           <div className="mt-6 overflow-x-auto">
             <table className="w-full min-w-[480px] text-left text-xs">

@@ -9,7 +9,8 @@ import { useCart } from "@/lib/cart-context"
 import { useLanguage } from "@/lib/language-context"
 import { getCategoryImage } from "@/lib/category-images"
 import { getCatalogItemId } from "@/lib/catalog-identifiers"
-import { formatLocalizedPrice, translateCatalogText, translateCategory } from "@/lib/site-localization"
+import { formatLocalizedPrice, translateCategory } from "@/lib/site-localization"
+import { translateCategoryDescription, translateProductName } from "@/lib/catalog-localization"
 
 type Product = {
   id: string
@@ -127,7 +128,7 @@ export function CollectionProducts({
           </h1>
           {category.description && (
             <p className="text-muted-foreground mt-2 text-lg">
-              {translateCatalogText(category.description, locale)}
+              {translateCategoryDescription(category.slug, category.description, locale)}
             </p>
           )}
           <p className="text-sm text-primary mt-2">
@@ -229,7 +230,7 @@ export function CollectionProducts({
                       <div className="mirai-neon-frame mirai-neon-lift relative mb-4 aspect-[3/4] overflow-hidden rounded-2xl bg-card">
                         <Image
                           src={product.image_url || "/placeholder.jpg"}
-                          alt={product.name}
+                          alt={translateProductName(product.name, locale)}
                           fill
                           className={
                             isParfumCollection
@@ -297,7 +298,7 @@ export function CollectionProducts({
                             {"MIR\u039BI"}
                           </p>
                           <h3 className="text-sm font-medium text-foreground group-hover:text-primary transition-colors duration-300">
-                            {translateCatalogText(product.name, locale)}
+                            {translateProductName(product.name, locale)}
                           </h3>
                         </div>
                         <p className="text-sm font-semibold text-foreground">

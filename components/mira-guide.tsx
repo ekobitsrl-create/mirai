@@ -254,7 +254,7 @@ export function MiraGuide() {
 
   useEffect(() => {
     let active = true
-    fetch("/api/mira")
+    fetch(`/api/mira?locale=${locale}`)
       .then((response) => (response.ok ? response.json() : null))
       .then((payload: { products?: StoreProduct[] } | null) => {
         if (active && payload?.products) setMiraCatalog(payload.products)
@@ -265,7 +265,7 @@ export function MiraGuide() {
     return () => {
       active = false
     }
-  }, [])
+  }, [locale])
 
   useEffect(() => {
     let savedVariant: MiraVariant | null = null

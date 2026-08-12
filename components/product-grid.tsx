@@ -8,6 +8,8 @@ import { useCart } from "@/lib/cart-context"
 import { useScrollAnimation } from "@/hooks/use-scroll-animation"
 import { useLanguage } from "@/lib/language-context"
 import { getCatalogItemId } from "@/lib/catalog-identifiers"
+import { translateProductName } from "@/lib/catalog-localization"
+import { formatLocalizedPrice } from "@/lib/site-localization"
 
 type Product = {
   id: string
@@ -36,7 +38,7 @@ export function ProductGrid({ products, title, subtitle }: { products: Product[]
   const [wishlist, setWishlist] = useState<string[]>([])
   const { addItem } = useCart()
   const { ref, isVisible } = useScrollAnimation(0.05)
-  const { t } = useLanguage()
+  const { t, locale } = useLanguage()
 
   const displayTitle = title || t.products.title
   const displaySubtitle = subtitle || t.products.subtitle
@@ -71,7 +73,7 @@ export function ProductGrid({ products, title, subtitle }: { products: Product[]
                 <div className="mirai-neon-frame mirai-neon-lift relative mb-4 aspect-[3/4] overflow-hidden rounded-2xl bg-card">
                   <Image
                     src={product.image_url || "/placeholder.jpg"}
-                    alt={product.name}
+                    alt={translateProductName(product.name, locale)}
                     fill
                     className="object-cover object-top transition-transform duration-700 ease-out group-hover:scale-110"
                     sizes="(max-width: 1024px) 50vw, 25vw"
@@ -130,10 +132,10 @@ export function ProductGrid({ products, title, subtitle }: { products: Product[]
               <div>
                 <p className="text-[10px] tracking-[0.2em] uppercase text-primary mb-0.5">{"MIR\u039BI"}</p>
                 <h3 className="text-xs md:text-sm font-medium text-foreground group-hover:text-primary transition-colors duration-300 line-clamp-2 mb-1">
-                  {product.name}
+                  {translateProductName(product.name, locale)}
                 </h3>
                 <p className="text-sm font-semibold text-foreground">
-                  {"\u20AC"}{Number(product.price).toFixed(2)}
+                  {formatLocalizedPrice(Number(product.price), locale)}
                 </p>
               </div>
             </article>
