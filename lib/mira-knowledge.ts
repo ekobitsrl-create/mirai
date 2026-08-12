@@ -196,7 +196,7 @@ function contextualFollowUp(message: string, context: MiraKnowledgeContext) {
 
   if (context.lastIntent === "returns" || context.lastIntent === "refund") {
     if (hasAny(message, ["gratis", "gratuito", "costa"])) {
-      return answer("returns", "Per gli ordini consegnati in Italia il reso è gratuito entro 14 giorni dalla consegna: MIRAI invia l'etichetta prepagata, sostiene le spese di restituzione e non applica costi di restocking.", "/resi", "Dettagli reso")
+      return answer("returns", "Per gli ordini consegnati in Italia il reso è gratuito entro 30 giorni dalla consegna: MIRAI invia l'etichetta prepagata, sostiene le spese di restituzione e non applica costi di restocking.", "/resi", "Dettagli reso")
     }
     return answer("refund", "Dopo la ricezione e la verifica del reso, il rimborso viene elaborato entro 14 giorni sul metodo di pagamento usato dal cliente al checkout.", "/resi", "Dettagli rimborso")
   }
@@ -227,7 +227,7 @@ export function getMiraLocalReply(rawMessage: string, context: MiraKnowledgeCont
   if (asksShipping && asksReturns) {
     return answer(
       "shipping",
-      "La spedizione è sempre gratuita e la consegna stimata varia in base al prodotto: 3–5 oppure 7–12 giorni lavorativi, come indicato nella scheda. Se il capo non va bene, puoi chiedere il reso entro 14 giorni: per ogni reso approvato MIRAI invia un'etichetta prepagata e sostiene le spese di restituzione.",
+      "La spedizione è sempre gratuita e la consegna stimata varia in base al prodotto: 3–5 oppure 7–12 giorni lavorativi, come indicato nella scheda. Se il capo non va bene, puoi chiedere il reso entro 30 giorni: per ogni reso approvato MIRAI invia un'etichetta prepagata e sostiene le spese di restituzione.",
       "/faq",
       "Vedi tutte le FAQ",
     )
@@ -315,7 +315,7 @@ export function getMiraLocalReply(rawMessage: string, context: MiraKnowledgeCont
     if (hasAny(message, ["personalizzato", "custom", "lavato", "indossato", "senza etichetta"])) {
       return answer("returns", "Non sono accettati prodotti personalizzati, lavati, indossati o senza etichette originali. Se hai un caso particolare, scrivi all’assistenza prima di spedire.", "/resi", "Condizioni del reso")
     }
-    return answer("returns", "Per gli ordini consegnati in Italia puoi richiedere il reso entro 14 giorni di calendario dalla consegna scrivendo a info@mirailabstore.com. MIRAI invia l'etichetta prepagata, sostiene le spese di restituzione e non applica costi di restocking.", "/resi", "Come fare il reso")
+    return answer("returns", "Per gli ordini consegnati in Italia puoi richiedere il reso entro 30 giorni di calendario dalla consegna scrivendo a info@mirailabstore.com. MIRAI invia l'etichetta prepagata, sostiene le spese di restituzione e non applica costi di restocking.", "/resi", "Come fare il reso")
   }
 
   if (asksPayments) {

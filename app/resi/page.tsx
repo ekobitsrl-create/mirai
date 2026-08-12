@@ -8,11 +8,11 @@ import { COMPANY_INFO } from "@/lib/company-info"
 export const metadata: Metadata = {
   title: "Resi e Rimborsi - MIRAI",
   alternates: { canonical: "/resi" },
-  description: "Resi gratuiti in Italia entro 14 giorni dalla consegna, con etichetta prepagata e nessun costo di restocking.",
+  description: "Resi gratuiti in Italia entro 30 giorni dalla consegna, con etichetta prepagata e nessun costo di restocking.",
 }
 
 const returnSteps = [
-  `Scrivi entro 14 giorni di calendario dalla consegna a ${COMPANY_INFO.email} indicando numero ordine, email usata per l'acquisto e articoli da restituire.`,
+  `Scrivi entro 30 giorni di calendario dalla consegna a ${COMPANY_INFO.email} indicando numero ordine, email usata per l'acquisto e articoli da restituire.`,
   "Quando il reso è approvato, MIRAI sostiene le spese di restituzione e invia un'etichetta prepagata con le istruzioni di rientro.",
   "Imballa il prodotto in modo sicuro, preferibilmente nella confezione originale, con cartellini ed eventuali accessori.",
   "Consegna il pacco al corriere o al punto di consegna indicato nelle istruzioni: il reso avviene per posta tramite spedizione tracciata.",
@@ -22,7 +22,7 @@ const returnSteps = [
 const policyFacts = [
   { label: "Paese", value: "Italia (IT)" },
   { label: "Valuta", value: "Euro (EUR)" },
-  { label: "Finestra di reso", value: "14 giorni di calendario dalla consegna" },
+  { label: "Finestra di reso", value: "30 giorni di calendario dalla consegna" },
   { label: "Metodo", value: "Per posta, con consegna al corriere o al punto indicato" },
   { label: "Costo del reso", value: "Gratuito: spese a carico di MIRAI" },
   { label: "Costo di restocking", value: "Nessuno (0,00 EUR)" },
@@ -31,7 +31,7 @@ const policyFacts = [
 const accepted = [
   "Prodotti non utilizzati, non lavati e non danneggiati",
   "Cartellini originali, confezione e accessori presenti",
-  "Richiesta inviata entro 14 giorni dalla data di consegna",
+  "Richiesta inviata entro 30 giorni dalla data di consegna",
   "Prodotti difettosi o non conformi segnalati appena rilevati",
 ]
 
@@ -63,7 +63,7 @@ export default function ResiPage() {
 
           <div className="mb-16 grid grid-cols-1 gap-4 md:grid-cols-3">
             {[
-              { icon: Clock, title: "14 giorni", desc: "Puoi richiedere il reso dalla data di consegna." },
+              { icon: Clock, title: "30 giorni", desc: "Puoi richiedere il reso dalla data di consegna." },
               { icon: RotateCcw, title: "Spese a carico MIRAI", desc: "Etichetta prepagata per ogni reso approvato." },
               { icon: CheckCircle, title: "Rimborso entro 14 giorni", desc: "Sullo stesso metodo di pagamento usato al checkout." },
             ].map((item) => (

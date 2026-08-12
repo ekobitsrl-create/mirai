@@ -191,7 +191,7 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
         "@type": "MerchantReturnPolicy",
         applicableCountry: "IT",
         returnPolicyCategory: "https://schema.org/MerchantReturnFiniteReturnWindow",
-        merchantReturnDays: 14,
+        merchantReturnDays: 30,
         returnMethod: "https://schema.org/ReturnByMail",
         returnFees: "https://schema.org/FreeReturn",
         refundType: "https://schema.org/FullRefund",

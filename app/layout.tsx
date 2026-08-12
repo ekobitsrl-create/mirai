@@ -159,7 +159,7 @@ window.gtag('consent', 'default', {
                 "@id": `${SITE_URL}/resi#return-policy`,
                 applicableCountry: "IT",
                 returnPolicyCategory: "https://schema.org/MerchantReturnFiniteReturnWindow",
-                merchantReturnDays: 14,
+                merchantReturnDays: 30,
                 returnMethod: "https://schema.org/ReturnByMail",
                 returnFees: "https://schema.org/FreeReturn",
                 refundType: "https://schema.org/FullRefund",

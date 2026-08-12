@@ -112,9 +112,9 @@ export function ProductDetail({
       sizeSoldOut: "Questa taglia è esaurita. Scegline un'altra.", selectSize: "Seleziona una taglia prima di continuare.", available: "Disponibile", availability: "Disponibilità", piece: "pezzo", pieces: "pezzi",
       added: "Aggiunto", add: "Aggiungi al carrello", soldOut: "Esaurito", productCode: "Codice prodotto", chooseCheckout: "scegli il metodo nel checkout",
       discountBeforePay: "Prima puoi applicare MIRAI10 o un altro codice sconto, poi scegliere il metodo di pagamento.", unavailable: "Momentaneamente non disponibile",
-      freeShipping: "Spedizione gratuita", always: "Sempre", easyReturn: "Reso facile", within14: "Entro 14 giorni", payment: "Pagamento", stripe: "Protetto da Stripe",
+      freeShipping: "Spedizione gratuita", always: "Sempre", easyReturn: "Reso facile", within30: "Entro 30 giorni", payment: "Pagamento", stripe: "Protetto da Stripe",
       details: "Dettagli prodotto", composition: "Composizione e cura", shippingReturns: "Spedizioni e resi", expected: "Tempi previsti", tracked: "Spedizione tracciata in Italia e in Europa.",
-      returnText: "Per gli ordini consegnati in Italia il reso è gratuito: puoi richiederlo entro 14 giorni di calendario dalla consegna", returnEnd: "MIRAI fornisce l'etichetta prepagata e non applica costi di restocking. Consulta la pagina", returns: "Resi e Rimborsi",
+      returnText: "Per gli ordini consegnati in Italia il reso è gratuito: puoi richiederlo entro 30 giorni di calendario dalla consegna", returnEnd: "MIRAI fornisce l'etichetta prepagata e non applica costi di restocking. Consulta la pagina", returns: "Resi e Rimborsi",
       complete: "Complete the look", mayLike: "Potrebbe piacerti", shopAll: "Shop all", closeImage: "Chiudi immagine", chooseSize: "Scegli taglia", fitGuide: "MIRAI fit guide", availableSizes: "Taglie disponibili",
       chest: "Torace", length: "Lunghezza", sleeve: "Manica", close: "Chiudi", understood: "Ho capito", precise: "Le misure precise possono variare in base al modello. Per una verifica prima dell'acquisto contatta l'assistenza indicando il codice",
     },
@@ -126,9 +126,9 @@ export function ProductDetail({
       sizeSoldOut: "This size is sold out. Choose another one.", selectSize: "Select a size before continuing.", available: "Available", availability: "Availability", piece: "item", pieces: "items",
       added: "Added", add: "Add to cart", soldOut: "Sold out", productCode: "Product code", chooseCheckout: "choose the method at checkout",
       discountBeforePay: "Apply MIRAI10 or another discount code first, then choose your payment method.", unavailable: "Temporarily unavailable",
-      freeShipping: "Free shipping", always: "Always", easyReturn: "Easy return", within14: "Within 14 days", payment: "Payment", stripe: "Secured by Stripe",
+      freeShipping: "Free shipping", always: "Always", easyReturn: "Easy return", within30: "Within 30 days", payment: "Payment", stripe: "Secured by Stripe",
       details: "Product details", composition: "Composition and care", shippingReturns: "Shipping and returns", expected: "Expected timing", tracked: "Tracked shipping in Italy and across Europe.",
-      returnText: "Returns are free for orders delivered in Italy: request one within 14 calendar days of delivery", returnEnd: "MIRAI provides a prepaid label and charges no restocking fee. See", returns: "Returns and Refunds",
+      returnText: "Returns are free for orders delivered in Italy: request one within 30 calendar days of delivery", returnEnd: "MIRAI provides a prepaid label and charges no restocking fee. See", returns: "Returns and Refunds",
       complete: "Complete the look", mayLike: "You may also like", shopAll: "Shop all", closeImage: "Close image", chooseSize: "Choose size", fitGuide: "MIRAI fit guide", availableSizes: "Available sizes",
       chest: "Chest", length: "Length", sleeve: "Sleeve", close: "Close", understood: "Got it", precise: "Measurements may vary by style. To check before buying, contact support and quote code",
     },
@@ -140,9 +140,9 @@ export function ProductDetail({
       sizeSoldOut: "Esta talla está agotada. Elige otra.", selectSize: "Selecciona una talla antes de continuar.", available: "Disponible", availability: "Disponibilidad", piece: "unidad", pieces: "unidades",
       added: "Añadido", add: "Añadir al carrito", soldOut: "Agotado", productCode: "Código de producto", chooseCheckout: "elige el método en el checkout",
       discountBeforePay: "Primero aplica MIRAI10 u otro código de descuento y después elige el método de pago.", unavailable: "No disponible temporalmente",
-      freeShipping: "Envío gratuito", always: "Siempre", easyReturn: "Devolución fácil", within14: "En 14 días", payment: "Pago", stripe: "Protegido por Stripe",
+      freeShipping: "Envío gratuito", always: "Siempre", easyReturn: "Devolución fácil", within30: "En 30 días", payment: "Pago", stripe: "Protegido por Stripe",
       details: "Detalles del producto", composition: "Composición y cuidado", shippingReturns: "Envíos y devoluciones", expected: "Plazo previsto", tracked: "Envío con seguimiento en Italia y Europa.",
-      returnText: "Las devoluciones son gratuitas para los pedidos entregados en Italia: solicítala en los 14 días naturales siguientes a la entrega", returnEnd: "MIRAI proporciona una etiqueta prepagada y no cobra gastos de reposición. Consulta", returns: "Devoluciones y reembolsos",
+      returnText: "Las devoluciones son gratuitas para los pedidos entregados en Italia: solicítala en los 30 días naturales siguientes a la entrega", returnEnd: "MIRAI proporciona una etiqueta prepagada y no cobra gastos de reposición. Consulta", returns: "Devoluciones y reembolsos",
       complete: "Completa el look", mayLike: "También te puede gustar", shopAll: "Ver todo", closeImage: "Cerrar imagen", chooseSize: "Elegir talla", fitGuide: "Guía de tallas MIRAI", availableSizes: "Tallas disponibles",
       chest: "Pecho", length: "Largo", sleeve: "Manga", close: "Cerrar", understood: "Entendido", precise: "Las medidas pueden variar según el modelo. Para comprobarlas antes de comprar, contacta con asistencia indicando el código",
     },
@@ -154,9 +154,9 @@ export function ProductDetail({
       sizeSoldOut: "Diese Größe ist ausverkauft. Wähle eine andere.", selectSize: "Wähle eine Größe, bevor du fortfährst.", available: "Verfügbar", availability: "Verfügbarkeit", piece: "Stück", pieces: "Stück",
       added: "Hinzugefügt", add: "In den Warenkorb", soldOut: "Ausverkauft", productCode: "Produktcode", chooseCheckout: "Zahlungsart an der Kasse wählen",
       discountBeforePay: "Wende zuerst MIRAI10 oder einen anderen Rabattcode an und wähle dann die Zahlungsart.", unavailable: "Vorübergehend nicht verfügbar",
-      freeShipping: "Kostenloser Versand", always: "Immer", easyReturn: "Einfache Rückgabe", within14: "Innerhalb von 14 Tagen", payment: "Zahlung", stripe: "Durch Stripe geschützt",
+      freeShipping: "Kostenloser Versand", always: "Immer", easyReturn: "Einfache Rückgabe", within30: "Innerhalb von 30 Tagen", payment: "Zahlung", stripe: "Durch Stripe geschützt",
       details: "Produktdetails", composition: "Material und Pflege", shippingReturns: "Versand und Rückgabe", expected: "Voraussichtliche Dauer", tracked: "Sendungsverfolgter Versand in Italien und Europa.",
-      returnText: "Für nach Italien gelieferte Bestellungen ist die Rückgabe kostenlos: Beantrage sie innerhalb von 14 Kalendertagen nach Zustellung", returnEnd: "MIRAI stellt ein vorausbezahltes Etikett bereit und erhebt keine Wiedereinlagerungsgebühr. Siehe", returns: "Rückgabe und Erstattung",
+      returnText: "Für nach Italien gelieferte Bestellungen ist die Rückgabe kostenlos: Beantrage sie innerhalb von 30 Kalendertagen nach Zustellung", returnEnd: "MIRAI stellt ein vorausbezahltes Etikett bereit und erhebt keine Wiedereinlagerungsgebühr. Siehe", returns: "Rückgabe und Erstattung",
       complete: "Vervollständige den Look", mayLike: "Das könnte dir gefallen", shopAll: "Alle ansehen", closeImage: "Bild schließen", chooseSize: "Größe wählen", fitGuide: "MIRAI Fit-Guide", availableSizes: "Verfügbare Größen",
       chest: "Brust", length: "Länge", sleeve: "Ärmel", close: "Schließen", understood: "Verstanden", precise: "Die Maße können je nach Modell variieren. Kontaktiere vor dem Kauf den Support und nenne den Code",
     },
@@ -168,9 +168,9 @@ export function ProductDetail({
       sizeSoldOut: "Cette taille est épuisée. Choisissez-en une autre.", selectSize: "Sélectionnez une taille avant de continuer.", available: "Disponible", availability: "Disponibilité", piece: "article", pieces: "articles",
       added: "Ajouté", add: "Ajouter au panier", soldOut: "Épuisé", productCode: "Code produit", chooseCheckout: "choisissez le mode au paiement",
       discountBeforePay: "Appliquez d’abord MIRAI10 ou un autre code promo, puis choisissez le mode de paiement.", unavailable: "Temporairement indisponible",
-      freeShipping: "Livraison gratuite", always: "Toujours", easyReturn: "Retour facile", within14: "Sous 14 jours", payment: "Paiement", stripe: "Protégé par Stripe",
+      freeShipping: "Livraison gratuite", always: "Toujours", easyReturn: "Retour facile", within30: "Sous 30 jours", payment: "Paiement", stripe: "Protégé par Stripe",
       details: "Détails du produit", composition: "Composition et entretien", shippingReturns: "Livraison et retours", expected: "Délai prévu", tracked: "Livraison suivie en Italie et en Europe.",
-      returnText: "Les retours sont gratuits pour les commandes livrées en Italie : faites-en la demande dans les 14 jours calendaires suivant la livraison", returnEnd: "MIRAI fournit une étiquette prépayée et ne facture aucun frais de restockage. Consultez", returns: "Retours et remboursements",
+      returnText: "Les retours sont gratuits pour les commandes livrées en Italie : faites-en la demande dans les 30 jours calendaires suivant la livraison", returnEnd: "MIRAI fournit une étiquette prépayée et ne facture aucun frais de restockage. Consultez", returns: "Retours et remboursements",
       complete: "Complétez le look", mayLike: "Vous aimerez aussi", shopAll: "Tout voir", closeImage: "Fermer l’image", chooseSize: "Choisir la taille", fitGuide: "Guide de coupe MIRAI", availableSizes: "Tailles disponibles",
       chest: "Poitrine", length: "Longueur", sleeve: "Manche", close: "Fermer", understood: "Compris", precise: "Les mesures peuvent varier selon le modèle. Pour les vérifier avant l’achat, contactez le support en indiquant le code",
     },
@@ -650,7 +650,7 @@ export function ProductDetail({
 
           <div className="mt-8 grid grid-cols-3 border-y border-white/15 bg-white/[0.025] py-5">
             <TrustItem icon={Truck} title={productCopy.freeShipping} detail={productCopy.always} />
-            <TrustItem icon={RotateCcw} title={productCopy.easyReturn} detail={productCopy.within14} bordered />
+            <TrustItem icon={RotateCcw} title={productCopy.easyReturn} detail={productCopy.within30} bordered />
             <TrustItem icon={ShieldCheck} title={productCopy.payment} detail={productCopy.stripe} />
           </div>
 

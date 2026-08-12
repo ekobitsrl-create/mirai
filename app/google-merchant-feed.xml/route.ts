@@ -298,7 +298,7 @@ function renderReturnPolicy(baseUrl: string) {
     "      <g:returns>",
     "        <g:country>IT</g:country>",
     "        <g:item_condition>NEW</g:item_condition>",
-    "        <g:window_days>14</g:window_days>",
+    "        <g:window_days>30</g:window_days>",
     "        <g:window_type>FINITE_RETURN_WINDOW</g:window_type>",
     "        <g:method>BY_MAIL</g:method>",
     "        <g:method>DROP_OFF_LOCATION</g:method>",

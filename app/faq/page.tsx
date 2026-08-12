@@ -51,7 +51,7 @@ const faqs = [
     questions: [
       {
         q: "Posso restituire un prodotto?",
-        a: "Sì. Per gli ordini consegnati in Italia hai 14 giorni di calendario dalla consegna per richiedere il reso. Il prodotto deve essere nelle condizioni originali, non indossato e con i cartellini. Consulta la pagina Resi e Rimborsi per i dettagli.",
+        a: "Sì. Per gli ordini consegnati in Italia hai 30 giorni di calendario dalla consegna per richiedere il reso. Il prodotto deve essere nelle condizioni originali, non indossato e con i cartellini. Consulta la pagina Resi e Rimborsi per i dettagli.",
       },
       {
         q: "Il reso e gratuito?",
