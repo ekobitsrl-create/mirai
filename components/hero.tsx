@@ -23,6 +23,7 @@ const slideHrefs = [
 export function Hero() {
   const { t } = useLanguage()
   const [current, setCurrent] = useState(0)
+  const [loadedSlides, setLoadedSlides] = useState(() => new Set([0]))
   const [loaded, setLoaded] = useState(false)
   const [direction, setDirection] = useState(0)
 
@@ -31,26 +32,38 @@ export function Hero() {
   }, [])
 
   const goTo = useCallback((index: number) => {
+    setLoadedSlides((previous) => new Set(previous).add(index))
     setDirection(index > current ? 1 : -1)
     setCurrent(index)
   }, [current])
 
   const totalSlides = slideImages.length
-
   const next = useCallback(() => {
+    const nextIndex = (current + 1) % totalSlides
     setDirection(1)
-    setCurrent((p) => (p + 1) % totalSlides)
-  }, [totalSlides])
+    setLoadedSlides((loadedIndexes) => new Set(loadedIndexes).add(nextIndex))
+    setCurrent(nextIndex)
+  }, [current, totalSlides])
 
   const prev = useCallback(() => {
+    const previousIndex = (current - 1 + totalSlides) % totalSlides
     setDirection(-1)
-    setCurrent((p) => (p - 1 + totalSlides) % totalSlides)
-  }, [totalSlides])
+    setLoadedSlides((loadedIndexes) => new Set(loadedIndexes).add(previousIndex))
+    setCurrent(previousIndex)
+  }, [current, totalSlides])
 
   useEffect(() => {
     const timer = setInterval(next, 5000)
     return () => clearInterval(timer)
   }, [next])
+
+  useEffect(() => {
+    const preloadTimer = window.setTimeout(() => {
+      setLoadedSlides((previous) => new Set(previous).add((current + 1) % totalSlides))
+    }, 3200)
+
+    return () => window.clearTimeout(preloadTimer)
+  }, [current, totalSlides])
 
   const slides = t.hero.slides
 
@@ -78,23 +91,27 @@ export function Hero() {
             >
               {/* Blurred, slightly enlarged copy sits behind so its soft halo
                   hides the sharp rectangular border of the base image. */}
-              <Image
-                src={image.src}
-                alt=""
-                aria-hidden
-                fill
-                className="mirai-hero-edge-blur object-cover"
-                sizes="100vw"
-              />
+              {loadedSlides.has(i) ? (
+                <Image
+                  src={image.src}
+                  alt=""
+                  aria-hidden
+                  fill
+                  className="mirai-hero-edge-blur object-cover"
+                  sizes="100vw"
+                />
+              ) : null}
               {/* Sharp base image, faded out just before its own hard edge. */}
-              <Image
-                src={image.src}
-                alt={slides[i]?.title.replace("\n", " ") || ""}
-                fill
-                className="mirai-hero-base object-cover"
-                preload={i === 0}
-                sizes="100vw"
-              />
+              {loadedSlides.has(i) ? (
+                <Image
+                  src={image.src}
+                  alt={slides[i]?.title.replace("\n", " ") || ""}
+                  fill
+                  className="mirai-hero-base object-cover"
+                  preload={i === 0}
+                  sizes="100vw"
+                />
+              ) : null}
               <div
                 className={`mirai-image-edge-fade absolute inset-0 ${
                   image.strongBottomFade ? "mirai-image-edge-fade--bottom" : ""

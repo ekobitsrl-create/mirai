@@ -1,6 +1,6 @@
 "use client"
 
-import posthog from "posthog-js"
+import { getLoadedPostHogClient } from "@/lib/posthog-client"
 
 export const POSTHOG_CONSENT_EVENT = "mirai:cookie-consent"
 export const POSTHOG_READY_EVENT = "mirai:posthog-ready"
@@ -50,7 +50,9 @@ export function trackPostHogEvent(
   eventName: PostHogCommerceEventName,
   properties: PostHogCommerceProperties,
 ) {
-  if (typeof window === "undefined" || !posthog.__loaded || !hasPostHogConsent()) {
+  const posthog = getLoadedPostHogClient()
+
+  if (typeof window === "undefined" || !posthog?.__loaded || !hasPostHogConsent()) {
     return false
   }
 

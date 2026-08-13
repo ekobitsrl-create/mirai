@@ -2,13 +2,12 @@
 
 import { Suspense, useEffect, useRef, useState, type ReactNode } from "react"
 import { usePathname, useSearchParams } from "next/navigation"
-import posthog from "posthog-js"
-import { PostHogProvider as ReactPostHogProvider } from "posthog-js/react"
 import {
   POSTHOG_CONSENT_EVENT,
   POSTHOG_READY_EVENT,
   hasPostHogConsent,
 } from "@/lib/posthog-events"
+import { getLoadedPostHogClient, loadPostHogClient } from "@/lib/posthog-client"
 import { sanitizedAnalyticsUrl } from "@/lib/safe-analytics-url"
 
 const projectToken = process.env.NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN?.trim() || ""
@@ -16,10 +15,13 @@ const apiHost = process.env.NEXT_PUBLIC_POSTHOG_HOST?.trim() || ""
 
 let initializationStarted = false
 
-function initializePostHog(onReady: () => void) {
+async function initializePostHog(onReady: () => void) {
   if (!projectToken || !apiHost || typeof window === "undefined" || !hasPostHogConsent()) {
     return
   }
+
+  const posthog = await loadPostHogClient()
+  if (!hasPostHogConsent()) return
 
   if (posthog.__loaded) {
     posthog.opt_in_capturing()
@@ -55,7 +57,8 @@ function PostHogPageViews({ ready }: { ready: boolean }) {
   const lastTrackedUrl = useRef<string | null>(null)
 
   useEffect(() => {
-    if (!ready || !posthog.__loaded || !hasPostHogConsent()) return
+    const posthog = getLoadedPostHogClient()
+    if (!ready || !posthog?.__loaded || !hasPostHogConsent()) return
 
     const currentUrl = sanitizedAnalyticsUrl(window.location.href).toString()
     if (lastTrackedUrl.current === currentUrl) return
@@ -80,28 +83,29 @@ export function PostHogProvider({ children }: { children: ReactNode }) {
       const consent = (event as CustomEvent<"all" | "necessary">).detail
 
       if (consent === "all") {
-        initializePostHog(markReady)
+        void initializePostHog(markReady)
         return
       }
 
       setReady(false)
-      if (posthog.__loaded) {
+      const posthog = getLoadedPostHogClient()
+      if (posthog?.__loaded) {
         posthog.stopSessionRecording()
         posthog.opt_out_capturing()
       }
     }
 
-    initializePostHog(markReady)
+    void initializePostHog(markReady)
     window.addEventListener(POSTHOG_CONSENT_EVENT, handleConsent)
     return () => window.removeEventListener(POSTHOG_CONSENT_EVENT, handleConsent)
   }, [])
 
   return (
-    <ReactPostHogProvider client={posthog}>
+    <>
       <Suspense fallback={null}>
         <PostHogPageViews ready={ready} />
       </Suspense>
       {children}
-    </ReactPostHogProvider>
+    </>
   )
 }

@@ -428,7 +428,7 @@ export function ProductDetail({
                 className="object-cover transition-transform duration-700 group-hover:scale-[1.025]"
                 style={{ objectPosition: selectedImage.position || "center" }}
                 sizes="(max-width: 1024px) 100vw, 60vw"
-                priority
+                preload
               />
             ) : (
               <span className="absolute inset-0 flex items-center justify-center"><ShoppingBag className="h-16 w-16 text-black/15" /></span>

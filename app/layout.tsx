@@ -9,8 +9,8 @@ import { CookieBanner } from '@/components/cookie-banner'
 import { WhatsAppButton } from '@/components/whatsapp-button'
 import { BackgroundMusic } from '@/components/background-music'
 import { SiteIntro } from '@/components/site-intro'
-import { SiteLocalizer } from '@/components/site-localizer'
-import { MiraGuide } from '@/components/mira-guide'
+import { LazySiteLocalizer } from '@/components/lazy-site-localizer'
+import { LazyMiraGuide } from '@/components/lazy-mira-guide'
 import { MarketingPixels } from '@/components/marketing-pixels'
 import { GoogleIntegrations } from '@/components/google-integrations'
 import { PostHogProvider } from '@/components/posthog-provider'
@@ -189,11 +189,11 @@ window.gtag('consent', 'default', {
           />
           <SiteIntro />
           <LanguageProvider>
-            <SiteLocalizer />
+            <LazySiteLocalizer />
             <CartProvider>
               {children}
               <CartAddedBanner />
-              <MiraGuide />
+              <LazyMiraGuide />
               <BackgroundMusic />
               <WhatsAppButton />
               <CookieBanner />
