@@ -12,11 +12,15 @@ import { createClient } from "@/lib/supabase/server"
 import { SITE_URL } from "@/lib/site-url"
 import { getCatalogItemId, normalizeCatalogIdentifier } from "@/lib/catalog-identifiers"
 import { getShippingCostCents, SHIPPING_CONFIG } from "@/lib/shipping"
+import { localizeColor, localizeProduct } from "@/lib/catalog-localization"
+import { localizedOrganicPath } from "@/lib/international-seo"
+import type { Locale } from "@/lib/translations"
 
 export const runtime = "nodejs"
 export const dynamic = "force-dynamic"
 
 const RETURN_POLICY_PATH = "/resi"
+const MERCHANT_FEED_LOCALES: Locale[] = ["it", "en", "es", "de", "fr"]
 const CATALOG_SELECT = "id, name, description, price, category, image_url, sizes, stock_by_size, in_stock, is_new, created_at, updated_at, brand, supplier_profile, supplier_sku, gtin, shipping_min_days, shipping_max_days, color_name, color_hex, image_gallery, detail_items, composition"
 const PRE_SUPPLIER_CATALOG_SELECT = "id, name, description, price, category, image_url, sizes, stock_by_size, in_stock, is_new, created_at, updated_at, brand, supplier_sku, color_name, color_hex, image_gallery, detail_items, composition"
 const LEGACY_CATALOG_SELECT = "id, name, description, price, category, image_url, sizes, stock_by_size, in_stock, is_new, created_at, updated_at"
@@ -35,6 +39,8 @@ const GOOGLE_CATEGORY_BY_STORE_CATEGORY: Record<string, string> = {
   cappelli: "173",
   caps: "173",
   hats: "173",
+  felpe: "212",
+  profumi: "479",
 }
 
 const PRODUCT_TYPE_BY_STORE_CATEGORY: Record<string, string> = {
@@ -51,6 +57,8 @@ const PRODUCT_TYPE_BY_STORE_CATEGORY: Record<string, string> = {
   cappelli: "Accessori > Cappelli personalizzati",
   caps: "Accessori > Cappelli personalizzati",
   hats: "Accessori > Cappelli personalizzati",
+  felpe: "Abbigliamento > Felpe e hoodie",
+  profumi: "Bellezza e cura della persona > Profumi",
 }
 
 const HEADWEAR_CATEGORIES = new Set(["headwear", "cappelli", "caps", "hats"])
@@ -184,6 +192,29 @@ function getItemGroupId(product: StoreProduct) {
 function getSizes(product: StoreProduct) {
   const sizes = (product.sizes || []).filter(Boolean)
   return sizes.length > 0 ? sizes : ["OS"]
+}
+
+const LOCALIZED_PRODUCT_TYPES: Record<Exclude<Locale, "it">, Record<string, string>> = {
+  en: { "t-shirt": "Clothing > T-shirts", tshirt: "Clothing > T-shirts", magliette: "Clothing > T-shirts", camicie: "Clothing > Shirts", canotte: "Clothing > Tank tops", jeans: "Clothing > Jeans", pantaloni: "Clothing > Trousers", shorts: "Clothing > Shorts", bermuda: "Clothing > Shorts", headwear: "Accessories > Custom caps", cappelli: "Accessories > Custom caps", caps: "Accessories > Custom caps", hats: "Accessories > Custom caps", felpe: "Clothing > Sweatshirts & Hoodies", profumi: "Beauty & Personal Care > Perfume" },
+  es: { "t-shirt": "Ropa > Camisetas", tshirt: "Ropa > Camisetas", magliette: "Ropa > Camisetas", camicie: "Ropa > Camisas", canotte: "Ropa > Camisetas sin mangas", jeans: "Ropa > Vaqueros", pantaloni: "Ropa > Pantalones", shorts: "Ropa > Bermudas", bermuda: "Ropa > Bermudas", headwear: "Accesorios > Gorras personalizadas", cappelli: "Accesorios > Gorras personalizadas", caps: "Accesorios > Gorras personalizadas", hats: "Accesorios > Gorras personalizadas", felpe: "Ropa > Sudaderas y hoodies", profumi: "Belleza y cuidado personal > Perfumes" },
+  de: { "t-shirt": "Bekleidung > T-Shirts", tshirt: "Bekleidung > T-Shirts", magliette: "Bekleidung > T-Shirts", camicie: "Bekleidung > Hemden", canotte: "Bekleidung > Tanktops", jeans: "Bekleidung > Jeans", pantaloni: "Bekleidung > Hosen", shorts: "Bekleidung > Shorts", bermuda: "Bekleidung > Shorts", headwear: "Accessoires > Individuelle Caps", cappelli: "Accessoires > Individuelle Caps", caps: "Accessoires > Individuelle Caps", hats: "Accessoires > Individuelle Caps", felpe: "Bekleidung > Sweatshirts & Hoodies", profumi: "Körperpflege > Parfum" },
+  fr: { "t-shirt": "Vêtements > T-shirts", tshirt: "Vêtements > T-shirts", magliette: "Vêtements > T-shirts", camicie: "Vêtements > Chemises", canotte: "Vêtements > Débardeurs", jeans: "Vêtements > Jeans", pantaloni: "Vêtements > Pantalons", shorts: "Vêtements > Bermudas", bermuda: "Vêtements > Bermudas", headwear: "Accessoires > Casquettes personnalisées", cappelli: "Accessoires > Casquettes personnalisées", caps: "Accessoires > Casquettes personnalisées", hats: "Accessoires > Casquettes personnalisées", felpe: "Vêtements > Sweats et hoodies", profumi: "Beauté et soins personnels > Parfums" },
+}
+
+const SIZE_LABELS: Record<Locale, string> = {
+  it: "Taglia",
+  en: "Size",
+  es: "Talla",
+  de: "Größe",
+  fr: "Taille",
+}
+
+const FEED_DESCRIPTIONS: Record<Locale, string> = {
+  it: "Catalogo prodotti MIRAI LAB STORE per Google Merchant Center",
+  en: "MIRAI LAB STORE product catalogue for Google Merchant Center",
+  es: "Catálogo de productos MIRAI LAB STORE para Google Merchant Center",
+  de: "MIRAI LAB STORE Produktkatalog für Google Merchant Center",
+  fr: "Catalogue produits MIRAI LAB STORE pour Google Merchant Center",
 }
 
 function normalizeInventoryQuantity(quantity: unknown) {
@@ -354,9 +385,16 @@ const META_DARKADS_ITEM_GROUP_IDS = new Set([
   "4c89683d-939d-427a-8a34-3e00f9509d1e",
 ])
 
-function renderProductVariant(product: StoreProduct, size: string, baseUrl: string, platform?: string | null) {
+function renderProductVariant(
+  product: StoreProduct,
+  size: string,
+  baseUrl: string,
+  platform?: string | null,
+  locale: Locale = "it",
+) {
   const itemId = getCatalogItemId(product, size)
-  const productUrl = absoluteUrl(`/prodotto/${encodeURIComponent(product.id)}`, baseUrl)
+  const productPath = `/prodotto/${encodeURIComponent(product.id)}`
+  const productUrl = absoluteUrl(localizedOrganicPath(productPath, locale), baseUrl)
   const primaryImage = product.image_url ? absoluteUrl(product.image_url, baseUrl) : ""
   const additionalImages = getAdditionalImages(product, baseUrl, primaryImage)
   const categoryKey = product.category.toLowerCase()
@@ -364,20 +402,33 @@ function renderProductVariant(product: StoreProduct, size: string, baseUrl: stri
   const material = getMaterial(product)
   const pattern = getPattern(product)
   const supplierSettings = getProductSupplierSettings(product)
-  const merchantProductName = supplierSettings.profile === "mirai"
+  const italianMerchantProductName = supplierSettings.profile === "mirai"
     ? product.name.replace(/^MIRAI\s+/i, "").trim()
     : product.name
+  const localizedProduct = localizeProduct(product, locale)
+  const merchantProductName = locale === "it"
+    ? italianMerchantProductName
+    : localizedProduct.name.replace(/^MIRAI\s+/i, "").trim()
   const merchantCopyOverride = GOOGLE_ADS_MERCHANT_COPY_BY_PRODUCT_ID[product.id]
-  const titleParts = [merchantCopyOverride?.title || merchantProductName, color, `Taglia ${size}`].filter(Boolean)
+  const localizedColor = locale === "it" ? color : localizeColor(color, locale)
+  const titleParts = [
+    locale === "it" ? (merchantCopyOverride?.title || merchantProductName) : merchantProductName,
+    localizedColor,
+    `${SIZE_LABELS[locale]} ${size}`,
+  ].filter(Boolean)
   const title = titleParts.join(" - ")
-  const description = merchantCopyOverride?.description
-    || getMerchantDescription(product, merchantProductName, color, pattern, material)
+  const description = locale === "it"
+    ? merchantCopyOverride?.description
+      || getMerchantDescription(product, merchantProductName, color, pattern, material)
+    : localizedProduct.description
   const brand = supplierSettings.brand
   const itemGroupId = getItemGroupId(product)
   const metaInternalLabel = platform === "meta" && META_DARKADS_ITEM_GROUP_IDS.has(itemGroupId)
     ? "darkads"
     : null
-  const productType = PRODUCT_TYPE_BY_STORE_CATEGORY[categoryKey] || `Abbigliamento > ${product.category}`
+  const productType = locale === "it"
+    ? PRODUCT_TYPE_BY_STORE_CATEGORY[categoryKey] || `Abbigliamento > ${product.category}`
+    : LOCALIZED_PRODUCT_TYPES[locale][categoryKey] || localizedProduct.name
   const googleCategory = GOOGLE_CATEGORY_BY_STORE_CATEGORY[categoryKey] || "166"
   const inventory = getVariantInventory(product, size)
   const availability = getAvailability(product, size)
@@ -413,7 +464,7 @@ function renderProductVariant(product: StoreProduct, size: string, baseUrl: stri
     `      <g:size>${escapeXml(size)}</g:size>`,
     `      <g:size_system>${isHeadwear ? "US" : "EU"}</g:size_system>`,
     isHeadwear ? "" : "      <g:size_type>regular</g:size_type>",
-    `      <g:color>${escapeXml(color)}</g:color>`,
+    `      <g:color>${escapeXml(localizedColor)}</g:color>`,
     ...(material ? [`      <g:material>${escapeXml(material)}</g:material>`] : []),
     ...(pattern ? [`      <g:pattern>${escapeXml(pattern)}</g:pattern>`] : []),
     "      <g:gender>unisex</g:gender>",
@@ -455,6 +506,10 @@ export async function GET(request: NextRequest) {
   const baseUrl = getBaseUrl(request)
   const requestedSupplier = request.nextUrl.searchParams.get("supplier")
   const requestedPlatform = request.nextUrl.searchParams.get("platform")
+  const requestedLocale = request.nextUrl.searchParams.get("locale")
+  const locale: Locale = MERCHANT_FEED_LOCALES.includes(requestedLocale as Locale)
+    ? requestedLocale as Locale
+    : "it"
   const supplierProfile: SupplierProfile | null = requestedSupplier === "minimal" || requestedSupplier === "mirai"
     ? requestedSupplier
     : null
@@ -467,7 +522,7 @@ export async function GET(request: NextRequest) {
       && (!supplierProfile || getSupplierProfile(product) === supplierProfile),
   )
   const items = products.flatMap((product) =>
-    getSizes(product).map((size) => renderProductVariant(product, size, baseUrl, requestedPlatform)),
+    getSizes(product).map((size) => renderProductVariant(product, size, baseUrl, requestedPlatform, locale)),
   )
 
   const xml = [
@@ -475,8 +530,8 @@ export async function GET(request: NextRequest) {
     '<rss version="2.0" xmlns:g="http://base.google.com/ns/1.0">',
     "  <channel>",
     `    <title>${supplierProfile ? `MIRAI LAB STORE - ${supplierProfile === "minimal" ? "Minimal" : "MIRAI"}` : "MIRAI LAB STORE"}${requestedPlatform === "meta" ? " - Meta" : ""}</title>`,
-    `    <link>${escapeXml(baseUrl)}</link>`,
-    `    <description>Catalogo prodotti ${supplierProfile === "minimal" ? "Minimal" : supplierProfile === "mirai" ? "MIRAI" : "MIRAI LAB STORE"} per ${platformLabel}</description>`,
+    `    <link>${escapeXml(absoluteUrl(localizedOrganicPath("/", locale), baseUrl))}</link>`,
+    `    <description>${escapeXml(FEED_DESCRIPTIONS[locale])}${supplierProfile ? ` - ${supplierProfile === "minimal" ? "Minimal" : "MIRAI"}` : ""}${requestedPlatform === "meta" ? ` - ${platformLabel}` : ""}</description>`,
     ...items,
     "  </channel>",
     "</rss>",
