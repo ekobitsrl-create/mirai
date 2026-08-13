@@ -7,6 +7,14 @@ import { usePathname } from "next/navigation"
 import { useLanguage } from "@/lib/language-context"
 
 type GoogleConsentValue = "granted" | "denied"
+type ClarityConsentValue = "granted" | "denied"
+type ClarityConsentOptions = {
+  ad_Storage: ClarityConsentValue
+  analytics_Storage: ClarityConsentValue
+}
+type ClarityFunction = ((command: "consentv2", options: ClarityConsentOptions) => void) & {
+  q?: unknown[][]
+}
 
 function updateGoogleConsent(consent: "all" | "necessary") {
   const gtag = (window as Window & {
@@ -40,6 +48,28 @@ function recordNecessaryOnlyChoice() {
   })
 }
 
+function updateClarityConsent(consent: "all" | "necessary") {
+  const clarityWindow = window as Window & { clarity?: ClarityFunction }
+
+  if (!clarityWindow.clarity) {
+    // Clarity is intentionally loaded through GTM only after full consent.
+    // There is nothing to revoke until the tag has actually been loaded.
+    if (consent === "necessary") return
+
+    const queuedClarity: ClarityFunction = (command, options) => {
+      queuedClarity.q = queuedClarity.q || []
+      queuedClarity.q.push([command, options])
+    }
+    clarityWindow.clarity = queuedClarity
+  }
+
+  const value: ClarityConsentValue = consent === "all" ? "granted" : "denied"
+  clarityWindow.clarity("consentv2", {
+    ad_Storage: value,
+    analytics_Storage: value,
+  })
+}
+
 export function CookieBanner() {
   const pathname = usePathname()
   const [visible, setVisible] = useState(false)
@@ -58,8 +88,10 @@ export function CookieBanner() {
       setAnalyticsEnabled(true)
       setMarketingEnabled(true)
       updateGoogleConsent("all")
+      updateClarityConsent("all")
     } else if (consent === "cookie_consent=necessary") {
       updateGoogleConsent("necessary")
+      updateClarityConsent("necessary")
     } else {
       // Small delay so it doesn't flash on load
       timer = setTimeout(() => setVisible(true), 1000)
@@ -86,6 +118,7 @@ export function CookieBanner() {
   function acceptAll() {
     document.cookie = "cookie_consent=all; path=/; max-age=31536000; SameSite=Lax"
     updateGoogleConsent("all")
+    updateClarityConsent("all")
     window.dispatchEvent(new CustomEvent("mirai:cookie-consent", { detail: "all" }))
     setAnalyticsEnabled(true)
     setMarketingEnabled(true)
@@ -102,6 +135,7 @@ export function CookieBanner() {
 
     document.cookie = "cookie_consent=necessary; path=/; max-age=31536000; SameSite=Lax"
     updateGoogleConsent("necessary")
+    updateClarityConsent("necessary")
     window.dispatchEvent(new CustomEvent("mirai:cookie-consent", { detail: "necessary" }))
     setAnalyticsEnabled(false)
     setMarketingEnabled(false)
