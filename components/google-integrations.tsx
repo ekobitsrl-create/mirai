@@ -2,7 +2,7 @@
 
 import Script from "next/script"
 import { usePathname } from "next/navigation"
-import { useCallback, useEffect, useRef } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import { sanitizedAnalyticsPath, sanitizedAnalyticsUrl } from "@/lib/safe-analytics-url"
 
 const GOOGLE_ANALYTICS_ID = "G-CY0KQKG7VG"
@@ -33,8 +33,21 @@ function hasAnalyticsConsent() {
     .some((row) => row === "cookie_consent=all")
 }
 
+function updateGoogleConsent(consent: "all" | "necessary") {
+  if (!window.gtag) return
+
+  const value = consent === "all" ? "granted" : "denied"
+  window.gtag("consent", "update", {
+    analytics_storage: value,
+    ad_storage: value,
+    ad_user_data: value,
+    ad_personalization: value,
+  })
+}
+
 export function GoogleIntegrations() {
   const pathname = usePathname()
+  const [googleTagReady, setGoogleTagReady] = useState(false)
   const merchantWidgetStarted = useRef(false)
   const lastTrackedPath = useRef<string | null>(null)
 
@@ -54,7 +67,7 @@ export function GoogleIntegrations() {
   }, [])
 
   const trackPageView = useCallback((force = false) => {
-    if (!hasAnalyticsConsent() || !window.gtag) return
+    if (!googleTagReady || !window.gtag) return
 
     const safeUrl = sanitizedAnalyticsUrl(window.location.href)
     const pagePath = sanitizedAnalyticsPath(safeUrl)
@@ -67,33 +80,31 @@ export function GoogleIntegrations() {
       page_path: pagePath,
       page_title: document.title,
     })
-  }, [])
+  }, [googleTagReady])
 
   useEffect(() => {
     const timer = window.setTimeout(() => {
-      if (!hasAnalyticsConsent() || !window.gtag) return
+      if (!googleTagReady || !window.gtag) return
 
-      // Ensure the saved consent update is queued before the first page view.
-      window.gtag("consent", "update", {
-        analytics_storage: "granted",
-        ad_storage: "granted",
-        ad_user_data: "granted",
-        ad_personalization: "granted",
-      })
+      // Keep advanced Consent Mode active: consent is updated before the event,
+      // while visitors without analytics consent only send a cookieless ping.
+      updateGoogleConsent(hasAnalyticsConsent() ? "all" : "necessary")
       trackPageView()
     }, 0)
 
     return () => window.clearTimeout(timer)
-  }, [pathname, trackPageView])
+  }, [googleTagReady, pathname, trackPageView])
 
   useEffect(() => {
     const handleConsent = (event: Event) => {
       const consent = (event as CustomEvent<"all" | "necessary">).detail
 
-      if (consent === "all") {
-        window.setTimeout(() => trackPageView(true), 0)
-      } else {
-        lastTrackedPath.current = null
+      updateGoogleConsent(consent)
+
+      // If consent was chosen before gtag became ready, the readiness effect
+      // will send the first page view. Never duplicate a page already measured.
+      if (consent === "all" && lastTrackedPath.current === null) {
+        window.setTimeout(() => trackPageView(), 0)
       }
     }
 
@@ -106,6 +117,8 @@ export function GoogleIntegrations() {
       <Script
         src={`https://www.googletagmanager.com/gtag/js?id=${GOOGLE_ANALYTICS_ID}`}
         strategy="afterInteractive"
+        onLoad={() => setGoogleTagReady(true)}
+        onReady={() => setGoogleTagReady(true)}
       />
       <Script id="mirai-google-analytics" strategy="afterInteractive">
         {`window.dataLayer = window.dataLayer || [];
