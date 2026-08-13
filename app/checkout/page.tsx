@@ -20,6 +20,12 @@ import { buildMetaCartParameters, getMetaPurchaseStorageKey } from "@/lib/meta-p
 import { PostHogCommerceEvent } from "@/components/posthog-commerce-event"
 import { getCatalogItemId } from "@/lib/catalog-identifiers"
 import { formatLocalizedPrice, translateSiteText } from "@/lib/site-localization"
+import {
+  getShippingCostCents,
+  isEuShippingCountry,
+  SHIPPING_CONFIG,
+  type EuCountryCode,
+} from "@/lib/shipping"
 
 const stripePublishableKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
 const stripePromise = stripePublishableKey ? loadStripe(stripePublishableKey) : null
@@ -38,6 +44,7 @@ export default function CheckoutPage() {
   const [marketingConsent, setMarketingConsent] = useState(false)
   const [guestError, setGuestError] = useState<string | null>(null)
   const [paymentMethod, setPaymentMethod] = useState<"card" | "cash_on_delivery">("card")
+  const [shippingCountry, setShippingCountry] = useState<EuCountryCode>("IT")
   const [cashOnDeliveryAvailable, setCashOnDeliveryAvailable] = useState(false)
   const [cashDetails, setCashDetails] = useState({ name: "", phone: "", address: "", city: "", postalCode: "" })
   const [cashError, setCashError] = useState<string | null>(null)
@@ -110,10 +117,10 @@ export default function CheckoutPage() {
   }, [cartLineItems])
 
   useEffect(() => {
-    if (!cashOnDeliveryAvailable && paymentMethod === "cash_on_delivery") {
+    if ((!cashOnDeliveryAvailable || shippingCountry !== "IT") && paymentMethod === "cash_on_delivery") {
       setPaymentMethod("card")
     }
-  }, [cashOnDeliveryAvailable, paymentMethod])
+  }, [cashOnDeliveryAvailable, paymentMethod, shippingCountry])
 
   const hasAccountEmail = emailPattern.test(accountEmail)
   const requiresGuestEmail = !isAuthenticated || !hasAccountEmail
@@ -125,8 +132,13 @@ export default function CheckoutPage() {
       email: checkoutEmail,
       marketingConsent,
       discountCode: appliedDiscount?.code || "",
+      shippingCountry,
     }),
-    [appliedDiscount?.code, cartLineItems, checkoutEmail, marketingConsent]
+    [appliedDiscount?.code, cartLineItems, checkoutEmail, marketingConsent, shippingCountry]
+  )
+  const countryDisplayNames = useMemo(
+    () => typeof Intl.DisplayNames === "function" ? new Intl.DisplayNames([locale], { type: "region" }) : null,
+    [locale],
   )
 
   const fetchClientSecret = useCallback(() => {
@@ -146,6 +158,7 @@ export default function CheckoutPage() {
       marketingConsent,
       sessionIdRef.current,
       appliedDiscount?.code,
+      shippingCountry,
     )
       .then((session) => {
         if (!session?.clientSecret) throw new Error(t.checkout.error)
@@ -163,7 +176,7 @@ export default function CheckoutPage() {
 
     checkoutSessionRef.current = { key: checkoutKey, promise }
     return promise
-  }, [appliedDiscount?.code, cartLineItems, checkoutEmail, checkoutKey, marketingConsent, t.checkout.error])
+  }, [appliedDiscount?.code, cartLineItems, checkoutEmail, checkoutKey, marketingConsent, shippingCountry, t.checkout.error])
 
   const retryCardCheckout = () => {
     checkoutSessionRef.current = null
@@ -285,7 +298,8 @@ export default function CheckoutPage() {
   const accountSignUpHref = `/auth/sign-up?next=/checkout&email=${encodeURIComponent(guestEmail.trim())}`
   const discountedProductsTotalCents = appliedDiscount?.totalCents ?? Math.round(getTotal() * 100)
   const selectedPaymentFeeCents = paymentMethod === "cash_on_delivery" ? CASH_ON_DELIVERY_FEE_CENTS : 0
-  const checkoutTotalCents = discountedProductsTotalCents + selectedPaymentFeeCents
+  const shippingFeeCents = getShippingCostCents(shippingCountry)
+  const checkoutTotalCents = discountedProductsTotalCents + selectedPaymentFeeCents + shippingFeeCents
   const checkoutMetaParameters = buildMetaCartParameters(items, getTotal())
 
   return (
@@ -336,6 +350,9 @@ export default function CheckoutPage() {
                 {ui("Supplemento contrassegno")} +{money(selectedPaymentFeeCents)}
               </p>
             )}
+            <p className={`mt-1 text-xs font-semibold ${shippingFeeCents > 0 ? "text-amber-400" : "text-emerald-400"}`}>
+              {ui("Spedizione")} {shippingFeeCents > 0 ? `+${money(shippingFeeCents)}` : ui("gratuita")}
+            </p>
             <p className="mt-1 text-2xl font-bold text-foreground">
               {money(checkoutTotalCents)}
             </p>
@@ -467,8 +484,39 @@ export default function CheckoutPage() {
             </section>
 
             <section className="mb-4 border border-border bg-card p-4 sm:p-5">
+              <Label htmlFor="shipping-country" className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
+                {ui("Paese di spedizione")}
+              </Label>
+              <select
+                id="shipping-country"
+                name="shipping-country"
+                autoComplete="country"
+                value={shippingCountry}
+                onChange={(event) => {
+                  const countryCode = event.target.value
+                  if (!isEuShippingCountry(countryCode)) return
+                  setShippingCountry(countryCode)
+                  if (countryCode !== "IT") setPaymentMethod("card")
+                  resetCardCheckout()
+                }}
+                className="mt-3 min-h-12 w-full border border-border bg-secondary px-4 text-sm text-foreground outline-none transition-colors focus:border-primary"
+              >
+                {SHIPPING_CONFIG.allowedCountries.map((countryCode) => (
+                  <option key={countryCode} value={countryCode}>
+                    {countryDisplayNames?.of(countryCode) || countryCode}
+                  </option>
+                ))}
+              </select>
+              <p className="mt-3 text-xs leading-5 text-muted-foreground">
+                {shippingCountry === "IT"
+                  ? ui("Spedizione gratuita in Italia.")
+                  : ui("Supplemento fisso di 40 € per le spedizioni negli altri Paesi dell'Unione Europea.")}
+              </p>
+            </section>
+
+            <section className="mb-4 border border-border bg-card p-4 sm:p-5">
               <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Metodo di pagamento</p>
-              <div className={`mt-3 grid border border-border ${cashOnDeliveryAvailable ? "grid-cols-2" : "grid-cols-1"}`} role="radiogroup" aria-label="Metodo di pagamento">
+              <div className={`mt-3 grid border border-border ${cashOnDeliveryAvailable && shippingCountry === "IT" ? "grid-cols-2" : "grid-cols-1"}`} role="radiogroup" aria-label="Metodo di pagamento">
                 <button
                   type="button"
                   role="radio"
@@ -478,7 +526,7 @@ export default function CheckoutPage() {
                 >
                   <CreditCard className="h-4 w-4" /> Pagamento online
                 </button>
-                {cashOnDeliveryAvailable && (
+                {cashOnDeliveryAvailable && shippingCountry === "IT" && (
                   <button
                     type="button"
                     role="radio"
@@ -490,9 +538,11 @@ export default function CheckoutPage() {
                   </button>
                 )}
               </div>
-              {!cashOnDeliveryAvailable && (
+              {(!cashOnDeliveryAvailable || shippingCountry !== "IT") && (
                 <p className="mt-3 text-xs leading-5 text-muted-foreground">
-                  Il pagamento in contrassegno è disponibile solo per gli ordini che contengono esclusivamente prodotti del brand Minimal.
+                  {shippingCountry !== "IT"
+                    ? ui("Il pagamento in contrassegno è disponibile solo per le consegne in Italia.")
+                    : ui("Il pagamento in contrassegno è disponibile solo per gli ordini che contengono esclusivamente prodotti del brand Minimal.")}
                 </p>
               )}
               <div className="mt-4 flex items-start gap-3 border-t border-border pt-4">

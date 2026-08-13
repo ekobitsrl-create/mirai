@@ -3,7 +3,11 @@ import type Stripe from 'stripe'
 import { assertStripeConfigured, stripe } from '@/lib/stripe'
 import { createClient, getServerUser } from '@/lib/supabase/server'
 import { getDemoProduct, isBlackIslandProduct, type StoreProduct } from '@/lib/products'
-import { getStripeShippingOptions, SHIPPING_CONFIG } from '@/lib/shipping'
+import {
+  getShippingCostCents,
+  getStripeShippingOptions,
+  normalizeShippingCountry,
+} from '@/lib/shipping'
 import {
   CUSTOM_TEE_PRODUCT_ID,
   customizationMetadata,
@@ -67,7 +71,23 @@ export async function POST(request: NextRequest) {
       }
       return NextResponse.json({ error: 'Richiesta non valida' }, { status: 400 })
     }
-    const { items, paymentMethod, cancelPath, customerEmail: requestedEmail } = body
+    const {
+      items,
+      paymentMethod,
+      cancelPath,
+      customerEmail: requestedEmail,
+      shippingCountry: requestedShippingCountry,
+    } = body
+    let shippingCountry
+    try {
+      shippingCountry = normalizeShippingCountry(requestedShippingCountry || 'IT')
+    } catch (error) {
+      return NextResponse.json(
+        { error: error instanceof Error ? error.message : 'Paese di spedizione non valido' },
+        { status: 400 },
+      )
+    }
+    const shippingFeeCents = getShippingCostCents(shippingCountry)
     const customerEmail = validEmail(user?.email || requestedEmail)
     const accountMetadata: Stripe.MetadataParam = user ? { user_id: user.id } : {}
     const customerParams: Pick<
@@ -228,6 +248,8 @@ export async function POST(request: NextRequest) {
     const confirmation = createCheckoutConfirmation()
     const sessionMetadata: Stripe.MetadataParam = {
       ...accountMetadata,
+      shipping_country: shippingCountry,
+      shipping_fee_cents: String(shippingFeeCents),
       [CHECKOUT_CONFIRMATION_METADATA_KEY]: confirmation.hash,
       ...(compactOrderItems.length <= 500
         ? { order_items: compactOrderItems }
@@ -241,12 +263,12 @@ export async function POST(request: NextRequest) {
       line_items: lineItems,
       // Raccolta indirizzo di spedizione
       shipping_address_collection: {
-        allowed_countries: [...SHIPPING_CONFIG.allowedCountries],
+        allowed_countries: [shippingCountry],
       },
       phone_number_collection: {
         enabled: true,
       },
-      shipping_options: getStripeShippingOptions(subtotalCents),
+      shipping_options: getStripeShippingOptions(shippingCountry),
       // URL di redirect
       success_url: `${baseUrl}/success?session_id={CHECKOUT_SESSION_ID}&confirmation_token=${encodeURIComponent(confirmation.token)}`,
       cancel_url: `${baseUrl}${safeCancelPath}`,

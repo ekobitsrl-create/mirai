@@ -13,6 +13,7 @@ import {
 } from "@/lib/products"
 import { getAbsoluteUrl, SITE_URL } from "@/lib/site-url"
 import { safeJsonLd } from "@/lib/json-ld"
+import { getShippingCostCents, SHIPPING_CONFIG } from "@/lib/shipping"
 
 export const revalidate = 300
 
@@ -160,16 +161,16 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
       seller: {
         "@id": `${SITE_URL}/#organization`,
       },
-      shippingDetails: {
+      shippingDetails: SHIPPING_CONFIG.allowedCountries.map((countryCode) => ({
         "@type": "OfferShippingDetails",
         shippingRate: {
           "@type": "MonetaryAmount",
-          value: "0.00",
+          value: (getShippingCostCents(countryCode) / 100).toFixed(2),
           currency: "EUR",
         },
         shippingDestination: {
           "@type": "DefinedRegion",
-          addressCountry: "IT",
+          addressCountry: countryCode,
         },
         deliveryTime: {
           "@type": "ShippingDeliveryTime",
@@ -186,7 +187,7 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
             unitCode: "d",
           },
         },
-      },
+      })),
       hasMerchantReturnPolicy: {
         "@type": "MerchantReturnPolicy",
         applicableCountry: "IT",

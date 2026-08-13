@@ -43,7 +43,7 @@ const PROCESS = [
     icon: PackageCheck,
     number: "03",
     title: "Produciamo",
-    description: "Prepariamo il tuo pezzo singolarmente e lo spediamo con tracking gratuito.",
+    description: "Prepariamo il tuo pezzo singolarmente e lo spediamo con tracking; la spedizione è gratuita in Italia.",
   },
 ]
 
@@ -132,7 +132,7 @@ export default function CustomLabPage() {
                 <Link href="#editor" className="inline-flex items-center gap-2 rounded-full bg-white px-5 py-3 text-[10px] font-bold uppercase tracking-[0.18em] text-black transition-transform hover:-translate-y-0.5">
                   Inizia a creare <ArrowDown className="h-3.5 w-3.5" />
                 </Link>
-                <span className="text-[9px] uppercase tracking-[0.17em] text-white/30">Da 79 € · Spedizione gratuita</span>
+                <span className="text-[9px] uppercase tracking-[0.17em] text-white/30">Da 79 € · Spedizione gratuita in Italia</span>
               </div>
             </div>
           </div>

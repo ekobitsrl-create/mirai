@@ -24,7 +24,7 @@ export default function TerminiPage() {
           <h1 className="mb-2 font-[family-name:var(--font-space-grotesk)] text-3xl font-bold tracking-tight text-foreground text-balance md:text-4xl">
             Termini e Condizioni
           </h1>
-          <p className="mb-12 text-sm text-muted-foreground">Ultimo aggiornamento: 2 agosto 2026</p>
+          <p className="mb-12 text-sm text-muted-foreground">Ultimo aggiornamento: 13 agosto 2026</p>
 
           <div className="flex flex-col gap-10 text-muted-foreground leading-relaxed">
             <section className="flex flex-col gap-3">
@@ -44,7 +44,7 @@ export default function TerminiPage() {
 
             <section className="flex flex-col gap-3">
               <h2 className="font-[family-name:var(--font-space-grotesk)] text-xl font-bold text-foreground">4. Spedizioni</h2>
-              <p>La spedizione è gratuita senza importo minimo. Costi, tempi, origine degli ordini, tracking e destinazioni sono indicati nella pagina <Link href="/spedizioni" className="text-primary hover:underline">Spedizioni</Link>. L'eventuale supplemento fisso di 9 € per il contrassegno riguarda il metodo di pagamento e non costituisce un costo di spedizione. Le informazioni mostrate al checkout prevalgono se aggiornate in tempo reale prima della conferma.</p>
+              <p>La spedizione è gratuita in Italia senza importo minimo. Per le consegne negli altri Paesi dell'Unione Europea viene applicato un costo fisso di 40 € per ordine; al momento non sono supportate destinazioni extra-UE. Costi, tempi, tracking e destinazioni sono indicati nella pagina <Link href="/spedizioni" className="text-primary hover:underline">Spedizioni</Link>. L'eventuale supplemento fisso di 9 € per il contrassegno riguarda il metodo di pagamento, è disponibile solo in Italia e non costituisce un costo di spedizione. Le informazioni mostrate al checkout prevalgono se aggiornate in tempo reale prima della conferma.</p>
             </section>
 
             <section className="flex flex-col gap-3">

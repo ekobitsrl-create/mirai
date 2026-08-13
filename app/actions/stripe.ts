@@ -4,7 +4,12 @@ import type Stripe from 'stripe'
 import { assertStripeCheckoutConfigured, stripe } from '@/lib/stripe'
 import { createAdminClient, getServerUser } from '@/lib/supabase/server'
 import { getDemoProduct, getSupplierProfile, isBlackIslandProduct, type StoreProduct } from '@/lib/products'
-import { getStripeShippingOptions, SHIPPING_CONFIG } from '@/lib/shipping'
+import {
+  getShippingCostCents,
+  getStripeShippingOptions,
+  normalizeShippingCountry,
+  SHIPPING_CONFIG,
+} from '@/lib/shipping'
 import { CASH_ON_DELIVERY_FEE_CENTS } from '@/lib/checkout-fees'
 import { SITE_URL } from '@/lib/site-url'
 import { applyOrderInventory } from '@/lib/orders/apply-order-inventory'
@@ -159,11 +164,14 @@ export async function createCheckoutSession(
   marketingConsent = false,
   previousCheckoutSessionId?: string | null,
   discountCode?: string,
+  requestedShippingCountry: string = 'IT',
 ) {
   if (!await consumeRateLimit({ bucket: 'stripe-checkout', limit: 20, windowSeconds: 600 })) {
     throw new Error('Troppi tentativi di pagamento. Riprova tra qualche minuto')
   }
   assertStripeCheckoutConfigured()
+  const shippingCountry = normalizeShippingCountry(requestedShippingCountry)
+  const shippingFeeCents = getShippingCostCents(shippingCountry)
   const user = await getServerUser()
   const customerEmail = validEmail(user?.email || guestEmail)
   if ((user?.email || guestEmail)?.trim() && !customerEmail) {
@@ -293,6 +301,8 @@ export async function createCheckoutSession(
     ...(user ? { client_reference_id: user.id } : {}),
     metadata: {
       order_item_count: String(cartItems.length),
+      shipping_country: shippingCountry,
+      shipping_fee_cents: String(shippingFeeCents),
       [CHECKOUT_CONFIRMATION_METADATA_KEY]: confirmation.hash,
       ...(user ? { user_id: user.id } : {}),
       ...discountMetadata,
@@ -300,17 +310,19 @@ export async function createCheckoutSession(
     payment_intent_data: {
       ...(customerEmail ? { receipt_email: customerEmail } : {}),
       metadata: {
+        shipping_country: shippingCountry,
+        shipping_fee_cents: String(shippingFeeCents),
         ...(user ? { user_id: user.id } : {}),
         ...discountMetadata,
       },
     },
     shipping_address_collection: {
-      allowed_countries: [...SHIPPING_CONFIG.allowedCountries],
+      allowed_countries: [shippingCountry],
     },
     phone_number_collection: {
       enabled: true,
     },
-    shipping_options: getStripeShippingOptions(subtotalCents),
+    shipping_options: getStripeShippingOptions(shippingCountry),
   }
 
   if (couponId) {

@@ -34,7 +34,7 @@ const faqs = [
     questions: [
       {
         q: "Quanto costa la spedizione?",
-        a: "La spedizione è sempre gratuita in tutte le destinazioni supportate, senza importo minimo. Se scegli il contrassegno per una consegna in Italia viene applicato un supplemento fisso di 9 € relativo al metodo di pagamento, non alla spedizione.",
+        a: "La spedizione è gratuita in Italia, senza importo minimo. Per le consegne negli altri Paesi dell'Unione Europea viene applicato un costo fisso di 40 € per ordine. Il contrassegno è disponibile solo in Italia e prevede un supplemento separato di 9 €.",
       },
       {
         q: "In quanto tempo ricevero il mio ordine?",
@@ -42,7 +42,7 @@ const faqs = [
       },
       {
         q: "Spedite all'estero?",
-        a: "Si, spediamo in tutti i Paesi dell'Unione Europea, nel Regno Unito e in Svizzera. Eventuali dazi o oneri doganali fuori dall'UE restano a carico del destinatario.",
+        a: "Sì, spediamo in tutti i 27 Paesi dell'Unione Europea. Per le destinazioni UE diverse dall'Italia il costo è di 40 € per ordine. Al momento non spediamo nel Regno Unito, in Svizzera o in altri Paesi extra-UE.",
       },
     ],
   },

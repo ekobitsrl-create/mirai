@@ -245,7 +245,7 @@ REGOLE:
 PAGINA ATTUALE: ${pathname}
 
 INFORMAZIONI NEGOZIO:
-- Spedizione standard gratuita, senza importo minimo: ${SHIPPING_CONFIG.standardDeliveryDays.minimum}-${SHIPPING_CONFIG.standardDeliveryDays.maximum} giorni lavorativi.
+- Spedizione gratuita in Italia. Per gli altri 26 Paesi dell'Unione Europea il costo fisso è di 40 euro per ordine. Non sono supportate destinazioni extra-UE. Consegna standard: ${SHIPPING_CONFIG.standardDeliveryDays.minimum}-${SHIPPING_CONFIG.standardDeliveryDays.maximum} giorni lavorativi.
 - Contrassegno disponibile per consegne in Italia.
 - Per gli ordini consegnati in Italia, reso gratuito richiedibile entro 30 giorni di calendario dalla consegna. MIRAI invia l'etichetta prepagata, sostiene le spese di restituzione e non applica costi di restocking. Il rimborso viene elaborato entro 3 giorni dal ricevimento del reso.
 - Pagamenti gestiti tramite Stripe. I metodi effettivamente mostrati al checkout dipendono dalla configurazione attiva.

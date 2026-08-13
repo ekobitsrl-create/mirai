@@ -11,6 +11,7 @@ import {
 import { createClient } from "@/lib/supabase/server"
 import { SITE_URL } from "@/lib/site-url"
 import { getCatalogItemId, normalizeCatalogIdentifier } from "@/lib/catalog-identifiers"
+import { getShippingCostCents, SHIPPING_CONFIG } from "@/lib/shipping"
 
 export const runtime = "nodejs"
 export const dynamic = "force-dynamic"
@@ -430,19 +431,21 @@ function renderProductVariant(product: StoreProduct, size: string, baseUrl: stri
     ...(supplierSettings.merchantCustomLabel4
       ? [`      <g:custom_label_4>${escapeXml(supplierSettings.merchantCustomLabel4)}</g:custom_label_4>`]
       : []),
-    "      <g:shipping>",
-    "        <g:country>IT</g:country>",
-    "        <g:service>Standard</g:service>",
-    "        <g:price>0.00 EUR</g:price>",
-    ...(supplierSettings.shippingMinDays !== undefined && supplierSettings.shippingMaxDays !== undefined
-      ? [
-          "        <g:min_handling_time>0</g:min_handling_time>",
-          "        <g:max_handling_time>0</g:max_handling_time>",
-          `        <g:min_transit_time>${supplierSettings.shippingMinDays}</g:min_transit_time>`,
-          `        <g:max_transit_time>${supplierSettings.shippingMaxDays}</g:max_transit_time>`,
-        ]
-      : []),
-    "      </g:shipping>",
+    ...SHIPPING_CONFIG.allowedCountries.flatMap((countryCode) => [
+      "      <g:shipping>",
+      `        <g:country>${countryCode}</g:country>`,
+      "        <g:service>Standard</g:service>",
+      `        <g:price>${(getShippingCostCents(countryCode) / 100).toFixed(2)} EUR</g:price>`,
+      ...(supplierSettings.shippingMinDays !== undefined && supplierSettings.shippingMaxDays !== undefined
+        ? [
+            "        <g:min_handling_time>0</g:min_handling_time>",
+            "        <g:max_handling_time>0</g:max_handling_time>",
+            `        <g:min_transit_time>${supplierSettings.shippingMinDays}</g:min_transit_time>`,
+            `        <g:max_transit_time>${supplierSettings.shippingMaxDays}</g:max_transit_time>`,
+          ]
+        : []),
+      "      </g:shipping>",
+    ]),
     renderReturnPolicy(baseUrl),
     "    </item>",
   ].filter(Boolean).join("\n")

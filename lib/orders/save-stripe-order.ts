@@ -63,6 +63,11 @@ export async function saveStripeOrder(session: Stripe.Checkout.Session) {
     || session.amount_total
     || 0,
   )
+  const shippingFeeCents = Number(
+    session.total_details?.amount_shipping
+    || session.metadata?.shipping_fee_cents
+    || 0,
+  )
   const baseOrderPayload = {
     user_id: userId || null,
     email: session.customer_details?.email || session.customer_email || '',
@@ -76,6 +81,7 @@ export async function saveStripeOrder(session: Stripe.Checkout.Session) {
     stripe_session_id: session.id,
     notes: [
       'Pagamento online acquisito tramite Stripe',
+      shippingFeeCents > 0 ? `Spedizione UE: €${(shippingFeeCents / 100).toFixed(2)}` : 'Spedizione Italia: gratuita',
       shipping.phone ? `Telefono: ${shipping.phone}` : null,
     ].filter(Boolean).join(' | '),
   }

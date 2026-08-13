@@ -189,9 +189,9 @@ function contextualFollowUp(message: string, context: MiraKnowledgeContext) {
 
   if (context.lastIntent === "shipping" || context.lastIntent === "tracking") {
     if (hasAny(message, ["costa", "prezzo", "gratis", "gratuita"])) {
-      return answer("shipping", "La spedizione è sempre gratuita, senza importo minimo.", "/spedizioni", "Dettagli spedizioni")
+      return answer("shipping", "La spedizione è gratuita in Italia. Per gli altri Paesi UE il costo fisso è di 40 € per ordine.", "/spedizioni", "Dettagli spedizioni")
     }
-    return answer("shipping", "La spedizione è sempre gratuita. La consegna stimata varia in base al prodotto: 3–5 oppure 7–12 giorni lavorativi, come indicato nella scheda prodotto. Il tracking arriva via email dopo la spedizione.", "/spedizioni", "Dettagli spedizioni")
+    return answer("shipping", "La spedizione è gratuita in Italia e costa 40 € negli altri Paesi UE. La consegna stimata varia in base al prodotto: 3–5 oppure 7–12 giorni lavorativi, come indicato nella scheda prodotto. Il tracking arriva via email dopo la spedizione.", "/spedizioni", "Dettagli spedizioni")
   }
 
   if (context.lastIntent === "returns" || context.lastIntent === "refund") {
@@ -227,7 +227,7 @@ export function getMiraLocalReply(rawMessage: string, context: MiraKnowledgeCont
   if (asksShipping && asksReturns) {
     return answer(
       "shipping",
-      "La spedizione è sempre gratuita e la consegna stimata varia in base al prodotto: 3–5 oppure 7–12 giorni lavorativi, come indicato nella scheda. Se il capo non va bene, puoi chiedere il reso entro 30 giorni: per ogni reso approvato MIRAI invia un'etichetta prepagata e sostiene le spese di restituzione.",
+      "La spedizione è gratuita in Italia e costa 40 € negli altri Paesi UE. La consegna stimata varia in base al prodotto: 3–5 oppure 7–12 giorni lavorativi, come indicato nella scheda. Se il capo non va bene, per gli ordini consegnati in Italia puoi chiedere il reso entro 30 giorni.",
       "/faq",
       "Vedi tutte le FAQ",
     )
@@ -236,7 +236,7 @@ export function getMiraLocalReply(rawMessage: string, context: MiraKnowledgeCont
   if (asksShipping && asksPayments) {
     return answer(
       "shipping",
-      "La spedizione standard è gratuita. Al checkout puoi pagare con i metodi Stripe disponibili oppure scegliere il contrassegno per consegne in Italia, con un supplemento fisso di 9 €.",
+      "La spedizione è gratuita in Italia e costa 40 € negli altri Paesi UE. Al checkout puoi pagare con i metodi Stripe disponibili oppure scegliere il contrassegno per consegne in Italia, con un supplemento fisso di 9 €.",
       "/faq",
       "FAQ acquisto",
     )
@@ -299,12 +299,12 @@ export function getMiraLocalReply(rawMessage: string, context: MiraKnowledgeCont
 
   if (asksShipping) {
     if (hasAny(message, ["estero", "europa", "francia", "germania", "spagna", "regno unito", "svizzera", "internazionale"])) {
-      return answer("shipping", "MIRAI spedisce nell’Unione Europea, nel Regno Unito e in Svizzera con le tempistiche indicate sul sito. Per altre destinazioni, chiedi conferma all’assistenza.", "/spedizioni", "Destinazioni servite")
+      return answer("shipping", "MIRAI spedisce nei 27 Paesi dell’Unione Europea. In Italia la spedizione è gratuita; negli altri Paesi UE costa 40 € per ordine. Regno Unito, Svizzera e destinazioni extra-UE non sono al momento supportati.", "/spedizioni", "Destinazioni servite")
     }
     if (hasAny(message, ["quanto costa", "costo", "prezzo", "gratis", "gratuita"])) {
-      return answer("shipping", "La spedizione è sempre gratuita, senza importo minimo.", "/spedizioni", "Dettagli spedizioni")
+      return answer("shipping", "La spedizione è gratuita in Italia. Per gli altri Paesi UE il costo fisso è di 40 € per ordine.", "/spedizioni", "Dettagli spedizioni")
     }
-    return answer("shipping", "La spedizione è sempre gratuita, senza importo minimo. La consegna stimata varia in base al prodotto: 3–5 oppure 7–12 giorni lavorativi, come indicato nella scheda prodotto.", "/spedizioni", "Dettagli spedizioni")
+    return answer("shipping", "La spedizione è gratuita in Italia e costa 40 € negli altri Paesi UE. La consegna stimata varia in base al prodotto: 3–5 oppure 7–12 giorni lavorativi, come indicato nella scheda prodotto.", "/spedizioni", "Dettagli spedizioni")
   }
 
   if (hasAny(message, ["rimborso", "soldi indietro", "riavere i soldi", "accredito"])) {

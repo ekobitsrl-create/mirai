@@ -25,15 +25,15 @@ export default function SpedizioniPage() {
             Spedizioni
           </h1>
           <p className="mb-12 max-w-2xl text-lg text-muted-foreground text-pretty">
-            La spedizione è sempre gratuita, senza importo minimo. Se scegli il pagamento in contrassegno viene applicato un supplemento fisso di 9 €, distinto dal costo di spedizione. I tempi di consegna variano in base al prodotto e sono indicati chiaramente nella relativa scheda.
+            La spedizione è gratuita in Italia, senza importo minimo. Per le consegne negli altri Paesi dell'Unione Europea viene applicato un costo fisso di 40 € per ordine. Al momento non spediamo al di fuori dell'Unione Europea. I tempi di consegna variano in base al prodotto e sono indicati chiaramente nella relativa scheda.
           </p>
 
           <div className="mb-16 grid grid-cols-1 gap-4 md:grid-cols-2">
             {[
-              { icon: Truck, title: "Spedizione", value: "Sempre gratuita", desc: "Nessun importo minimo richiesto" },
+              { icon: Truck, title: "Italia", value: "Spedizione gratuita", desc: "Nessun importo minimo richiesto" },
+              { icon: Globe, title: "Altri Paesi UE", value: "40 € per ordine", desc: "Costo fisso mostrato nel checkout" },
               { icon: Package, title: "Prodotti standard", value: "3–5 giorni lavorativi", desc: "La tempistica è indicata nella scheda prodotto" },
               { icon: Clock3, title: "Prodotti a consegna estesa", value: "7–12 giorni lavorativi", desc: "La tempistica è indicata nella scheda prodotto" },
-              { icon: Globe, title: "Destinazioni", value: "Italia e UE", desc: "Spedizione gratuita in Italia e in Europa" },
             ].map((item) => (
               <div key={item.title} className="flex gap-4 rounded-lg border border-border bg-card p-6">
                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
@@ -54,7 +54,7 @@ export default function SpedizioniPage() {
               <div>
                 <h2 className="text-sm font-bold uppercase tracking-widest text-foreground">Pagamento in contrassegno</h2>
                 <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                  Il contrassegno è disponibile esclusivamente per le consegne in Italia e prevede un supplemento fisso di 9 €. Il supplemento riguarda il metodo di pagamento, non la spedizione, che resta gratuita. L'importo viene mostrato e incluso nel totale del checkout prima della conferma dell'ordine.
+                  Il contrassegno è disponibile esclusivamente per le consegne in Italia e prevede un supplemento fisso di 9 €. Il supplemento riguarda il metodo di pagamento, non la spedizione, che in Italia resta gratuita. L'importo viene mostrato e incluso nel totale del checkout prima della conferma dell'ordine.
                 </p>
               </div>
             </div>

@@ -64,7 +64,7 @@ const TSHIRT_SEO: CategorySeo = {
   primaryKeyword: "t-shirt oversize streetwear",
   title: "T-shirt oversize streetwear da uomo",
   description:
-    "Scopri le t-shirt oversize streetwear MIRAI: fit boxy, grafiche urban e cotone strutturato. Acquista online con spedizione gratuita.",
+    "Scopri le t-shirt oversize streetwear MIRAI: fit boxy, grafiche urban e cotone strutturato. Acquista online con spedizione gratuita in Italia.",
   heading: "T-shirt oversize streetwear: fit, peso e identità",
   intro:
     "La selezione MIRAI unisce proporzioni oversize, spalle rilassate e grafiche pensate per outfit urban. Dalle heavy tee alle silhouette boxy, ogni modello è presentato con indicazioni su taglia, composizione e vestibilità.",
