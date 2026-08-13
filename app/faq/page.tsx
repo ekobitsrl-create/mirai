@@ -17,7 +17,7 @@ const faqs = [
     questions: [
       {
         q: "Quali metodi di pagamento accettate?",
-        a: "Accettiamo Visa, Mastercard, Postepay, PayPal, Apple Pay e Google Pay. Klarna e Scalapay sono disponibili quando l'ordine e il cliente rispettano i requisiti mostrati da Stripe. Per le consegne in Italia puoi scegliere anche il contrassegno, con un supplemento fisso di 9 €. Tutti i pagamenti online sono processati in modo sicuro tramite Stripe.",
+        a: "Accettiamo Visa, Mastercard, Postepay, PayPal, Apple Pay e Google Pay. Klarna e Scalapay sono disponibili quando l'ordine e il cliente rispettano i requisiti mostrati da Stripe. Per gli ordini composti esclusivamente da prodotti Minimal puoi scegliere anche il contrassegno, con un supplemento fisso di 9 €. Tutti i pagamenti online sono processati in modo sicuro tramite Stripe.",
       },
       {
         q: "Posso modificare o annullare un ordine?",
@@ -34,7 +34,7 @@ const faqs = [
     questions: [
       {
         q: "Quanto costa la spedizione?",
-        a: "La spedizione è gratuita in Italia, senza importo minimo. Per le consegne negli altri Paesi dell'Unione Europea viene applicato un costo fisso di 40 € per ordine. Il contrassegno è disponibile solo in Italia e prevede un supplemento separato di 9 €.",
+        a: "La spedizione è gratuita in Italia, senza importo minimo. Per le consegne negli altri Paesi dell'Unione Europea viene applicato un costo fisso di 40 € per ordine, sia con pagamento online sia in contrassegno. Il contrassegno è disponibile solo per ordini composti esclusivamente da prodotti Minimal e prevede un supplemento separato di 9 €.",
       },
       {
         q: "In quanto tempo ricevero il mio ordine?",

@@ -54,7 +54,7 @@ export default function SpedizioniPage() {
               <div>
                 <h2 className="text-sm font-bold uppercase tracking-widest text-foreground">Pagamento in contrassegno</h2>
                 <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                  Il contrassegno è disponibile esclusivamente per le consegne in Italia e prevede un supplemento fisso di 9 €. Il supplemento riguarda il metodo di pagamento, non la spedizione, che in Italia resta gratuita. L'importo viene mostrato e incluso nel totale del checkout prima della conferma dell'ordine.
+                  Il contrassegno è disponibile in tutti i Paesi UE esclusivamente per ordini composti da prodotti Minimal e prevede un supplemento fisso di 9 €. In Italia la spedizione resta gratuita; negli altri Paesi UE si aggiungono i 40 € di spedizione. Tutti gli importi vengono mostrati e inclusi nel totale prima della conferma.
                 </p>
               </div>
             </div>

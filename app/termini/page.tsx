@@ -39,12 +39,12 @@ export default function TerminiPage() {
 
             <section className="flex flex-col gap-3">
               <h2 className="font-[family-name:var(--font-space-grotesk)] text-xl font-bold text-foreground">3. Ordini e pagamenti</h2>
-              <p>L'ordine inviato dal cliente costituisce proposta di acquisto. Il contratto si conclude con la conferma dell'ordine. I pagamenti online sono gestiti tramite Stripe e possono includere carte, PayPal, Apple Pay, Google Pay, Klarna o Scalapay quando disponibili per l'ordine. Per le consegne in Italia puo essere disponibile il pagamento in contrassegno, con un supplemento fisso di 9 € mostrato nel riepilogo prima della conferma. Il checkout avviene su connessione sicura.</p>
+              <p>L'ordine inviato dal cliente costituisce proposta di acquisto. Il contratto si conclude con la conferma dell'ordine. I pagamenti online sono gestiti tramite Stripe e possono includere carte, PayPal, Apple Pay, Google Pay, Klarna o Scalapay quando disponibili per l'ordine. Per gli ordini composti esclusivamente da prodotti Minimal può essere disponibile il pagamento in contrassegno in tutti i Paesi UE, con un supplemento fisso di 9 € mostrato nel riepilogo prima della conferma. Il checkout avviene su connessione sicura.</p>
             </section>
 
             <section className="flex flex-col gap-3">
               <h2 className="font-[family-name:var(--font-space-grotesk)] text-xl font-bold text-foreground">4. Spedizioni</h2>
-              <p>La spedizione è gratuita in Italia senza importo minimo. Per le consegne negli altri Paesi dell'Unione Europea viene applicato un costo fisso di 40 € per ordine; al momento non sono supportate destinazioni extra-UE. Costi, tempi, tracking e destinazioni sono indicati nella pagina <Link href="/spedizioni" className="text-primary hover:underline">Spedizioni</Link>. L'eventuale supplemento fisso di 9 € per il contrassegno riguarda il metodo di pagamento, è disponibile solo in Italia e non costituisce un costo di spedizione. Le informazioni mostrate al checkout prevalgono se aggiornate in tempo reale prima della conferma.</p>
+              <p>La spedizione è gratuita in Italia senza importo minimo. Per le consegne negli altri Paesi dell'Unione Europea viene applicato un costo fisso di 40 € per ordine, anche in caso di contrassegno; al momento non sono supportate destinazioni extra-UE. Costi, tempi, tracking e destinazioni sono indicati nella pagina <Link href="/spedizioni" className="text-primary hover:underline">Spedizioni</Link>. Il supplemento fisso di 9 € per il contrassegno riguarda il metodo di pagamento ed è disponibile nell'UE solo per ordini composti esclusivamente da prodotti Minimal. Le informazioni mostrate al checkout prevalgono se aggiornate in tempo reale prima della conferma.</p>
             </section>
 
             <section className="flex flex-col gap-3">

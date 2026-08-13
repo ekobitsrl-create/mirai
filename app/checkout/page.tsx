@@ -117,10 +117,10 @@ export default function CheckoutPage() {
   }, [cartLineItems])
 
   useEffect(() => {
-    if ((!cashOnDeliveryAvailable || shippingCountry !== "IT") && paymentMethod === "cash_on_delivery") {
+    if (!cashOnDeliveryAvailable && paymentMethod === "cash_on_delivery") {
       setPaymentMethod("card")
     }
-  }, [cashOnDeliveryAvailable, paymentMethod, shippingCountry])
+  }, [cashOnDeliveryAvailable, paymentMethod])
 
   const hasAccountEmail = emailPattern.test(accountEmail)
   const requiresGuestEmail = !isAuthenticated || !hasAccountEmail
@@ -251,7 +251,7 @@ export default function CheckoutPage() {
           guestEmail: checkoutEmail,
           discountCode: appliedDiscount?.code,
           ...cashDetails,
-          country: "IT",
+          country: shippingCountry,
         }
       )
 
@@ -496,7 +496,6 @@ export default function CheckoutPage() {
                   const countryCode = event.target.value
                   if (!isEuShippingCountry(countryCode)) return
                   setShippingCountry(countryCode)
-                  if (countryCode !== "IT") setPaymentMethod("card")
                   resetCardCheckout()
                 }}
                 className="mt-3 min-h-12 w-full border border-border bg-secondary px-4 text-sm text-foreground outline-none transition-colors focus:border-primary"
@@ -516,7 +515,7 @@ export default function CheckoutPage() {
 
             <section className="mb-4 border border-border bg-card p-4 sm:p-5">
               <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Metodo di pagamento</p>
-              <div className={`mt-3 grid border border-border ${cashOnDeliveryAvailable && shippingCountry === "IT" ? "grid-cols-2" : "grid-cols-1"}`} role="radiogroup" aria-label="Metodo di pagamento">
+              <div className={`mt-3 grid border border-border ${cashOnDeliveryAvailable ? "grid-cols-2" : "grid-cols-1"}`} role="radiogroup" aria-label="Metodo di pagamento">
                 <button
                   type="button"
                   role="radio"
@@ -526,7 +525,7 @@ export default function CheckoutPage() {
                 >
                   <CreditCard className="h-4 w-4" /> Pagamento online
                 </button>
-                {cashOnDeliveryAvailable && shippingCountry === "IT" && (
+                {cashOnDeliveryAvailable && (
                   <button
                     type="button"
                     role="radio"
@@ -538,11 +537,9 @@ export default function CheckoutPage() {
                   </button>
                 )}
               </div>
-              {(!cashOnDeliveryAvailable || shippingCountry !== "IT") && (
+              {!cashOnDeliveryAvailable && (
                 <p className="mt-3 text-xs leading-5 text-muted-foreground">
-                  {shippingCountry !== "IT"
-                    ? ui("Il pagamento in contrassegno è disponibile solo per le consegne in Italia.")
-                    : ui("Il pagamento in contrassegno è disponibile solo per gli ordini che contengono esclusivamente prodotti del brand Minimal.")}
+                  {ui("Il pagamento in contrassegno è disponibile solo per gli ordini che contengono esclusivamente prodotti del brand Minimal.")}
                 </p>
               )}
               <div className="mt-4 flex items-start gap-3 border-t border-border pt-4">
@@ -633,7 +630,7 @@ export default function CheckoutPage() {
                   <div>
                     <h2 className="font-semibold text-foreground">Pagamento alla consegna</h2>
                     <p className="mt-1 text-sm leading-6 text-muted-foreground">
-                      Pagherai al corriere quando riceverai il tuo ordine. Il totale include un supplemento fisso di {"\u20AC"}9,00. Disponibile solo in Italia.
+                      {ui("Pagherai al corriere quando riceverai il tuo ordine. Il totale include il supplemento fisso di 9 € per il contrassegno e, fuori dall'Italia, 40 € di spedizione UE.")}
                     </p>
                   </div>
                 </div>
@@ -657,7 +654,7 @@ export default function CheckoutPage() {
                   </div>
                   <div>
                     <Label htmlFor="cash-postal-code" className="text-xs uppercase tracking-widest text-muted-foreground">CAP</Label>
-                    <Input id="cash-postal-code" required inputMode="numeric" pattern="[0-9]{5}" maxLength={5} autoComplete="postal-code" value={cashDetails.postalCode} onChange={(event) => setCashDetails((current) => ({ ...current, postalCode: event.target.value.replace(/\D/g, "") }))} className="mt-2 bg-secondary" />
+                    <Input id="cash-postal-code" required inputMode={shippingCountry === "IT" ? "numeric" : "text"} pattern={shippingCountry === "IT" ? "[0-9]{5}" : undefined} maxLength={16} autoComplete="postal-code" value={cashDetails.postalCode} onChange={(event) => setCashDetails((current) => ({ ...current, postalCode: shippingCountry === "IT" ? event.target.value.replace(/\D/g, "") : event.target.value }))} className="mt-2 bg-secondary" />
                   </div>
                 </div>
 

@@ -52,7 +52,7 @@ export type CashOnDeliveryDetails = {
   address: string
   city: string
   postalCode: string
-  country: "IT"
+  country: string
 }
 
 function validEmail(value?: string) {
@@ -413,9 +413,8 @@ export async function createCashOnDeliveryOrder(cartItems: CartLineItem[], detai
     throw new Error('Il servizio ordini non e configurato')
   }
 
-  if (details.country !== 'IT') {
-    throw new Error('Il contrassegno e disponibile solo per consegne in Italia')
-  }
+  const shippingCountry = normalizeShippingCountry(details.country)
+  const shippingFeeCents = getShippingCostCents(shippingCountry)
 
   const user = await getServerUser()
   const customerEmail = validEmail(user?.email || details.guestEmail)
@@ -438,7 +437,7 @@ export async function createCashOnDeliveryOrder(cartItems: CartLineItem[], detai
   const shippingAddress = cleanDeliveryField(details.address, 'Indirizzo', 180)
   const shippingCity = cleanDeliveryField(details.city, 'Citta', 80)
   const shippingZip = cleanDeliveryField(details.postalCode, 'CAP', 16)
-  if (!/^\d{5}$/.test(shippingZip)) {
+  if (shippingCountry === 'IT' && !/^\d{5}$/.test(shippingZip)) {
     throw new Error('Inserisci un CAP italiano valido')
   }
 
@@ -518,13 +517,16 @@ export async function createCashOnDeliveryOrder(cartItems: CartLineItem[], detai
       })
     : null
   const discountedProductsTotalCents = appliedDiscount?.totalCents ?? subtotalCents
-  const totalCents = discountedProductsTotalCents + CASH_ON_DELIVERY_FEE_CENTS
+  const totalCents = discountedProductsTotalCents + shippingFeeCents + CASH_ON_DELIVERY_FEE_CENTS
   const customizations = validatedItems
     .filter((item) => item.customization)
     .map((item) => `${item.product.name}: ${customizationSummary(item.customization!)}`)
   const orderNotes = [
     'Pagamento in contrassegno alla consegna',
     `Supplemento contrassegno: €${(CASH_ON_DELIVERY_FEE_CENTS / 100).toFixed(2)}`,
+    shippingFeeCents > 0
+      ? `Spedizione UE: €${(shippingFeeCents / 100).toFixed(2)}`
+      : 'Spedizione Italia: gratuita',
     `Telefono: ${shippingPhone}`,
     ...(appliedDiscount
       ? [`Codice sconto ${appliedDiscount.code}: -€${(appliedDiscount.discountCents / 100).toFixed(2)}`]
@@ -541,7 +543,7 @@ export async function createCashOnDeliveryOrder(cartItems: CartLineItem[], detai
     shipping_address: shippingAddress,
     shipping_city: shippingCity,
     shipping_zip: shippingZip,
-    shipping_country: 'IT',
+    shipping_country: shippingCountry,
     notes: orderNotes,
   }
 
@@ -627,7 +629,7 @@ export async function createCashOnDeliveryOrder(cartItems: CartLineItem[], detai
     review: {
       orderId: order.id,
       email: customerEmail || '',
-      deliveryCountry: 'IT',
+      deliveryCountry: shippingCountry,
       estimatedDeliveryDate: getEstimatedDeliveryDate(SHIPPING_CONFIG.standardDeliveryDays.maximum),
     },
   }

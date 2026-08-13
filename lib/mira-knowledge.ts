@@ -236,7 +236,7 @@ export function getMiraLocalReply(rawMessage: string, context: MiraKnowledgeCont
   if (asksShipping && asksPayments) {
     return answer(
       "shipping",
-      "La spedizione è gratuita in Italia e costa 40 € negli altri Paesi UE. Al checkout puoi pagare con i metodi Stripe disponibili oppure scegliere il contrassegno per consegne in Italia, con un supplemento fisso di 9 €.",
+      "La spedizione è gratuita in Italia e costa 40 € negli altri Paesi UE, sia con Stripe sia in contrassegno. Il contrassegno è disponibile in tutta l'UE solo per ordini composti esclusivamente da prodotti Minimal e aggiunge 9 €.",
       "/faq",
       "FAQ acquisto",
     )
@@ -329,7 +329,7 @@ export function getMiraLocalReply(rawMessage: string, context: MiraKnowledgeCont
       return answer("payments", "Scalapay può comparire tra i pagamenti rapidi per ordini in euro idonei, quando è attivo sul tuo account Stripe. La disponibilità definitiva viene verificata nel checkout.", "/faq", "FAQ pagamenti")
     }
     if (hasAny(message, ["contrassegno", "alla consegna"])) {
-      return answer("payments", "Il contrassegno è disponibile per le consegne in Italia e prevede un supplemento fisso di 9 €, mostrato e incluso nel totale prima della conferma dell'ordine.", "/faq", "FAQ pagamenti")
+      return answer("payments", "Il contrassegno è disponibile in tutti i Paesi UE solo per ordini composti esclusivamente da prodotti Minimal e prevede un supplemento fisso di 9 €. Fuori dall'Italia si aggiungono anche 40 € di spedizione UE.", "/faq", "FAQ pagamenti")
     }
     return answer("payments", "Il checkout è gestito tramite Stripe. Sono previsti Visa, Mastercard, Postepay, PayPal, Apple Pay e Google Pay; Klarna e Scalapay compaiono quando disponibili e abilitati.", "/faq", "Metodi di pagamento")
   }
