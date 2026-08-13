@@ -14,6 +14,11 @@ import {
 import { getAbsoluteUrl, SITE_URL } from "@/lib/site-url"
 import { safeJsonLd } from "@/lib/json-ld"
 import { getShippingCostCents, SHIPPING_CONFIG } from "@/lib/shipping"
+import { getOrganicLanguageAlternates } from "@/lib/international-seo"
+import { HTML_LOCALES, localizedOrganicPath } from "@/lib/international-seo"
+import type { Locale } from "@/lib/translations"
+import { localizeProduct } from "@/lib/catalog-localization"
+import { translateCategory } from "@/lib/site-localization"
 
 export const revalidate = 300
 
@@ -52,7 +57,10 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
     title: product.name,
     description,
     robots: isPrivateCheckoutProduct(product) ? { index: false, follow: false } : undefined,
-    alternates: { canonical: productPath },
+    alternates: {
+      canonical: productPath,
+      languages: isPrivateCheckoutProduct(product) ? undefined : getOrganicLanguageAlternates(productPath),
+    },
     openGraph: {
       title: `${product.name} - MIRAI`,
       description,
@@ -69,8 +77,8 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   }
 }
 
-export default async function ProductPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params
+export default async function ProductPage({ params }: { params: Promise<{ id: string; locale?: Locale }> }) {
+  const { id, locale = "it" } = await params
   const supabase = await createClient()
 
   let product: any = getDemoProduct(id)
@@ -120,7 +128,8 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
     parentName = subcat.name
   }
 
-  const productUrl = getAbsoluteUrl(`/prodotto/${encodeURIComponent(product.id)}`)
+  const localized = localizeProduct(product, locale)
+  const productUrl = getAbsoluteUrl(localizedOrganicPath(`/prodotto/${encodeURIComponent(product.id)}`, locale))
   const primaryImage = absoluteProductImage(product.image_url)
   const galleryImages = (product.image_gallery || [])
     .map((image: { src?: string }) => absoluteProductImage(image.src))
@@ -137,8 +146,9 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
     "@context": "https://schema.org",
     "@type": "Product",
     "@id": `${productUrl}#product`,
-    name: product.name,
-    description: product.description || `${product.name} - MIRAI`,
+    name: localized.name,
+    description: localized.description || `${localized.name} - MIRAI`,
+    inLanguage: HTML_LOCALES[locale],
     image: productImages.length ? productImages : undefined,
     sku: product.supplier_sku || product.id,
     mpn: supplierSettings.mpn,
@@ -147,8 +157,8 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
       "@type": "Brand",
       name: supplierSettings.brand,
     },
-    color: product.color_name || undefined,
-    material: product.composition || undefined,
+    color: localized.colorName || undefined,
+    material: localized.composition || undefined,
     size: product.sizes?.length ? product.sizes : undefined,
     offers: {
       "@type": "Offer",
@@ -204,7 +214,7 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
         url: getAbsoluteUrl("/resi"),
       },
     },
-    category: product.category,
+    category: translateCategory(product.category, product.category, locale),
   }
 
   const breadcrumbJsonLd = {
@@ -220,13 +230,13 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
       {
         "@type": "ListItem",
         position: 2,
-        name: parentName,
-        item: getAbsoluteUrl(`/collezione/${encodeURIComponent(parentSlug)}`),
+        name: translateCategory(parentSlug, parentName, locale),
+        item: getAbsoluteUrl(localizedOrganicPath(`/collezione/${encodeURIComponent(parentSlug)}`, locale)),
       },
       {
         "@type": "ListItem",
         position: 3,
-        name: product.name,
+        name: localized.name,
         item: productUrl,
       },
     ],

@@ -1,5 +1,12 @@
 import type { Metadata } from "next"
 import { getAbsoluteUrl, SITE_URL } from "@/lib/site-url"
+import type { Locale } from "@/lib/translations"
+import {
+  getOrganicLanguageAlternates,
+  HTML_LOCALES,
+  localizedOrganicPath,
+  OPEN_GRAPH_LOCALES,
+} from "@/lib/international-seo"
 
 export const SEO_BRAND_NAME = "MIRAI LAB STORE"
 export const SEO_SHORT_BRAND_NAME = "MIRAI"
@@ -12,6 +19,8 @@ type SeoMetadataInput = {
   keywords?: string[]
   image?: string | null
   absoluteTitle?: boolean
+  locale?: Locale
+  localizedAlternates?: boolean
 }
 
 export function buildSeoMetadata({
@@ -21,18 +30,24 @@ export function buildSeoMetadata({
   keywords = [],
   image = SEO_DEFAULT_IMAGE,
   absoluteTitle = false,
+  locale = "it",
+  localizedAlternates = false,
 }: SeoMetadataInput): Metadata {
-  const canonical = getAbsoluteUrl(path)
+  const localizedPath = localizedOrganicPath(path, locale)
+  const canonical = getAbsoluteUrl(localizedPath)
   const imageUrl = image ? getAbsoluteUrl(image) : undefined
 
   return {
     title: absoluteTitle ? { absolute: title } : title,
     description,
     keywords,
-    alternates: { canonical },
+    alternates: {
+      canonical,
+      languages: localizedAlternates ? getOrganicLanguageAlternates(path) : undefined,
+    },
     openGraph: {
       type: "website",
-      locale: "it_IT",
+      locale: OPEN_GRAPH_LOCALES[locale],
       siteName: SEO_BRAND_NAME,
       url: canonical,
       title,
@@ -219,13 +234,15 @@ export function createWebPageJsonLd({
   name,
   description,
   path,
+  locale = "it",
 }: {
   type?: "WebPage" | "CollectionPage" | "AboutPage" | "ContactPage"
   name: string
   description: string
   path: string
+  locale?: Locale
 }) {
-  const url = getAbsoluteUrl(path)
+  const url = getAbsoluteUrl(localizedOrganicPath(path, locale))
   return {
     "@context": "https://schema.org",
     "@type": type,
@@ -233,7 +250,7 @@ export function createWebPageJsonLd({
     url,
     name,
     description,
-    inLanguage: "it-IT",
+    inLanguage: HTML_LOCALES[locale],
     isPartOf: { "@id": `${SITE_URL}/#website` },
     about: { "@id": `${SITE_URL}/#organization` },
   }

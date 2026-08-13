@@ -3,8 +3,25 @@ import { createClient } from "@/lib/supabase/server"
 import { isPrivateCheckoutProduct, withoutBlackIslandProducts } from "@/lib/products"
 import { SITE_URL } from "@/lib/site-url"
 import { SEO_GUIDES } from "@/lib/seo-guides"
+import {
+  getOrganicLanguageAlternates,
+  localizedOrganicPath,
+  ORGANIC_LOCALES,
+} from "@/lib/international-seo"
 
 export const dynamic = "force-dynamic"
+
+function localizedEntries(
+  path: string,
+  values: Omit<MetadataRoute.Sitemap[number], "url" | "alternates">,
+): MetadataRoute.Sitemap {
+  const alternates = { languages: getOrganicLanguageAlternates(path) }
+  return ORGANIC_LOCALES.map((locale) => ({
+    ...values,
+    url: `${SITE_URL}${localizedOrganicPath(path, locale)}`,
+    alternates,
+  }))
+}
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   let products: Array<{ id: string; name: string | null; image_url: string | null; updated_at: string | null }> = []
@@ -29,12 +46,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     (product) => !isPrivateCheckoutProduct(product),
   )
 
-  const productUrls: MetadataRoute.Sitemap = visibleDatabaseProducts.map((p) => ({
-    url: `${SITE_URL}/prodotto/${encodeURIComponent(p.id)}`,
-    lastModified: p.updated_at || "2026-07-21",
-    changeFrequency: "weekly" as const,
-    priority: 0.8,
-  }))
+  const productUrls: MetadataRoute.Sitemap = visibleDatabaseProducts.flatMap((p) =>
+    localizedEntries(`/prodotto/${encodeURIComponent(p.id)}`, {
+      lastModified: p.updated_at || "2026-07-21",
+      changeFrequency: "weekly" as const,
+      priority: 0.8,
+    }),
+  )
 
   const priorityCategorySlugs = ["t-shirt", "cappelli", "camicie", "pantaloni"]
   const categoryMap = new Map(categories.map((category) => [category.slug, category.updated_at]))
@@ -42,42 +60,31 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     if (!categoryMap.has(slug)) categoryMap.set(slug, null)
   })
 
-  const categoryUrls: MetadataRoute.Sitemap = [...categoryMap.entries()].map(([slug, updatedAt]) => ({
-    url: `${SITE_URL}/collezione/${encodeURIComponent(slug)}`,
-    lastModified: updatedAt || "2026-07-21",
-    changeFrequency: "weekly" as const,
-    priority: priorityCategorySlugs.includes(slug) ? 0.8 : 0.7,
-  }))
+  const categoryUrls: MetadataRoute.Sitemap = [...categoryMap.entries()].flatMap(([slug, updatedAt]) =>
+    localizedEntries(`/collezione/${encodeURIComponent(slug)}`, {
+      lastModified: updatedAt || "2026-07-21",
+      changeFrequency: "weekly" as const,
+      priority: priorityCategorySlugs.includes(slug) ? 0.8 : 0.7,
+    }),
+  )
 
-  const guideUrls: MetadataRoute.Sitemap = SEO_GUIDES.map((guide) => ({
-    url: `${SITE_URL}/guide/${guide.slug}`,
-    lastModified: guide.updatedAt,
-    changeFrequency: "monthly" as const,
-    priority: 0.65,
-  }))
+  const guideUrls: MetadataRoute.Sitemap = SEO_GUIDES.flatMap((guide) =>
+    localizedEntries(`/guide/${guide.slug}`, {
+      lastModified: guide.updatedAt,
+      changeFrequency: "monthly" as const,
+      priority: 0.65,
+    }),
+  )
 
   const staticPages: MetadataRoute.Sitemap = [
-    {
-      url: SITE_URL,
-      changeFrequency: "daily",
-      priority: 1.0,
-    },
-    {
-      url: `${SITE_URL}/collezioni`,
-      changeFrequency: "weekly",
-      priority: 0.9,
-    },
+    ...localizedEntries("/", { changeFrequency: "daily", priority: 1.0 }),
+    ...localizedEntries("/collezioni", { changeFrequency: "weekly", priority: 0.9 }),
     {
       url: `${SITE_URL}/custom-lab`,
       changeFrequency: "weekly",
       priority: 0.9,
     },
-    {
-      url: `${SITE_URL}/guide`,
-      lastModified: "2026-07-21",
-      changeFrequency: "weekly",
-      priority: 0.75,
-    },
+    ...localizedEntries("/guide", { lastModified: "2026-07-21", changeFrequency: "weekly", priority: 0.75 }),
     {
       url: `${SITE_URL}/negozio`,
       changeFrequency: "monthly",

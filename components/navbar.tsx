@@ -8,6 +8,7 @@ import { createClient } from "@/lib/supabase/client"
 import { useCart } from "@/lib/cart-context"
 import { useLanguage } from "@/lib/language-context"
 import { LanguageSwitcher } from "@/components/language-switcher"
+import { localizedOrganicPath } from "@/lib/international-seo"
 import { MarqueeBanner } from "@/components/marquee-banner"
 import { translateCategory } from "@/lib/site-localization"
 
@@ -198,7 +199,7 @@ export function Navbar({ showPromo = false }: { showPromo?: boolean }) {
       <nav className="mirai-neon-divider bg-[#0c0c0d]/88 backdrop-blur-2xl">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
           <div className="flex items-center gap-8">
-            <Link href="/" className="flex items-center shrink-0">
+            <Link href={localizedOrganicPath("/", locale)} className="flex items-center shrink-0">
               <span
                 className="text-xl font-bold tracking-[0.25em] uppercase text-white"
                 style={{ fontFamily: "var(--font-space-grotesk)" }}
@@ -209,7 +210,7 @@ export function Navbar({ showPromo = false }: { showPromo?: boolean }) {
 
             <div className="hidden items-center gap-5 whitespace-nowrap 2xl:flex">
               <Link
-                href="/collezioni"
+                href={localizedOrganicPath("/collezioni", locale)}
                 className="inline-flex items-center rounded-sm bg-primary px-4 py-2 text-[11px] font-bold uppercase tracking-[0.2em] text-primary-foreground transition-all hover:-translate-y-0.5 hover:bg-primary/90 hover:shadow-[0_10px_30px_rgba(168,85,247,0.25)]"
               >
                 {t.nav.shop}
@@ -236,7 +237,7 @@ export function Navbar({ showPromo = false }: { showPromo?: boolean }) {
                 {communityLabel}
               </Link>
               <Link
-                href="/#prodotti"
+                href={localizedOrganicPath("/#prodotti", locale)}
                 className="text-sm tracking-widest uppercase text-white/55 hover:text-white transition-colors"
               >
                 {t.nav.newArrivals}
@@ -249,7 +250,7 @@ export function Navbar({ showPromo = false }: { showPromo?: boolean }) {
                 onMouseLeave={handleDropdownLeave}
               >
                 <Link
-                  href="/collezioni"
+                  href={localizedOrganicPath("/collezioni", locale)}
                   className="flex items-center gap-1 text-sm tracking-widest uppercase text-white/55 hover:text-white transition-colors"
                 >
                   {t.nav.collections}
@@ -265,7 +266,7 @@ export function Navbar({ showPromo = false }: { showPromo?: boolean }) {
                         {categories.map((parent) => (
                           <div key={parent.id}>
                             <Link
-                              href={`/collezione/${parent.slug}`}
+                              href={localizedOrganicPath(`/collezione/${parent.slug}`, locale)}
                               className="mb-2.5 block text-xs font-bold uppercase tracking-[0.2em] text-white hover:text-primary transition-colors"
                               onClick={() => setDropdownOpen(false)}
                             >
@@ -276,7 +277,7 @@ export function Navbar({ showPromo = false }: { showPromo?: boolean }) {
                                 {parent.children.map((sub) => (
                                   <Link
                                     key={sub.id}
-                                    href={`/collezione/${parent.slug}?sub=${sub.slug}`}
+                                    href={localizedOrganicPath(`/collezione/${parent.slug}?sub=${sub.slug}`, locale)}
                                     className="text-sm text-white/45 hover:pl-1 hover:text-white transition-all duration-200"
                                     onClick={() => setDropdownOpen(false)}
                                   >
@@ -290,7 +291,7 @@ export function Navbar({ showPromo = false }: { showPromo?: boolean }) {
                       </div>
                       <div className="mt-4 border-t border-white/10 pt-3">
                         <Link
-                          href="/collezioni"
+                          href={localizedOrganicPath("/collezioni", locale)}
                           className="text-xs tracking-widest uppercase text-primary hover:text-white transition-colors"
                           onClick={() => setDropdownOpen(false)}
                         >
@@ -319,7 +320,7 @@ export function Navbar({ showPromo = false }: { showPromo?: boolean }) {
 
           <div className="flex items-center gap-5">
             <Link
-              href="/collezioni#shop-search"
+              href={localizedOrganicPath("/collezioni#shop-search", locale)}
               aria-label={t.nav.search}
               className="text-white/55 hover:text-white transition-colors"
             >
@@ -358,7 +359,7 @@ export function Navbar({ showPromo = false }: { showPromo?: boolean }) {
         >
           <div className="flex flex-col gap-4 px-6 pb-[calc(2rem+env(safe-area-inset-bottom))] pt-6">
             <Link
-              href="/collezioni"
+              href={localizedOrganicPath("/collezioni", locale)}
               className="flex items-center justify-center rounded-sm bg-primary px-4 py-3 text-xs font-bold uppercase tracking-[0.2em] text-primary-foreground"
               onClick={() => setMobileOpen(false)}
             >
@@ -386,7 +387,7 @@ export function Navbar({ showPromo = false }: { showPromo?: boolean }) {
               <UsersRound className="h-4 w-4" /> {communityLabel}
             </Link>
             <Link
-              href="/#prodotti"
+              href={localizedOrganicPath("/#prodotti", locale)}
               className="text-sm tracking-widest uppercase text-white/55 hover:text-white transition-colors"
               onClick={() => setMobileOpen(false)}
             >
@@ -409,7 +410,7 @@ export function Navbar({ showPromo = false }: { showPromo?: boolean }) {
                   {categories.map((parent) => (
                     <div key={parent.id}>
                       <Link
-                        href={`/collezione/${parent.slug}`}
+                        href={localizedOrganicPath(`/collezione/${parent.slug}`, locale)}
                         className="mb-1.5 block text-xs font-bold uppercase tracking-[0.15em] text-white"
                         onClick={() => setMobileOpen(false)}
                       >
@@ -420,7 +421,7 @@ export function Navbar({ showPromo = false }: { showPromo?: boolean }) {
                           {parent.children.map((sub) => (
                             <Link
                               key={sub.id}
-                              href={`/collezione/${parent.slug}?sub=${sub.slug}`}
+                              href={localizedOrganicPath(`/collezione/${parent.slug}?sub=${sub.slug}`, locale)}
                               className="text-sm text-white/45 hover:text-white transition-colors"
                               onClick={() => setMobileOpen(false)}
                             >

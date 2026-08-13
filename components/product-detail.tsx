@@ -35,6 +35,7 @@ import { MetaPixelEvent } from "@/components/meta-pixel-event"
 import { PostHogCommerceEvent } from "@/components/posthog-commerce-event"
 import { useLanguage } from "@/lib/language-context"
 import type { Locale } from "@/lib/translations"
+import { localizedOrganicPath } from "@/lib/international-seo"
 import {
   formatLocalizedPrice,
   translateCategory,
@@ -373,11 +374,11 @@ export function ProductDetail({
         }}
       />
       <nav className="mb-7 flex items-center gap-1.5 overflow-hidden text-[9px] font-medium uppercase tracking-[0.2em] text-white/50" aria-label="Breadcrumb">
-        <Link href="/" className="shrink-0 hover:text-white">Home</Link>
+        <Link href={localizedOrganicPath("/", locale)} className="shrink-0 hover:text-white">Home</Link>
         <ChevronRight className="h-3 w-3 shrink-0" />
-        <Link href="/collezioni" className="shrink-0 hover:text-white">Shop</Link>
+        <Link href={localizedOrganicPath("/collezioni", locale)} className="shrink-0 hover:text-white">Shop</Link>
         <ChevronRight className="h-3 w-3 shrink-0" />
-        <Link href={`/collezione/${product.category}`} className="shrink-0 hover:text-white">{translateCategory(product.category, formatCategory(product.category), locale)}</Link>
+        <Link href={localizedOrganicPath(`/collezione/${product.category}`, locale)} className="shrink-0 hover:text-white">{translateCategory(product.category, formatCategory(product.category), locale)}</Link>
         <ChevronRight className="h-3 w-3 shrink-0" />
         <span className="truncate text-white/85">{displayTitle}</span>
       </nav>
@@ -492,7 +493,7 @@ export function ProductDetail({
                 return (
                   <Link
                     key={variant.id}
-                    href={`/prodotto/${variant.id}`}
+                    href={localizedOrganicPath(`/prodotto/${variant.id}`, locale)}
                     aria-current={isCurrent ? "page" : undefined}
                     className={`flex min-w-[8.5rem] items-center gap-2 rounded-xl border px-2.5 py-2 transition-all ${
                       isCurrent
@@ -683,11 +684,11 @@ export function ProductDetail({
               <p className="text-[9px] font-semibold uppercase tracking-[0.28em] text-[#9f86ff]">{productCopy.complete}</p>
               <h2 className="mt-2 text-3xl font-medium tracking-[-0.035em]">{productCopy.mayLike}</h2>
             </div>
-            <Link href="/collezioni" className="hidden border-b border-white/30 pb-1 text-[9px] uppercase tracking-[0.2em] text-white/50 hover:text-white sm:block">{productCopy.shopAll}</Link>
+            <Link href={localizedOrganicPath("/collezioni", locale)} className="hidden border-b border-white/30 pb-1 text-[9px] uppercase tracking-[0.2em] text-white/50 hover:text-white sm:block">{productCopy.shopAll}</Link>
           </div>
           <div className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-5">
             {suggestedProducts.map((item) => (
-              <Link key={item.id} href={`/prodotto/${item.id}`} className="group min-w-0">
+              <Link key={item.id} href={localizedOrganicPath(`/prodotto/${item.id}`, locale)} className="group min-w-0">
                 <div className="mirai-neon-frame mirai-neon-lift relative mb-3 aspect-[4/5] overflow-hidden rounded-2xl bg-white/5">
                   {item.image_url && <Image src={item.image_url} alt={translateProductName(item.name, locale)} fill className="object-cover transition-transform duration-700 group-hover:scale-[1.035]" sizes="(max-width: 768px) 50vw, 25vw" />}
                 </div>

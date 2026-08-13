@@ -11,6 +11,7 @@ import {
 import { ArrowRight } from "lucide-react"
 import { translateCategoryDescription } from "@/lib/catalog-localization"
 import { translateCategory } from "@/lib/site-localization"
+import { localizedOrganicPath } from "@/lib/international-seo"
 
 type Category = {
   id: string
@@ -55,7 +56,7 @@ export function Collections({ categories = [] }: { categories?: Category[] }) {
             return (
               <Link
                 key={cat.id}
-                href={`/collezione/${cat.slug}`}
+                href={localizedOrganicPath(`/collezione/${cat.slug}`, locale)}
                 className={`mirai-neon-frame mirai-neon-lift group relative aspect-[3/4] overflow-hidden rounded-2xl bg-secondary/50 transition-all duration-700 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-12"}`}
                 style={{ transitionDelay: isVisible ? `${i * 0.1}s` : "0s" }}
               >
@@ -107,7 +108,7 @@ export function Collections({ categories = [] }: { categories?: Category[] }) {
         {/* View all link */}
         <div className={`text-center mt-10 transition-all duration-700 delay-300 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
           <Link
-            href="/collezioni"
+            href={localizedOrganicPath("/collezioni", locale)}
             className="mirai-neon-outline inline-flex items-center gap-2 rounded-full px-8 py-3 text-xs font-bold uppercase tracking-widest text-foreground transition-all duration-300 hover:-translate-y-0.5 hover:text-primary"
           >
             {t.collections.viewAll || "Vedi Tutte le Collezioni"}

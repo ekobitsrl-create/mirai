@@ -20,6 +20,7 @@ import { useCart } from "@/lib/cart-context"
 import type { StoreProduct } from "@/lib/products"
 import { useLanguage } from "@/lib/language-context"
 import { getCatalogItemId } from "@/lib/catalog-identifiers"
+import { localizedOrganicPath } from "@/lib/international-seo"
 import { formatLocalizedPrice, translateCategory } from "@/lib/site-localization"
 import { localizeProduct, translateProductName } from "@/lib/catalog-localization"
 
@@ -550,7 +551,7 @@ function ProductCard({
   return (
     <article className="group min-w-0" style={{ animationDelay: `${Math.min(index, 8) * 45}ms` }}>
       <div className="mirai-neon-frame mirai-neon-lift relative mb-4 aspect-[4/5] overflow-hidden rounded-2xl bg-card">
-        <Link href={`/prodotto/${product.id}`} className="absolute inset-0">
+        <Link href={localizedOrganicPath(`/prodotto/${product.id}`, locale)} className="absolute inset-0">
           {product.image_url ? (
             <Image
               src={product.image_url}
@@ -590,7 +591,7 @@ function ProductCard({
           </div>
         )}
       </div>
-      <Link href={`/prodotto/${product.id}`} className="block">
+      <Link href={localizedOrganicPath(`/prodotto/${product.id}`, locale)} className="block">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
             <p className="mb-1 text-[8px] font-semibold uppercase tracking-[0.25em] text-primary md:text-[9px]">{categoryName}</p>
@@ -773,7 +774,7 @@ function QuickAdd({
         </div>
         <div className="mt-7 flex items-center justify-between">
           <p className="text-[10px] font-semibold uppercase tracking-[0.22em]">{labels.selectSize}</p>
-          <Link href={`/prodotto/${product.id}`} className="text-[9px] uppercase tracking-[0.18em] text-white/45 underline underline-offset-4 hover:text-white">{labels.productDetails}</Link>
+          <Link href={localizedOrganicPath(`/prodotto/${product.id}`, locale)} className="text-[9px] uppercase tracking-[0.18em] text-white/45 underline underline-offset-4 hover:text-white">{labels.productDetails}</Link>
         </div>
         <div className="mt-3 grid grid-cols-4 gap-2">
           {product.sizes.map((size) => {

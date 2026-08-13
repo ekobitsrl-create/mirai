@@ -11,12 +11,30 @@ type LanguageContextType = {
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined)
 
-export function LanguageProvider({ children }: { children: ReactNode }) {
-  const [locale, setLocaleState] = useState<Locale>("it")
+export function LanguageProvider({
+  children,
+  initialLocale = "it",
+  detectBrowserLanguage = true,
+}: {
+  children: ReactNode
+  initialLocale?: Locale
+  detectBrowserLanguage?: boolean
+}) {
+  const [locale, setLocaleState] = useState<Locale>(initialLocale)
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
     setMounted(true)
+    if (!detectBrowserLanguage) {
+      setLocaleState(initialLocale)
+      try {
+        window.localStorage.setItem("mirai-locale", initialLocale)
+      } catch {
+        // The URL still provides a stable language when storage is unavailable.
+      }
+      return
+    }
+
     let savedLocale: Locale | null = null
 
     try {
@@ -34,7 +52,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
         setLocaleState(browserLang)
       }
     }
-  }, [])
+  }, [detectBrowserLanguage, initialLocale])
 
   useEffect(() => {
     document.documentElement.lang = locale
@@ -51,10 +69,11 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
 
   const t = translations[locale]
 
-  // Prevent hydration mismatch by using default locale on server
+  // Keep server rendering deterministic while allowing locale-prefixed pages
+  // to emit translated HTML on their first response.
   if (!mounted) {
     return (
-      <LanguageContext.Provider value={{ locale: "it", setLocale, t: translations.it }}>
+      <LanguageContext.Provider value={{ locale: initialLocale, setLocale, t: translations[initialLocale] }}>
         {children}
       </LanguageContext.Provider>
     )

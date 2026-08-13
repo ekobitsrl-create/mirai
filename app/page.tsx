@@ -11,6 +11,9 @@ import { withDemoProducts } from "@/lib/products"
 import { HomeSeoContent } from "@/components/seo-content"
 import { buildSeoMetadata, createWebPageJsonLd } from "@/lib/seo"
 import { safeJsonLd } from "@/lib/json-ld"
+import type { Locale } from "@/lib/translations"
+import { HOME_ORGANIC_SEO } from "@/lib/organic-seo-copy"
+import { localizedOrganicPath } from "@/lib/international-seo"
 
 export const revalidate = 300
 
@@ -21,6 +24,7 @@ export const metadata = buildSeoMetadata({
   title: "Streetwear Catania | MIRAI LAB STORE",
   description: HOME_DESCRIPTION,
   path: "/",
+  localizedAlternates: true,
   absoluteTitle: true,
   keywords: [
     "streetwear Catania",
@@ -32,7 +36,7 @@ export const metadata = buildSeoMetadata({
   ],
 })
 
-export default async function Home() {
+export default async function Home({ locale = "it" }: { locale?: Locale } = {}) {
   let products: any[] = []
   let categories: any[] = []
   try {
@@ -57,12 +61,14 @@ export default async function Home() {
 
   products = withDemoProducts(products).slice(0, 8)
 
+  const seoCopy = HOME_ORGANIC_SEO[locale]
+
   return (
     <main className="min-h-screen bg-background">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: safeJsonLd(createWebPageJsonLd({ name: "Streetwear Catania - MIRAI LAB STORE", description: HOME_DESCRIPTION, path: "/" })),
+          __html: safeJsonLd(createWebPageJsonLd({ name: seoCopy.title, description: seoCopy.description, path: localizedOrganicPath("/", locale), locale })),
         }}
       />
       <Navbar showPromo />

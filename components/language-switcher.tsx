@@ -4,11 +4,15 @@ import { useState, useRef, useEffect } from "react"
 import { Globe, Check } from "lucide-react"
 import { useLanguage } from "@/lib/language-context"
 import { Locale, localeNames, localeFlags } from "@/lib/translations"
+import { localizedOrganicPath, supportsLocalizedOrganicPath } from "@/lib/international-seo"
+import { usePathname, useRouter } from "next/navigation"
 
 const locales: Locale[] = ["it", "en", "es", "de", "fr"]
 
 export function LanguageSwitcher() {
   const { locale, setLocale, t } = useLanguage()
+  const pathname = usePathname()
+  const router = useRouter()
   const [open, setOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
 
@@ -44,6 +48,9 @@ export function LanguageSwitcher() {
               onClick={() => {
                 setLocale(loc)
                 setOpen(false)
+                if (supportsLocalizedOrganicPath(pathname)) {
+                  router.push(localizedOrganicPath(pathname, loc))
+                }
               }}
               className={`w-full flex items-center gap-3 px-4 py-2.5 text-sm transition-colors ${
                 locale === loc

@@ -6,6 +6,9 @@ import { withDemoProducts } from "@/lib/products"
 import { CatalogSeoContent } from "@/components/seo-content"
 import { buildSeoMetadata, createWebPageJsonLd } from "@/lib/seo"
 import { safeJsonLd } from "@/lib/json-ld"
+import type { Locale } from "@/lib/translations"
+import { COLLECTIONS_ORGANIC_SEO } from "@/lib/organic-seo-copy"
+import { localizedOrganicPath } from "@/lib/international-seo"
 
 export const revalidate = 300
 
@@ -16,6 +19,7 @@ export const metadata = buildSeoMetadata({
   title: "Abbigliamento streetwear online",
   description: COLLECTIONS_DESCRIPTION,
   path: "/collezioni",
+  localizedAlternates: true,
   keywords: [
     "abbigliamento streetwear online",
     "shop streetwear italiano",
@@ -26,7 +30,7 @@ export const metadata = buildSeoMetadata({
   ],
 })
 
-export default async function CollezioniPage() {
+export default async function CollezioniPage({ locale = "it" }: { locale?: Locale } = {}) {
   const supabase = await createClient()
 
   const [categoriesRes, productsRes] = await Promise.all([
@@ -46,6 +50,8 @@ export default async function CollezioniPage() {
   const parentCategories = categories.filter((c) => !c.parent_id)
   const subcategories = categories.filter((c) => c.parent_id)
 
+  const seoCopy = COLLECTIONS_ORGANIC_SEO[locale]
+
   return (
     <main className="min-h-screen bg-background">
       <script
@@ -53,9 +59,10 @@ export default async function CollezioniPage() {
         dangerouslySetInnerHTML={{
           __html: safeJsonLd(createWebPageJsonLd({
             type: "CollectionPage",
-            name: "Abbigliamento streetwear online",
-            description: COLLECTIONS_DESCRIPTION,
-            path: "/collezioni",
+            name: seoCopy.title,
+            description: seoCopy.description,
+            path: localizedOrganicPath("/collezioni", locale),
+            locale,
           })),
         }}
       />

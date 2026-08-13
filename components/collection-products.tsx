@@ -8,6 +8,7 @@ import { Heart, ArrowLeft } from "lucide-react"
 import { useCart } from "@/lib/cart-context"
 import { useLanguage } from "@/lib/language-context"
 import { getCategoryImage } from "@/lib/category-images"
+import { localizedOrganicPath } from "@/lib/international-seo"
 import { getCatalogItemId } from "@/lib/catalog-identifiers"
 import { formatLocalizedPrice, translateCategory } from "@/lib/site-localization"
 import { translateCategoryDescription, translateProductName } from "@/lib/catalog-localization"
@@ -119,7 +120,7 @@ export function CollectionProducts({
         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent" />
         <div className="relative z-10 max-w-7xl w-full mx-auto px-6 pb-10">
           <Link
-            href="/collezioni"
+            href={localizedOrganicPath("/collezioni", locale)}
             className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors mb-4"
           >
             <ArrowLeft className="h-4 w-4" /> Tutte le Collezioni
@@ -153,7 +154,7 @@ export function CollectionProducts({
               {parentCategories.map((cat) => (
                 <Link
                   key={cat.id}
-                  href={`/collezione/${cat.slug}`}
+                  href={localizedOrganicPath(`/collezione/${cat.slug}`, locale)}
                   className={`text-sm whitespace-nowrap px-3 py-2 rounded-sm transition-colors ${
                     cat.slug === (isParent ? category.slug : "")
                       ? "bg-primary text-primary-foreground font-medium"
@@ -217,7 +218,7 @@ export function CollectionProducts({
                   {locale === "it" ? "Nessun prodotto in questa collezione." : locale === "en" ? "No products in this collection." : locale === "es" ? "No hay productos en esta colección." : locale === "de" ? "Keine Produkte in dieser Kollektion." : "Aucun produit dans cette collection."}
                 </p>
                 <Link
-                  href="/"
+                  href={localizedOrganicPath("/", locale)}
                   className="inline-flex items-center gap-2 text-primary mt-4 text-sm hover:underline"
                 >
                   <ArrowLeft className="h-4 w-4" /> Torna alla Home
@@ -228,7 +229,7 @@ export function CollectionProducts({
                 {filteredProducts.map((product) => (
                   <article key={product.id} className="group">
                     <Link
-                      href={`/prodotto/${product.id}`}
+                      href={localizedOrganicPath(`/prodotto/${product.id}`, locale)}
                       className="block"
                     >
                       <div className="mirai-neon-frame mirai-neon-lift relative mb-4 aspect-[3/4] overflow-hidden rounded-2xl bg-card">

@@ -8,6 +8,7 @@ import { useCart } from "@/lib/cart-context"
 import { useScrollAnimation } from "@/hooks/use-scroll-animation"
 import { useLanguage } from "@/lib/language-context"
 import { getCatalogItemId } from "@/lib/catalog-identifiers"
+import { localizedOrganicPath } from "@/lib/international-seo"
 import { translateProductName } from "@/lib/catalog-localization"
 import { formatLocalizedPrice } from "@/lib/site-localization"
 
@@ -69,7 +70,7 @@ export function ProductGrid({ products, title, subtitle }: { products: Product[]
               className={`group transition-all duration-700 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-12"}`}
               style={{ transitionDelay: isVisible ? `${(i % 4) * 0.08}s` : "0s" }}
             >
-              <Link href={`/prodotto/${product.id}`} className="block">
+              <Link href={localizedOrganicPath(`/prodotto/${product.id}`, locale)} className="block">
                 <div className="mirai-neon-frame mirai-neon-lift relative mb-4 aspect-[3/4] overflow-hidden rounded-2xl bg-card">
                   <Image
                     src={product.image_url || "/placeholder.jpg"}
@@ -146,7 +147,7 @@ export function ProductGrid({ products, title, subtitle }: { products: Product[]
           style={{ transitionDelay: "0.3s" }}
         >
           <Link
-            href="/collezioni"
+            href={localizedOrganicPath("/collezioni", locale)}
             className="mirai-neon-outline inline-flex items-center justify-center rounded-full px-10 py-3.5 text-xs font-bold uppercase tracking-widest text-foreground transition-all duration-300 hover:-translate-y-0.5 hover:text-primary"
           >
             {t.products.viewAll}

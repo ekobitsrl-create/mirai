@@ -5,6 +5,7 @@ import { ArrowRight, BookOpen, Sparkles } from "lucide-react"
 import { useLanguage } from "@/lib/language-context"
 import { localizeSeoGuide, SEO_GUIDES } from "@/lib/seo-guides"
 import { translateSiteText } from "@/lib/site-localization"
+import { localizedOrganicPath } from "@/lib/international-seo"
 
 export function GuideIndex() {
   const { locale } = useLanguage()
@@ -41,7 +42,7 @@ export function GuideIndex() {
               <p className="mt-8 text-[9px] font-bold uppercase tracking-[0.22em] text-primary">{guide.primaryKeyword}</p>
               <h2 className="mt-3 font-[family-name:var(--font-space-grotesk)] text-xl font-bold leading-tight tracking-[-0.025em]">{guide.title}</h2>
               <p className="mt-4 line-clamp-3 text-sm leading-6 text-white/45">{guide.description}</p>
-              <Link href={`/guide/${guide.slug}`} className="mt-auto inline-flex items-center gap-2 pt-8 text-[9px] font-bold uppercase tracking-[0.2em] text-primary transition-colors hover:text-white">
+              <Link href={localizedOrganicPath(`/guide/${guide.slug}`, locale)} className="mt-auto inline-flex items-center gap-2 pt-8 text-[9px] font-bold uppercase tracking-[0.2em] text-primary transition-colors hover:text-white">
                 {ui("Leggi la guida")} <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
               </Link>
             </article>

@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { X } from "lucide-react"
+import { useLanguage } from "@/lib/language-context"
 
 function InfiniteMarquee({ children, speed = "normal", className = "" }: { children: React.ReactNode; speed?: "normal" | "fast"; className?: string }) {
   const animClass = speed === "fast" ? "animate-marquee-fast" : "animate-marquee"
@@ -18,6 +19,7 @@ function InfiniteMarquee({ children, speed = "normal", className = "" }: { child
 
 export function MarqueeBanner() {
   const [visible, setVisible] = useState(true)
+  const { t } = useLanguage()
 
   if (!visible) return null
 
@@ -28,11 +30,11 @@ export function MarqueeBanner() {
           {Array.from({ length: 6 }).map((_, i) => (
             <span key={i} className="flex items-center mx-6">
               <span className="text-[11px] font-extrabold tracking-[0.25em] uppercase text-primary-foreground">
-                OTTIENI IL 10% DI SCONTO SUL PRIMO ORDINE
+                {t.nav.discountBanner}
               </span>
               <span className="mx-6 text-primary-foreground/40 text-[10px]">{"\u2726"}</span>
               <span className="text-[11px] font-extrabold tracking-[0.25em] uppercase text-primary-foreground">
-                CODICE: MIRAI10
+                {t.nav.discountCode}
               </span>
               <span className="mx-6 text-primary-foreground/40 text-[10px]">{"\u2726"}</span>
             </span>
@@ -40,7 +42,7 @@ export function MarqueeBanner() {
         </InfiniteMarquee>
         <button
           onClick={() => setVisible(false)}
-          aria-label="Chiudi banner"
+          aria-label={t.nav.closeBanner}
           className="absolute right-3 top-1/2 z-10 -translate-y-1/2 bg-primary/90 p-1 text-primary-foreground/70 transition-colors hover:text-primary-foreground"
         >
           <X className="h-3 w-3" />

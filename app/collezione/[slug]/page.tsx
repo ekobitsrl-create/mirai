@@ -11,6 +11,10 @@ import type { SupabaseClient } from "@supabase/supabase-js"
 import { CategorySeoContent } from "@/components/seo-content"
 import { buildSeoMetadata, createBreadcrumbJsonLd, createWebPageJsonLd, getCategorySeo } from "@/lib/seo"
 import { safeJsonLd } from "@/lib/json-ld"
+import type { Locale } from "@/lib/translations"
+import { translateCategory } from "@/lib/site-localization"
+import { translateCategoryDescription } from "@/lib/catalog-localization"
+import { localizedOrganicPath } from "@/lib/international-seo"
 
 export const revalidate = 300
 
@@ -84,18 +88,19 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     title,
     description,
     path: `/collezione/${encodeURIComponent(slug)}`,
+    localizedAlternates: true,
     keywords: seo?.keywords || [categoryName, `${categoryName} streetwear`, "MIRAI streetwear"],
     image: category?.image_url ? getAbsoluteUrl(category.image_url) : undefined,
   })
 }
 
-export default async function CollezionePage({ params }: { params: Promise<{ slug: string }> }) {
-  const { slug: rawSlug } = await params
+export default async function CollezionePage({ params }: { params: Promise<{ slug: string; locale?: Locale }> }) {
+  const { slug: rawSlug, locale = "it" } = await params
   // Normalize the slug: decode URI, trim, lowercase, replace spaces with hyphens
   const requestedSlug = decodeURIComponent(rawSlug).trim().toLowerCase().replace(/\s+/g, "-")
   const slug = normalizeCategorySlug(rawSlug)
-  if (requestedSlug !== slug) redirect(`/collezione/${slug}`)
-  if (slug === "abbigliamento") redirect("/collezioni")
+  if (requestedSlug !== slug) redirect(localizedOrganicPath(`/collezione/${slug}`, locale))
+  if (slug === "abbigliamento") redirect(localizedOrganicPath("/collezioni", locale))
   
   const supabase = await createClient()
 
@@ -164,6 +169,10 @@ export default async function CollezionePage({ params }: { params: Promise<{ slu
     .is("parent_id", null)
     .order("sort_order", { ascending: true })
 
+  const categoryName = translateCategory(slug, category.name, locale)
+  const categoryDescription = translateCategoryDescription(slug, category.description, locale)
+  const categoryPath = localizedOrganicPath(`/collezione/${encodeURIComponent(slug)}`, locale)
+
   return (
     <main className="min-h-screen bg-background">
       <script
@@ -171,9 +180,10 @@ export default async function CollezionePage({ params }: { params: Promise<{ slu
         dangerouslySetInnerHTML={{
           __html: safeJsonLd(createWebPageJsonLd({
             type: "CollectionPage",
-            name: seo?.title || category.name,
-            description: seo?.description || category.description || `Collezione ${category.name} MIRAI.`,
-            path: `/collezione/${encodeURIComponent(slug)}`,
+            name: categoryName,
+            description: categoryDescription || seo?.description || `MIRAI ${categoryName}.`,
+            path: categoryPath,
+            locale,
           })),
         }}
       />
@@ -181,9 +191,9 @@ export default async function CollezionePage({ params }: { params: Promise<{ slu
         type="application/ld+json"
         dangerouslySetInnerHTML={{
           __html: safeJsonLd(createBreadcrumbJsonLd([
-            { name: "Home", path: "/" },
-            { name: "Collezioni", path: "/collezioni" },
-            { name: category.name, path: `/collezione/${encodeURIComponent(slug)}` },
+            { name: locale === "it" ? "Home" : "MIRAI", path: localizedOrganicPath("/", locale) },
+            { name: translateCategory("collezioni", "Collezioni", locale), path: localizedOrganicPath("/collezioni", locale) },
+            { name: categoryName, path: categoryPath },
           ])),
         }}
       />

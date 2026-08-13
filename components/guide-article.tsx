@@ -5,6 +5,7 @@ import { ArrowLeft, ArrowRight, Check, Clock3 } from "lucide-react"
 import { useLanguage } from "@/lib/language-context"
 import { localizeSeoGuide, type SeoGuide } from "@/lib/seo-guides"
 import { localeTags, translateSiteText } from "@/lib/site-localization"
+import { localizedOrganicPath } from "@/lib/international-seo"
 
 export function GuideArticle({ guide, readingMinutes }: { guide: SeoGuide; readingMinutes: number }) {
   const { locale } = useLanguage()
@@ -17,7 +18,7 @@ export function GuideArticle({ guide, readingMinutes }: { guide: SeoGuide; readi
       <header className="relative overflow-hidden border-b border-white/10 px-6 pb-16 pt-40 sm:pb-20">
         <div className="pointer-events-none absolute left-1/2 top-10 h-[30rem] w-[30rem] -translate-x-1/2 rounded-full bg-primary/14 blur-[140px]" />
         <div className="relative mx-auto max-w-4xl">
-          <Link href="/guide" className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] text-white/45 transition-colors hover:text-primary">
+          <Link href={localizedOrganicPath("/guide", locale)} className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] text-white/45 transition-colors hover:text-primary">
             <ArrowLeft className="h-3.5 w-3.5" /> {ui("Tutte le guide")}
           </Link>
           <p className="mt-8 text-[10px] font-bold uppercase tracking-[0.26em] text-primary">{content.primaryKeyword}</p>
@@ -46,7 +47,7 @@ export function GuideArticle({ guide, readingMinutes }: { guide: SeoGuide; readi
           <div className="rounded-2xl border border-primary/25 bg-primary/[0.06] p-6">
             <h2 className="text-xs font-bold uppercase tracking-[0.18em] text-white">{ui("In breve")}</h2>
             <ul className="mt-5 space-y-4">{content.takeaways.map((takeaway) => <li key={takeaway} className="flex items-start gap-3 text-xs leading-5 text-white/50"><Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" /> {takeaway}</li>)}</ul>
-            <Link href={content.cta.href} className="mt-7 inline-flex items-center gap-2 text-[9px] font-bold uppercase tracking-[0.18em] text-primary transition-colors hover:text-white">{content.cta.label} <ArrowRight className="h-3.5 w-3.5" /></Link>
+            <Link href={localizedOrganicPath(content.cta.href, locale)} className="mt-7 inline-flex items-center gap-2 text-[9px] font-bold uppercase tracking-[0.18em] text-primary transition-colors hover:text-white">{content.cta.label} <ArrowRight className="h-3.5 w-3.5" /></Link>
           </div>
         </aside>
       </div>

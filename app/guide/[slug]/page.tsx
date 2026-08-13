@@ -7,6 +7,9 @@ import { GuideArticle } from "@/components/guide-article"
 import { getSeoGuide, SEO_GUIDES } from "@/lib/seo-guides"
 import { buildSeoMetadata, createBreadcrumbJsonLd } from "@/lib/seo"
 import { getAbsoluteUrl, SITE_URL } from "@/lib/site-url"
+import type { Locale } from "@/lib/translations"
+import { localizeSeoGuide } from "@/lib/seo-guides"
+import { HTML_LOCALES, localizedOrganicPath } from "@/lib/international-seo"
 
 type GuidePageProps = { params: Promise<{ slug: string }> }
 
@@ -24,16 +27,18 @@ export async function generateMetadata({ params }: GuidePageProps): Promise<Meta
     title: guide.title,
     description: guide.description,
     path: `/guide/${guide.slug}`,
+    localizedAlternates: true,
     keywords: [guide.primaryKeyword, ...guide.relatedKeywords],
   })
 }
 
-export default async function GuideArticlePage({ params }: GuidePageProps) {
-  const { slug } = await params
-  const guide = getSeoGuide(slug)
-  if (!guide) notFound()
+export default async function GuideArticlePage({ params }: { params: Promise<{ slug: string; locale?: Locale }> }) {
+  const { slug, locale = "it" } = await params
+  const baseGuide = getSeoGuide(slug)
+  if (!baseGuide) notFound()
+  const guide = localizeSeoGuide(baseGuide, locale)
 
-  const articleUrl = getAbsoluteUrl(`/guide/${guide.slug}`)
+  const articleUrl = getAbsoluteUrl(localizedOrganicPath(`/guide/${guide.slug}`, locale))
   const readingMinutes = Math.max(
     3,
     Math.ceil(
@@ -49,7 +54,7 @@ export default async function GuideArticlePage({ params }: GuidePageProps) {
     image: getAbsoluteUrl("/images/hero-storefront.jpg"),
     datePublished: guide.publishedAt,
     dateModified: guide.updatedAt,
-    inLanguage: "it-IT",
+    inLanguage: HTML_LOCALES[locale],
     mainEntityOfPage: { "@type": "WebPage", "@id": articleUrl },
     author: { "@id": `${SITE_URL}/#organization` },
     publisher: { "@id": `${SITE_URL}/#organization` },
@@ -63,9 +68,9 @@ export default async function GuideArticlePage({ params }: GuidePageProps) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{
           __html: JSON.stringify(createBreadcrumbJsonLd([
-            { name: "Home", path: "/" },
-            { name: "Guide", path: "/guide" },
-            { name: guide.title, path: `/guide/${guide.slug}` },
+            { name: "MIRAI", path: localizedOrganicPath("/", locale) },
+            { name: locale === "it" ? "Guide" : guide.primaryKeyword, path: localizedOrganicPath("/guide", locale) },
+            { name: guide.title, path: localizedOrganicPath(`/guide/${guide.slug}`, locale) },
           ])),
         }}
       />

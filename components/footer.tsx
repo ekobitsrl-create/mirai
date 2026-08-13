@@ -5,6 +5,7 @@ import { useLanguage } from "@/lib/language-context"
 import { COMPANY_INFO } from "@/lib/company-info"
 import { PaymentBadges } from "@/components/payment-badges"
 import { Building2, Mail, MapPin } from "lucide-react"
+import { localizedOrganicPath } from "@/lib/international-seo"
 
 export function Footer() {
   const { t, locale } = useLanguage()
@@ -124,7 +125,7 @@ export function Footer() {
                 {section.links.map((link) => (
                   <li key={link.label}>
                     <Link
-                      href={link.href}
+                      href={localizedOrganicPath(link.href, locale)}
                       className="text-sm text-muted-foreground hover:text-foreground transition-colors"
                     >
                       {link.label}
