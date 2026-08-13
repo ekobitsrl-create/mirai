@@ -470,6 +470,12 @@ function renderProductVariant(
     "      <g:gender>unisex</g:gender>",
     "      <g:age_group>adult</g:age_group>",
     "      <g:adult>no</g:adult>",
+    ...(locale === "it"
+      ? []
+      : [
+          "      <g:excluded_destination>Shopping_ads</g:excluded_destination>",
+          "      <g:excluded_destination>Display_ads</g:excluded_destination>",
+        ]),
     "      <g:excluded_destination>Local_inventory_ads</g:excluded_destination>",
     "      <g:excluded_destination>Free_local_listings</g:excluded_destination>",
     product.is_new ? "      <g:custom_label_0>Nuovi arrivi</g:custom_label_0>" : "",
