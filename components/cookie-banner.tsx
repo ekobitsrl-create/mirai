@@ -176,7 +176,7 @@ export function CookieBanner() {
         <button
           type="button"
           onClick={acceptNecessary}
-          className="absolute right-2 top-2 sm:right-3 sm:top-3 flex h-10 w-10 items-center justify-center rounded-full text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+          className="absolute left-2 top-2 sm:left-3 sm:top-3 flex h-10 w-10 items-center justify-center rounded-full text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
           aria-label={t.cookies.closeNecessary}
           title={t.cookies.closeNecessary}
         >
@@ -188,7 +188,7 @@ export function CookieBanner() {
         <div className="flex flex-col gap-3 sm:gap-4">
           {showPreferences ? (
             <>
-              <div className="flex flex-col gap-2 pr-12">
+              <div className="flex flex-col gap-2 pl-12">
                 <h3
                   className="text-sm font-bold tracking-widest uppercase text-foreground"
                   style={{ fontFamily: "var(--font-space-grotesk)" }}
@@ -222,7 +222,7 @@ export function CookieBanner() {
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-row sm:gap-3">
+              <div className="flex flex-wrap justify-end gap-2 sm:gap-3">
                 <button
                   type="button"
                   onClick={savePreferences}
@@ -241,7 +241,7 @@ export function CookieBanner() {
             </>
           ) : (
             <>
-              <div className="flex flex-col gap-2 pr-12">
+              <div className="flex flex-col gap-2 pl-12">
                 <h3
                   className="text-sm font-bold tracking-widest uppercase text-foreground"
                   style={{ fontFamily: "var(--font-space-grotesk)" }}
@@ -265,20 +265,20 @@ export function CookieBanner() {
                   </Link>.
                 </p>
               </div>
-              <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-row sm:gap-3">
-                <button
-                  type="button"
-                  onClick={acceptAll}
-                  className="min-h-11 px-3 sm:px-6 bg-primary text-primary-foreground font-medium text-[10px] sm:text-sm tracking-[0.08em] sm:tracking-wide uppercase rounded-lg hover:bg-primary/90 transition-colors"
-                >
-                  {t.cookies.acceptAll}
-                </button>
+              <div className="flex flex-wrap justify-end gap-2 sm:gap-3">
                 <button
                   type="button"
                   onClick={() => setShowPreferences(true)}
                   className="min-h-11 px-3 sm:px-6 border border-border text-foreground font-medium text-[10px] sm:text-sm tracking-[0.08em] sm:tracking-wide uppercase rounded-lg hover:bg-secondary transition-colors"
                 >
                   {t.cookies.personalize}
+                </button>
+                <button
+                  type="button"
+                  onClick={acceptAll}
+                  className="min-h-11 px-3 sm:px-6 bg-primary text-primary-foreground font-medium text-[10px] sm:text-sm tracking-[0.08em] sm:tracking-wide uppercase rounded-lg hover:bg-primary/90 transition-colors"
+                >
+                  {t.cookies.acceptAll}
                 </button>
               </div>
             </>
