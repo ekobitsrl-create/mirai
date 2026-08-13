@@ -50,6 +50,7 @@ export function GoogleIntegrations() {
   const [googleTagReady, setGoogleTagReady] = useState(false)
   const merchantWidgetStarted = useRef(false)
   const lastTrackedPath = useRef<string | null>(null)
+  const analyticsConsentGranted = useRef(false)
 
   const startMerchantWidget = useCallback(() => {
     if (merchantWidgetStarted.current || !window.merchantwidget) return
@@ -88,7 +89,9 @@ export function GoogleIntegrations() {
 
       // Keep advanced Consent Mode active: consent is updated before the event,
       // while visitors without analytics consent only send a cookieless ping.
-      updateGoogleConsent(hasAnalyticsConsent() ? "all" : "necessary")
+      const hasConsent = hasAnalyticsConsent()
+      analyticsConsentGranted.current = hasConsent
+      updateGoogleConsent(hasConsent ? "all" : "necessary")
       trackPageView()
     }, 0)
 
@@ -98,13 +101,17 @@ export function GoogleIntegrations() {
   useEffect(() => {
     const handleConsent = (event: Event) => {
       const consent = (event as CustomEvent<"all" | "necessary">).detail
+      const hadAnalyticsConsent = analyticsConsentGranted.current
+      const hasAnalyticsConsentNow = consent === "all"
 
+      analyticsConsentGranted.current = hasAnalyticsConsentNow
       updateGoogleConsent(consent)
 
       // If consent was chosen before gtag became ready, the readiness effect
-      // will send the first page view. Never duplicate a page already measured.
-      if (consent === "all" && lastTrackedPath.current === null) {
-        window.setTimeout(() => trackPageView(), 0)
+      // will send the first page view. If the current page was only sent as a
+      // cookieless ping, resend it once after consent so Realtime sees it.
+      if (hasAnalyticsConsentNow && !hadAnalyticsConsent) {
+        window.setTimeout(() => trackPageView(true), 0)
       }
     }
 
