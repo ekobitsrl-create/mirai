@@ -8,6 +8,37 @@ import { localizeCategoryGuide } from "@/lib/catalog-localization"
 import { translateSiteText } from "@/lib/site-localization"
 import { localizedOrganicPath } from "@/lib/international-seo"
 
+const MARKET_HOME_COPY = {
+  en: {
+    eyebrow: "MIRAI / Italian urban streetwear",
+    title: "Italian urban streetwear, delivered across Europe.",
+    text: "MIRAI LAB STORE brings Italian streetwear culture to Europe through oversized silhouettes, statement denim, custom caps and curated urban drops.",
+    primaryLink: "Shop European streetwear",
+    conceptLink: "Discover MIRAI",
+  },
+  es: {
+    eyebrow: "MIRAI / Streetwear urbano italiano",
+    title: "Streetwear urbano italiano para España y Europa.",
+    text: "MIRAI LAB STORE lleva la cultura streetwear italiana a Europa con siluetas oversize, denim con carácter, gorras custom y drops urbanos seleccionados.",
+    primaryLink: "Comprar streetwear en Europa",
+    conceptLink: "Descubre MIRAI",
+  },
+  de: {
+    eyebrow: "MIRAI / Italienische Urban Streetwear",
+    title: "Italienische Urban Streetwear für Deutschland und Europa.",
+    text: "MIRAI LAB STORE bringt italienische Streetwear-Kultur nach Europa: Oversized-Silhouetten, Statement-Denim, Custom Caps und kuratierte Urban Drops.",
+    primaryLink: "Streetwear online kaufen",
+    conceptLink: "MIRAI entdecken",
+  },
+  fr: {
+    eyebrow: "MIRAI / Streetwear urbain italien",
+    title: "Le streetwear urbain italien livré en France et en Europe.",
+    text: "MIRAI LAB STORE diffuse la culture streetwear italienne en Europe avec des volumes oversize, du denim affirmé, des casquettes custom et des sélections urbaines.",
+    primaryLink: "Acheter le streetwear MIRAI",
+    conceptLink: "Découvrir MIRAI",
+  },
+} as const
+
 const HOME_PILLARS = [
   {
     title: "Abbigliamento streetwear online",
@@ -32,6 +63,7 @@ const HOME_PILLARS = [
 export function HomeSeoContent() {
   const { locale } = useLanguage()
   const ui = (value: string) => translateSiteText(value, locale)
+  const marketCopy = locale === "it" ? null : MARKET_HOME_COPY[locale]
   return (
     <section className="relative overflow-hidden border-y border-white/10 bg-[#0d0b11] px-6 py-20 text-white sm:py-24">
       <div className="pointer-events-none absolute left-1/2 top-0 h-80 w-80 -translate-x-1/2 rounded-full bg-primary/10 blur-[120px]" />
@@ -39,22 +71,22 @@ export function HomeSeoContent() {
         <div className="grid gap-8 lg:grid-cols-[0.8fr_1.2fr] lg:items-end">
           <div>
             <p className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.28em] text-primary">
-              <MapPin className="h-3.5 w-3.5" /> MIRAI / Catania
+              <MapPin className="h-3.5 w-3.5" /> {marketCopy?.eyebrow || "MIRAI / Catania"}
             </p>
             <h2 className="mt-4 max-w-xl font-[family-name:var(--font-space-grotesk)] text-3xl font-bold uppercase leading-tight tracking-[-0.04em] sm:text-5xl">
-              {ui("Streetwear a Catania, online e in store.")}
+              {marketCopy?.title || "Streetwear a Catania, online e in store."}
             </h2>
           </div>
           <div className="max-w-2xl lg:justify-self-end">
             <p className="text-sm leading-7 text-white/55 sm:text-base">
-              {ui("MIRAI LAB STORE è un concept streetwear nato a Catania. Uniamo abbigliamento urban uomo, capi oversize e custom culture in uno shop online e nel futuro spazio fisico di Via Umberto 95.")}
+              {marketCopy?.text || "MIRAI LAB STORE è un concept streetwear nato a Catania. Uniamo abbigliamento urban uomo, capi oversize e custom culture in uno shop online e nel futuro spazio fisico di Via Umberto 95."}
             </p>
             <div className="mt-5 flex flex-wrap gap-4 text-[10px] font-bold uppercase tracking-[0.18em]">
-              <Link href="/negozio" className="inline-flex items-center gap-2 text-primary transition-colors hover:text-white">
-                {ui("Negozio streetwear Catania")} <ArrowRight className="h-3.5 w-3.5" />
+              <Link href={marketCopy ? localizedOrganicPath("/collezioni", locale) : "/negozio"} className="inline-flex items-center gap-2 text-primary transition-colors hover:text-white">
+                {marketCopy?.primaryLink || "Negozio streetwear Catania"} <ArrowRight className="h-3.5 w-3.5" />
               </Link>
               <Link href="/chi-siamo" className="inline-flex items-center gap-2 text-white/55 transition-colors hover:text-white">
-                {ui("Il concept MIRAI")} <ArrowRight className="h-3.5 w-3.5" />
+                {marketCopy?.conceptLink || "Il concept MIRAI"} <ArrowRight className="h-3.5 w-3.5" />
               </Link>
             </div>
           </div>

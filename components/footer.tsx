@@ -6,6 +6,9 @@ import { COMPANY_INFO } from "@/lib/company-info"
 import { PaymentBadges } from "@/components/payment-badges"
 import { Building2, Mail, MapPin } from "lucide-react"
 import { localizedOrganicPath } from "@/lib/international-seo"
+import { localeNames, type Locale } from "@/lib/translations"
+
+const PUBLIC_LOCALES: Locale[] = ["it", "en", "es", "de", "fr"]
 
 export function Footer() {
   const { t, locale } = useLanguage()
@@ -210,6 +213,18 @@ export function Footer() {
             <PaymentBadges />
           </div>
         </div>
+        <nav aria-label={t.common.language} className="mt-6 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-[10px] uppercase tracking-[0.16em] text-muted-foreground md:justify-start">
+          {PUBLIC_LOCALES.map((targetLocale) => (
+            <Link
+              key={targetLocale}
+              href={localizedOrganicPath("/", targetLocale)}
+              hrefLang={targetLocale}
+              className={targetLocale === locale ? "text-primary" : "transition-colors hover:text-foreground"}
+            >
+              {localeNames[targetLocale]}
+            </Link>
+          ))}
+        </nav>
       </div>
     </footer>
   )

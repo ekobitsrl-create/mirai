@@ -1,18 +1,18 @@
 "use client"
 
 import { useState, useRef, useEffect } from "react"
+import Link from "next/link"
 import { Globe, Check } from "lucide-react"
 import { useLanguage } from "@/lib/language-context"
 import { Locale, localeNames, localeFlags } from "@/lib/translations"
-import { localizedOrganicPath, supportsLocalizedOrganicPath } from "@/lib/international-seo"
-import { usePathname, useRouter } from "next/navigation"
+import { localizedOrganicPath } from "@/lib/international-seo"
+import { usePathname } from "next/navigation"
 
 const locales: Locale[] = ["it", "en", "es", "de", "fr"]
 
 export function LanguageSwitcher() {
   const { locale, setLocale, t } = useLanguage()
   const pathname = usePathname()
-  const router = useRouter()
   const [open, setOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
 
@@ -43,14 +43,13 @@ export function LanguageSwitcher() {
       {open && (
         <div className="absolute top-full right-0 mt-2 py-2 bg-white border border-[#e4e0ec] rounded-lg shadow-xl min-w-[160px] z-50 animate-in fade-in slide-in-from-top-2 duration-200">
           {locales.map((loc) => (
-            <button
+            <Link
               key={loc}
+              href={localizedOrganicPath(pathname, loc)}
+              hrefLang={loc}
               onClick={() => {
                 setLocale(loc)
                 setOpen(false)
-                if (supportsLocalizedOrganicPath(pathname)) {
-                  router.push(localizedOrganicPath(pathname, loc))
-                }
               }}
               className={`w-full flex items-center gap-3 px-4 py-2.5 text-sm transition-colors ${
                 locale === loc
@@ -63,7 +62,7 @@ export function LanguageSwitcher() {
               {locale === loc && (
                 <Check className="h-4 w-4 text-primary" />
               )}
-            </button>
+            </Link>
           ))}
         </div>
       )}
