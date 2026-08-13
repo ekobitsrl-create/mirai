@@ -13,7 +13,7 @@ import { SITE_URL } from "@/lib/site-url"
 import { getCatalogItemId, normalizeCatalogIdentifier } from "@/lib/catalog-identifiers"
 import { getShippingCostCents, SHIPPING_CONFIG } from "@/lib/shipping"
 import { localizeColor, localizeProduct } from "@/lib/catalog-localization"
-import { localizedOrganicPath } from "@/lib/international-seo"
+import { HTML_LOCALES, localizedOrganicPath } from "@/lib/international-seo"
 import type { Locale } from "@/lib/translations"
 
 export const runtime = "nodejs"
@@ -531,6 +531,7 @@ export async function GET(request: NextRequest) {
     "  <channel>",
     `    <title>${supplierProfile ? `MIRAI LAB STORE - ${supplierProfile === "minimal" ? "Minimal" : "MIRAI"}` : "MIRAI LAB STORE"}${requestedPlatform === "meta" ? " - Meta" : ""}</title>`,
     `    <link>${escapeXml(absoluteUrl(localizedOrganicPath("/", locale), baseUrl))}</link>`,
+    `    <language>${HTML_LOCALES[locale]}</language>`,
     `    <description>${escapeXml(FEED_DESCRIPTIONS[locale])}${supplierProfile ? ` - ${supplierProfile === "minimal" ? "Minimal" : "MIRAI"}` : ""}${requestedPlatform === "meta" ? ` - ${platformLabel}` : ""}</description>`,
     ...items,
     "  </channel>",

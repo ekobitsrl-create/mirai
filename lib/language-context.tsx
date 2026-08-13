@@ -27,11 +27,8 @@ export function LanguageProvider({
     setMounted(true)
     if (!detectBrowserLanguage) {
       setLocaleState(initialLocale)
-      try {
-        window.localStorage.setItem("mirai-locale", initialLocale)
-      } catch {
-        // The URL still provides a stable language when storage is unavailable.
-      }
+      // Locale-prefixed URLs are the source of truth. Do not overwrite the
+      // user's saved preference from a nested provider (for example /es).
       return
     }
 

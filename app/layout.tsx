@@ -188,7 +188,7 @@ window.gtag('consent', 'default', {
             }}
           />
           <SiteIntro />
-          <LanguageProvider>
+          <LanguageProvider initialLocale="it" detectBrowserLanguage={false}>
             <LazySiteLocalizer />
             <CartProvider>
               {children}
