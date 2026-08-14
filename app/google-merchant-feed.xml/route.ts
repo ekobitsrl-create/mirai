@@ -21,9 +21,9 @@ export const dynamic = "force-dynamic"
 
 const RETURN_POLICY_PATH = "/resi"
 const MERCHANT_FEED_LOCALES: Locale[] = ["it", "en", "es", "de", "fr"]
-const CATALOG_SELECT = "id, name, description, price, category, image_url, sizes, stock_by_size, in_stock, is_new, created_at, updated_at, brand, supplier_profile, supplier_sku, gtin, shipping_min_days, shipping_max_days, color_name, color_hex, image_gallery, detail_items, composition"
-const PRE_SUPPLIER_CATALOG_SELECT = "id, name, description, price, category, image_url, sizes, stock_by_size, in_stock, is_new, created_at, updated_at, brand, supplier_sku, color_name, color_hex, image_gallery, detail_items, composition"
-const LEGACY_CATALOG_SELECT = "id, name, description, price, category, image_url, sizes, stock_by_size, in_stock, is_new, created_at, updated_at"
+const CATALOG_SELECT = "id, name, description, price, category, image_url, sizes, stock_by_size, in_stock, is_new, is_published, created_at, updated_at, brand, supplier_profile, supplier_sku, gtin, shipping_min_days, shipping_max_days, color_name, color_hex, image_gallery, detail_items, composition"
+const PRE_SUPPLIER_CATALOG_SELECT = "id, name, description, price, category, image_url, sizes, stock_by_size, in_stock, is_new, is_published, created_at, updated_at, brand, supplier_sku, color_name, color_hex, image_gallery, detail_items, composition"
+const LEGACY_CATALOG_SELECT = "id, name, description, price, category, image_url, sizes, stock_by_size, in_stock, is_new, is_published, created_at, updated_at"
 
 const GOOGLE_CATEGORY_BY_STORE_CATEGORY: Record<string, string> = {
   "t-shirt": "212",

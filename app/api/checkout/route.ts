@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import type Stripe from 'stripe'
 import { assertStripeConfigured, stripe } from '@/lib/stripe'
 import { createClient, getServerUser } from '@/lib/supabase/server'
-import { getDemoProduct, isBlackIslandProduct, type StoreProduct } from '@/lib/products'
+import { getDemoProduct, isBlackIslandProduct, isProductPublished, type StoreProduct } from '@/lib/products'
 import {
   getShippingCostCents,
   getStripeShippingOptions,
@@ -148,7 +148,7 @@ export async function POST(request: NextRequest) {
     
     let { data: products, error } = await supabase
       .from('products')
-      .select('id, name, description, price, image_url, stock_by_size, supplier_sku, color_name')
+      .select('id, name, description, price, image_url, stock_by_size, supplier_sku, color_name, is_published')
       .in('id', productIds)
 
     if (error?.message.includes('stock_by_size')) {
@@ -175,6 +175,13 @@ export async function POST(request: NextRequest) {
     if (checkoutProducts.some(isBlackIslandProduct)) {
       return NextResponse.json(
         { error: 'Uno dei prodotti selezionati non è più disponibile' },
+        { status: 400 }
+      )
+    }
+
+    if (checkoutProducts.some((product) => !isProductPublished(product))) {
+      return NextResponse.json(
+        { error: 'Uno dei prodotti selezionati è in bozza e non può essere acquistato' },
         { status: 400 }
       )
     }

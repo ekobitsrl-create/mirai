@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server"
-import { getDemoProduct, type StoreProduct } from "@/lib/products"
+import { getDemoProduct, isProductPublished, type StoreProduct } from "@/lib/products"
 import {
   consumeRateLimit,
   contentLengthWithin,
@@ -52,14 +52,14 @@ export async function POST(request: Request) {
     const productIds = [...new Set(submittedItems.map((item) => item.productId))]
     const supabase = createAdminClient()
     const { data: databaseProducts, error: productError } = productIds.length
-      ? await supabase.from("products").select("id, name, price, image_url, sizes").in("id", productIds)
+      ? await supabase.from("products").select("id, name, price, image_url, sizes, is_published").in("id", productIds)
       : { data: [], error: null }
     if (productError) throw productError
 
     const products = [
       ...(databaseProducts || []),
       ...productIds.map(getDemoProduct).filter((product): product is StoreProduct => product !== null),
-    ]
+    ].filter(isProductPublished)
     const cleanItems = submittedItems.flatMap((item) => {
       const product = products.find((candidate) => candidate.id === item.productId)
       if (!product) return []

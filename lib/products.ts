@@ -99,6 +99,7 @@ export type StoreProduct = {
   sizes: string[]
   in_stock: boolean
   is_new: boolean
+  is_published?: boolean
   created_at: string
   brand?: string
   supplier_profile?: SupplierProfile
@@ -132,6 +133,7 @@ export const CUSTOM_TEE_PRODUCT: StoreProduct = {
   sizes: ["S", "M", "L", "XL", "XXL"],
   in_stock: true,
   is_new: true,
+  is_published: true,
   created_at: "2026-07-16T12:00:00.000Z",
   brand: "MIRAI",
   supplier_profile: "mirai",
@@ -175,6 +177,10 @@ export function isBlackIslandProduct(product: ProductIdentity) {
 
 export function isPrivateCheckoutProduct(product: ProductIdentity & { id?: string | null }) {
   return product.id === PRIVATE_CHECKOUT_PRODUCT_ID
+}
+
+export function isProductPublished(product: { is_published?: boolean | null }) {
+  return product.is_published !== false
 }
 
 export function withoutBlackIslandProducts<T extends ProductIdentity>(products: T[]) {
@@ -223,6 +229,7 @@ export function mapProductRow(row: Record<string, any>): StoreProduct {
     sizes: Array.isArray(row.sizes) ? (row.sizes as string[]) : [],
     in_stock: Boolean(row.in_stock),
     is_new: Boolean(row.is_new),
+    is_published: row.is_published !== false,
     created_at: (row.created_at as string) ?? new Date().toISOString(),
     brand: (row.brand as string) ?? undefined,
     supplier_profile:
@@ -259,7 +266,7 @@ export function mapProductRow(row: Record<string, any>): StoreProduct {
  * demo/hardcoded products no longer exist — everything comes from the database.)
  */
 export function withDemoProducts(products: Array<Record<string, any>>): StoreProduct[] {
-  return withoutBlackIslandProducts(products.map(mapProductRow))
+  return withoutBlackIslandProducts(products.map(mapProductRow)).filter(isProductPublished)
 }
 
 /**

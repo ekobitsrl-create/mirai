@@ -19,6 +19,8 @@ type Props = {
   cartCounterResetAt: string
   stats: {
     totalProducts: number
+    publishedProducts: number
+    draftProducts: number
     totalOrders: number
     totalUsers: number
     totalRevenue: number
@@ -66,6 +68,9 @@ export function AdminDashboard({
         <div className="border border-border rounded-lg bg-card p-5">
           <p className="text-xs uppercase tracking-widest text-muted-foreground mb-1">Prodotti</p>
           <p className="text-3xl font-bold text-foreground">{stats.totalProducts}</p>
+          <p className="mt-1 text-xs text-muted-foreground">
+            {stats.publishedProducts} pubblicati / {stats.draftProducts} bozze
+          </p>
         </div>
         <div className="border border-border rounded-lg bg-card p-5">
           <p className="text-xs uppercase tracking-widest text-muted-foreground mb-1">Categorie</p>

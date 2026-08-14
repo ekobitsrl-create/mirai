@@ -1,18 +1,21 @@
 "use client"
 
 import { useState } from "react"
+import { useRouter } from "next/navigation"
 import {
   createProduct,
   updateProduct,
   deleteProduct,
   deleteBlackIslandProducts,
   importMiraiSupplierCatalog,
+  setCatalogPublication,
+  setProductPublication,
 } from "@/app/admin/actions"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { Plus, Pencil, Trash2, X, Check, Package, Download } from "lucide-react"
+import { Plus, Pencil, Trash2, X, Check, Package, Download, Eye, EyeOff } from "lucide-react"
 import { AdminProductGallery } from "@/components/admin-product-gallery"
 
 type Product = {
@@ -27,6 +30,7 @@ type Product = {
   stock_by_size?: Record<string, number>
   in_stock: boolean
   is_new: boolean
+  is_published?: boolean
   brand?: string | null
   supplier_sku?: string | null
   color_name?: string | null
@@ -47,11 +51,14 @@ type Category = {
 }
 
 export function AdminProductTable({ products, categories = [] }: { products: Product[]; categories?: Category[] }) {
+  const router = useRouter()
   const [showForm, setShowForm] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [feedback, setFeedback] = useState<string | null>(null)
   const blackIslandCount = products.filter((product) => /black[\s_-]*island/i.test(`${product.name || ""} ${product.image_url || ""}`)).length
+  const publishedCount = products.filter((product) => product.is_published !== false).length
+  const draftCount = products.length - publishedCount
 
   const handleCreate = async (formData: FormData) => {
     setIsSubmitting(true)
@@ -129,6 +136,50 @@ export function AdminProductTable({ products, categories = [] }: { products: Pro
     }
   }
 
+  const handleProductPublication = async (product: Product, isPublished: boolean) => {
+    setIsSubmitting(true)
+    setFeedback(null)
+    try {
+      const formData = new FormData()
+      formData.set("id", product.id)
+      formData.set("is_published", String(isPublished))
+      await setProductPublication(formData)
+      setFeedback(isPublished
+        ? `“${product.name}” pubblicato sul sito e nei feed.`
+        : `“${product.name}” spostato in bozze e nascosto da sito e feed.`)
+      router.refresh()
+    } catch (err) {
+      console.error(err)
+      setFeedback(err instanceof Error ? err.message : "Impossibile modificare la pubblicazione.")
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  const handleCatalogPublication = async (isPublished: boolean) => {
+    const message = isPublished
+      ? "Pubblicare tutti i prodotti del catalogo?"
+      : "Mettere tutto il catalogo in bozze? I prodotti spariranno dal sito, dai feed e dal checkout, ma resteranno nell’admin."
+    if (!confirm(message)) return
+
+    setIsSubmitting(true)
+    setFeedback(null)
+    try {
+      const formData = new FormData()
+      formData.set("is_published", String(isPublished))
+      const result = await setCatalogPublication(formData)
+      setFeedback(isPublished
+        ? `${result.updated} prodotti pubblicati.`
+        : `${result.updated} prodotti spostati in bozze.`)
+      router.refresh()
+    } catch (err) {
+      console.error(err)
+      setFeedback(err instanceof Error ? err.message : "Impossibile aggiornare il catalogo.")
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
   return (
     <div>
       {/* Add product button */}
@@ -140,6 +191,30 @@ export function AdminProductTable({ products, categories = [] }: { products: Pro
           <Plus className="w-4 h-4" />
           Nuovo Prodotto
         </Button>
+        {publishedCount > 0 && (
+          <Button
+            type="button"
+            variant="outline"
+            disabled={isSubmitting}
+            onClick={() => handleCatalogPublication(false)}
+            className="h-10 gap-2 border-amber-500/40 text-xs uppercase tracking-widest text-amber-400 hover:bg-amber-500/10 hover:text-amber-300"
+          >
+            <EyeOff className="h-4 w-4" />
+            Metti tutti in bozza ({publishedCount})
+          </Button>
+        )}
+        {draftCount > 0 && (
+          <Button
+            type="button"
+            variant="outline"
+            disabled={isSubmitting}
+            onClick={() => handleCatalogPublication(true)}
+            className="h-10 gap-2 border-emerald-500/40 text-xs uppercase tracking-widest text-emerald-400 hover:bg-emerald-500/10 hover:text-emerald-300"
+          >
+            <Eye className="h-4 w-4" />
+            Pubblica tutti ({draftCount})
+          </Button>
+        )}
         <Button
           type="button"
           variant="outline"
@@ -269,6 +344,15 @@ export function AdminProductTable({ products, categories = [] }: { products: Pro
                           Esaurito
                         </span>
                       )}
+                      {product.is_published === false ? (
+                        <span className="rounded-full bg-amber-500/10 px-2 py-0.5 text-[10px] uppercase tracking-widest text-amber-400">
+                          Bozza
+                        </span>
+                      ) : (
+                        <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] uppercase tracking-widest text-emerald-400">
+                          Pubblicato
+                        </span>
+                      )}
                     </div>
                     <p className="text-sm text-muted-foreground mb-2 truncate">
                       {product.description || "Nessuna descrizione"}
@@ -289,6 +373,18 @@ export function AdminProductTable({ products, categories = [] }: { products: Pro
 
                   {/* Actions */}
                   <div className="flex items-center gap-2 flex-shrink-0">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="icon"
+                      className={`h-9 w-9 ${product.is_published === false ? "text-emerald-400 hover:text-emerald-300" : "text-amber-400 hover:text-amber-300"}`}
+                      disabled={isSubmitting}
+                      onClick={() => handleProductPublication(product, product.is_published === false)}
+                      title={product.is_published === false ? "Pubblica prodotto" : "Metti in bozza"}
+                    >
+                      {product.is_published === false ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
+                      <span className="sr-only">{product.is_published === false ? "Pubblica" : "Metti in bozza"}</span>
+                    </Button>
                     <Button
                       variant="outline"
                       size="icon"
@@ -425,6 +521,15 @@ function ProductForm({ product, categories = [] }: { product?: Product; categori
             className="rounded border-border"
           />
           <span className="text-xs uppercase tracking-widest text-muted-foreground">Nuovo</span>
+        </label>
+        <label className="flex items-center gap-2 cursor-pointer">
+          <input
+            type="checkbox"
+            name="is_published"
+            defaultChecked={product?.is_published ?? false}
+            className="rounded border-border"
+          />
+          <span className="text-xs uppercase tracking-widest text-muted-foreground">Pubblicato</span>
         </label>
       </div>
       <div className="flex flex-col gap-2">

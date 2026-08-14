@@ -145,7 +145,10 @@ function revalidateCatalog(productId?: string) {
   revalidatePath("/google-merchant-feed-fr.xml")
   revalidatePath("/meta-product-feed-mirai.xml")
   revalidatePath("/sitemap.xml")
-  if (productId) revalidatePath(`/prodotto/${productId}`)
+  if (productId) {
+    revalidatePath(`/prodotto/${productId}`)
+    revalidatePath("/[locale]/prodotto/[id]", "page")
+  }
 }
 
 async function assertAdmin() {
@@ -166,6 +169,7 @@ export async function createProduct(formData: FormData) {
   const category = formData.get("category") as string
   const { sizes, stock_by_size, in_stock } = parseProductInventory(formData)
   const is_new = formData.get("is_new") === "on"
+  const is_published = formData.get("is_published") === "on"
   const productDetails = parseProductDetails(formData)
   const productImages = parseProductImages(formData, name)
 
@@ -179,6 +183,7 @@ export async function createProduct(formData: FormData) {
     stock_by_size,
     in_stock,
     is_new,
+    is_published,
     ...productDetails,
   })
 
@@ -197,6 +202,7 @@ export async function updateProduct(formData: FormData) {
   const category = formData.get("category") as string
   const { sizes, stock_by_size, in_stock } = parseProductInventory(formData)
   const is_new = formData.get("is_new") === "on"
+  const is_published = formData.get("is_published") === "on"
   const productDetails = parseProductDetails(formData)
   const productImages = parseProductImages(formData, name)
 
@@ -212,6 +218,7 @@ export async function updateProduct(formData: FormData) {
       stock_by_size,
       in_stock,
       is_new,
+      is_published,
       ...productDetails,
       updated_at: new Date().toISOString(),
     })
@@ -220,6 +227,49 @@ export async function updateProduct(formData: FormData) {
   if (error) throw new Error(error.message)
 
   revalidateCatalog(id)
+}
+
+export async function setProductPublication(formData: FormData) {
+  const { supabase } = await assertAdmin()
+  const id = String(formData.get("id") || "").trim()
+  const isPublished = formData.get("is_published") === "true"
+
+  if (!id) throw new Error("Prodotto non valido")
+
+  const { data, error } = await supabase
+    .from("products")
+    .update({
+      is_published: isPublished,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", id)
+    .select("id")
+    .maybeSingle()
+
+  if (error) throw new Error(error.message)
+  if (!data) throw new Error("Prodotto non trovato")
+
+  revalidateCatalog(id)
+  return { id, isPublished }
+}
+
+export async function setCatalogPublication(formData: FormData) {
+  const { supabase } = await assertAdmin()
+  const isPublished = formData.get("is_published") === "true"
+
+  const { data, error } = await supabase
+    .from("products")
+    .update({
+      is_published: isPublished,
+      updated_at: new Date().toISOString(),
+    })
+    .neq("id", "00000000-0000-0000-0000-000000000000")
+    .select("id")
+
+  if (error) throw new Error(error.message)
+
+  revalidateCatalog()
+  return { updated: data?.length || 0, isPublished }
 }
 
 export async function deleteProduct(formData: FormData) {

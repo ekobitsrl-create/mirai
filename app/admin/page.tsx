@@ -72,6 +72,8 @@ export default async function AdminPage() {
 
   const stats = {
     totalProducts: products.length,
+    publishedProducts: products.filter((product: any) => product.is_published !== false).length,
+    draftProducts: products.filter((product: any) => product.is_published === false).length,
     totalOrders: orders.length,
     totalUsers: users.length,
     totalRevenue: orders
