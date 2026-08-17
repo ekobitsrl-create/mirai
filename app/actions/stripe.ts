@@ -35,6 +35,7 @@ import {
 } from '@/lib/checkout-confirmation'
 import { consumeRateLimit } from '@/lib/request-security'
 import { sendMetaPurchaseEvent } from '@/lib/meta-conversions-server'
+import { parseQuickPaymentMethod, type QuickPaymentMethod } from '@/lib/quick-payment'
 
 type CartLineItem = {
   productId: string
@@ -224,12 +225,14 @@ async function createCheckoutSessionInternal(
   previousCheckoutSessionId?: string | null,
   discountCode?: string,
   requestedShippingCountry: string = 'IT',
+  requestedQuickPaymentMethod?: QuickPaymentMethod,
 ) {
   if (!await consumeRateLimit({ bucket: 'stripe-checkout', limit: 20, windowSeconds: 600 })) {
     throw new Error('Troppi tentativi di pagamento. Riprova tra qualche minuto')
   }
   assertStripeCheckoutConfigured()
   const shippingCountry = normalizeShippingCountry(requestedShippingCountry)
+  const quickPaymentMethod = parseQuickPaymentMethod(requestedQuickPaymentMethod)
   const shippingFeeCents = getShippingCostCents(shippingCountry)
   const user = await getServerUser()
   const customerEmail = validEmail(user?.email || guestEmail)
@@ -359,12 +362,20 @@ async function createCheckoutSessionInternal(
     line_items: lineItems,
     mode: 'payment',
     customer_creation: 'if_required',
+    ...(quickPaymentMethod
+      ? {
+          payment_method_types: [
+            quickPaymentMethod as Stripe.Checkout.SessionCreateParams.PaymentMethodType,
+          ],
+        }
+      : {}),
     ...(customerEmail ? { customer_email: customerEmail } : {}),
     ...(user ? { client_reference_id: user.id } : {}),
     metadata: {
       order_item_count: String(cartItems.length),
       shipping_country: shippingCountry,
       shipping_fee_cents: String(shippingFeeCents),
+      ...(quickPaymentMethod ? { requested_payment_method: quickPaymentMethod } : {}),
       [CHECKOUT_CONFIRMATION_METADATA_KEY]: confirmation.hash,
       ...(user ? { user_id: user.id } : {}),
       ...discountMetadata,
@@ -708,6 +719,7 @@ export async function createCheckoutSession(
   previousCheckoutSessionId?: string | null,
   discountCode?: string,
   requestedShippingCountry: string = 'IT',
+  requestedQuickPaymentMethod?: QuickPaymentMethod,
 ) {
   try {
     const session = await createCheckoutSessionInternal(
@@ -717,6 +729,7 @@ export async function createCheckoutSession(
       previousCheckoutSessionId,
       discountCode,
       requestedShippingCountry,
+      requestedQuickPaymentMethod,
     )
     return { ok: true as const, session }
   } catch (error) {

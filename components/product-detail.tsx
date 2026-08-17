@@ -41,6 +41,11 @@ import {
   translateCategory,
 } from "@/lib/site-localization"
 import { localizeColor, localizeProduct, translateProductName } from "@/lib/catalog-localization"
+import {
+  QUICK_PAYMENT_METHOD_QUERY_KEY,
+  QUICK_PAYMENT_METHOD_STORAGE_KEY,
+  type QuickPaymentMethod,
+} from "@/lib/quick-payment"
 
 function formatCategory(slug: string) {
   return slug.replace(/-/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase())
@@ -299,7 +304,7 @@ export function ProductDetail({
     handleAddToCart()
   }
 
-  function handleQuickPayment(paymentMethod: "paypal" | "klarna" | "scalapay") {
+  function handleQuickPayment(paymentMethod: QuickPaymentMethod) {
     if (sizes.length > 0 && !selectedSize) {
       setSizeError(true)
       return
@@ -334,7 +339,12 @@ export function ProductDetail({
       })
     }
 
-    router.push("/checkout")
+    try {
+      window.sessionStorage.setItem(QUICK_PAYMENT_METHOD_STORAGE_KEY, paymentMethod)
+    } catch {}
+
+    const checkoutPath = `/checkout?${QUICK_PAYMENT_METHOD_QUERY_KEY}=${encodeURIComponent(paymentMethod)}`
+    router.push(localizedOrganicPath(checkoutPath, locale))
   }
 
   async function shareProduct() {

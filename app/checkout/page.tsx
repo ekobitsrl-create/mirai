@@ -26,6 +26,12 @@ import {
   SHIPPING_CONFIG,
   type EuCountryCode,
 } from "@/lib/shipping"
+import {
+  parseQuickPaymentMethod,
+  QUICK_PAYMENT_METHOD_QUERY_KEY,
+  QUICK_PAYMENT_METHOD_STORAGE_KEY,
+  type QuickPaymentMethod,
+} from "@/lib/quick-payment"
 
 const stripePublishableKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
 const stripePromise = stripePublishableKey ? loadStripe(stripePublishableKey) : null
@@ -58,6 +64,8 @@ export default function CheckoutPage() {
   const [promoError, setPromoError] = useState<string | null>(null)
   const [promoLoading, setPromoLoading] = useState(false)
   const [appliedDiscount, setAppliedDiscount] = useState<AppliedDiscount | null>(null)
+  const [preferredQuickPaymentMethod, setPreferredQuickPaymentMethod] = useState<QuickPaymentMethod | null>(null)
+  const [quickPaymentPreferenceReady, setQuickPaymentPreferenceReady] = useState(false)
   const sessionIdRef = useRef<string | null>(null)
   const confirmationTokenRef = useRef<string | null>(null)
   const checkoutSessionRef = useRef<{ key: string; promise: Promise<string> } | null>(null)
@@ -66,6 +74,21 @@ export default function CheckoutPage() {
   useEffect(() => {
     clearCartRef.current = clearCart
   }, [clearCart])
+
+  useEffect(() => {
+    try {
+      const queryMethod = new URLSearchParams(window.location.search).get(QUICK_PAYMENT_METHOD_QUERY_KEY)
+      const storedMethod = window.sessionStorage.getItem(QUICK_PAYMENT_METHOD_STORAGE_KEY)
+      setPreferredQuickPaymentMethod(
+        parseQuickPaymentMethod(queryMethod) || parseQuickPaymentMethod(storedMethod),
+      )
+      window.sessionStorage.removeItem(QUICK_PAYMENT_METHOD_STORAGE_KEY)
+    } catch {
+      setPreferredQuickPaymentMethod(null)
+    } finally {
+      setQuickPaymentPreferenceReady(true)
+    }
+  }, [])
 
   const handleCardCheckoutComplete = useCallback(() => {
     clearCartRef.current()
@@ -151,8 +174,9 @@ export default function CheckoutPage() {
       marketingConsent,
       discountCode: appliedDiscount?.code || "",
       shippingCountry,
+      preferredQuickPaymentMethod,
     }),
-    [appliedDiscount?.code, cartLineItems, checkoutEmail, marketingConsent, shippingCountry]
+    [appliedDiscount?.code, cartLineItems, checkoutEmail, marketingConsent, preferredQuickPaymentMethod, shippingCountry]
   )
   const countryDisplayNames = useMemo(
     () => typeof Intl.DisplayNames === "function" ? new Intl.DisplayNames([locale], { type: "region" }) : null,
@@ -177,6 +201,7 @@ export default function CheckoutPage() {
       sessionIdRef.current,
       appliedDiscount?.code,
       shippingCountry,
+      preferredQuickPaymentMethod || undefined,
     )
       .then((result) => {
         if (!result.ok) throw new CheckoutActionError(result.error)
@@ -196,7 +221,7 @@ export default function CheckoutPage() {
 
     checkoutSessionRef.current = { key: checkoutKey, promise }
     return promise
-  }, [appliedDiscount?.code, cartLineItems, checkoutEmail, checkoutKey, marketingConsent, shippingCountry, t.checkout.error])
+  }, [appliedDiscount?.code, cartLineItems, checkoutEmail, checkoutKey, marketingConsent, preferredQuickPaymentMethod, shippingCountry, t.checkout.error])
 
   const retryCardCheckout = () => {
     checkoutSessionRef.current = null
@@ -306,7 +331,7 @@ export default function CheckoutPage() {
     }
   }
 
-  if (!hydrated || isAuthenticated === null) {
+  if (!hydrated || isAuthenticated === null || !quickPaymentPreferenceReady) {
     return (
       <main className="flex min-h-screen items-center justify-center bg-background">
         <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
