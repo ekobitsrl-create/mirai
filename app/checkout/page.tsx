@@ -31,6 +31,8 @@ const stripePublishableKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
 const stripePromise = stripePublishableKey ? loadStripe(stripePublishableKey) : null
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
+class CheckoutActionError extends Error {}
+
 export default function CheckoutPage() {
   const { items, getTotal, clearCart, hydrated } = useCart()
   const { t, locale } = useLanguage()
@@ -59,6 +61,22 @@ export default function CheckoutPage() {
   const sessionIdRef = useRef<string | null>(null)
   const confirmationTokenRef = useRef<string | null>(null)
   const checkoutSessionRef = useRef<{ key: string; promise: Promise<string> } | null>(null)
+  const clearCartRef = useRef(clearCart)
+
+  useEffect(() => {
+    clearCartRef.current = clearCart
+  }, [clearCart])
+
+  const handleCardCheckoutComplete = useCallback(() => {
+    clearCartRef.current()
+    const sessionId = sessionIdRef.current
+    const confirmationToken = confirmationTokenRef.current
+    window.location.assign(
+      sessionId && confirmationToken
+        ? `/success?session_id=${encodeURIComponent(sessionId)}&confirmation_token=${encodeURIComponent(confirmationToken)}`
+        : "/success",
+    )
+  }, [])
 
   useEffect(() => {
     let active = true
@@ -160,7 +178,9 @@ export default function CheckoutPage() {
       appliedDiscount?.code,
       shippingCountry,
     )
-      .then((session) => {
+      .then((result) => {
+        if (!result.ok) throw new CheckoutActionError(result.error)
+        const session = result.session
         if (!session?.clientSecret) throw new Error(t.checkout.error)
         sessionIdRef.current = session.sessionId
         confirmationTokenRef.current = session.confirmationToken
@@ -168,7 +188,7 @@ export default function CheckoutPage() {
       })
       .catch((error) => {
         checkoutSessionRef.current = null
-        const message = error instanceof Error ? error.message : t.checkout.error
+        const message = error instanceof CheckoutActionError ? error.message : t.checkout.error
         setCardError(ui(message))
         throw error
       })
@@ -204,13 +224,21 @@ export default function CheckoutPage() {
 
     setPromoLoading(true)
     try {
-      const discount = await validateCheckoutDiscount(cartLineItems, checkoutEmail, promoCode)
+      const result = await validateCheckoutDiscount(cartLineItems, checkoutEmail, promoCode)
+      if (!result.ok) {
+        setAppliedDiscount(null)
+        setPromoError(ui(result.error))
+        resetCardCheckout()
+        return
+      }
+      const discount = result.discount
       setAppliedDiscount(discount)
       setPromoCode(discount.code)
       resetCardCheckout()
     } catch (error) {
+      console.error("Impossibile verificare il codice sconto", error)
       setAppliedDiscount(null)
-      setPromoError(error instanceof Error ? ui(error.message) : ui("Codice sconto non valido"))
+      setPromoError(ui("Non è stato possibile verificare il codice sconto. Riprova."))
       resetCardCheckout()
     } finally {
       setPromoLoading(false)
@@ -223,6 +251,11 @@ export default function CheckoutPage() {
     setPromoError(null)
     resetCardCheckout()
   }
+
+  const embeddedCheckoutOptions = useMemo(() => ({
+    fetchClientSecret,
+    onComplete: handleCardCheckoutComplete,
+  }), [fetchClientSecret, handleCardCheckoutComplete])
 
   const beginGuestCheckout = () => {
     if (guestEmail.trim() && !emailPattern.test(guestEmail.trim())) {
@@ -583,19 +616,7 @@ export default function CheckoutPage() {
                     <EmbeddedCheckoutProvider
                       key={`${checkoutKey}:${cardAttempt}`}
                       stripe={stripePromise}
-                      options={{
-                        fetchClientSecret,
-                        onComplete: () => {
-                          clearCart()
-                          const sessionId = sessionIdRef.current
-                          const confirmationToken = confirmationTokenRef.current
-                          window.location.assign(
-                            sessionId && confirmationToken
-                              ? `/success?session_id=${encodeURIComponent(sessionId)}&confirmation_token=${encodeURIComponent(confirmationToken)}`
-                              : "/success",
-                          )
-                        },
-                      }}
+                      options={embeddedCheckoutOptions}
                     >
                       <EmbeddedCheckout />
                     </EmbeddedCheckoutProvider>

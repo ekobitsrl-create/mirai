@@ -108,7 +108,43 @@ async function ensureStripeCoupon(discount: AppliedDiscount) {
   }
 }
 
-export async function validateCheckoutDiscount(
+const SAFE_CHECKOUT_ERROR_PREFIXES = [
+  'Troppe richieste',
+  'Troppi tentativi',
+  'Inserisci ',
+  "L'indirizzo email",
+  'Il carrello',
+  'Errore nel recupero dei prodotti',
+  'Uno dei prodotti',
+  'Prodotto ',
+  'Quantità ',
+  'Taglia ',
+  'Sono disponibili ',
+  'Personalizzazione ',
+  'Impossibile inizializzare il pagamento',
+  'Non è stato possibile verificare',
+  'Codice sconto',
+  'Questo codice',
+  'Il codice',
+]
+
+function safeCheckoutErrorMessage(error: unknown, fallback: string) {
+  const message = error instanceof Error ? error.message.trim() : ''
+  if (message.startsWith('Prodotto ')) {
+    return 'Uno dei prodotti nel carrello non è più disponibile'
+  }
+  return SAFE_CHECKOUT_ERROR_PREFIXES.some((prefix) => message.startsWith(prefix))
+    ? message
+    : fallback
+}
+
+function logCheckoutActionError(operation: string, error: unknown) {
+  const message = error instanceof Error ? error.message.trim() : ''
+  if (SAFE_CHECKOUT_ERROR_PREFIXES.some((prefix) => message.startsWith(prefix))) return
+  console.error(`[checkout:${operation}]`, error)
+}
+
+async function validateCheckoutDiscountInternal(
   cartItems: CartLineItem[],
   guestEmail: string | undefined,
   discountCode: string,
@@ -161,7 +197,27 @@ export async function validateCheckoutDiscount(
   })
 }
 
-export async function createCheckoutSession(
+export async function validateCheckoutDiscount(
+  cartItems: CartLineItem[],
+  guestEmail: string | undefined,
+  discountCode: string,
+) {
+  try {
+    const discount = await validateCheckoutDiscountInternal(cartItems, guestEmail, discountCode)
+    return { ok: true as const, discount }
+  } catch (error) {
+    logCheckoutActionError('discount-validation', error)
+    return {
+      ok: false as const,
+      error: safeCheckoutErrorMessage(
+        error,
+        'Non è stato possibile verificare il codice sconto. Riprova.',
+      ),
+    }
+  }
+}
+
+async function createCheckoutSessionInternal(
   cartItems: CartLineItem[],
   guestEmail?: string,
   marketingConsent = false,
@@ -642,5 +698,35 @@ export async function createCashOnDeliveryOrder(cartItems: CartLineItem[], detai
       deliveryCountry: shippingCountry,
       estimatedDeliveryDate: getEstimatedDeliveryDate(SHIPPING_CONFIG.standardDeliveryDays.maximum),
     },
+  }
+}
+
+export async function createCheckoutSession(
+  cartItems: CartLineItem[],
+  guestEmail?: string,
+  marketingConsent = false,
+  previousCheckoutSessionId?: string | null,
+  discountCode?: string,
+  requestedShippingCountry: string = 'IT',
+) {
+  try {
+    const session = await createCheckoutSessionInternal(
+      cartItems,
+      guestEmail,
+      marketingConsent,
+      previousCheckoutSessionId,
+      discountCode,
+      requestedShippingCountry,
+    )
+    return { ok: true as const, session }
+  } catch (error) {
+    logCheckoutActionError('stripe-session', error)
+    return {
+      ok: false as const,
+      error: safeCheckoutErrorMessage(
+        error,
+        'Non è stato possibile preparare il pagamento. Riprova.',
+      ),
+    }
   }
 }
