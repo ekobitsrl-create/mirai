@@ -18,21 +18,27 @@ function InfiniteMarquee({ children, speed = "normal", className = "" }: { child
   )
 }
 
-export function MarqueeBanner() {
+export function MarqueeBanner({
+  onVisibilityChange,
+}: {
+  onVisibilityChange?: (visible: boolean) => void
+}) {
   const [visible, setVisible] = useState(true)
   const [remainingMs, setRemainingMs] = useState<number | null>(null)
   const { t } = useLanguage()
 
   useEffect(() => {
     const updateRemainingTime = () => {
-      setRemainingMs(Math.max(0, Date.parse(MINIMAL_PROMO_END_ISO) - Date.now()))
+      const nextRemainingMs = Math.max(0, Date.parse(MINIMAL_PROMO_END_ISO) - Date.now())
+      setRemainingMs(nextRemainingMs)
+      onVisibilityChange?.(nextRemainingMs > 0)
     }
 
     updateRemainingTime()
     const timer = window.setInterval(updateRemainingTime, 1000)
 
     return () => window.clearInterval(timer)
-  }, [])
+  }, [onVisibilityChange])
 
   if (!visible || remainingMs === 0) return null
 
@@ -66,7 +72,10 @@ export function MarqueeBanner() {
           ))}
         </InfiniteMarquee>
         <button
-          onClick={() => setVisible(false)}
+          onClick={() => {
+            setVisible(false)
+            onVisibilityChange?.(false)
+          }}
           aria-label={t.nav.closeBanner}
           className="absolute right-3 top-1/2 z-10 -translate-y-1/2 bg-primary/90 p-1 text-primary-foreground/70 transition-colors hover:text-primary-foreground"
         >

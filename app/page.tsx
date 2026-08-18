@@ -71,7 +71,7 @@ export default async function Home({ locale = "it" }: { locale?: Locale } = {}) 
           __html: safeJsonLd(createWebPageJsonLd({ name: seoCopy.title, description: seoCopy.description, path: localizedOrganicPath("/", locale), locale })),
         }}
       />
-      <Navbar showPromo />
+      <Navbar />
       <Hero />
       <Collections categories={categories} />
       <ProductGrid products={products} />
