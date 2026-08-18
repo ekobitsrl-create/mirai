@@ -1,12 +1,12 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import Link from "next/link"
 import { BadgePercent, Check, Copy, Sparkles, Timer, X } from "lucide-react"
 import { useLanguage } from "@/lib/language-context"
 import { MINIMAL_PROMO_END_ISO } from "@/lib/minimal-promo"
 
-const STORAGE_KEY = "mirai-minimal-days-modal-seen-2026-08-20"
+const STORAGE_KEY = "mirai-minimal-days-modal-seen-2026-08-20-v2"
 const DISCOUNT_CODE = "MIRAI10"
 
 export function FirstProductDiscountModal() {
@@ -15,6 +15,15 @@ export function FirstProductDiscountModal() {
   const [remainingMs, setRemainingMs] = useState<number | null>(null)
   const openedRef = useRef(false)
   const { t, locale } = useLanguage()
+
+  const dismissModal = useCallback(() => {
+    setOpen(false)
+    try {
+      window.sessionStorage.setItem(STORAGE_KEY, "1")
+    } catch {
+      // Dismissal still works when storage is unavailable.
+    }
+  }, [])
 
   useEffect(() => {
     const endAt = Date.parse(MINIMAL_PROMO_END_ISO)
@@ -29,15 +38,18 @@ export function FirstProductDiscountModal() {
     let timer: number | undefined
     const showOffer = () => {
       if (openedRef.current) return
-      openedRef.current = true
-      timer = window.setTimeout(() => {
-        setOpen(true)
-        try {
-          window.sessionStorage.setItem(STORAGE_KEY, "1")
-        } catch {
-          // The modal still works for this visit.
+
+      const openWhenIntroIsFinished = () => {
+        if (document.querySelector("[data-mirai-site-intro]")) {
+          timer = window.setTimeout(openWhenIntroIsFinished, 400)
+          return
         }
-      }, 800)
+
+        openedRef.current = true
+        setOpen(true)
+      }
+
+      timer = window.setTimeout(openWhenIntroIsFinished, 800)
     }
 
     const hasCookieChoice = document.cookie
@@ -73,7 +85,7 @@ export function FirstProductDiscountModal() {
 
     const previousOverflow = document.body.style.overflow
     const closeOnEscape = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setOpen(false)
+      if (event.key === "Escape") dismissModal()
     }
 
     document.body.style.overflow = "hidden"
@@ -83,7 +95,7 @@ export function FirstProductDiscountModal() {
       document.body.style.overflow = previousOverflow
       window.removeEventListener("keydown", closeOnEscape)
     }
-  }, [open])
+  }, [dismissModal, open])
 
   const copyCode = async () => {
     try {
@@ -113,7 +125,7 @@ export function FirstProductDiscountModal() {
       aria-modal="true"
       aria-labelledby="minimal-days-offer-title"
       onMouseDown={(event) => {
-        if (event.target === event.currentTarget) setOpen(false)
+        if (event.target === event.currentTarget) dismissModal()
       }}
     >
       <div className="relative w-full max-w-lg overflow-hidden rounded-3xl border border-primary/35 bg-[#120d1d] p-6 text-white shadow-[0_30px_100px_rgba(100,45,220,0.45)] sm:p-9">
@@ -122,7 +134,7 @@ export function FirstProductDiscountModal() {
 
         <button
           type="button"
-          onClick={() => setOpen(false)}
+          onClick={dismissModal}
           aria-label={t.nav.closeBanner}
           className="absolute right-4 top-4 z-10 rounded-full border border-white/10 bg-black/25 p-2 text-white/60 transition-colors hover:text-white"
         >
@@ -170,14 +182,14 @@ export function FirstProductDiscountModal() {
           <div className="mt-6 grid gap-3 sm:grid-cols-2">
             <button
               type="button"
-              onClick={() => setOpen(false)}
+              onClick={dismissModal}
               className="min-h-12 rounded-xl border border-white/15 px-5 text-xs font-bold uppercase tracking-widest text-white/75 transition-colors hover:border-white/30 hover:text-white"
             >
               {t.nav.continueShopping}
             </button>
             <Link
               href={collectionsHref}
-              onClick={() => setOpen(false)}
+              onClick={dismissModal}
               className="flex min-h-12 items-center justify-center rounded-xl bg-primary px-5 text-xs font-bold uppercase tracking-widest text-primary-foreground transition-transform hover:-translate-y-0.5"
             >
               {t.nav.discoverProducts}

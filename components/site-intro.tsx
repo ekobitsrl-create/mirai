@@ -75,6 +75,7 @@ export function SiteIntro() {
 
   return (
     <div
+      data-mirai-site-intro
       className={`fixed inset-0 z-[10000] flex items-center justify-center overflow-hidden bg-[#0b0611]/95 p-3 backdrop-blur-md transition-opacity duration-[1800ms] ease-[cubic-bezier(0.22,1,0.36,1)] sm:p-6 md:p-10 ${
         isLeaving ? "pointer-events-none opacity-0" : "opacity-100"
       }`}
