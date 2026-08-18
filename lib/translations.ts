@@ -36,6 +36,10 @@ export const translations = {
       discountCode: "SCONTO AUTOMATICO — CUMULABILE CON MIRAI10 SUL PRIMO ORDINE",
       promoEndsIn: "TERMINA TRA",
       closeBanner: "Chiudi banner",
+      copyCode: "Copia",
+      codeCopied: "Copiato",
+      continueShopping: "Continua qui",
+      discoverProducts: "Scopri i prodotti",
     },
     // Hero
     hero: {
@@ -221,6 +225,10 @@ export const translations = {
       discountCode: "AUTOMATIC DISCOUNT — STACKABLE WITH MIRAI10 ON YOUR FIRST ORDER",
       promoEndsIn: "ENDS IN",
       closeBanner: "Close banner",
+      copyCode: "Copy",
+      codeCopied: "Copied",
+      continueShopping: "Keep shopping",
+      discoverProducts: "Discover products",
     },
     // Hero
     hero: {
@@ -406,6 +414,10 @@ export const translations = {
       discountCode: "DESCUENTO AUTOMÁTICO — ACUMULABLE CON MIRAI10 EN TU PRIMER PEDIDO",
       promoEndsIn: "TERMINA EN",
       closeBanner: "Cerrar banner",
+      copyCode: "Copiar",
+      codeCopied: "Copiado",
+      continueShopping: "Seguir comprando",
+      discoverProducts: "Descubrir productos",
     },
     // Hero
     hero: {
@@ -591,6 +603,10 @@ export const translations = {
       discountCode: "AUTOMATISCHER RABATT — MIT MIRAI10 BEI DER ERSTEN BESTELLUNG KOMBINIERBAR",
       promoEndsIn: "ENDET IN",
       closeBanner: "Banner schließen",
+      copyCode: "Kopieren",
+      codeCopied: "Kopiert",
+      continueShopping: "Weiter einkaufen",
+      discoverProducts: "Produkte entdecken",
     },
     // Hero
     hero: {
@@ -776,6 +792,10 @@ export const translations = {
       discountCode: "REMISE AUTOMATIQUE — CUMULABLE AVEC MIRAI10 SUR LA PREMIÈRE COMMANDE",
       promoEndsIn: "SE TERMINE DANS",
       closeBanner: "Fermer la bannière",
+      copyCode: "Copier",
+      codeCopied: "Copié",
+      continueShopping: "Continuer mes achats",
+      discoverProducts: "Découvrir les produits",
     },
     // Hero
     hero: {

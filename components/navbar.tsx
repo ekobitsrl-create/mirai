@@ -1,6 +1,6 @@
 "use client"
 
-import { useCallback, useState, useEffect, useRef } from "react"
+import { useState, useEffect, useRef } from "react"
 import Link from "next/link"
 import dynamic from "next/dynamic"
 import { Disc3, Search, Menu, X, User, ShoppingBag, ChevronDown, ChevronRight, UsersRound, WandSparkles } from "lucide-react"
@@ -9,7 +9,6 @@ import { useCart } from "@/lib/cart-context"
 import { useLanguage } from "@/lib/language-context"
 import { LanguageSwitcher } from "@/components/language-switcher"
 import { localizedOrganicPath } from "@/lib/international-seo"
-import { MarqueeBanner } from "@/components/marquee-banner"
 import { translateCategory } from "@/lib/site-localization"
 
 type CategoryNode = {
@@ -115,8 +114,7 @@ function useCategories() {
   return tree
 }
 
-export function Navbar({ showPromo = false }: { showPromo?: boolean }) {
-  const [promoVisible, setPromoVisible] = useState(showPromo)
+export function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false)
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [dropdownOpen, setDropdownOpen] = useState(false)
@@ -146,10 +144,6 @@ export function Navbar({ showPromo = false }: { showPromo?: boolean }) {
     fr: "Communaute",
   }[locale]
   const categories = useCategories()
-  const handlePromoVisibilityChange = useCallback((visible: boolean) => {
-    setPromoVisible(visible)
-  }, [])
-
   useEffect(() => {
     try {
       const supabase = createClient()
@@ -200,7 +194,6 @@ export function Navbar({ showPromo = false }: { showPromo?: boolean }) {
   return (
     <>
       <header className="fixed top-0 left-0 right-0 z-50">
-        {showPromo && <MarqueeBanner onVisibilityChange={handlePromoVisibilityChange} />}
         <nav className="mirai-neon-divider bg-[#0c0c0d]/88 backdrop-blur-2xl">
           <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
           <div className="flex items-center gap-8">
@@ -363,11 +356,7 @@ export function Navbar({ showPromo = false }: { showPromo?: boolean }) {
 
         {/* Mobile menu */}
         {mobileOpen && (
-          <div
-            className={`touch-pan-y overflow-y-auto overscroll-contain border-t border-white/10 bg-[#111113] [-webkit-overflow-scrolling:touch] 2xl:hidden ${
-              showPromo && promoVisible ? "max-h-[calc(100dvh-6.5rem)]" : "max-h-[calc(100dvh-4rem)]"
-            }`}
-          >
+          <div className="max-h-[calc(100dvh-4rem)] touch-pan-y overflow-y-auto overscroll-contain border-t border-white/10 bg-[#111113] [-webkit-overflow-scrolling:touch] 2xl:hidden">
           <div className="flex flex-col gap-4 px-6 pb-[calc(2rem+env(safe-area-inset-bottom))] pt-6">
             <Link
               href={localizedOrganicPath("/collezioni", locale)}
@@ -479,7 +468,6 @@ export function Navbar({ showPromo = false }: { showPromo?: boolean }) {
           </div>
         )}
       </header>
-      {showPromo && promoVisible ? <div aria-hidden="true" className="h-10" /> : null}
     </>
   )
 }
