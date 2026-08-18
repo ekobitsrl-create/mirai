@@ -98,6 +98,7 @@ const categoryDescriptions: Record<string, Record<Locale, string>> = {
   "t-shirt": { it: "T-shirt oversize streetwear con grafiche decise, lavaggi vintage e fit rilassato.", en: "Oversized streetwear T-shirts with bold graphics, vintage washes and a relaxed fit.", es: "Camisetas oversize streetwear con gráficos potentes, lavados vintage y corte relajado.", de: "Oversized-Streetwear-T-Shirts mit markanten Grafiken, Vintage-Waschungen und lockerem Fit.", fr: "T-shirts oversize streetwear aux graphismes affirmés, délavages vintage et coupe décontractée." },
   "t-shirt-mirai": { it: "T-shirt oversize streetwear MIRAI con grafiche decise, lavaggi vintage e fit rilassato.", en: "MIRAI oversized streetwear T-shirts with bold graphics, vintage washes and a relaxed fit.", es: "Camisetas oversize streetwear MIRAI con gráficos potentes, lavados vintage y corte relajado.", de: "Oversized-Streetwear-T-Shirts von MIRAI mit markanten Grafiken, Vintage-Waschungen und lockerem Fit.", fr: "T-shirts oversize streetwear MIRAI aux graphismes affirmés, délavages vintage et coupe décontractée." },
   "t-shirt-god-street": { it: "T-shirt oversize God Street selezionate da MIRAI.", en: "God Street oversized T-shirts selected by MIRAI.", es: "Camisetas oversize God Street seleccionadas por MIRAI.", de: "Von MIRAI ausgewählte God Street Oversize-T-Shirts.", fr: "T-shirts oversize God Street sélectionnés par MIRAI." },
+  "t-shirt-valley": { it: "T-shirt oversize Valley selezionate da MIRAI.", en: "Valley oversized T-shirts selected by MIRAI.", es: "Camisetas oversize Valley seleccionadas por MIRAI.", de: "Von MIRAI ausgewählte Valley Oversize-T-Shirts.", fr: "T-shirts oversize Valley sélectionnés par MIRAI." },
   tracksuits: { it: "Completi e tracksuit streetwear coordinati, pensati per comfort e stile urban.", en: "Coordinated streetwear tracksuits designed for comfort and urban style.", es: "Conjuntos streetwear coordinados, creados para ofrecer comodidad y estilo urbano.", de: "Abgestimmte Streetwear-Trainingsanzüge für Komfort und Urban Style.", fr: "Ensembles streetwear coordonnés, pensés pour le confort et le style urbain." },
   jeans: { it: "Jeans streetwear uomo con lavaggi washed, dettagli distressed e vestibilità rilassate.", en: "Men's streetwear jeans with washed finishes, distressed details and relaxed fits.", es: "Vaqueros streetwear para hombre con lavados, detalles distressed y cortes relajados.", de: "Herren-Streetwear-Jeans mit Waschungen, Distressed-Details und lockerem Fit.", fr: "Jeans streetwear homme avec délavages, détails distressed et coupes décontractées." },
   shorts: { it: "Bermuda e shorts streetwear con volumi baggy, denim lavorato e dettagli premium.", en: "Streetwear shorts with baggy proportions, treated denim and premium details.", es: "Bermudas streetwear de volumen baggy, denim trabajado y detalles premium.", de: "Streetwear-Shorts mit Baggy-Volumen, bearbeitetem Denim und Premium-Details.", fr: "Bermudas streetwear aux volumes baggy, denim travaillé et détails premium." },
@@ -222,6 +223,7 @@ function naturalList(values: string[], locale: ForeignLocale) {
 }
 
 function productKind(category: string, locale: ForeignLocale, productName = "") {
+  const normalizedCategory = category.startsWith("t-shirt-") ? "t-shirt" : category
   const rows: Record<string, Record<ForeignLocale, string>> = {
     "t-shirt": { en: "oversized streetwear T-shirt", es: "camiseta oversize streetwear", de: "Oversized-Streetwear-T-Shirt", fr: "T-shirt oversize streetwear" },
     camicie: { en: "oversized streetwear shirt", es: "camisa oversize streetwear", de: "Oversized-Streetwear-Hemd", fr: "chemise oversize streetwear" },
@@ -242,7 +244,7 @@ function productKind(category: string, locale: ForeignLocale, productName = "") 
     if (/longsleeve/.test(name)) return ({ en: "Made in Italy long-sleeve T-shirt", es: "camiseta de manga larga Made in Italy", de: "Made-in-Italy-Langarmshirt", fr: "T-shirt manches longues Made in Italy" } as const)[locale]
     if (/tee/.test(name)) return ({ en: "Made in Italy T-shirt", es: "camiseta Made in Italy", de: "Made-in-Italy-T-Shirt", fr: "T-shirt Made in Italy" } as const)[locale]
   }
-  return rows[category]?.[locale] || ({ en: "streetwear piece", es: "prenda streetwear", de: "Streetwear-Piece", fr: "pièce streetwear" } as const)[locale]
+  return rows[normalizedCategory]?.[locale] || ({ en: "streetwear piece", es: "prenda streetwear", de: "Streetwear-Piece", fr: "pièce streetwear" } as const)[locale]
 }
 
 function localizedDescription(product: StoreProduct, locale: ForeignLocale, name: string, color: string) {
@@ -280,7 +282,7 @@ function localizedDetails(product: StoreProduct, locale: ForeignLocale, color: s
 function localizedComposition(product: StoreProduct, locale: ForeignLocale) {
   const source = `${product.composition || ""} ${product.description || ""}`.toLowerCase()
   const isDenim = /denim|jeans/.test(source) || ["shorts", "jeans", "camicie"].includes(product.category)
-  const isCotton = /cotone|cotton/.test(source) || ["t-shirt", "canotte", "felpe", "sweatshirts"].includes(product.category)
+  const isCotton = /cotone|cotton/.test(source) || product.category.startsWith("t-shirt-") || ["t-shirt", "canotte", "felpe", "sweatshirts"].includes(product.category)
   if (locale === "en") return `${isDenim ? "Cotton denim" : isCotton ? "Cotton fabric" : "Selected materials"}. Check the internal label for the complete fibre composition.`
   if (locale === "es") return `${isDenim ? "Denim de algodón" : isCotton ? "Tejido de algodón" : "Materiales seleccionados"}. Consulta la etiqueta interior para conocer la composición completa de las fibras.`
   if (locale === "de") return `${isDenim ? "Baumwoll-Denim" : isCotton ? "Baumwollgewebe" : "Ausgewählte Materialien"}. Die vollständige Faserzusammensetzung steht auf dem Innenetikett.`
