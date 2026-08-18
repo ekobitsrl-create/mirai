@@ -3,6 +3,7 @@ import { createHash } from "node:crypto"
 import {
   getProductSupplierSettings,
   getSupplierProfile,
+  hasMinimalMerchantBrand,
   isPrivateCheckoutProduct,
   withDemoProducts,
   type StoreProduct,
@@ -437,7 +438,7 @@ function renderProductVariant(
     ? merchantCopyOverride?.description
       || getMerchantDescription(product, merchantProductName, color, pattern, material)
     : localizedProduct.description
-  const brand = supplierSettings.brand
+  const brand = hasMinimalMerchantBrand(product) ? "Minimal" : supplierSettings.brand
   const itemGroupId = getItemGroupId(product)
   const metaInternalLabel = platform === "meta" && META_DARKADS_ITEM_GROUP_IDS.has(itemGroupId)
     ? "darkads"

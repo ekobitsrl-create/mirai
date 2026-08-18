@@ -46,7 +46,8 @@ export const SUPPLIER_PROFILE_OPTIONS: Record<SupplierProfile, {
 }
 
 export function hasMinimalMerchantBrand(product: Pick<SupplierProduct, "brand">) {
-  return /^minimal(?:\s|$)/i.test(product.brand?.trim() || "")
+  const brand = product.brand?.trim().toLocaleLowerCase("it") || ""
+  return brand === "minimal" || brand === "minimal couture"
 }
 
 export function getSupplierProfile(product: SupplierProduct): SupplierProfile {
