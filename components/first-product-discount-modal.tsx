@@ -120,7 +120,7 @@ export function FirstProductDiscountModal() {
 
   return (
     <div
-      className="fixed inset-0 z-[10000] flex items-center justify-center bg-black/75 p-4 backdrop-blur-sm"
+      className="fixed inset-0 z-[10000] flex items-start justify-center overflow-y-auto bg-black/75 p-3 backdrop-blur-sm sm:items-center sm:p-4"
       role="dialog"
       aria-modal="true"
       aria-labelledby="minimal-days-offer-title"
@@ -128,7 +128,16 @@ export function FirstProductDiscountModal() {
         if (event.target === event.currentTarget) dismissModal()
       }}
     >
-      <div className="relative w-full max-w-lg overflow-hidden rounded-3xl border border-primary/35 bg-[#120d1d] p-6 text-white shadow-[0_30px_100px_rgba(100,45,220,0.45)] sm:p-9">
+      <button
+        type="button"
+        onClick={dismissModal}
+        aria-label={t.nav.closeBanner}
+        className="fixed right-3 top-3 z-[10001] flex h-11 w-11 items-center justify-center rounded-full border border-white/20 bg-black/85 text-white shadow-lg backdrop-blur-sm sm:hidden"
+      >
+        <X className="h-5 w-5" />
+      </button>
+
+      <div className="relative my-3 w-full max-w-lg overflow-hidden rounded-3xl border border-primary/35 bg-[#120d1d] p-6 text-white shadow-[0_30px_100px_rgba(100,45,220,0.45)] sm:my-0 sm:p-9">
         <div className="pointer-events-none absolute -right-20 -top-24 h-64 w-64 rounded-full bg-primary/25 blur-[90px]" aria-hidden="true" />
         <div className="pointer-events-none absolute -bottom-24 -left-16 h-56 w-56 rounded-full bg-fuchsia-500/15 blur-[85px]" aria-hidden="true" />
 
@@ -136,7 +145,7 @@ export function FirstProductDiscountModal() {
           type="button"
           onClick={dismissModal}
           aria-label={t.nav.closeBanner}
-          className="absolute right-4 top-4 z-10 rounded-full border border-white/10 bg-black/25 p-2 text-white/60 transition-colors hover:text-white"
+          className="absolute right-4 top-4 z-10 hidden rounded-full border border-white/10 bg-black/25 p-2 text-white/60 transition-colors hover:text-white sm:inline-flex"
         >
           <X className="h-4 w-4" />
         </button>
