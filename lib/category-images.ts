@@ -24,6 +24,8 @@ const CATEGORY_IMAGES: Record<string, string> = {
   hoodies: "/images/categories/sweatshirts.jpeg",
   hoodie: "/images/categories/sweatshirts.jpeg",
   "t-shirt": "/images/categories/t-shirt.jpeg",
+  "t-shirt-mirai": "/images/categories/t-shirt.jpeg",
+  "t-shirt-god-speed": "/images/categories/t-shirt.jpeg",
   "t-shirts": "/images/categories/t-shirt.jpeg",
   tshirt: "/images/categories/t-shirt.jpeg",
   magliette: "/images/categories/t-shirt.jpeg",
@@ -38,6 +40,8 @@ const DEFAULT_CATEGORY_IMAGE = "/images/collection-tshirt.jpg"
 
 const CATEGORY_CARD_IMAGES: Record<string, string> = {
   "t-shirt": "/images/categories/t-shirt-card.jpeg",
+  "t-shirt-mirai": "/images/categories/t-shirt-card.jpeg",
+  "t-shirt-god-speed": "/images/categories/t-shirt-card.jpeg",
   "t-shirts": "/images/categories/t-shirt-card.jpeg",
   tshirt: "/images/categories/t-shirt-card.jpeg",
   magliette: "/images/categories/t-shirt-card.jpeg",
@@ -61,6 +65,8 @@ const CONTAINED_CATEGORY_SLUGS = new Set([
   "short",
   "bermuda",
   "t-shirt",
+  "t-shirt-mirai",
+  "t-shirt-god-speed",
   "t-shirts",
   "tshirt",
   "magliette",

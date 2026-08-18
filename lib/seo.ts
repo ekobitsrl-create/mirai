@@ -197,6 +197,8 @@ const APPAREL_SEO: CategorySeo = {
 
 const CATEGORY_SEO_MAP: Record<string, CategorySeo> = {
   "t-shirt": TSHIRT_SEO,
+  "t-shirt-mirai": TSHIRT_SEO,
+  "t-shirt-god-speed": TSHIRT_SEO,
   "t-shirts": TSHIRT_SEO,
   tshirt: TSHIRT_SEO,
   magliette: TSHIRT_SEO,

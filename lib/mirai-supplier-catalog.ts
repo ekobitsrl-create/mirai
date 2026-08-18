@@ -2,7 +2,7 @@ export type MiraiSupplierCatalogProduct = {
   name: string
   description: string
   price: number
-  category: "t-shirt" | "canotte" | "jeans" | "pantaloni" | "shorts" | "profumi"
+  category: "t-shirt-mirai" | "canotte" | "jeans" | "pantaloni" | "shorts" | "profumi"
   image_url: string
   image_gallery: string[]
   sizes: string[]
@@ -25,7 +25,7 @@ const MIRAI_SUPPLIER_CATALOG_BASE = [
     "name": "MIRAI Divine Garden Tee – White",
     "description": "T-shirt oversize bianca dal carattere barocco, costruita attorno a una maxi grafica con cherubini, ali e dettagli botanici. Il contrasto tra la base pulita e la stampa scura crea un capo streetwear scenografico, pensato per diventare il centro dell’outfit.",
     "price": 85,
-    "category": "t-shirt",
+    "category": "t-shirt-mirai",
     "image_url": "/products/mirai-supplier/divine-garden-white-01.jpeg",
     "image_gallery": [
       "/products/mirai-supplier/divine-garden-white-01.jpeg"
@@ -55,7 +55,7 @@ const MIRAI_SUPPLIER_CATALOG_BASE = [
     "name": "MIRAI Hope Angel Tee – White",
     "description": "T-shirt oversize bianca con una composizione angelica dall’estetica vintage e distressed. La stampa frontale nei toni seppia dialoga con la grafica posteriore ad alto contrasto, per un look streetwear completo da ogni angolazione.",
     "price": 85,
-    "category": "t-shirt",
+    "category": "t-shirt-mirai",
     "image_url": "/products/mirai-supplier/hope-angel-white-01.jpeg",
     "image_gallery": [
       "/products/mirai-supplier/hope-angel-white-01.jpeg"
@@ -85,7 +85,7 @@ const MIRAI_SUPPLIER_CATALOG_BASE = [
     "name": "MIRAI Blind Cupid Tee – Black",
     "description": "T-shirt oversize nera con Cupido bendato, arco centrale e ali scolpite in una grafica dal forte impatto visivo. Il lettering luminoso e la palette fredda trasformano un’immagine classica in un pezzo urban contemporaneo.",
     "price": 85,
-    "category": "t-shirt",
+    "category": "t-shirt-mirai",
     "image_url": "/products/mirai-supplier/blind-cupid-black-01.jpeg",
     "image_gallery": [
       "/products/mirai-supplier/blind-cupid-black-01.jpeg"
@@ -115,7 +115,7 @@ const MIRAI_SUPPLIER_CATALOG_BASE = [
     "name": "MIRAI Blind Cupid Tee – Pink",
     "description": "Variante rosa della Blind Cupid Tee, con maxi stampa scultorea e lettering argentato. Il colore acceso alleggerisce l’immaginario gotico della grafica e crea un contrasto deciso, perfetto per styling streetwear fuori dagli schemi.",
     "price": 85,
-    "category": "t-shirt",
+    "category": "t-shirt-mirai",
     "image_url": "/products/mirai-supplier/blind-cupid-pink-01.jpeg",
     "image_gallery": [
       "/products/mirai-supplier/blind-cupid-pink-01.jpeg"
@@ -145,7 +145,7 @@ const MIRAI_SUPPLIER_CATALOG_BASE = [
     "name": "MIRAI Guardian Prayer Tee – Black",
     "description": "T-shirt oversize nera con angelo bendato in preghiera, ali dorate e dettagli pittorici di ispirazione rinascimentale. Una grafica ricca e stratificata che unisce iconografia sacra, atmosfere dark e linguaggio streetwear.",
     "price": 85,
-    "category": "t-shirt",
+    "category": "t-shirt-mirai",
     "image_url": "/products/mirai-supplier/guardian-prayer-black-01.jpeg",
     "image_gallery": [
       "/products/mirai-supplier/guardian-prayer-black-01.jpeg",
@@ -176,7 +176,7 @@ const MIRAI_SUPPLIER_CATALOG_BASE = [
     "name": "MIRAI Celestial Rider Tee – Black",
     "description": "T-shirt oversize nera con un giovane angelo a cavallo, raccontato attraverso una maxi stampa dai toni notturni. Il soggetto classico viene reinterpretato con proporzioni bold e una presenza grafica ideale per outfit urban monocromatici.",
     "price": 85,
-    "category": "t-shirt",
+    "category": "t-shirt-mirai",
     "image_url": "/products/mirai-supplier/celestial-rider-black-01.jpeg",
     "image_gallery": [
       "/products/mirai-supplier/celestial-rider-black-01.jpeg"
@@ -206,7 +206,7 @@ const MIRAI_SUPPLIER_CATALOG_BASE = [
     "name": "MIRAI Mixed Emotion Tee – Black",
     "description": "T-shirt oversize nera con scena frontale dal tono cinematico e lettering Mixed Emotion sul retro. La doppia stampa crea un capo completo e dinamico, con accenti rosso fuoco che emergono sulla base scura.",
     "price": 85,
-    "category": "t-shirt",
+    "category": "t-shirt-mirai",
     "image_url": "/products/mirai-supplier/mixed-emotion-black-01.jpeg",
     "image_gallery": [
       "/products/mirai-supplier/mixed-emotion-black-01.jpeg"
@@ -266,7 +266,7 @@ const MIRAI_SUPPLIER_CATALOG_BASE = [
     "name": "MIRAI Astro Riders Tee – Black",
     "description": "T-shirt oversize nera con grafica spaziale multicolore, tra razzi, personaggi e suggestioni retro-futuristiche. La stampa ad alta presenza visiva porta energia pop all’interno di una silhouette streetwear rilassata.",
     "price": 70,
-    "category": "t-shirt",
+    "category": "t-shirt-mirai",
     "image_url": "/products/mirai-supplier/astro-riders-black-01.jpeg",
     "image_gallery": [
       "/products/mirai-supplier/astro-riders-black-01.jpeg"
@@ -296,7 +296,7 @@ const MIRAI_SUPPLIER_CATALOG_BASE = [
     "name": "MIRAI Astro Riders Tee – White",
     "description": "Variante bianca della Astro Riders Tee, caratterizzata da una maxi grafica retro-futuristica con razzi e personaggi illustrati. La base chiara amplifica i colori della stampa e rende il capo immediato da abbinare.",
     "price": 120,
-    "category": "t-shirt",
+    "category": "t-shirt-mirai",
     "image_url": "/products/mirai-supplier/astro-riders-white-01.jpeg",
     "image_gallery": [
       "/products/mirai-supplier/astro-riders-white-01.jpeg"
@@ -326,7 +326,7 @@ const MIRAI_SUPPLIER_CATALOG_BASE = [
     "name": "MIRAI Guardian Prayer Tee – Sand",
     "description": "Variante sabbia della Guardian Prayer Tee, con maxi stampa tono su tono ispirata alla pittura classica. Le sfumature beige, oro e avorio danno profondità alla grafica mantenendo un’estetica morbida e premium.",
     "price": 120,
-    "category": "t-shirt",
+    "category": "t-shirt-mirai",
     "image_url": "/products/mirai-supplier/guardian-prayer-sand-01.jpeg",
     "image_gallery": [
       "/products/mirai-supplier/guardian-prayer-sand-01.jpeg"
@@ -356,7 +356,7 @@ const MIRAI_SUPPLIER_CATALOG_BASE = [
     "name": "MIRAI Liberty Dreams Tee – Vintage Black",
     "description": "T-shirt oversize nera dall’effetto vintage con ritratto pop e richiami alla Statua della Libertà. I colori saturi e il trattamento grafico consumato donano al capo un’attitudine metropolitana immediata.",
     "price": 120,
-    "category": "t-shirt",
+    "category": "t-shirt-mirai",
     "image_url": "/products/mirai-supplier/liberty-dreams-black-01.jpeg",
     "image_gallery": [
       "/products/mirai-supplier/liberty-dreams-black-01.jpeg"
@@ -386,7 +386,7 @@ const MIRAI_SUPPLIER_CATALOG_BASE = [
     "name": "MIRAI Wild Valley Tiger Tee – White",
     "description": "T-shirt oversize bianca con tigre centrale, lettering college e dettagli grafici effetto lightning. Il mix tra immaginario varsity e stampa animalier crea un pezzo energico, facile da inserire in look streetwear quotidiani.",
     "price": 120,
-    "category": "t-shirt",
+    "category": "t-shirt-mirai",
     "image_url": "/products/mirai-supplier/wild-valley-tiger-white-01.jpeg",
     "image_gallery": [
       "/products/mirai-supplier/wild-valley-tiger-white-01.jpeg"
@@ -416,7 +416,7 @@ const MIRAI_SUPPLIER_CATALOG_BASE = [
     "name": "MIRAI Court Bulldog Tee – Black",
     "description": "T-shirt oversize nera con bulldog da playground, pallone da basket e lettering college. La grafica ruvida e stratificata richiama le divise sportive vintage, reinterpretate in chiave urban.",
     "price": 120,
-    "category": "t-shirt",
+    "category": "t-shirt-mirai",
     "image_url": "/products/mirai-supplier/court-bulldog-black-01.jpeg",
     "image_gallery": [
       "/products/mirai-supplier/court-bulldog-black-01.jpeg"
@@ -446,7 +446,7 @@ const MIRAI_SUPPLIER_CATALOG_BASE = [
     "name": "MIRAI Night Panther Tee – Black",
     "description": "T-shirt oversize nera con pantera blu elettrico, dettagli metallici e lettering oversize. Un soggetto aggressivo e notturno che costruisce un forte contrasto sulla base black.",
     "price": 120,
-    "category": "t-shirt",
+    "category": "t-shirt-mirai",
     "image_url": "/products/mirai-supplier/night-panther-black-01.jpeg",
     "image_gallery": [
       "/products/mirai-supplier/night-panther-black-01.jpeg"
@@ -476,7 +476,7 @@ const MIRAI_SUPPLIER_CATALOG_BASE = [
     "name": "MIRAI Target Practice Tee – Washed Red",
     "description": "T-shirt oversize rossa con trattamento washed e grafica frontale ispirata ai bersagli da poligono. Le tonalità consumate e il layout tipografico donano al capo un aspetto vissuto e autenticamente urban.",
     "price": 120,
-    "category": "t-shirt",
+    "category": "t-shirt-mirai",
     "image_url": "/products/mirai-supplier/target-practice-red-01.jpeg",
     "image_gallery": [
       "/products/mirai-supplier/target-practice-red-01.jpeg"
@@ -506,7 +506,7 @@ const MIRAI_SUPPLIER_CATALOG_BASE = [
     "name": "MIRAI Court Clash Tee – Black",
     "description": "T-shirt oversize nera con una scena da playground in movimento, sviluppata in una stampa multicolore che attraversa il fronte. Il mix di blu, giallo e rosa crea un’estetica sportiva dal taglio illustrato.",
     "price": 120,
-    "category": "t-shirt",
+    "category": "t-shirt-mirai",
     "image_url": "/products/mirai-supplier/court-clash-black-01.jpeg",
     "image_gallery": [
       "/products/mirai-supplier/court-clash-black-01.jpeg"
@@ -536,7 +536,7 @@ const MIRAI_SUPPLIER_CATALOG_BASE = [
     "name": "MIRAI Grit & Dreams Tee – White",
     "description": "T-shirt oversize bianco sporco con grafica fotografica e lettering varsity dai toni giallo e rosso. L’impostazione da poster vintage racconta ambizione e cultura street in una composizione forte ma facile da indossare.",
     "price": 120,
-    "category": "t-shirt",
+    "category": "t-shirt-mirai",
     "image_url": "/products/mirai-supplier/grit-dreams-white-01.jpeg",
     "image_gallery": [
       "/products/mirai-supplier/grit-dreams-white-01.jpeg"
@@ -566,7 +566,7 @@ const MIRAI_SUPPLIER_CATALOG_BASE = [
     "name": "MIRAI Neon Racing Tee – White",
     "description": "T-shirt oversize bianca con grafiche racing in stile arcade, auto sportive e dettagli neon. La stampa fronte-retro combina velocità, colori saturi e lettering tecnico per un look Y2K ad alto impatto.",
     "price": 120,
-    "category": "t-shirt",
+    "category": "t-shirt-mirai",
     "image_url": "/products/mirai-supplier/neon-racing-white-01.jpeg",
     "image_gallery": [
       "/products/mirai-supplier/neon-racing-white-01.jpeg"
@@ -596,7 +596,7 @@ const MIRAI_SUPPLIER_CATALOG_BASE = [
     "name": "MIRAI Valley Athletic Bulldog Tee – White",
     "description": "T-shirt oversize bianco sporco con bulldog atletico e lettering college effetto vintage. Un capo che riprende l’estetica delle uniformi universitarie e la porta in una silhouette streetwear rilassata.",
     "price": 120,
-    "category": "t-shirt",
+    "category": "t-shirt-mirai",
     "image_url": "/products/mirai-supplier/valley-athletic-bulldog-white-01.jpeg",
     "image_gallery": [
       "/products/mirai-supplier/valley-athletic-bulldog-white-01.jpeg"
@@ -626,7 +626,7 @@ const MIRAI_SUPPLIER_CATALOG_BASE = [
     "name": "MIRAI Jamaica Crew Tee – Black",
     "description": "T-shirt oversize nera con bandiera giamaicana, gruppo in silhouette e dettagli grafici verde acido. La palette intensa rende omaggio alla cultura caraibica con un linguaggio visivo contemporaneo e urbano.",
     "price": 120,
-    "category": "t-shirt",
+    "category": "t-shirt-mirai",
     "image_url": "/products/mirai-supplier/jamaica-crew-black-01.jpeg",
     "image_gallery": [
       "/products/mirai-supplier/jamaica-crew-black-01.jpeg"
@@ -656,7 +656,7 @@ const MIRAI_SUPPLIER_CATALOG_BASE = [
     "name": "MIRAI Sacred Static Tee – Black",
     "description": "T-shirt oversize nera con volto monocromatico, croce centrale e lettering gotico. Il trattamento ruvido in bianco e nero crea un’estetica dark essenziale, costruita per outfit total black.",
     "price": 120,
-    "category": "t-shirt",
+    "category": "t-shirt-mirai",
     "image_url": "/products/mirai-supplier/sacred-static-black-01.jpeg",
     "image_gallery": [
       "/products/mirai-supplier/sacred-static-black-01.jpeg"
@@ -686,7 +686,7 @@ const MIRAI_SUPPLIER_CATALOG_BASE = [
     "name": "MIRAI Golden Machine Tee – Black",
     "description": "T-shirt oversize nera con composizione meccanica in giallo metallico e lettering geometrico. Il disegno tecnico destrutturato richiama motori, velocità e cultura industrial, mantenendo una palette netta e sofisticata.",
     "price": 120,
-    "category": "t-shirt",
+    "category": "t-shirt-mirai",
     "image_url": "/products/mirai-supplier/golden-machine-black-01.jpeg",
     "image_gallery": [
       "/products/mirai-supplier/golden-machine-black-01.jpeg"
@@ -716,7 +716,7 @@ const MIRAI_SUPPLIER_CATALOG_BASE = [
     "name": "MIRAI Electric Reaper Tee – Black",
     "description": "T-shirt oversize nera con scheletro attraversato da scariche blu elettrico. La grafica verticale, intensa e luminosa, trasforma un immaginario dark in un capo streetwear dal forte impatto.",
     "price": 120,
-    "category": "t-shirt",
+    "category": "t-shirt-mirai",
     "image_url": "/products/mirai-supplier/electric-reaper-black-01.jpeg",
     "image_gallery": [
       "/products/mirai-supplier/electric-reaper-black-01.jpeg"
@@ -746,7 +746,7 @@ const MIRAI_SUPPLIER_CATALOG_BASE = [
     "name": "MIRAI Neon Racing Tee – Black",
     "description": "Variante nera della Neon Racing Tee, con auto sportive, fiamme e dettagli cromatici ispirati al mondo arcade. La base scura rende ancora più vivi il blu, il magenta e il giallo della maxi stampa.",
     "price": 120,
-    "category": "t-shirt",
+    "category": "t-shirt-mirai",
     "image_url": "/products/mirai-supplier/neon-racing-black-01.jpeg",
     "image_gallery": [
       "/products/mirai-supplier/neon-racing-black-01.jpeg"
@@ -776,7 +776,7 @@ const MIRAI_SUPPLIER_CATALOG_BASE = [
     "name": "MIRAI Jamaica Crew Tee – White",
     "description": "Variante bianca della Jamaica Crew Tee, con grafica verde e nera sviluppata sia sul fronte sia sul retro. Il doppio artwork crea un capo completo, fresco e immediatamente riconoscibile.",
     "price": 120,
-    "category": "t-shirt",
+    "category": "t-shirt-mirai",
     "image_url": "/products/mirai-supplier/jamaica-crew-white-01.jpeg",
     "image_gallery": [
       "/products/mirai-supplier/jamaica-crew-white-01.jpeg"

@@ -1060,6 +1060,8 @@ const categoryCopy: Record<string, Record<Locale, string>> = {
   shorts: { it: "Shorts", en: "Shorts", es: "Pantalones cortos", de: "Shorts", fr: "Shorts" },
   pantaloni: { it: "Pantaloni", en: "Trousers", es: "Pantalones", de: "Hosen", fr: "Pantalons" },
   "t-shirt": { it: "T-shirt", en: "T-shirts", es: "Camisetas", de: "T-Shirts", fr: "T-shirts" },
+  "t-shirt-mirai": { it: "MIRAI", en: "MIRAI", es: "MIRAI", de: "MIRAI", fr: "MIRAI" },
+  "t-shirt-god-speed": { it: "God Speed", en: "God Speed", es: "God Speed", de: "God Speed", fr: "God Speed" },
   tracksuits: { it: "Tute", en: "Tracksuits", es: "Chándales", de: "Trainingsanzüge", fr: "Survêtements" },
   sunglasses: { it: "Occhiali da sole", en: "Sunglasses", es: "Gafas de sol", de: "Sonnenbrillen", fr: "Lunettes de soleil" },
   "mirai-parfum-exlusive": { it: "Profumi", en: "Fragrances", es: "Perfumes", de: "Düfte", fr: "Parfums" },
