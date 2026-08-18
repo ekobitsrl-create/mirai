@@ -148,7 +148,7 @@ export async function POST(request: NextRequest) {
     
     let { data: products, error } = await supabase
       .from('products')
-      .select('id, name, description, price, image_url, stock_by_size, supplier_sku, color_name, is_published')
+      .select('id, name, description, price, image_url, stock_by_size, supplier_sku, color_name, is_published, is_preorder, preorder_release_at')
       .in('id', productIds)
 
     if (error?.message.includes('stock_by_size')) {
@@ -230,6 +230,8 @@ export async function POST(request: NextRequest) {
               product_id: product.id,
               meta_content_id: getCatalogItemId(staticProduct, cartItem.size || 'OS'),
               ...(cartItem.size ? { size: cartItem.size } : {}),
+              is_preorder: product.is_preorder ? 'true' : 'false',
+              ...(product.preorder_release_at ? { preorder_release_at: product.preorder_release_at } : {}),
               ...(customization ? customizationMetadata(customization) : {}),
             },
           },

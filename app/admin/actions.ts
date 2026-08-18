@@ -54,6 +54,9 @@ function parseProductDetails(formData: FormData) {
     composition: text(formData.get("composition")),
     care: text(formData.get("care")),
     detail_items: detailItems.length ? detailItems : null,
+    is_preorder: formData.get("is_preorder") === "on",
+    preorder_release_at: text(formData.get("preorder_release_at")),
+    drop_name: text(formData.get("drop_name")),
   }
 }
 
@@ -135,6 +138,7 @@ function revalidateCatalog(productId?: string) {
   revalidatePath("/admin")
   revalidatePath("/")
   revalidatePath("/collezioni")
+  revalidatePath("/collezione/drop")
   revalidatePath("/collezione/[slug]", "page")
   revalidatePath("/google-merchant-feed.xml")
   revalidatePath("/google-merchant-feed-minimal.xml")

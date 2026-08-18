@@ -252,7 +252,7 @@ async function createCheckoutSessionInternal(
   const productIds = cartItems.map((item) => item.productId)
   let { data: products, error } = await supabase
     .from('products')
-    .select('id, name, description, price, image_url, stock_by_size, supplier_sku, color_name, is_published')
+    .select('id, name, description, price, image_url, stock_by_size, supplier_sku, color_name, is_published, is_preorder, preorder_release_at')
     .in('id', productIds)
 
   if (error?.message.includes('stock_by_size')) {
@@ -323,6 +323,8 @@ async function createCheckoutSessionInternal(
             product_id: product.id,
             meta_content_id: getCatalogItemId(staticProduct, cartItem.size || 'OS'),
             ...(cartItem.size ? { size: cartItem.size } : {}),
+            is_preorder: product.is_preorder ? 'true' : 'false',
+            ...(product.preorder_release_at ? { preorder_release_at: product.preorder_release_at } : {}),
             ...(customization ? customizationMetadata(customization) : {}),
           },
         },
@@ -519,7 +521,7 @@ export async function createCashOnDeliveryOrder(cartItems: CartLineItem[], detai
   const productIds = [...new Set(cartItems.map((item) => item.productId))]
   let { data: products, error } = await supabase
     .from('products')
-    .select('id, name, description, price, image_url, stock_by_size, supplier_sku, color_name, supplier_profile, brand, is_published')
+    .select('id, name, description, price, image_url, stock_by_size, supplier_sku, color_name, supplier_profile, brand, is_published, is_preorder, preorder_release_at')
     .in('id', productIds)
 
   if (error?.message.includes('stock_by_size')) {
@@ -658,6 +660,8 @@ export async function createCashOnDeliveryOrder(cartItems: CartLineItem[], detai
     size: cartItem.size || null,
     quantity,
     price: Number(product.price),
+    is_preorder: Boolean(product.is_preorder),
+    preorder_release_at: product.preorder_release_at || null,
   }))
   const { error: itemsError } = await supabase.from('order_items').insert(orderItems)
   if (itemsError) {

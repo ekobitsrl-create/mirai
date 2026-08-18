@@ -1068,6 +1068,7 @@ const categoryCopy: Record<string, Record<Locale, string>> = {
   "cappelli-custom": { it: "Cappelli Custom", en: "Custom Caps", es: "Gorras Custom", de: "Custom Caps", fr: "Casquettes Custom" },
   "tee-shorts": { it: "Tee & Shorts", en: "T-shirts & Shorts", es: "Camisetas y bermudas", de: "T-Shirts & Shorts", fr: "T-shirts et shorts" },
   "tee&shorts": { it: "Tee & Shorts", en: "T-shirts & Shorts", es: "Camisetas y bermudas", de: "T-Shirts & Shorts", fr: "T-shirts et shorts" },
+  drop: { it: "Drop", en: "Drop", es: "Drop", de: "Drop", fr: "Drop" },
 }
 
 const categoryWordCopy: Record<Exclude<Locale, "it">, Array<readonly [RegExp, string]>> = {

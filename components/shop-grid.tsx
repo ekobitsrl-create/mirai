@@ -55,6 +55,8 @@ const shopCopy = {
     search: "Cerca nello shop",
     noMatch: "Nessun prodotto trovato.",
     newProduct: "Nuovo",
+    preorder: "Preordine",
+    preorderNow: "Preordina",
     soldOut: "Esaurito",
     quickAdd: "Aggiunta rapida",
     selectSize: "Seleziona taglia",
@@ -72,6 +74,8 @@ const shopCopy = {
     search: "Search the shop",
     noMatch: "No products found.",
     newProduct: "New",
+    preorder: "Preorder",
+    preorderNow: "Preorder",
     soldOut: "Sold out",
     quickAdd: "Quick add",
     selectSize: "Select size",
@@ -89,6 +93,8 @@ const shopCopy = {
     search: "Buscar en la tienda",
     noMatch: "No se encontraron productos.",
     newProduct: "Nuevo",
+    preorder: "Preventa",
+    preorderNow: "Reservar",
     soldOut: "Agotado",
     quickAdd: "Añadir rápido",
     selectSize: "Selecciona talla",
@@ -106,6 +112,8 @@ const shopCopy = {
     search: "Im Shop suchen",
     noMatch: "Keine Produkte gefunden.",
     newProduct: "Neu",
+    preorder: "Vorbestellung",
+    preorderNow: "Vorbestellen",
     soldOut: "Ausverkauft",
     quickAdd: "Schnell hinzufügen",
     selectSize: "Größe wählen",
@@ -123,6 +131,8 @@ const shopCopy = {
     search: "Rechercher dans la boutique",
     noMatch: "Aucun produit trouvé.",
     newProduct: "Nouveau",
+    preorder: "Précommande",
+    preorderNow: "Précommander",
     soldOut: "Épuisé",
     quickAdd: "Ajout rapide",
     selectSize: "Choisir la taille",
@@ -557,7 +567,7 @@ function ProductCard({
               src={product.image_url}
               alt={translateProductName(product.name, locale)}
               fill
-              className="object-cover object-center transition-transform duration-700 ease-out group-hover:scale-[1.035]"
+              className={`${product.category === "drop" ? "object-contain" : "object-cover"} object-center transition-transform duration-700 ease-out group-hover:scale-[1.035]`}
               sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
             />
           ) : (
@@ -567,6 +577,7 @@ function ProductCard({
         <div className="pointer-events-none absolute inset-x-0 top-0 flex items-start justify-between p-3 md:p-4">
           <div className="flex flex-col items-start gap-1.5">
             {product.is_new && <span className="bg-primary px-2 py-1 text-[8px] font-bold uppercase tracking-[0.2em] text-primary-foreground">{labels.newProduct}</span>}
+            {product.is_preorder && <span className="bg-black/80 px-2 py-1 text-[8px] font-bold uppercase tracking-[0.2em] text-white backdrop-blur-md">{labels.preorder}</span>}
             {!product.in_stock && <span className="bg-white px-2 py-1 text-[8px] font-bold uppercase tracking-[0.2em] text-black">{labels.soldOut}</span>}
           </div>
           <button
@@ -586,7 +597,7 @@ function ProductCard({
               className="mirai-neon-primary flex w-full items-center justify-center gap-1.5 rounded-lg bg-white px-2 py-2 text-[8px] font-bold uppercase tracking-[0.16em] text-black transition-all hover:bg-primary hover:text-primary-foreground md:gap-2 md:rounded-xl md:px-3 md:py-3.5 md:text-[10px] md:tracking-[0.22em]"
             >
               <ShoppingBag className="h-3 w-3 md:h-3.5 md:w-3.5" />
-              {labels.quickAdd}
+              {product.is_preorder ? labels.preorderNow : labels.quickAdd}
             </button>
           </div>
         )}
@@ -759,7 +770,7 @@ function QuickAdd({
       <div className="relative w-full max-w-xl border border-white/10 bg-card p-5 text-white shadow-2xl animate-in slide-in-from-bottom-5 duration-300 md:p-7">
         <div className="flex gap-4">
           <div className="relative h-28 w-24 shrink-0 overflow-hidden bg-white/5">
-            {product.image_url && <Image src={product.image_url} alt={translateProductName(product.name, locale)} fill className="object-cover" sizes="96px" />}
+            {product.image_url && <Image src={product.image_url} alt={translateProductName(product.name, locale)} fill className={product.category === "drop" ? "object-contain" : "object-cover"} sizes="96px" />}
           </div>
           <div className="min-w-0 flex-1">
             <div className="flex items-start justify-between gap-4">

@@ -117,6 +117,7 @@ export function ProductDetail({
       tax: "IVA inclusa", save: "risparmi", checkoutCode: "applicando il codice nel checkout", color: "Colore", variant: "Variante", size: "Taglia", sizeGuide: "Guida alle taglie",
       sizeSoldOut: "Questa taglia è esaurita. Scegline un'altra.", selectSize: "Seleziona una taglia prima di continuare.", available: "Disponibile", availability: "Disponibilità", piece: "pezzo", pieces: "pezzi",
       added: "Aggiunto", add: "Aggiungi al carrello", soldOut: "Esaurito", productCode: "Codice prodotto", chooseCheckout: "scegli il metodo nel checkout",
+      preorder: "Preordine", preorderNow: "Preordina ora", preorderAvailability: "Disponibile dal", shipsAfterRelease: "La spedizione parte dopo l'uscita del prodotto.",
       discountBeforePay: "Prima puoi applicare MIRAI10 o un altro codice sconto, poi scegliere il metodo di pagamento.", unavailable: "Momentaneamente non disponibile",
       freeShipping: "Spedizione", always: "Gratis in Italia", easyReturn: "Reso facile", within30: "Entro 30 giorni", payment: "Pagamento", stripe: "Protetto da Stripe",
       details: "Dettagli prodotto", composition: "Composizione e cura", shippingReturns: "Spedizioni e resi", expected: "Tempi previsti", tracked: "Spedizione tracciata: gratuita in Italia, supplemento fisso di 40 € negli altri Paesi UE.",
@@ -131,6 +132,7 @@ export function ProductDetail({
       tax: "VAT included", save: "save", checkoutCode: "by applying the code at checkout", color: "Colour", variant: "Variant", size: "Size", sizeGuide: "Size guide",
       sizeSoldOut: "This size is sold out. Choose another one.", selectSize: "Select a size before continuing.", available: "Available", availability: "Availability", piece: "item", pieces: "items",
       added: "Added", add: "Add to cart", soldOut: "Sold out", productCode: "Product code", chooseCheckout: "choose the method at checkout",
+      preorder: "Preorder", preorderNow: "Preorder now", preorderAvailability: "Available from", shipsAfterRelease: "Shipping starts after the product release.",
       discountBeforePay: "Apply MIRAI10 or another discount code first, then choose your payment method.", unavailable: "Temporarily unavailable",
       freeShipping: "Shipping", always: "Free in Italy", easyReturn: "Easy return", within30: "Within 30 days", payment: "Payment", stripe: "Secured by Stripe",
       details: "Product details", composition: "Composition and care", shippingReturns: "Shipping and returns", expected: "Expected timing", tracked: "Tracked shipping: free in Italy, fixed €40 surcharge in other EU countries.",
@@ -145,6 +147,7 @@ export function ProductDetail({
       tax: "IVA incluido", save: "ahorras", checkoutCode: "aplicando el código en el checkout", color: "Color", variant: "Variante", size: "Talla", sizeGuide: "Guía de tallas",
       sizeSoldOut: "Esta talla está agotada. Elige otra.", selectSize: "Selecciona una talla antes de continuar.", available: "Disponible", availability: "Disponibilidad", piece: "unidad", pieces: "unidades",
       added: "Añadido", add: "Añadir al carrito", soldOut: "Agotado", productCode: "Código de producto", chooseCheckout: "elige el método en el checkout",
+      preorder: "Preventa", preorderNow: "Reservar ahora", preorderAvailability: "Disponible desde", shipsAfterRelease: "El envío comienza después del lanzamiento del producto.",
       discountBeforePay: "Primero aplica MIRAI10 u otro código de descuento y después elige el método de pago.", unavailable: "No disponible temporalmente",
       freeShipping: "Envío", always: "Gratis en Italia", easyReturn: "Devolución fácil", within30: "En 30 días", payment: "Pago", stripe: "Protegido por Stripe",
       details: "Detalles del producto", composition: "Composición y cuidado", shippingReturns: "Envíos y devoluciones", expected: "Plazo previsto", tracked: "Envío con seguimiento: gratuito en Italia, suplemento fijo de 40 € en los demás países de la UE.",
@@ -159,6 +162,7 @@ export function ProductDetail({
       tax: "inkl. MwSt.", save: "du sparst", checkoutCode: "bei Eingabe des Codes an der Kasse", color: "Farbe", variant: "Variante", size: "Größe", sizeGuide: "Größentabelle",
       sizeSoldOut: "Diese Größe ist ausverkauft. Wähle eine andere.", selectSize: "Wähle eine Größe, bevor du fortfährst.", available: "Verfügbar", availability: "Verfügbarkeit", piece: "Stück", pieces: "Stück",
       added: "Hinzugefügt", add: "In den Warenkorb", soldOut: "Ausverkauft", productCode: "Produktcode", chooseCheckout: "Zahlungsart an der Kasse wählen",
+      preorder: "Vorbestellung", preorderNow: "Jetzt vorbestellen", preorderAvailability: "Verfügbar ab", shipsAfterRelease: "Der Versand beginnt nach der Produktveröffentlichung.",
       discountBeforePay: "Wende zuerst MIRAI10 oder einen anderen Rabattcode an und wähle dann die Zahlungsart.", unavailable: "Vorübergehend nicht verfügbar",
       freeShipping: "Versand", always: "Kostenlos in Italien", easyReturn: "Einfache Rückgabe", within30: "Innerhalb von 30 Tagen", payment: "Zahlung", stripe: "Durch Stripe geschützt",
       details: "Produktdetails", composition: "Material und Pflege", shippingReturns: "Versand und Rückgabe", expected: "Voraussichtliche Dauer", tracked: "Sendungsverfolgter Versand: kostenlos in Italien, 40 € Festzuschlag in den übrigen EU-Ländern.",
@@ -173,6 +177,7 @@ export function ProductDetail({
       tax: "TVA incluse", save: "économisez", checkoutCode: "en appliquant le code au paiement", color: "Couleur", variant: "Variante", size: "Taille", sizeGuide: "Guide des tailles",
       sizeSoldOut: "Cette taille est épuisée. Choisissez-en une autre.", selectSize: "Sélectionnez une taille avant de continuer.", available: "Disponible", availability: "Disponibilité", piece: "article", pieces: "articles",
       added: "Ajouté", add: "Ajouter au panier", soldOut: "Épuisé", productCode: "Code produit", chooseCheckout: "choisissez le mode au paiement",
+      preorder: "Précommande", preorderNow: "Précommander", preorderAvailability: "Disponible à partir du", shipsAfterRelease: "L’expédition commence après la sortie du produit.",
       discountBeforePay: "Appliquez d’abord MIRAI10 ou un autre code promo, puis choisissez le mode de paiement.", unavailable: "Temporairement indisponible",
       freeShipping: "Livraison", always: "Gratuite en Italie", easyReturn: "Retour facile", within30: "Sous 30 jours", payment: "Paiement", stripe: "Protégé par Stripe",
       details: "Détails du produit", composition: "Composition et entretien", shippingReturns: "Livraison et retours", expected: "Délai prévu", tracked: "Livraison suivie : gratuite en Italie, supplément fixe de 40 € dans les autres pays de l’UE.",
@@ -191,7 +196,16 @@ export function ProductDetail({
     product.category.trim().toLowerCase(),
   )
   const returnCondition = isFragrance ? productCopy.fragranceCondition : productCopy.garmentCondition
-  const shippingEstimate = supplierSettings.shippingMinDays !== undefined && supplierSettings.shippingMaxDays !== undefined
+  const isPreorder = Boolean(product.is_preorder)
+  const releaseDate = new Intl.DateTimeFormat(locale, {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    timeZone: "Europe/Rome",
+  }).format(new Date(product.preorder_release_at || "2026-09-30T00:00:00+02:00"))
+  const shippingEstimate = isPreorder
+    ? `${productCopy.preorderAvailability} ${releaseDate}`
+    : supplierSettings.shippingMinDays !== undefined && supplierSettings.shippingMaxDays !== undefined
     ? `${productCopy.delivery} ${supplierSettings.shippingMinDays}–${supplierSettings.shippingMaxDays} ${productCopy.workingDays}`
     : `${productCopy.delivery} 3–5 ${productCopy.workingDays}`
   const detailItems = localizedProduct.detailItems
@@ -409,7 +423,7 @@ export function ProductDetail({
                   src={image.src}
                   alt=""
                   fill
-                  className="object-cover"
+                  className={image.fit === "contain" ? "object-contain" : "object-cover"}
                   style={{ objectPosition: image.position || "center" }}
                   sizes="72px"
                 />
@@ -436,7 +450,7 @@ export function ProductDetail({
                 src={selectedImage.src}
                 alt={selectedImage.alt}
                 fill
-                className="object-cover transition-transform duration-700 group-hover:scale-[1.025]"
+                className={`${selectedImage.fit === "contain" ? "object-contain" : "object-cover"} transition-transform duration-700 group-hover:scale-[1.025]`}
                 style={{ objectPosition: selectedImage.position || "center" }}
                 sizes="(max-width: 1024px) 100vw, 60vw"
                 preload
@@ -449,6 +463,9 @@ export function ProductDetail({
             </span>
             {product.is_new && (
               <span className="absolute left-4 top-4 bg-[#9f86ff] px-3 py-1.5 text-[9px] font-bold uppercase tracking-[0.2em] text-black">{productCopy.newProduct}</span>
+            )}
+            {isPreorder && (
+              <span className={`absolute left-4 ${product.is_new ? "top-14" : "top-4"} bg-black/80 px-3 py-1.5 text-[9px] font-bold uppercase tracking-[0.2em] text-white backdrop-blur-md`}>{productCopy.preorder}</span>
             )}
             {selectedImage && (
               <span className="absolute bottom-4 left-4 rounded-full border border-white/15 bg-black/65 px-3 py-1.5 text-[8px] font-semibold uppercase tracking-[0.16em] text-white/75 backdrop-blur-md">
@@ -597,7 +614,7 @@ export function ProductDetail({
               disabled={!product.in_stock}
               className={`order-1 flex min-h-16 w-full items-center justify-center gap-2 px-5 text-xs font-bold uppercase tracking-[0.2em] transition-all sm:order-2 sm:min-h-14 sm:text-[10px] sm:tracking-[0.22em] ${added ? "bg-emerald-400 text-black" : product.in_stock ? "bg-primary text-primary-foreground shadow-[0_0_34px_rgba(159,134,255,0.46)] hover:-translate-y-0.5 hover:brightness-110 hover:shadow-[0_0_42px_rgba(159,134,255,0.55)]" : "cursor-not-allowed bg-white/10 text-white/30"}`}
             >
-              {added ? <><Check className="h-4 w-4" /> {productCopy.added}</> : product.in_stock ? <><ShoppingBag className="h-4 w-4" /> {productCopy.add}</> : productCopy.soldOut}
+              {added ? <><Check className="h-4 w-4" /> {productCopy.added}</> : product.in_stock ? <><ShoppingBag className="h-4 w-4" /> {isPreorder ? productCopy.preorderNow : productCopy.add}</> : productCopy.soldOut}
             </button>
           </div>
 
@@ -655,7 +672,7 @@ export function ProductDetail({
           <div className="mt-4 flex items-center gap-2 text-[10px] text-white/60">
             <PackageCheck className="h-4 w-4 text-emerald-400" />
             {product.in_stock
-              ? `${productCopy.available} — ${shippingEstimate}`
+              ? `${isPreorder ? productCopy.preorder : productCopy.available} — ${shippingEstimate}`
               : `${productCopy.unavailable} — ${shippingEstimate}`}
           </div>
 
@@ -680,7 +697,7 @@ export function ProductDetail({
               </Details>
             )}
             <Details title={productCopy.shippingReturns}>
-              {productCopy.expected}: {shippingEstimate}. {productCopy.tracked} {productCopy.returnText}, {returnCondition}. {productCopy.returnEnd} <Link href="/resi" className="text-[#9f86ff] underline underline-offset-4">{productCopy.returns}</Link>.
+              {productCopy.expected}: {shippingEstimate}. {isPreorder && `${productCopy.shipsAfterRelease} `}{productCopy.tracked} {productCopy.returnText}, {returnCondition}. {productCopy.returnEnd} <Link href="/resi" className="text-[#9f86ff] underline underline-offset-4">{productCopy.returns}</Link>.
             </Details>
           </div>
           </section>
@@ -700,7 +717,7 @@ export function ProductDetail({
             {suggestedProducts.map((item) => (
               <Link key={item.id} href={localizedOrganicPath(`/prodotto/${item.id}`, locale)} className="group min-w-0">
                 <div className="mirai-neon-frame mirai-neon-lift relative mb-3 aspect-[4/5] overflow-hidden rounded-2xl bg-white/5">
-                  {item.image_url && <Image src={item.image_url} alt={translateProductName(item.name, locale)} fill className="object-cover transition-transform duration-700 group-hover:scale-[1.035]" sizes="(max-width: 768px) 50vw, 25vw" />}
+                  {item.image_url && <Image src={item.image_url} alt={translateProductName(item.name, locale)} fill className={`${item.category === "drop" ? "object-contain" : "object-cover"} transition-transform duration-700 group-hover:scale-[1.035]`} sizes="(max-width: 768px) 50vw, 25vw" />}
                 </div>
                 <h3 className="truncate text-xs font-medium group-hover:text-[#9f86ff]">{translateProductName(item.name, locale)}</h3>
                 <p className="mt-1 text-xs text-white/45">{formatPrice(item.price)}</p>
@@ -736,7 +753,9 @@ export function ProductDetail({
                   ? productCopy.chooseSize
                   : added
                     ? productCopy.added
-                    : productCopy.add}
+                    : isPreorder
+                      ? productCopy.preorderNow
+                      : productCopy.add}
             </span>
           </button>
         </div>
@@ -750,7 +769,7 @@ export function ProductDetail({
               src={selectedImage.src}
               alt={selectedImage.alt}
               fill
-              className="object-cover"
+              className={selectedImage.fit === "contain" ? "object-contain" : "object-cover"}
               style={{ objectPosition: selectedImage.position || "center" }}
               sizes="100vw"
               priority

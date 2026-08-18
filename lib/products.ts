@@ -100,6 +100,9 @@ export type StoreProduct = {
   in_stock: boolean
   is_new: boolean
   is_published?: boolean
+  is_preorder?: boolean
+  preorder_release_at?: string
+  drop_name?: string
   created_at: string
   brand?: string
   supplier_profile?: SupplierProfile
@@ -230,6 +233,9 @@ export function mapProductRow(row: Record<string, any>): StoreProduct {
     in_stock: Boolean(row.in_stock),
     is_new: Boolean(row.is_new),
     is_published: row.is_published !== false,
+    is_preorder: Boolean(row.is_preorder),
+    preorder_release_at: (row.preorder_release_at as string) ?? undefined,
+    drop_name: (row.drop_name as string) ?? undefined,
     created_at: (row.created_at as string) ?? new Date().toISOString(),
     brand: (row.brand as string) ?? undefined,
     supplier_profile:

@@ -37,7 +37,7 @@ export default async function CollezioniPage({ locale = "it" }: { locale?: Local
     supabase.from("categories").select("*").order("sort_order", { ascending: true }),
     supabase
       .from("products")
-      .select("id, name, description, price, category, image_url, sizes, in_stock, is_new, created_at, stock_by_size, supplier_sku, color_name")
+      .select("id, name, description, price, category, image_url, sizes, in_stock, is_new, is_published, is_preorder, preorder_release_at, drop_name, created_at, brand, supplier_profile, supplier_sku, gtin, shipping_min_days, shipping_max_days, color_name, color_hex, fit_note, detail_items, composition, care, stock_by_size, image_gallery")
       .order("created_at", { ascending: false }),
   ])
 

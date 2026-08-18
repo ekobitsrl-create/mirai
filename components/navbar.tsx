@@ -242,6 +242,12 @@ export function Navbar({ showPromo = false }: { showPromo?: boolean }) {
               >
                 {t.nav.newArrivals}
               </Link>
+              <Link
+                href={localizedOrganicPath("/collezione/drop", locale)}
+                className="text-sm font-semibold tracking-widest uppercase text-primary hover:text-white transition-colors"
+              >
+                Drop
+              </Link>
 
               {/* Collezioni dropdown */}
               <div
@@ -392,6 +398,13 @@ export function Navbar({ showPromo = false }: { showPromo?: boolean }) {
               onClick={() => setMobileOpen(false)}
             >
               {t.nav.newArrivals}
+            </Link>
+            <Link
+              href={localizedOrganicPath("/collezione/drop", locale)}
+              className="text-sm font-semibold tracking-widest uppercase text-primary hover:text-white transition-colors"
+              onClick={() => setMobileOpen(false)}
+            >
+              Drop
             </Link>
 
             {/* Mobile Collezioni accordion */}

@@ -13,6 +13,8 @@ type OrderItem = {
   size: string | null
   quantity: number
   price: number
+  is_preorder?: boolean
+  preorder_release_at?: string | null
 }
 
 type Order = {
@@ -254,6 +256,11 @@ export function AdminOrdersTable({ orders }: { orders: Order[] }) {
                             <p className="text-xs text-muted-foreground">
                               {item.size && `Taglia: ${item.size} - `}Qty: {item.quantity}
                             </p>
+                            {item.is_preorder && (
+                              <p className="mt-1 text-[10px] font-semibold uppercase tracking-widest text-primary">
+                                Preordine · uscita prevista {item.preorder_release_at ? new Date(item.preorder_release_at).toLocaleDateString("it-IT") : "fine settembre"}
+                              </p>
+                            )}
                           </div>
                           <span className="font-mono text-sm text-foreground">
                             {"\u20AC"}{Number(item.price).toFixed(2)}

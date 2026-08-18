@@ -142,6 +142,8 @@ export async function saveStripeOrder(session: Stripe.Checkout.Session) {
       size: metadata.size || null,
       quantity,
       price: (item.amount_total || 0) / 100 / quantity,
+      is_preorder: metadata.is_preorder === 'true',
+      preorder_release_at: metadata.preorder_release_at || null,
     }
   })
 

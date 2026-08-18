@@ -31,6 +31,9 @@ type Product = {
   in_stock: boolean
   is_new: boolean
   is_published?: boolean
+  is_preorder?: boolean
+  preorder_release_at?: string | null
+  drop_name?: string | null
   brand?: string | null
   supplier_sku?: string | null
   color_name?: string | null
@@ -362,6 +365,7 @@ export function AdminProductTable({ products, categories = [] }: { products: Pro
                         {"\u20AC"}{Number(product.price).toFixed(2)}
                       </span>
                       <span className="uppercase tracking-widest">{product.category}</span>
+                      {product.is_preorder && <span className="font-semibold uppercase tracking-widest text-primary">Preordine</span>}
                       <span>{product.sizes?.join(", ") || "N/A"}</span>
                       {product.stock_by_size && (
                         <span>
@@ -531,6 +535,39 @@ function ProductForm({ product, categories = [] }: { product?: Product; categori
           />
           <span className="text-xs uppercase tracking-widest text-muted-foreground">Pubblicato</span>
         </label>
+        <label className="flex items-center gap-2 cursor-pointer">
+          <input
+            type="checkbox"
+            name="is_preorder"
+            defaultChecked={product?.is_preorder ?? false}
+            className="rounded border-border"
+          />
+          <span className="text-xs uppercase tracking-widest text-muted-foreground">Preordine</span>
+        </label>
+      </div>
+      <div className="flex flex-col gap-2">
+        <Label htmlFor="preorder_release_at" className="text-xs uppercase tracking-widest text-muted-foreground">
+          Disponibile dal
+        </Label>
+        <Input
+          id="preorder_release_at"
+          name="preorder_release_at"
+          type="date"
+          defaultValue={product?.preorder_release_at?.slice(0, 10) || ""}
+          className="bg-secondary border-border text-foreground"
+        />
+      </div>
+      <div className="flex flex-col gap-2">
+        <Label htmlFor="drop_name" className="text-xs uppercase tracking-widest text-muted-foreground">
+          Nome drop
+        </Label>
+        <Input
+          id="drop_name"
+          name="drop_name"
+          defaultValue={product?.drop_name || ""}
+          placeholder="Chrome Drop FW26/27"
+          className="bg-secondary border-border text-foreground"
+        />
       </div>
       <div className="flex flex-col gap-2">
         <Label htmlFor="brand" className="text-xs uppercase tracking-widest text-muted-foreground">

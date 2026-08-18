@@ -41,7 +41,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
     const supabase = await createClient()
     const { data } = await supabase
       .from("products")
-      .select("id, name, description, price, category, image_url, brand, supplier_sku, in_stock, stock_by_size, color_name")
+      .select("id, name, description, price, category, image_url, brand, supplier_sku, in_stock, stock_by_size, color_name, is_preorder, preorder_release_at, drop_name")
       .eq("id", id)
       .single()
     product = data ? mapProductRow(data) : null
@@ -136,7 +136,7 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
     .filter(Boolean)
   const productImages = [...new Set([primaryImage, ...galleryImages].filter(Boolean))]
   const availability = hasAvailableStock(product)
-    ? "https://schema.org/InStock"
+    ? product.is_preorder ? "https://schema.org/PreOrder" : "https://schema.org/InStock"
     : "https://schema.org/OutOfStock"
   const supplierSettings = getProductSupplierSettings(product)
   const isSupplierTimedShipping = supplierSettings.shippingMinDays !== undefined
@@ -167,6 +167,9 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
       priceCurrency: "EUR",
       price: Number(product.price).toFixed(2),
       availability,
+      availabilityStarts: product.is_preorder && product.preorder_release_at
+        ? product.preorder_release_at
+        : undefined,
       itemCondition: "https://schema.org/NewCondition",
       seller: {
         "@id": `${SITE_URL}/#organization`,

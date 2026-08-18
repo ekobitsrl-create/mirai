@@ -73,9 +73,9 @@ export function localizeColor(value: string | null | undefined, locale: Locale) 
 function translateCommercialTerms(value: string, locale: ForeignLocale) {
   const rules: Record<ForeignLocale, Array<[RegExp, string]>> = {
     en: [[/\bCappello\b/gi, "Cap"], [/\bCappelli\b/gi, "Caps"], [/\bCamicia\b/gi, "Shirt"], [/\bCamicie\b/gi, "Shirts"], [/\bCanotta\b/gi, "Tank Top"], [/\bCanotte\b/gi, "Tank Tops"], [/\bFelpa\b/gi, "Hoodie"], [/\bBermuda\b/gi, "Shorts"], [/\bPantaloni\b/gi, "Trousers"], [/\bMaglietta\b/gi, "T-shirt"]],
-    es: [[/\bZip Up Hoodie\b/gi, "Sudadera con cremallera"], [/\bZip Hoodie\b/gi, "Sudadera con cremallera"], [/\bSleeveless\b/gi, "Sin mangas"], [/\bTee\b/gi, "Camiseta"], [/\bT-shirt\b/gi, "Camiseta"], [/\bJorts\b/gi, "Bermudas vaqueras"], [/\bShorts\b/gi, "Bermudas"], [/\bJeans\b/gi, "Vaqueros"]],
-    de: [[/\bZip Up Hoodie\b/gi, "Zip-Hoodie"], [/\bZip Hoodie\b/gi, "Zip-Hoodie"], [/\bSleeveless\b/gi, "Ärmellos"], [/\bTee\b/gi, "T-Shirt"], [/\bJorts\b/gi, "Jeansshorts"], [/\bShorts\b/gi, "Shorts"]],
-    fr: [[/\bZip Up Hoodie\b/gi, "Sweat zippé"], [/\bZip Hoodie\b/gi, "Sweat zippé"], [/\bSleeveless\b/gi, "Sans manches"], [/\bTee\b/gi, "T-shirt"], [/\bJorts\b/gi, "Bermuda en jean"], [/\bShorts\b/gi, "Bermuda"], [/\bJeans\b/gi, "Jean"]],
+    es: [[/\bZip Up Hoodie\b/gi, "Sudadera con cremallera"], [/\bZip Hoodie\b/gi, "Sudadera con cremallera"], [/\bLongsleeve\b/gi, "Camiseta de manga larga"], [/\bCrewneck\b/gi, "Sudadera sin capucha"], [/\bSleeveless\b/gi, "Sin mangas"], [/\bTee\b/gi, "Camiseta"], [/\bT-shirt\b/gi, "Camiseta"], [/\bJorts\b/gi, "Bermudas vaqueras"], [/\bShorts\b/gi, "Bermudas"], [/\bJeans\b/gi, "Vaqueros"]],
+    de: [[/\bZip Up Hoodie\b/gi, "Zip-Hoodie"], [/\bZip Hoodie\b/gi, "Zip-Hoodie"], [/\bLongsleeve\b/gi, "Langarmshirt"], [/\bCrewneck\b/gi, "Crewneck-Sweatshirt"], [/\bSleeveless\b/gi, "Ärmellos"], [/\bTee\b/gi, "T-Shirt"], [/\bJorts\b/gi, "Jeansshorts"], [/\bShorts\b/gi, "Shorts"]],
+    fr: [[/\bZip Up Hoodie\b/gi, "Sweat zippé"], [/\bZip Hoodie\b/gi, "Sweat zippé"], [/\bLongsleeve\b/gi, "T-shirt manches longues"], [/\bCrewneck\b/gi, "Sweat col rond"], [/\bSleeveless\b/gi, "Sans manches"], [/\bTee\b/gi, "T-shirt"], [/\bJorts\b/gi, "Bermuda en jean"], [/\bShorts\b/gi, "Bermuda"], [/\bJeans\b/gi, "Jean"]],
   }
   return rules[locale].reduce((text, [pattern, replacement]) => text.replace(pattern, replacement), value)
 }
@@ -102,6 +102,7 @@ const categoryDescriptions: Record<string, Record<Locale, string>> = {
   canotte: { it: "Canotte e smanicati streetwear MIRAI.", en: "MIRAI streetwear tank tops and sleeveless pieces.", es: "Camisetas y prendas sin mangas streetwear MIRAI.", de: "Streetwear-Tanktops und ärmellose Styles von MIRAI.", fr: "Débardeurs et pièces sans manches streetwear MIRAI." },
   felpe: { it: "Felpe oversize, hoodie e zip hoodie streetwear MIRAI.", en: "MIRAI oversized sweatshirts, hoodies and zip hoodies.", es: "Sudaderas oversize, hoodies y sudaderas con cremallera MIRAI.", de: "Oversized-Sweatshirts, Hoodies und Zip-Hoodies von MIRAI.", fr: "Sweats oversize, hoodies et sweats zippés MIRAI." },
   sweatshirts: { it: "Felpe e sweatshirt streetwear con vestibilità oversize e grafiche urban.", en: "Streetwear sweatshirts with oversized fits and urban graphics.", es: "Sudaderas streetwear de corte oversize y gráficos urbanos.", de: "Streetwear-Sweatshirts mit Oversized-Fit und Urban-Grafiken.", fr: "Sweatshirts streetwear aux coupes oversize et graphismes urbains." },
+  drop: { it: "Chrome Drop FW26/27 ArtSuperMoney: capi Made in Italy disponibili in preordine con uscita a fine settembre.", en: "ArtSuperMoney Chrome Drop FW26/27: Made in Italy pieces available to preorder, releasing at the end of September.", es: "Chrome Drop FW26/27 de ArtSuperMoney: prendas Made in Italy disponibles en preventa, con lanzamiento a finales de septiembre.", de: "ArtSuperMoney Chrome Drop FW26/27: Made-in-Italy-Styles zur Vorbestellung, erhältlich ab Ende September.", fr: "Chrome Drop FW26/27 ArtSuperMoney : pièces Made in Italy disponibles en précommande, sortie fin septembre." },
 }
 
 export function translateCategoryDescription(slug: string, fallback: string | null | undefined, locale: Locale) {
@@ -218,7 +219,7 @@ function naturalList(values: string[], locale: ForeignLocale) {
   return `${values.slice(0, -1).join(", ")}${conjunction}${values.at(-1)}`
 }
 
-function productKind(category: string, locale: ForeignLocale) {
+function productKind(category: string, locale: ForeignLocale, productName = "") {
   const rows: Record<string, Record<ForeignLocale, string>> = {
     "t-shirt": { en: "oversized streetwear T-shirt", es: "camiseta oversize streetwear", de: "Oversized-Streetwear-T-Shirt", fr: "T-shirt oversize streetwear" },
     camicie: { en: "oversized streetwear shirt", es: "camisa oversize streetwear", de: "Oversized-Streetwear-Hemd", fr: "chemise oversize streetwear" },
@@ -231,11 +232,19 @@ function productKind(category: string, locale: ForeignLocale) {
     profumi: { en: "MIRAI fragrance", es: "fragancia MIRAI", de: "MIRAI-Duft", fr: "parfum MIRAI" },
     "mirai-parfum-exlusive": { en: "MIRAI fragrance", es: "fragancia MIRAI", de: "MIRAI-Duft", fr: "parfum MIRAI" },
   }
+  if (category === "drop") {
+    const name = productName.toLowerCase()
+    if (/denim|jeans/.test(name)) return ({ en: "Made in Italy denim", es: "denim Made in Italy", de: "Made-in-Italy-Denim", fr: "denim Made in Italy" } as const)[locale]
+    if (/hoodie/.test(name)) return ({ en: "Made in Italy hoodie", es: "sudadera Made in Italy", de: "Made-in-Italy-Hoodie", fr: "sweat à capuche Made in Italy" } as const)[locale]
+    if (/crewneck|simply hoodie/.test(name)) return ({ en: "Made in Italy crewneck sweatshirt", es: "sudadera de cuello redondo Made in Italy", de: "Made-in-Italy-Crewneck", fr: "sweat col rond Made in Italy" } as const)[locale]
+    if (/longsleeve/.test(name)) return ({ en: "Made in Italy long-sleeve T-shirt", es: "camiseta de manga larga Made in Italy", de: "Made-in-Italy-Langarmshirt", fr: "T-shirt manches longues Made in Italy" } as const)[locale]
+    if (/tee/.test(name)) return ({ en: "Made in Italy T-shirt", es: "camiseta Made in Italy", de: "Made-in-Italy-T-Shirt", fr: "T-shirt Made in Italy" } as const)[locale]
+  }
   return rows[category]?.[locale] || ({ en: "streetwear piece", es: "prenda streetwear", de: "Streetwear-Piece", fr: "pièce streetwear" } as const)[locale]
 }
 
 function localizedDescription(product: StoreProduct, locale: ForeignLocale, name: string, color: string) {
-  const kind = productKind(product.category, locale)
+  const kind = productKind(product.category, locale, product.name)
   const features = naturalList(featureKeys(product).slice(0, 4).map((key) => words[locale][key]), locale)
   const inColor = color || ({ en: "the selected colour", es: "el color seleccionado", de: "der gewählten Farbe", fr: "le coloris sélectionné" } as const)[locale]
   const feature = features || ({ en: "carefully selected construction details", es: "detalles de confección cuidadosamente seleccionados", de: "sorgfältig ausgewählte Konstruktionsdetails", fr: "des détails de confection soigneusement sélectionnés" } as const)[locale]
@@ -258,10 +267,10 @@ function localizedFit(product: StoreProduct, locale: ForeignLocale) {
 function localizedDetails(product: StoreProduct, locale: ForeignLocale, color: string) {
   const category = product.category
   const bases: Record<ForeignLocale, string[]> = {
-    en: [`Product type: ${productKind(category, locale)}`, `Colour: ${color || "as pictured"}`],
-    es: [`Tipo de producto: ${productKind(category, locale)}`, `Color: ${color || "como en la imagen"}`],
-    de: [`Produkttyp: ${productKind(category, locale)}`, `Farbe: ${color || "wie abgebildet"}`],
-    fr: [`Type de produit : ${productKind(category, locale)}`, `Couleur : ${color || "comme sur la photo"}`],
+    en: [`Product type: ${productKind(category, locale, product.name)}`, `Colour: ${color || "as pictured"}`],
+    es: [`Tipo de producto: ${productKind(category, locale, product.name)}`, `Color: ${color || "como en la imagen"}`],
+    de: [`Produkttyp: ${productKind(category, locale, product.name)}`, `Farbe: ${color || "wie abgebildet"}`],
+    fr: [`Type de produit : ${productKind(category, locale, product.name)}`, `Couleur : ${color || "comme sur la photo"}`],
   }
   return [...bases[locale], ...featureKeys(product).slice(0, 5).map((key) => words[locale][key])]
 }

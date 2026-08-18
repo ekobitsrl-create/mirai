@@ -21,7 +21,7 @@ export const dynamic = "force-dynamic"
 
 const RETURN_POLICY_PATH = "/resi"
 const MERCHANT_FEED_LOCALES: Locale[] = ["it", "en", "es", "de", "fr"]
-const CATALOG_SELECT = "id, name, description, price, category, image_url, sizes, stock_by_size, in_stock, is_new, is_published, created_at, updated_at, brand, supplier_profile, supplier_sku, gtin, shipping_min_days, shipping_max_days, color_name, color_hex, image_gallery, detail_items, composition"
+const CATALOG_SELECT = "id, name, description, price, category, image_url, sizes, stock_by_size, in_stock, is_new, is_published, is_preorder, preorder_release_at, drop_name, created_at, updated_at, brand, supplier_profile, supplier_sku, gtin, shipping_min_days, shipping_max_days, color_name, color_hex, image_gallery, detail_items, composition"
 const PRE_SUPPLIER_CATALOG_SELECT = "id, name, description, price, category, image_url, sizes, stock_by_size, in_stock, is_new, is_published, created_at, updated_at, brand, supplier_sku, color_name, color_hex, image_gallery, detail_items, composition"
 const LEGACY_CATALOG_SELECT = "id, name, description, price, category, image_url, sizes, stock_by_size, in_stock, is_new, is_published, created_at, updated_at"
 
@@ -40,6 +40,7 @@ const GOOGLE_CATEGORY_BY_STORE_CATEGORY: Record<string, string> = {
   caps: "173",
   hats: "173",
   felpe: "212",
+  drop: "166",
   profumi: "479",
 }
 
@@ -58,6 +59,7 @@ const PRODUCT_TYPE_BY_STORE_CATEGORY: Record<string, string> = {
   caps: "Accessori > Cappelli personalizzati",
   hats: "Accessori > Cappelli personalizzati",
   felpe: "Abbigliamento > Felpe e hoodie",
+  drop: "Abbigliamento > Drop e capsule",
   profumi: "Bellezza e cura della persona > Profumi",
 }
 
@@ -240,7 +242,12 @@ function getVariantInventory(product: StoreProduct, size: string) {
 function getAvailability(product: StoreProduct, size: string) {
   const productInventory = getProductInventory(product)
   const variantInventory = getVariantInventory(product, size)
-  return productInventory > 0 && variantInventory > 0 ? "in_stock" : "out_of_stock"
+  if (productInventory <= 0 || variantInventory <= 0) return "out_of_stock"
+  return product.is_preorder ? "preorder" : "in_stock"
+}
+
+function formatMerchantAvailabilityDate(value: string) {
+  return value.replace(/\.\d{3}Z$/, "+0000").replace(/([+-]\d{2}):(\d{2})$/, "$1$2")
 }
 
 function getAdditionalImages(product: StoreProduct, baseUrl: string, primaryImage: string) {
@@ -444,6 +451,9 @@ function renderProductVariant(
     `      <g:image_link>${escapeXml(primaryImage)}</g:image_link>`,
     ...additionalImages.map((image) => `      <g:additional_image_link>${escapeXml(image)}</g:additional_image_link>`),
     `      <g:availability>${availability}</g:availability>`,
+    ...(availability === "preorder" && product.preorder_release_at
+      ? [`      <g:availability_date>${escapeXml(formatMerchantAvailabilityDate(product.preorder_release_at))}</g:availability_date>`]
+      : []),
     ...(platform === "meta" ? [`      <g:inventory>${inventory}</g:inventory>`] : []),
     `      <g:price>${Number(product.price).toFixed(2)} EUR</g:price>`,
     "      <g:condition>new</g:condition>",
@@ -479,6 +489,9 @@ function renderProductVariant(
     "      <g:excluded_destination>Local_inventory_ads</g:excluded_destination>",
     "      <g:excluded_destination>Free_local_listings</g:excluded_destination>",
     product.is_new ? "      <g:custom_label_0>Nuovi arrivi</g:custom_label_0>" : "",
+    ...(product.drop_name
+      ? [`      <g:custom_label_1>${escapeXml(product.drop_name)}</g:custom_label_1>`]
+      : []),
     ...(googleAdsCampaignLabel
       ? [`      <g:custom_label_2>${escapeXml(googleAdsCampaignLabel)}</g:custom_label_2>`]
       : []),
