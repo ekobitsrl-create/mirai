@@ -498,7 +498,7 @@ export default function CheckoutPage() {
                 <BadgePercent className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
                 <div className="min-w-0 flex-1">
                   <p className="font-semibold text-foreground">Hai un codice sconto?</p>
-                  <p className="mt-1 text-sm text-muted-foreground">MIRAI10 ti dà il 10% sul primo ordine.</p>
+                  <p className="mt-1 text-sm text-muted-foreground">MIRAI10 ti dà il 10% sul primo ordine, anche sui prodotti Minimal già a 29,90 €.</p>
                 </div>
               </div>
 
