@@ -45,12 +45,16 @@ export const SUPPLIER_PROFILE_OPTIONS: Record<SupplierProfile, {
   },
 }
 
+export function hasMinimalMerchantBrand(product: Pick<SupplierProduct, "brand">) {
+  return /^minimal(?:\s|$)/i.test(product.brand?.trim() || "")
+}
+
 export function getSupplierProfile(product: SupplierProduct): SupplierProfile {
   if (product.supplier_profile === "minimal" || product.supplier_profile === "mirai") {
     return product.supplier_profile
   }
 
-  return /^minimal(?:\s|$)/i.test(product.brand?.trim() || "") ? "minimal" : "mirai"
+  return hasMinimalMerchantBrand(product) ? "minimal" : "mirai"
 }
 
 export function getProductSupplierSettings(product: SupplierProduct) {

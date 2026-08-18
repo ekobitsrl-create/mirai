@@ -437,9 +437,7 @@ function renderProductVariant(
     ? merchantCopyOverride?.description
       || getMerchantDescription(product, merchantProductName, color, pattern, material)
     : localizedProduct.description
-  // MIRAI is the catalog brand exposed to advertising platforms. Supplier
-  // profiles remain untouched and still drive GTIN and shipping settings.
-  const brand = "MIRAI"
+  const brand = supplierSettings.brand
   const itemGroupId = getItemGroupId(product)
   const metaInternalLabel = platform === "meta" && META_DARKADS_ITEM_GROUP_IDS.has(itemGroupId)
     ? "darkads"
