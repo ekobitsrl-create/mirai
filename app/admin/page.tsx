@@ -86,14 +86,14 @@ export default async function AdminPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="max-w-7xl mx-auto px-4 py-10">
-        <div className="flex items-center justify-between mb-10">
+    <div className="min-h-dvh overflow-x-hidden bg-background">
+      <div className="mx-auto max-w-7xl px-3 py-5 sm:px-4 sm:py-10">
+        <div className="mb-7 flex flex-col gap-4 sm:mb-10 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h1 className="text-2xl font-bold text-foreground tracking-tight">Pannello Admin</h1>
             <p className="text-sm text-muted-foreground mt-1">Gestisci prodotti, categorie, ordini e utenti</p>
           </div>
-          <div className="flex items-center gap-5">
+          <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
             <a href="/community/hub" className="text-xs uppercase tracking-widest text-muted-foreground hover:text-foreground transition-colors">
               Community
             </a>

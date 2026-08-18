@@ -63,51 +63,51 @@ export function AdminDashboard({
   }, [cartCounterResetAt, router])
 
   return (
-    <div>
-      <div className="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-8 gap-4 mb-10">
-        <div className="border border-border rounded-lg bg-card p-5">
+    <div className="min-w-0 touch-pan-y">
+      <div className="mb-7 grid grid-cols-2 gap-2.5 sm:gap-4 md:grid-cols-4 xl:mb-10 xl:grid-cols-8">
+        <div className="border border-border rounded-lg bg-card p-3 sm:p-5">
           <p className="text-xs uppercase tracking-widest text-muted-foreground mb-1">Prodotti</p>
           <p className="text-3xl font-bold text-foreground">{stats.totalProducts}</p>
           <p className="mt-1 text-xs text-muted-foreground">
             {stats.publishedProducts} pubblicati / {stats.draftProducts} bozze
           </p>
         </div>
-        <div className="border border-border rounded-lg bg-card p-5">
+        <div className="border border-border rounded-lg bg-card p-3 sm:p-5">
           <p className="text-xs uppercase tracking-widest text-muted-foreground mb-1">Categorie</p>
           <p className="text-3xl font-bold text-foreground">{categories.length}</p>
         </div>
-        <div className="border border-border rounded-lg bg-card p-5">
+        <div className="border border-border rounded-lg bg-card p-3 sm:p-5">
           <p className="text-xs uppercase tracking-widest text-muted-foreground mb-1">Ordini</p>
           <p className="text-3xl font-bold text-foreground">{stats.totalOrders}</p>
           {stats.pendingOrders > 0 && (
             <p className="text-xs text-primary mt-1">{stats.pendingOrders} in attesa</p>
           )}
         </div>
-        <div className="border border-border rounded-lg bg-card p-5">
+        <div className="border border-border rounded-lg bg-card p-3 sm:p-5">
           <p className="text-xs uppercase tracking-widest text-muted-foreground mb-1">Carrelli creati oggi</p>
           <p className="text-3xl font-bold text-foreground">{stats.cartsCreated}</p>
         </div>
-        <div className="border border-border rounded-lg bg-card p-5">
+        <div className="border border-border rounded-lg bg-card p-3 sm:p-5">
           <p className="text-xs uppercase tracking-widest text-muted-foreground mb-1">Abbandonati</p>
           <p className="text-3xl font-bold text-foreground">{stats.cartsAbandoned}</p>
           <p className="text-xs text-muted-foreground mt-1">oggi · inattivi da 30 min</p>
         </div>
-        <div className="border border-border rounded-lg bg-card p-5">
+        <div className="border border-border rounded-lg bg-card p-3 sm:p-5">
           <p className="text-xs uppercase tracking-widest text-muted-foreground mb-1">Cookie non accettati</p>
           <p className="text-3xl font-bold text-foreground">{stats.cookieDeclines}</p>
           <p className="text-xs text-muted-foreground mt-1">oggi · solo conteggio</p>
         </div>
-        <div className="border border-border rounded-lg bg-card p-5">
+        <div className="border border-border rounded-lg bg-card p-3 sm:p-5">
           <p className="text-xs uppercase tracking-widest text-muted-foreground mb-1">Utenti</p>
           <p className="text-3xl font-bold text-foreground">{stats.totalUsers}</p>
         </div>
-        <div className="border border-border rounded-lg bg-card p-5">
+        <div className="border border-border rounded-lg bg-card p-3 sm:p-5">
           <p className="text-xs uppercase tracking-widest text-muted-foreground mb-1">Fatturato</p>
           <p className="text-3xl font-bold text-foreground">{"\u20AC"}{stats.totalRevenue.toFixed(2)}</p>
         </div>
       </div>
 
-      <div className="flex items-center gap-1 border-b border-border mb-8 overflow-x-auto">
+      <div className="-mx-3 mb-6 flex items-center gap-1 overflow-x-auto border-b border-border px-3 pb-px [scrollbar-width:none] sm:mx-0 sm:mb-8 sm:px-0 [&::-webkit-scrollbar]:hidden">
         {TABS.map((tab) => {
           const Icon = tab.icon
           return (

@@ -232,16 +232,19 @@ export function CollectionProducts({
                       href={localizedOrganicPath(`/prodotto/${product.id}`, locale)}
                       className="block"
                     >
-                      <div className="mirai-neon-frame mirai-neon-lift relative mb-4 aspect-[3/4] overflow-hidden rounded-2xl bg-card">
+                      <div className={`mirai-neon-frame mirai-neon-lift relative mb-4 aspect-[3/4] overflow-hidden rounded-2xl ${product.category === "t-shirt-god-street" ? "bg-white" : "bg-card"}`}>
                         <Image
                           src={product.image_url || "/placeholder.jpg"}
                           alt={translateProductName(product.name, locale)}
                           fill
                           className={
-                            isParfumCollection
+                            product.category === "t-shirt-god-street"
+                              ? "object-contain object-center p-3 transition-transform duration-700 ease-out group-hover:scale-[1.02] sm:p-4"
+                              : isParfumCollection
                               ? "object-contain p-4 transition-all duration-[1s] ease-out group-hover:scale-105"
                               : "object-cover object-top transition-all duration-[1s] ease-out group-hover:scale-110"
                           }
+                          sizes="(max-width: 640px) calc(100vw - 3rem), (max-width: 1024px) 45vw, 30vw"
                         />
                         {product.is_new && (
                           <span className="absolute top-4 left-4 px-3 py-1 bg-primary text-primary-foreground text-[10px] font-bold tracking-widest uppercase rounded-sm">

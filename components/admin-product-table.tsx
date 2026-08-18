@@ -250,11 +250,15 @@ export function AdminProductTable({ products, categories = [] }: { products: Pro
 
       {/* Create form */}
       {showForm && (
-        <div className="border border-border rounded-lg p-6 bg-card mb-8">
-          <h2 className="text-lg font-semibold text-foreground mb-6">Nuovo Prodotto</h2>
+        <div className="mb-8 max-h-[calc(100dvh-1rem)] touch-pan-y overflow-y-auto overscroll-contain rounded-lg border border-border bg-card sm:max-h-none sm:overflow-visible">
+          <h2 className="sticky top-0 z-20 border-b border-border bg-card/95 px-4 py-4 text-lg font-semibold text-foreground backdrop-blur sm:static sm:border-0 sm:bg-transparent sm:px-6 sm:pb-0 sm:pt-6">
+            Nuovo Prodotto
+          </h2>
           <form action={handleCreate}>
-            <ProductForm categories={categories} />
-            <div className="flex gap-3 mt-6">
+            <div className="p-4 sm:p-6">
+              <ProductForm categories={categories} />
+            </div>
+            <div className="sticky bottom-0 z-20 flex gap-3 border-t border-border bg-card/95 p-4 pb-[calc(1rem+env(safe-area-inset-bottom))] backdrop-blur sm:static sm:bg-transparent sm:px-6 sm:pb-6 sm:pt-0">
               <Button
                 type="submit"
                 disabled={isSubmitting}
@@ -288,14 +292,16 @@ export function AdminProductTable({ products, categories = [] }: { products: Pro
           {products.map((product) => (
             <div key={product.id} className="border border-border rounded-lg bg-card overflow-hidden">
               {editingId === product.id ? (
-                <div className="p-6">
-                  <h2 className="text-lg font-semibold text-foreground mb-6">
+                <div className="max-h-[calc(100dvh-1rem)] touch-pan-y overflow-y-auto overscroll-contain sm:max-h-none sm:overflow-visible">
+                  <h2 className="sticky top-0 z-20 border-b border-border bg-card/95 px-4 py-4 text-lg font-semibold text-foreground backdrop-blur sm:static sm:border-0 sm:bg-transparent sm:px-6 sm:pb-0 sm:pt-6">
                     Modifica Prodotto
                   </h2>
                   <form action={handleUpdate}>
                     <input type="hidden" name="id" value={product.id} />
-                    <ProductForm product={product} categories={categories} />
-                    <div className="flex gap-3 mt-6">
+                    <div className="p-4 sm:p-6">
+                      <ProductForm product={product} categories={categories} />
+                    </div>
+                    <div className="sticky bottom-0 z-20 flex gap-3 border-t border-border bg-card/95 p-4 pb-[calc(1rem+env(safe-area-inset-bottom))] backdrop-blur sm:static sm:bg-transparent sm:px-6 sm:pb-6 sm:pt-0">
                       <Button
                         type="submit"
                         disabled={isSubmitting}
@@ -317,7 +323,7 @@ export function AdminProductTable({ products, categories = [] }: { products: Pro
                   </form>
                 </div>
               ) : (
-                <div className="p-6 flex items-start gap-6">
+                <div className="flex flex-col items-start gap-4 p-4 sm:flex-row sm:gap-6 sm:p-6">
                   {/* Thumbnail */}
                   <div className="w-16 h-16 rounded bg-secondary flex-shrink-0 overflow-hidden">
                     {product.image_url ? (
@@ -335,8 +341,8 @@ export function AdminProductTable({ products, categories = [] }: { products: Pro
 
                   {/* Info */}
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-3 mb-1">
-                      <h3 className="font-semibold text-foreground truncate">{product.name}</h3>
+                    <div className="mb-1 flex flex-wrap items-center gap-2 sm:gap-3">
+                      <h3 className="min-w-0 basis-full font-semibold text-foreground sm:basis-auto sm:truncate">{product.name}</h3>
                       {product.is_new && (
                         <span className="text-[10px] uppercase tracking-widest px-2 py-0.5 bg-primary/10 text-primary rounded-full">
                           Nuovo
@@ -360,7 +366,7 @@ export function AdminProductTable({ products, categories = [] }: { products: Pro
                     <p className="text-sm text-muted-foreground mb-2 truncate">
                       {product.description || "Nessuna descrizione"}
                     </p>
-                    <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                    <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
                       <span className="font-mono text-foreground">
                         {"\u20AC"}{Number(product.price).toFixed(2)}
                       </span>
@@ -376,7 +382,7 @@ export function AdminProductTable({ products, categories = [] }: { products: Pro
                   </div>
 
                   {/* Actions */}
-                  <div className="flex items-center gap-2 flex-shrink-0">
+                  <div className="flex flex-shrink-0 items-center gap-2 self-end sm:self-auto">
                     <Button
                       type="button"
                       variant="outline"
@@ -507,7 +513,7 @@ function ProductForm({ product, categories = [] }: { product?: Product; categori
           className="bg-secondary border-border text-foreground"
         />
       </div>
-      <div className="flex items-end gap-6 pb-1">
+      <div className="flex flex-wrap items-end gap-x-6 gap-y-3 pb-1">
         <label className="flex items-center gap-2 cursor-pointer">
           <input
             type="checkbox"
