@@ -67,7 +67,24 @@ export function localizeColor(value: string | null | undefined, locale: Locale) 
   const normalized = value.trim().toLocaleLowerCase("it-IT")
   const exact = colorRows[normalized]
   if (exact) return exact[locale]
-  return value.split(/\s*\/\s*/).map((part) => colorRows[part.toLowerCase()]?.[locale] || part).join(" / ")
+
+  const conjunctions: Record<ForeignLocale, string> = {
+    en: " and ",
+    es: " y ",
+    de: " und ",
+    fr: " et ",
+  }
+  const colorParts = value.split(/\s+(?:e|and|y|und|et)\s+/i)
+  if (colorParts.length > 1) {
+    return colorParts
+      .map((part) => colorRows[part.trim().toLocaleLowerCase("it-IT")]?.[locale] || part.trim())
+      .join(conjunctions[locale])
+  }
+
+  return value
+    .split(/\s*\/\s*/)
+    .map((part) => colorRows[part.toLocaleLowerCase("it-IT")]?.[locale] || part)
+    .join(" / ")
 }
 
 function translateCommercialTerms(value: string, locale: ForeignLocale) {
@@ -84,10 +101,14 @@ export function translateProductName(name: string, locale: Locale) {
   if (!name || locale === "it") return name
   const exact = exactNames[name]?.[locale]
   if (exact) return exact
-  const parts = name.split(/(\s+[–-]\s+)/)
-  const translated = translateCommercialTerms(parts[0], locale)
-  if (parts.length < 3) return translated
-  return `${translated}${parts[1]}${localizeColor(parts.slice(2).join(""), locale)}`
+  const parts = name.split(/\s+[–-]\s+/)
+  return parts
+    .map((part, index) => {
+      const localizedColor = localizeColor(part, locale)
+      if (localizedColor !== part) return localizedColor
+      return index === 0 ? translateCommercialTerms(part, locale) : part
+    })
+    .join(" - ")
 }
 
 const categoryDescriptions: Record<string, Record<Locale, string>> = {

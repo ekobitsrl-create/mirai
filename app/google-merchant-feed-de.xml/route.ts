@@ -1,14 +1,10 @@
 import type { NextRequest } from "next/server"
-import { NextRequest as MerchantFeedRequest } from "next/server"
-import { GET as getMerchantFeed } from "@/app/google-merchant-feed.xml/route"
+import { getMerchantFeedResponse } from "@/app/google-merchant-feed.xml/route"
+import { MERCHANT_FEED_CONFIG } from "@/lib/merchant-feed-config"
 
 export const runtime = "nodejs"
 export const dynamic = "force-dynamic"
 
 export async function GET(request: NextRequest) {
-  const feedUrl = request.nextUrl.clone()
-  feedUrl.pathname = "/google-merchant-feed.xml"
-  feedUrl.searchParams.set("locale", "de")
-
-  return getMerchantFeed(new MerchantFeedRequest(feedUrl, { headers: request.headers }))
+  return getMerchantFeedResponse(request, MERCHANT_FEED_CONFIG.de)
 }

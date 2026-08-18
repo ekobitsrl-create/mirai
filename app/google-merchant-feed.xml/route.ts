@@ -14,13 +14,13 @@ import { getCatalogItemId, normalizeCatalogIdentifier } from "@/lib/catalog-iden
 import { getShippingCostCents, SHIPPING_CONFIG } from "@/lib/shipping"
 import { localizeColor, localizeProduct } from "@/lib/catalog-localization"
 import { HTML_LOCALES, localizedOrganicPath } from "@/lib/international-seo"
+import { MERCHANT_FEED_CONFIG, type MerchantFeedConfig } from "@/lib/merchant-feed-config"
 import type { Locale } from "@/lib/translations"
 
 export const runtime = "nodejs"
 export const dynamic = "force-dynamic"
 
 const RETURN_POLICY_PATH = "/resi"
-const MERCHANT_FEED_LOCALES: Locale[] = ["it", "en", "es", "de", "fr"]
 const CATALOG_SELECT = "id, name, description, price, category, image_url, sizes, stock_by_size, in_stock, is_new, is_published, is_preorder, preorder_release_at, drop_name, created_at, updated_at, brand, supplier_profile, supplier_sku, gtin, shipping_min_days, shipping_max_days, color_name, color_hex, image_gallery, detail_items, composition"
 const PRE_SUPPLIER_CATALOG_SELECT = "id, name, description, price, category, image_url, sizes, stock_by_size, in_stock, is_new, is_published, created_at, updated_at, brand, supplier_sku, color_name, color_hex, image_gallery, detail_items, composition"
 const LEGACY_CATALOG_SELECT = "id, name, description, price, category, image_url, sizes, stock_by_size, in_stock, is_new, is_published, created_at, updated_at"
@@ -424,9 +424,12 @@ function renderProductVariant(
     : localizedProduct.name.replace(/^MIRAI\s+/i, "").trim()
   const merchantCopyOverride = GOOGLE_ADS_MERCHANT_COPY_BY_PRODUCT_ID[product.id]
   const localizedColor = locale === "it" ? color : localizeColor(color, locale)
+  const merchantNameAlreadyIncludesColor = locale !== "it"
+    && merchantProductName.toLocaleLowerCase(HTML_LOCALES[locale])
+      .endsWith(localizedColor.toLocaleLowerCase(HTML_LOCALES[locale]))
   const titleParts = [
     locale === "it" ? (merchantCopyOverride?.title || merchantProductName) : merchantProductName,
-    localizedColor,
+    merchantNameAlreadyIncludesColor ? null : localizedColor,
     `${SIZE_LABELS[locale]} ${size}`,
   ].filter(Boolean)
   const title = titleParts.join(" - ")
@@ -529,14 +532,14 @@ function renderProductVariant(
   ].filter(Boolean).join("\n")
 }
 
-export async function GET(request: NextRequest) {
+export async function getMerchantFeedResponse(
+  request: NextRequest,
+  feedConfig: MerchantFeedConfig = MERCHANT_FEED_CONFIG.it,
+) {
   const baseUrl = getBaseUrl(request)
   const requestedSupplier = request.nextUrl.searchParams.get("supplier")
   const requestedPlatform = request.nextUrl.searchParams.get("platform")
-  const requestedLocale = request.nextUrl.searchParams.get("locale")
-  const locale: Locale = MERCHANT_FEED_LOCALES.includes(requestedLocale as Locale)
-    ? requestedLocale as Locale
-    : "it"
+  const locale = feedConfig.locale
   const supplierProfile: SupplierProfile | null = requestedSupplier === "minimal" || requestedSupplier === "mirai"
     ? requestedSupplier
     : null
@@ -576,12 +579,16 @@ export async function GET(request: NextRequest) {
     : new Date().toUTCString()
   const headers = {
     "Content-Type": "application/xml; charset=utf-8",
+    "Content-Language": HTML_LOCALES[locale],
     // Catalogue deletions must be visible on the very next Google/Meta fetch.
     // Keep ETag revalidation, but never serve a stale feed from the CDN.
     "Cache-Control": "public, max-age=0, s-maxage=0, must-revalidate",
     "ETag": etag,
     "Last-Modified": lastModified,
     "X-Robots-Tag": "noindex",
+    "X-Mirai-Merchant-Content-Language": feedConfig.contentLanguage,
+    "X-Mirai-Merchant-Feed-Label": feedConfig.dataSourceLabel,
+    "X-Mirai-Merchant-Target-Countries": feedConfig.targetCountries.join(","),
   }
 
   if (request.headers.get("if-none-match") === etag) {
@@ -592,4 +599,13 @@ export async function GET(request: NextRequest) {
     status: 200,
     headers,
   })
+}
+
+/**
+ * The canonical endpoint is permanently bound to the Italian source. Locale
+ * query parameters are deliberately ignored so the IT source can never serve
+ * translated copy or collide with an international Merchant data source.
+ */
+export async function GET(request: NextRequest) {
+  return getMerchantFeedResponse(request, MERCHANT_FEED_CONFIG.it)
 }

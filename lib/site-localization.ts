@@ -18,7 +18,9 @@ export function formatLocalizedPrice(value: number, locale: Locale, currency = "
 type PhraseRow = readonly [it: string, en: string, es: string, de: string, fr: string]
 
 const phraseRows: PhraseRow[] = [
-  ["OTTIENI IL 10% DI SCONTO SUL PRIMO ORDINE", "GET 10% OFF YOUR FIRST ORDER", "CONSIGUE UN 10% DE DESCUENTO EN TU PRIMER PEDIDO", "10 % RABATT AUF DEINE ERSTE BESTELLUNG", "OBTENEZ 10 % DE RÉDUCTION SUR VOTRE PREMIÈRE COMMANDE"],
+  ["MINIMAL DAYS: TUTTI I PRODOTTI MINIMAL A 29,90 €", "MINIMAL DAYS: ALL MINIMAL PRODUCTS €29.90", "MINIMAL DAYS: TODOS LOS PRODUCTOS MINIMAL A 29,90 €", "MINIMAL DAYS: ALLE MINIMAL-PRODUKTE FÜR 29,90 €", "MINIMAL DAYS : TOUS LES PRODUITS MINIMAL À 29,90 €"],
+  ["SCONTO AUTOMATICO — NESSUN CODICE", "AUTOMATIC DISCOUNT — NO CODE NEEDED", "DESCUENTO AUTOMÁTICO — SIN CÓDIGO", "AUTOMATISCHER RABATT — KEIN CODE NÖTIG", "REMISE AUTOMATIQUE — SANS CODE"],
+  ["TERMINA TRA", "ENDS IN", "TERMINA EN", "ENDET IN", "SE TERMINE DANS"],
   ["Abbigliamento che guarda al futuro. Design innovativo, materiali tecnici, stile senza compromessi.", "Future-facing clothing. Innovative design, technical materials and uncompromising style.", "Ropa que mira al futuro. Diseño innovador, materiales técnicos y estilo sin concesiones.", "Mode mit Blick in die Zukunft. Innovatives Design, technische Materialien und kompromissloser Stil.", "Des vêtements tournés vers l’avenir. Design innovant, matières techniques et style sans compromis."],
   ["DATI AZIENDALI", "COMPANY DETAILS", "DATOS DE LA EMPRESA", "UNTERNEHMENSDATEN", "INFORMATIONS SUR L’ENTREPRISE"],
   ["INDIRIZZO NEGOZIO", "STORE ADDRESS", "DIRECCIÓN DE LA TIENDA", "GESCHÄFTSADRESSE", "ADRESSE DE LA BOUTIQUE"],

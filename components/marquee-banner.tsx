@@ -1,8 +1,9 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { X } from "lucide-react"
 import { useLanguage } from "@/lib/language-context"
+import { MINIMAL_PROMO_END_ISO } from "@/lib/minimal-promo"
 
 function InfiniteMarquee({ children, speed = "normal", className = "" }: { children: React.ReactNode; speed?: "normal" | "fast"; className?: string }) {
   const animClass = speed === "fast" ? "animate-marquee-fast" : "animate-marquee"
@@ -19,9 +20,29 @@ function InfiniteMarquee({ children, speed = "normal", className = "" }: { child
 
 export function MarqueeBanner() {
   const [visible, setVisible] = useState(true)
+  const [remainingMs, setRemainingMs] = useState<number | null>(null)
   const { t } = useLanguage()
 
-  if (!visible) return null
+  useEffect(() => {
+    const updateRemainingTime = () => {
+      setRemainingMs(Math.max(0, Date.parse(MINIMAL_PROMO_END_ISO) - Date.now()))
+    }
+
+    updateRemainingTime()
+    const timer = window.setInterval(updateRemainingTime, 1000)
+
+    return () => window.clearInterval(timer)
+  }, [])
+
+  if (!visible || remainingMs === 0) return null
+
+  const totalSeconds = Math.floor((remainingMs ?? 48 * 60 * 60 * 1000) / 1000)
+  const hours = Math.floor(totalSeconds / 3600)
+  const minutes = Math.floor((totalSeconds % 3600) / 60)
+  const seconds = totalSeconds % 60
+  const countdown = [hours, minutes, seconds]
+    .map((value) => String(value).padStart(2, "0"))
+    .join(":")
 
   return (
     <div className="relative z-50 border-b border-primary/25 bg-primary">
@@ -35,6 +56,10 @@ export function MarqueeBanner() {
               <span className="mx-6 text-primary-foreground/40 text-[10px]">{"\u2726"}</span>
               <span className="text-[11px] font-extrabold tracking-[0.25em] uppercase text-primary-foreground">
                 {t.nav.discountCode}
+              </span>
+              <span className="mx-6 text-primary-foreground/40 text-[10px]">{"\u2726"}</span>
+              <span className="font-mono text-[11px] font-extrabold tracking-[0.18em] uppercase tabular-nums text-primary-foreground">
+                {t.nav.promoEndsIn} {countdown}
               </span>
               <span className="mx-6 text-primary-foreground/40 text-[10px]">{"\u2726"}</span>
             </span>
