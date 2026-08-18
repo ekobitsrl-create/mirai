@@ -29,7 +29,9 @@ const LEGACY_CATALOG_SELECT = "id, name, description, price, category, image_url
 const GOOGLE_CATEGORY_BY_STORE_CATEGORY: Record<string, string> = {
   "t-shirt": "212",
   "t-shirt-mirai": "212",
+  "t-shirt-godspeed": "212",
   "t-shirt-god-street": "212",
+  "t-shirt-god-speed": "212",
   "t-shirt-valley": "212",
   tshirt: "212",
   magliette: "212",
@@ -51,7 +53,9 @@ const GOOGLE_CATEGORY_BY_STORE_CATEGORY: Record<string, string> = {
 const PRODUCT_TYPE_BY_STORE_CATEGORY: Record<string, string> = {
   "t-shirt": "Abbigliamento > T-shirt",
   "t-shirt-mirai": "Abbigliamento > T-shirt > MIRAI",
-  "t-shirt-god-street": "Abbigliamento > T-shirt > God Street",
+  "t-shirt-godspeed": "Abbigliamento > T-shirt > GodSpeed",
+  "t-shirt-god-street": "Abbigliamento > T-shirt > GodSpeed",
+  "t-shirt-god-speed": "Abbigliamento > T-shirt > GodSpeed",
   "t-shirt-valley": "Abbigliamento > T-shirt > Valley",
   tshirt: "Abbigliamento > T-shirt",
   magliette: "Abbigliamento > T-shirt",
@@ -71,7 +75,7 @@ const PRODUCT_TYPE_BY_STORE_CATEGORY: Record<string, string> = {
 }
 
 const HEADWEAR_CATEGORIES = new Set(["headwear", "cappelli", "caps", "hats"])
-const TSHIRT_CATEGORIES = new Set(["t-shirt", "t-shirt-mirai", "t-shirt-god-street", "t-shirt-valley", "tshirt", "magliette"])
+const TSHIRT_CATEGORIES = new Set(["t-shirt", "t-shirt-mirai", "t-shirt-godspeed", "t-shirt-god-street", "t-shirt-god-speed", "t-shirt-valley", "tshirt", "magliette"])
 const GOOGLE_ADS_CAMPAIGN_LABEL = "campagna_selezionati"
 const GOOGLE_ADS_SELECTED_SUPPLIER_SKUS = new Set([
   "M.0089",
@@ -204,10 +208,10 @@ function getSizes(product: StoreProduct) {
 }
 
 const LOCALIZED_PRODUCT_TYPES: Record<Exclude<Locale, "it">, Record<string, string>> = {
-  en: { "t-shirt": "Clothing > T-shirts", "t-shirt-mirai": "Clothing > T-shirts > MIRAI", "t-shirt-god-street": "Clothing > T-shirts > God Street", "t-shirt-valley": "Clothing > T-shirts > Valley", tshirt: "Clothing > T-shirts", magliette: "Clothing > T-shirts", camicie: "Clothing > Shirts", canotte: "Clothing > Tank tops", jeans: "Clothing > Jeans", pantaloni: "Clothing > Trousers", shorts: "Clothing > Shorts", bermuda: "Clothing > Shorts", headwear: "Accessories > Custom caps", cappelli: "Accessories > Custom caps", caps: "Accessories > Custom caps", hats: "Accessories > Custom caps", felpe: "Clothing > Sweatshirts & Hoodies", profumi: "Beauty & Personal Care > Perfume" },
-  es: { "t-shirt": "Ropa > Camisetas", "t-shirt-mirai": "Ropa > Camisetas > MIRAI", "t-shirt-god-street": "Ropa > Camisetas > God Street", "t-shirt-valley": "Ropa > Camisetas > Valley", tshirt: "Ropa > Camisetas", magliette: "Ropa > Camisetas", camicie: "Ropa > Camisas", canotte: "Ropa > Camisetas sin mangas", jeans: "Ropa > Vaqueros", pantaloni: "Ropa > Pantalones", shorts: "Ropa > Bermudas", bermuda: "Ropa > Bermudas", headwear: "Accesorios > Gorras personalizadas", cappelli: "Accesorios > Gorras personalizadas", caps: "Accesorios > Gorras personalizadas", hats: "Accesorios > Gorras personalizadas", felpe: "Ropa > Sudaderas y hoodies", profumi: "Belleza y cuidado personal > Perfumes" },
-  de: { "t-shirt": "Bekleidung > T-Shirts", "t-shirt-mirai": "Bekleidung > T-Shirts > MIRAI", "t-shirt-god-street": "Bekleidung > T-Shirts > God Street", "t-shirt-valley": "Bekleidung > T-Shirts > Valley", tshirt: "Bekleidung > T-Shirts", magliette: "Bekleidung > T-Shirts", camicie: "Bekleidung > Hemden", canotte: "Bekleidung > Tanktops", jeans: "Bekleidung > Jeans", pantaloni: "Bekleidung > Hosen", shorts: "Bekleidung > Shorts", bermuda: "Bekleidung > Shorts", headwear: "Accessoires > Individuelle Caps", cappelli: "Accessoires > Individuelle Caps", caps: "Accessoires > Individuelle Caps", hats: "Accessoires > Individuelle Caps", felpe: "Bekleidung > Sweatshirts & Hoodies", profumi: "Körperpflege > Parfum" },
-  fr: { "t-shirt": "Vêtements > T-shirts", "t-shirt-mirai": "Vêtements > T-shirts > MIRAI", "t-shirt-god-street": "Vêtements > T-shirts > God Street", "t-shirt-valley": "Vêtements > T-shirts > Valley", tshirt: "Vêtements > T-shirts", magliette: "Vêtements > T-shirts", camicie: "Vêtements > Chemises", canotte: "Vêtements > Débardeurs", jeans: "Vêtements > Jeans", pantaloni: "Vêtements > Pantalons", shorts: "Vêtements > Bermudas", bermuda: "Vêtements > Bermudas", headwear: "Accessoires > Casquettes personnalisées", cappelli: "Accessoires > Casquettes personnalisées", caps: "Accessoires > Casquettes personnalisées", hats: "Accessoires > Casquettes personnalisées", felpe: "Vêtements > Sweats et hoodies", profumi: "Beauté et soins personnels > Parfums" },
+  en: { "t-shirt": "Clothing > T-shirts", "t-shirt-mirai": "Clothing > T-shirts > MIRAI", "t-shirt-godspeed": "Clothing > T-shirts > GodSpeed", "t-shirt-god-street": "Clothing > T-shirts > GodSpeed", "t-shirt-god-speed": "Clothing > T-shirts > GodSpeed", "t-shirt-valley": "Clothing > T-shirts > Valley", tshirt: "Clothing > T-shirts", magliette: "Clothing > T-shirts", camicie: "Clothing > Shirts", canotte: "Clothing > Tank tops", jeans: "Clothing > Jeans", pantaloni: "Clothing > Trousers", shorts: "Clothing > Shorts", bermuda: "Clothing > Shorts", headwear: "Accessories > Custom caps", cappelli: "Accessories > Custom caps", caps: "Accessories > Custom caps", hats: "Accessories > Custom caps", felpe: "Clothing > Sweatshirts & Hoodies", profumi: "Beauty & Personal Care > Perfume" },
+  es: { "t-shirt": "Ropa > Camisetas", "t-shirt-mirai": "Ropa > Camisetas > MIRAI", "t-shirt-godspeed": "Ropa > Camisetas > GodSpeed", "t-shirt-god-street": "Ropa > Camisetas > GodSpeed", "t-shirt-god-speed": "Ropa > Camisetas > GodSpeed", "t-shirt-valley": "Ropa > Camisetas > Valley", tshirt: "Ropa > Camisetas", magliette: "Ropa > Camisetas", camicie: "Ropa > Camisas", canotte: "Ropa > Camisetas sin mangas", jeans: "Ropa > Vaqueros", pantaloni: "Ropa > Pantalones", shorts: "Ropa > Bermudas", bermuda: "Ropa > Bermudas", headwear: "Accesorios > Gorras personalizadas", cappelli: "Accesorios > Gorras personalizadas", caps: "Accesorios > Gorras personalizadas", hats: "Accesorios > Gorras personalizadas", felpe: "Ropa > Sudaderas y hoodies", profumi: "Belleza y cuidado personal > Perfumes" },
+  de: { "t-shirt": "Bekleidung > T-Shirts", "t-shirt-mirai": "Bekleidung > T-Shirts > MIRAI", "t-shirt-godspeed": "Bekleidung > T-Shirts > GodSpeed", "t-shirt-god-street": "Bekleidung > T-Shirts > GodSpeed", "t-shirt-god-speed": "Bekleidung > T-Shirts > GodSpeed", "t-shirt-valley": "Bekleidung > T-Shirts > Valley", tshirt: "Bekleidung > T-Shirts", magliette: "Bekleidung > T-Shirts", camicie: "Bekleidung > Hemden", canotte: "Bekleidung > Tanktops", jeans: "Bekleidung > Jeans", pantaloni: "Bekleidung > Hosen", shorts: "Bekleidung > Shorts", bermuda: "Bekleidung > Shorts", headwear: "Accessoires > Individuelle Caps", cappelli: "Accessoires > Individuelle Caps", caps: "Accessoires > Individuelle Caps", hats: "Accessoires > Individuelle Caps", felpe: "Bekleidung > Sweatshirts & Hoodies", profumi: "Körperpflege > Parfum" },
+  fr: { "t-shirt": "Vêtements > T-shirts", "t-shirt-mirai": "Vêtements > T-shirts > MIRAI", "t-shirt-godspeed": "Vêtements > T-shirts > GodSpeed", "t-shirt-god-street": "Vêtements > T-shirts > GodSpeed", "t-shirt-god-speed": "Vêtements > T-shirts > GodSpeed", "t-shirt-valley": "Vêtements > T-shirts > Valley", tshirt: "Vêtements > T-shirts", magliette: "Vêtements > T-shirts", camicie: "Vêtements > Chemises", canotte: "Vêtements > Débardeurs", jeans: "Vêtements > Jeans", pantaloni: "Vêtements > Pantalons", shorts: "Vêtements > Bermudas", bermuda: "Vêtements > Bermudas", headwear: "Accessoires > Casquettes personnalisées", cappelli: "Accessoires > Casquettes personnalisées", caps: "Accessoires > Casquettes personnalisées", hats: "Accessoires > Casquettes personnalisées", felpe: "Vêtements > Sweats et hoodies", profumi: "Beauté et soins personnels > Parfums" },
 }
 
 const SIZE_LABELS: Record<Locale, string> = {
@@ -288,7 +292,7 @@ function getMaterial(product: StoreProduct) {
 
   if (/\bdenim\b/i.test(productText)) return "Denim"
   if (/\bcamouflage\b/i.test(productText)) return "Tessuto camouflage"
-  if (["t-shirt", "t-shirt-mirai", "t-shirt-god-street", "t-shirt-valley", "tshirt", "magliette", "canotte"].includes(category)) return "Cotone"
+  if (["t-shirt", "t-shirt-mirai", "t-shirt-godspeed", "t-shirt-god-street", "t-shirt-god-speed", "t-shirt-valley", "tshirt", "magliette", "canotte"].includes(category)) return "Cotone"
 
   return null
 }

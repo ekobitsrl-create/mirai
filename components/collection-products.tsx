@@ -232,13 +232,13 @@ export function CollectionProducts({
                       href={localizedOrganicPath(`/prodotto/${product.id}`, locale)}
                       className="block"
                     >
-                      <div className={`mirai-neon-frame mirai-neon-lift relative mb-4 aspect-[3/4] overflow-hidden rounded-2xl ${product.category === "t-shirt-god-street" ? "bg-white" : "bg-card"}`}>
+                      <div className={`mirai-neon-frame mirai-neon-lift relative mb-4 aspect-[3/4] overflow-hidden rounded-2xl ${["t-shirt-godspeed", "t-shirt-god-street", "t-shirt-god-speed"].includes(product.category) ? "bg-white" : "bg-card"}`}>
                         <Image
                           src={product.image_url || "/placeholder.jpg"}
                           alt={translateProductName(product.name, locale)}
                           fill
                           className={
-                            product.category === "t-shirt-god-street"
+                            ["t-shirt-godspeed", "t-shirt-god-street", "t-shirt-god-speed"].includes(product.category)
                               ? "object-contain object-center p-3 transition-transform duration-700 ease-out group-hover:scale-[1.02] sm:p-4"
                               : isParfumCollection
                               ? "object-contain p-4 transition-all duration-[1s] ease-out group-hover:scale-105"

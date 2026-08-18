@@ -28,11 +28,34 @@ const STATIC_CATEGORY_NAMES: Record<string, string> = {
 }
 
 const LEGACY_CATEGORY_SLUGS: Record<string, string> = {
+  "t-shirt-god-street": "t-shirt-godspeed",
+  "t-shirt-god-speed": "t-shirt-godspeed",
   "tee-e-short": "camicie",
   "tee-e-shorts": "camicie",
   "tee-short": "camicie",
   "tee-shorts": "camicie",
   teeshorts: "camicie",
+}
+
+const GODSPEED_LEGACY_SLUGS = ["t-shirt-god-street", "t-shirt-god-speed"]
+
+type CategoryRecord = {
+  id: string
+  name: string
+  slug: string
+  description: string | null
+  image_url: string | null
+  parent_id: string | null
+  sort_order: number
+}
+
+async function getCategoryByCanonicalSlug(supabase: SupabaseClient, slug: string): Promise<CategoryRecord | null> {
+  const lookupSlugs = slug === "t-shirt-godspeed" ? [slug, ...GODSPEED_LEGACY_SLUGS] : [slug]
+  for (const lookupSlug of lookupSlugs) {
+    const { data } = await supabase.from("categories").select("*").eq("slug", lookupSlug).maybeSingle()
+    if (data) return data as CategoryRecord
+  }
+  return null
 }
 
 function normalizeCategorySlug(rawSlug: string) {
@@ -66,10 +89,10 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug: rawSlug } = await params
   const slug = normalizeCategorySlug(rawSlug)
   const supabase = await createClient()
-  let { data: category } = await supabase.from("categories").select("name, description, image_url").eq("slug", slug).single()
+  let category = await getCategoryByCanonicalSlug(supabase, slug)
   if (!category) {
-    const { data: categoryByIlike } = await supabase.from("categories").select("name, description, image_url").ilike("slug", slug).single()
-    category = categoryByIlike
+    const { data: categoryByIlike } = await supabase.from("categories").select("*").ilike("slug", slug).single()
+    category = categoryByIlike as CategoryRecord | null
   }
 
   if (!category) category = await getStaticCategory(slug, supabase)
@@ -105,11 +128,7 @@ export default async function CollezionePage({ params }: { params: Promise<{ slu
   const supabase = await createClient()
 
   // Get category by slug (try normalized slug first, then original)
-  let { data: category } = await supabase
-    .from("categories")
-    .select("*")
-    .eq("slug", slug)
-    .single()
+  let category = await getCategoryByCanonicalSlug(supabase, slug)
 
   // If not found with normalized slug, try case-insensitive match
   if (!category) {
@@ -118,7 +137,7 @@ export default async function CollezionePage({ params }: { params: Promise<{ slu
       .select("*")
       .ilike("slug", slug)
       .single()
-    category = categoryByIlike
+    category = categoryByIlike as CategoryRecord | null
   }
 
   if (!category) category = await getStaticCategory(slug, supabase)
