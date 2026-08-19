@@ -37,7 +37,7 @@ const nextConfig = {
   },
   images: {
     formats: ['image/avif', 'image/webp'],
-    qualities: [90],
+    qualities: [75, 90],
     minimumCacheTTL: 2592000,
     remotePatterns: [
       {
