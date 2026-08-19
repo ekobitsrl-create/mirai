@@ -51,10 +51,10 @@ export default function ChiSiamoPage() {
         <section className="relative flex flex-col items-center">
           <div className="relative w-full max-w-4xl mx-auto">
             <Image
-              src="/images/store-interior.png"
+              src="/images/about-mirai-store-interior.png"
               alt="Lo spazio MIRAI - Interno del negozio streetwear"
-              width={1024}
-              height={1365}
+              width={1122}
+              height={1402}
               className="w-full h-auto"
               priority
             />
