@@ -51,9 +51,16 @@ export default async function Home({ locale = "it" }: { locale?: Locale } = {}) 
       supabase.from("categories").select("*").is("parent_id", null).order("name", { ascending: true }),
     ])
     products = withDemoProducts(prodRes.data || []).slice(0, 8)
-    categories = (catRes.data || []).filter((category) => {
+    const publicCategories = (catRes.data || []).filter((category) => {
       const slug = String(category.slug || "").toLowerCase()
       return slug !== "mirai-parfum-exlusive" && slug !== "mirai-parfum-exclusive"
+    })
+    const hasCanonicalFelpe = publicCategories.some(
+      (category) => String(category.slug || "").toLowerCase() === "felpe",
+    )
+    categories = publicCategories.filter((category) => {
+      const slug = String(category.slug || "").toLowerCase()
+      return !hasCanonicalFelpe || slug !== "sweatshirts"
     })
   } catch (e) {
     console.error("[v0] Failed to fetch data:", e)
