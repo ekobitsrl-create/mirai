@@ -79,6 +79,7 @@ export const metadata: Metadata = {
   alternates: {
     types: {
       "application/xml": getAbsoluteUrl("/google-merchant-feed.xml"),
+      "text/plain": getAbsoluteUrl("/llms.txt"),
     },
   },
   verification: {
@@ -127,17 +128,42 @@ window.gtag('consent', 'default', {
             dangerouslySetInnerHTML={{
               __html: JSON.stringify({
               "@context": "https://schema.org",
-              "@type": "Organization",
+              "@type": "OnlineStore",
               "@id": `${SITE_URL}/#organization`,
               name: "MIRAI LAB STORE",
               legalName: COMPANY_INFO.legalName,
               alternateName: ["MIRAI", "MIRAI Concept Store", "MIRAI Store Catania"],
               url: SITE_URL,
-              logo: getAbsoluteUrl("/favicon.png"),
+              logo: {
+                "@type": "ImageObject",
+                url: getAbsoluteUrl("/favicon.png"),
+                contentUrl: getAbsoluteUrl("/favicon.png"),
+                width: 512,
+                height: 512,
+              },
               email: COMPANY_INFO.email,
               telephone: "+39 349 866 3584",
+              taxID: COMPANY_INFO.taxCode,
+              vatID: `IT${COMPANY_INFO.vatNumber}`,
+              slogan: "Different by design.",
               description: "Concept store streetwear nato a Catania: abbigliamento urban, cappelli custom e t-shirt personalizzate online.",
               sameAs: ["https://www.instagram.com/mirai_labstore/"],
+              founder: {
+                "@type": "Person",
+                name: "Christian Scrivano",
+                jobTitle: "Founder & Creative Director",
+              },
+              knowsAbout: [
+                "streetwear italiano",
+                "abbigliamento urban",
+                "t-shirt oversize",
+                "cappelli custom",
+                "personalizzazione t-shirt",
+              ],
+              areaServed: [
+                { "@type": "Country", name: "Italia" },
+                { "@type": "AdministrativeArea", name: "Unione europea" },
+              ],
               address: {
                 "@type": "PostalAddress",
                 streetAddress: "Via Umberto 95",

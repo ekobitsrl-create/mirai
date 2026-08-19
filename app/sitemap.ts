@@ -1,6 +1,10 @@
 import type { MetadataRoute } from "next"
 import { createClient } from "@/lib/supabase/server"
-import { isPrivateCheckoutProduct, withoutBlackIslandProducts } from "@/lib/products"
+import {
+  isPrivateCheckoutProduct,
+  isProductPublished,
+  withoutBlackIslandProducts,
+} from "@/lib/products"
 import { SITE_URL } from "@/lib/site-url"
 import { SEO_GUIDES } from "@/lib/seo-guides"
 import {
@@ -24,7 +28,13 @@ function localizedEntries(
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  let products: Array<{ id: string; name: string | null; image_url: string | null; updated_at: string | null }> = []
+  let products: Array<{
+    id: string
+    name: string | null
+    image_url: string | null
+    updated_at: string | null
+    is_published: boolean | null
+  }> = []
   let categories: Array<{ slug: string; updated_at: string | null }> = []
 
   try {
@@ -32,8 +42,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const [productsResult, categoriesResult] = await Promise.all([
       supabase
         .from("products")
-        .select("id, name, image_url, updated_at")
-        .eq("in_stock", true),
+        .select("id, name, image_url, updated_at, is_published"),
       supabase.from("categories").select("slug, updated_at"),
     ])
     products = productsResult.data || []
@@ -43,7 +52,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }
 
   const visibleDatabaseProducts = withoutBlackIslandProducts(products).filter(
-    (product) => !isPrivateCheckoutProduct(product),
+    (product) => isProductPublished(product) && !isPrivateCheckoutProduct(product),
   )
 
   const productUrls: MetadataRoute.Sitemap = visibleDatabaseProducts.flatMap((p) =>
