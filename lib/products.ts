@@ -205,8 +205,33 @@ export function mapProductRow(row: Record<string, any>): StoreProduct {
   const rawDetails = row.detail_items
   const productId = String(row.id)
   const productName = (row.name as string) ?? ""
-  const databaseGallery = Array.isArray(rawGallery)
-    ? (rawGallery as StoreProductImage[])
+  const databaseGallery: StoreProductImage[] = Array.isArray(rawGallery)
+    ? rawGallery
+        .map((image, index): StoreProductImage | null => {
+          if (typeof image === "string" && image.trim()) {
+            return {
+              src: image.trim(),
+              alt: index === 0 ? productName : `${productName} - immagine ${index + 1}`,
+              fit: "contain",
+            }
+          }
+
+          if (!image || typeof image !== "object" || typeof image.src !== "string" || !image.src.trim()) {
+            return null
+          }
+
+          return {
+            src: image.src.trim(),
+            alt: typeof image.alt === "string" && image.alt.trim()
+              ? image.alt.trim()
+              : index === 0
+                ? productName
+                : `${productName} - immagine ${index + 1}`,
+            fit: image.fit === "cover" ? "cover" : "contain",
+            position: typeof image.position === "string" ? image.position : undefined,
+          }
+        })
+        .filter((image): image is StoreProductImage => image !== null)
     : []
   const generatedGallery = HEADWEAR_GENERATED_GALLERIES[productId] || []
   const galleryWithOriginalPrimary = generatedGallery.length
