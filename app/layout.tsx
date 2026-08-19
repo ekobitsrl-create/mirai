@@ -1,7 +1,6 @@
 import type { Metadata, Viewport } from 'next'
 import { Inter, Space_Grotesk } from 'next/font/google'
 import Script from 'next/script'
-import { Analytics } from '@vercel/analytics/next'
 import { CartProvider } from '@/lib/cart-context'
 import { CartAddedBanner } from '@/components/cart-added-banner'
 import { LanguageProvider } from '@/lib/language-context'
@@ -14,6 +13,7 @@ import { LazyMiraGuide } from '@/components/lazy-mira-guide'
 import { MarketingPixels } from '@/components/marketing-pixels'
 import { GoogleIntegrations } from '@/components/google-integrations'
 import { PostHogProvider } from '@/components/posthog-provider'
+import { ConsentedVercelAnalytics } from '@/components/consented-vercel-analytics'
 import { COMPANY_INFO } from '@/lib/company-info'
 import { getAbsoluteUrl, SITE_URL } from '@/lib/site-url'
 import './globals.css'
@@ -199,7 +199,7 @@ window.gtag('consent', 'default', {
             </CartProvider>
           </LanguageProvider>
           <MarketingPixels />
-          <Analytics />
+          <ConsentedVercelAnalytics />
         </PostHogProvider>
       </body>
     </html>

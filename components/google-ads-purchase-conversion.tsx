@@ -1,6 +1,10 @@
 "use client"
 
 import { useEffect, useRef } from "react"
+import {
+  hasFullTrackingConsent,
+  TRACKING_CONSENT_EVENT,
+} from "@/lib/tracking-consent"
 
 const GOOGLE_ADS_PURCHASE_DESTINATION = "AW-18327352851/jnIQCIfWrdIcEJPslKNE"
 const SENT_STORAGE_PREFIX = "mirai:google-ads-purchase:"
@@ -24,7 +28,8 @@ export function GoogleAdsPurchaseConversion({ transactionId }: { transactionId: 
 
     let attempts = 0
     const sendConversion = () => {
-      if (!window.gtag) return false
+      if (sentTransactionId.current === normalizedTransactionId) return true
+      if (!hasFullTrackingConsent() || !window.gtag) return false
 
       window.gtag("event", "conversion", {
         send_to: GOOGLE_ADS_PURCHASE_DESTINATION,
@@ -43,12 +48,22 @@ export function GoogleAdsPurchaseConversion({ transactionId }: { transactionId: 
 
     if (sendConversion()) return
 
+    const handleConsent = (event: Event) => {
+      if ((event as CustomEvent<"all" | "necessary">).detail === "all") {
+        window.setTimeout(sendConversion, 0)
+      }
+    }
+    window.addEventListener(TRACKING_CONSENT_EVENT, handleConsent)
+
     const timer = window.setInterval(() => {
       attempts += 1
       if (sendConversion() || attempts >= 20) window.clearInterval(timer)
     }, 250)
 
-    return () => window.clearInterval(timer)
+    return () => {
+      window.clearInterval(timer)
+      window.removeEventListener(TRACKING_CONSENT_EVENT, handleConsent)
+    }
   }, [transactionId])
 
   return null

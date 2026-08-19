@@ -5,6 +5,10 @@ import Link from "next/link"
 import { X } from "lucide-react"
 import { usePathname } from "next/navigation"
 import { useLanguage } from "@/lib/language-context"
+import {
+  revokeLoadedTrackers,
+  TRACKING_CONSENT_EVENT,
+} from "@/lib/tracking-consent"
 
 type GoogleConsentValue = "granted" | "denied"
 type ClarityConsentValue = "granted" | "denied"
@@ -92,7 +96,10 @@ export function CookieBanner() {
     } else if (consent === "cookie_consent=necessary") {
       updateGoogleConsent("necessary")
       updateClarityConsent("necessary")
+      revokeLoadedTrackers()
     } else {
+      // Remove identifiers left by older deployments before asking again.
+      revokeLoadedTrackers()
       // Small delay so it doesn't flash on load
       timer = setTimeout(() => setVisible(true), 1000)
     }
@@ -119,7 +126,7 @@ export function CookieBanner() {
     document.cookie = "cookie_consent=all; path=/; max-age=31536000; SameSite=Lax"
     updateGoogleConsent("all")
     updateClarityConsent("all")
-    window.dispatchEvent(new CustomEvent("mirai:cookie-consent", { detail: "all" }))
+    window.dispatchEvent(new CustomEvent(TRACKING_CONSENT_EVENT, { detail: "all" }))
     setAnalyticsEnabled(true)
     setMarketingEnabled(true)
     setShowPreferences(false)
@@ -136,7 +143,8 @@ export function CookieBanner() {
     document.cookie = "cookie_consent=necessary; path=/; max-age=31536000; SameSite=Lax"
     updateGoogleConsent("necessary")
     updateClarityConsent("necessary")
-    window.dispatchEvent(new CustomEvent("mirai:cookie-consent", { detail: "necessary" }))
+    revokeLoadedTrackers()
+    window.dispatchEvent(new CustomEvent(TRACKING_CONSENT_EVENT, { detail: "necessary" }))
     setAnalyticsEnabled(false)
     setMarketingEnabled(false)
     setShowPreferences(false)

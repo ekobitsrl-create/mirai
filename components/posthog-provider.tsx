@@ -58,7 +58,10 @@ function PostHogPageViews({ ready }: { ready: boolean }) {
 
   useEffect(() => {
     const posthog = getLoadedPostHogClient()
-    if (!ready || !posthog?.__loaded || !hasPostHogConsent()) return
+    if (!ready || !posthog?.__loaded || !hasPostHogConsent()) {
+      lastTrackedUrl.current = null
+      return
+    }
 
     const currentUrl = sanitizedAnalyticsUrl(window.location.href).toString()
     if (lastTrackedUrl.current === currentUrl) return
