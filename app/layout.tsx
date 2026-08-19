@@ -86,10 +86,9 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [
-      { url: '/favicon.svg', type: 'image/svg+xml', sizes: 'any' },
-      { url: '/favicon.ico', sizes: 'any' },
-      { url: '/favicon-32x32.png', type: 'image/png', sizes: '32x32' },
       { url: '/favicon.png', type: 'image/png', sizes: '512x512' },
+      { url: '/favicon-32x32.png', type: 'image/png', sizes: '32x32' },
+      { url: '/favicon.ico', sizes: 'any' },
     ],
     shortcut: '/favicon.ico',
     apple: [{ url: '/apple-icon.png', type: 'image/png', sizes: '180x180' }],
@@ -134,7 +133,7 @@ window.gtag('consent', 'default', {
               legalName: COMPANY_INFO.legalName,
               alternateName: ["MIRAI", "MIRAI Concept Store", "MIRAI Store Catania"],
               url: SITE_URL,
-              logo: getAbsoluteUrl("/icon.svg"),
+              logo: getAbsoluteUrl("/favicon.png"),
               email: COMPANY_INFO.email,
               telephone: "+39 349 866 3584",
               description: "Concept store streetwear nato a Catania: abbigliamento urban, cappelli custom e t-shirt personalizzate online.",

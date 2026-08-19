@@ -45,6 +45,11 @@ export const translations = {
     hero: {
       slides: [
         {
+          subtitle: "MIRAI LAB STORE",
+          title: "Lo Streetwear\ncome non lo avevi mai visto",
+          cta: "Scopri lo Shop",
+        },
+        {
           subtitle: "Il Brand",
           title: "Il Futuro\nDella Moda",
           cta: "Scopri",
@@ -223,6 +228,11 @@ export const translations = {
     // Hero
     hero: {
       slides: [
+        {
+          subtitle: "MIRAI LAB STORE",
+          title: "Streetwear\nlike you've never seen it before",
+          cta: "Discover the Shop",
+        },
         {
           subtitle: "The Brand",
           title: "The Future\nOf Fashion",
@@ -403,6 +413,11 @@ export const translations = {
     hero: {
       slides: [
         {
+          subtitle: "MIRAI LAB STORE",
+          title: "El streetwear\ncomo nunca lo habías visto",
+          cta: "Descubre la Tienda",
+        },
+        {
           subtitle: "La Marca",
           title: "El Futuro\nDe La Moda",
           cta: "Descubrir",
@@ -582,6 +597,11 @@ export const translations = {
     hero: {
       slides: [
         {
+          subtitle: "MIRAI LAB STORE",
+          title: "Streetwear,\nwie du ihn noch nie gesehen hast",
+          cta: "Shop entdecken",
+        },
+        {
           subtitle: "Die Marke",
           title: "Die Zukunft\nDer Mode",
           cta: "Entdecken",
@@ -760,6 +780,11 @@ export const translations = {
     // Hero
     hero: {
       slides: [
+        {
+          subtitle: "MIRAI LAB STORE",
+          title: "Le streetwear\ncomme vous ne l’avez jamais vu",
+          cta: "Découvrir la Boutique",
+        },
         {
           subtitle: "La Marque",
           title: "L'Avenir\nDe La Mode",

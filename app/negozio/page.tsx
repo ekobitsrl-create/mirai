@@ -30,7 +30,7 @@ const storeJsonLd = {
   description: STORE_DESCRIPTION,
   url: getAbsoluteUrl("/negozio"),
   image: getAbsoluteUrl("/images/store-interior.png"),
-  logo: getAbsoluteUrl("/icon.svg"),
+  logo: getAbsoluteUrl("/favicon.png"),
   telephone: "+39 349 866 3584",
   email: "info@mirailabstore.com",
   address: {

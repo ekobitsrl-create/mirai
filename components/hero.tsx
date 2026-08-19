@@ -15,11 +15,13 @@ type HeroSlideImage = {
 }
 
 const slideImages: HeroSlideImage[] = [
+  { src: "/images/hero-mirai-store-entrance.png", ratio: 853 / 1844, heightPct: 90 },
   { src: "/images/hero-model-black.png", ratio: 1024 / 1536, heightPct: 70 },
   { src: "/images/hero-model-white.png", ratio: 1024 / 1536, heightPct: 70 },
 ]
 
 const slideHrefs = [
+  "/collezioni",
   "/chi-siamo",
   "/negozio",
 ]
