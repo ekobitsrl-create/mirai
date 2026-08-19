@@ -77,6 +77,8 @@ const PRODUCT_TYPE_BY_STORE_CATEGORY: Record<string, string> = {
 const HEADWEAR_CATEGORIES = new Set(["headwear", "cappelli", "caps", "hats"])
 const TSHIRT_CATEGORIES = new Set(["t-shirt", "t-shirt-mirai", "t-shirt-godspeed", "t-shirt-god-street", "t-shirt-god-speed", "t-shirt-valley", "tshirt", "magliette"])
 const SWEATSHIRT_CATEGORIES = new Set(["felpe", "felpa", "sweatshirts", "sweatshirt", "hoodies", "hoodie"])
+// Stable one-time version that makes Merchant re-fetch T-shirt images replaced at the same URL.
+const MERCHANT_TSHIRT_IMAGE_VERSION = "20260819"
 const GOOGLE_ADS_CAMPAIGN_LABEL = "campagna_selezionati"
 const GOOGLE_ADS_SELECTED_SUPPLIER_SKUS = new Set([
   "M.0089",
@@ -279,6 +281,20 @@ function getAdditionalImages(product: StoreProduct, baseUrl: string, primaryImag
   return [...uniqueImages].slice(0, 10)
 }
 
+function versionMerchantTshirtImage(imageUrl: string, categoryKey: string, platform?: string | null) {
+  if (!imageUrl || platform?.toLowerCase() === "meta" || !TSHIRT_CATEGORIES.has(categoryKey)) {
+    return imageUrl
+  }
+
+  try {
+    const versionedUrl = new URL(imageUrl)
+    versionedUrl.searchParams.set("merchant_image_v", MERCHANT_TSHIRT_IMAGE_VERSION)
+    return versionedUrl.toString()
+  } catch {
+    return imageUrl
+  }
+}
+
 function getColor(product: StoreProduct) {
   if (product.color_name) return product.color_name
 
@@ -420,9 +436,11 @@ function renderProductVariant(
   const itemId = getCatalogItemId(product, size)
   const productPath = `/prodotto/${encodeURIComponent(product.id)}`
   const productUrl = absoluteUrl(localizedOrganicPath(productPath, locale), baseUrl)
-  const primaryImage = product.image_url ? absoluteUrl(product.image_url, baseUrl) : ""
-  const additionalImages = getAdditionalImages(product, baseUrl, primaryImage)
   const categoryKey = product.category.toLowerCase()
+  const rawPrimaryImage = product.image_url ? absoluteUrl(product.image_url, baseUrl) : ""
+  const rawAdditionalImages = getAdditionalImages(product, baseUrl, rawPrimaryImage)
+  const primaryImage = versionMerchantTshirtImage(rawPrimaryImage, categoryKey, platform)
+  const additionalImages = rawAdditionalImages.map((image) => versionMerchantTshirtImage(image, categoryKey, platform))
   const color = getColor(product)
   const material = getMaterial(product)
   const pattern = getPattern(product)
