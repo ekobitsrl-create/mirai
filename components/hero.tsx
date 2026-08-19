@@ -6,16 +6,20 @@ import { useEffect, useState, useCallback } from "react"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import { useLanguage } from "@/lib/language-context"
 
-const slideImages = [
-  { src: "/images/hero-mirai-logo.png", ratio: 738 / 1600, heightPct: 90 },
-  { src: "/images/hero-storefront.png", ratio: 1536 / 1024, heightPct: 68, heightPctMobile: 54, strongBottomFade: true },
+type HeroSlideImage = {
+  src: string
+  ratio: number
+  heightPct: number
+  heightPctMobile?: number
+  strongBottomFade?: boolean
+}
+
+const slideImages: HeroSlideImage[] = [
   { src: "/images/hero-model-black.png", ratio: 1024 / 1536, heightPct: 70 },
   { src: "/images/hero-model-white.png", ratio: 1024 / 1536, heightPct: 70 },
 ]
 
 const slideHrefs = [
-  "/#prodotti",
-  "/collezioni",
   "/chi-siamo",
   "/negozio",
 ]

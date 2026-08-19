@@ -5,7 +5,7 @@ import { useCallback, useEffect, useRef, useState } from "react"
 const FADE_DURATION_MS = 1800
 const FADE_LEAD_SECONDS = FADE_DURATION_MS / 1000
 const SAFETY_TIMEOUT_MS = 12000
-const INTRO_SEEN_KEY = "mirai-intro-seen-v1"
+const INTRO_SEEN_KEY = "mirai-intro-seen-v2"
 
 export function SiteIntro() {
   const [isVisible, setIsVisible] = useState(false)

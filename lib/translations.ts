@@ -45,16 +45,6 @@ export const translations = {
     hero: {
       slides: [
         {
-          subtitle: "MIRAI LAB STORE",
-          title: "Streetwear\nCatania",
-          cta: "Scopri lo Shop",
-        },
-        {
-          subtitle: "Streetwear",
-          title: "Lo Street Style\nAl Suo Meglio",
-          cta: "Inizia lo Shopping",
-        },
-        {
           subtitle: "Il Brand",
           title: "Il Futuro\nDella Moda",
           cta: "Scopri",
@@ -233,16 +223,6 @@ export const translations = {
     // Hero
     hero: {
       slides: [
-        {
-          subtitle: "New Season",
-          title: "New Products\nSS26",
-          cta: "Shop Now",
-        },
-        {
-          subtitle: "Streetwear",
-          title: "Street Style\nAt Its Best",
-          cta: "Start Shopping",
-        },
         {
           subtitle: "The Brand",
           title: "The Future\nOf Fashion",
@@ -423,16 +403,6 @@ export const translations = {
     hero: {
       slides: [
         {
-          subtitle: "Nueva Temporada",
-          title: "Nuevos Productos\nSS26",
-          cta: "Comprar Ahora",
-        },
-        {
-          subtitle: "Streetwear",
-          title: "El Street Style\nEn Su Mejor Momento",
-          cta: "Empezar a Comprar",
-        },
-        {
           subtitle: "La Marca",
           title: "El Futuro\nDe La Moda",
           cta: "Descubrir",
@@ -612,16 +582,6 @@ export const translations = {
     hero: {
       slides: [
         {
-          subtitle: "Neue Saison",
-          title: "Neue Produkte\nSS26",
-          cta: "Jetzt Kaufen",
-        },
-        {
-          subtitle: "Streetwear",
-          title: "Street Style\nVom Feinsten",
-          cta: "Jetzt Shoppen",
-        },
-        {
           subtitle: "Die Marke",
           title: "Die Zukunft\nDer Mode",
           cta: "Entdecken",
@@ -800,16 +760,6 @@ export const translations = {
     // Hero
     hero: {
       slides: [
-        {
-          subtitle: "Nouvelle Saison",
-          title: "Nouveaux Produits\nSS26",
-          cta: "Acheter Maintenant",
-        },
-        {
-          subtitle: "Streetwear",
-          title: "Le Street Style\nÀ Son Meilleur",
-          cta: "Commencer le Shopping",
-        },
         {
           subtitle: "La Marque",
           title: "L'Avenir\nDe La Mode",
