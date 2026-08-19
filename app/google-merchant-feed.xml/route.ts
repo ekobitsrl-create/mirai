@@ -76,6 +76,7 @@ const PRODUCT_TYPE_BY_STORE_CATEGORY: Record<string, string> = {
 
 const HEADWEAR_CATEGORIES = new Set(["headwear", "cappelli", "caps", "hats"])
 const TSHIRT_CATEGORIES = new Set(["t-shirt", "t-shirt-mirai", "t-shirt-godspeed", "t-shirt-god-street", "t-shirt-god-speed", "t-shirt-valley", "tshirt", "magliette"])
+const SWEATSHIRT_CATEGORIES = new Set(["felpe", "felpa", "sweatshirts", "sweatshirt", "hoodies", "hoodie"])
 const GOOGLE_ADS_CAMPAIGN_LABEL = "campagna_selezionati"
 const GOOGLE_ADS_SELECTED_SUPPLIER_SKUS = new Set([
   "M.0089",
@@ -205,6 +206,12 @@ function getItemGroupId(product: StoreProduct) {
 function getSizes(product: StoreProduct) {
   const sizes = (product.sizes || []).filter(Boolean)
   return sizes.length > 0 ? sizes : ["OS"]
+}
+
+function getMerchantCustomLabel3(categoryKey: string, fallback?: string) {
+  if (SWEATSHIRT_CATEGORIES.has(categoryKey)) return "felpe"
+  if (TSHIRT_CATEGORIES.has(categoryKey)) return "magliette"
+  return fallback
 }
 
 const LOCALIZED_PRODUCT_TYPES: Record<Exclude<Locale, "it">, Record<string, string>> = {
@@ -455,6 +462,7 @@ function renderProductVariant(
   const availability = getAvailability(product, size)
   const isHeadwear = HEADWEAR_CATEGORIES.has(categoryKey)
   const googleAdsCampaignLabel = getGoogleAdsCampaignLabel(product)
+  const merchantCustomLabel3 = getMerchantCustomLabel3(categoryKey, supplierSettings.merchantCustomLabel3)
 
   return [
     "    <item>",
@@ -509,8 +517,8 @@ function renderProductVariant(
     ...(googleAdsCampaignLabel
       ? [`      <g:custom_label_2>${escapeXml(googleAdsCampaignLabel)}</g:custom_label_2>`]
       : []),
-    ...(supplierSettings.merchantCustomLabel3
-      ? [`      <g:custom_label_3>${escapeXml(supplierSettings.merchantCustomLabel3)}</g:custom_label_3>`]
+    ...(merchantCustomLabel3
+      ? [`      <g:custom_label_3>${escapeXml(merchantCustomLabel3)}</g:custom_label_3>`]
       : []),
     ...(supplierSettings.merchantCustomLabel4
       ? [`      <g:custom_label_4>${escapeXml(supplierSettings.merchantCustomLabel4)}</g:custom_label_4>`]
