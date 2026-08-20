@@ -11,9 +11,19 @@ export function proxy(request: NextRequest) {
     return NextResponse.redirect(loginUrl)
   }
 
-  return NextResponse.next()
+  const localeMatch = pathname.match(/^\/(en|es|fr|de)(?:\/|$)/)
+  const requestHeaders = new Headers(request.headers)
+  requestHeaders.set("x-mirai-locale", localeMatch?.[1] ?? "it")
+
+  return NextResponse.next({
+    request: {
+      headers: requestHeaders,
+    },
+  })
 }
 
 export const config = {
-  matcher: ["/account/:path*", "/admin/:path*"],
+  matcher: [
+    "/((?!api|_next/static|_next/image|favicon.ico|favicon.png|favicon-32x32.png|apple-icon.png|robots.txt|sitemap.xml|google-merchant-feed(?:-[a-z]{2})?\\.xml).*)",
+  ],
 }

@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 import { Inter, Space_Grotesk } from 'next/font/google'
 import Script from 'next/script'
+import { headers } from 'next/headers'
 import { CartProvider } from '@/lib/cart-context'
 import { CartAddedBanner } from '@/components/cart-added-banner'
 import { LanguageProvider } from '@/lib/language-context'
@@ -100,13 +101,19 @@ export const viewport: Viewport = {
   themeColor: '#070708',
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode
 }>) {
+  const requestHeaders = await headers()
+  const requestedLocale = requestHeaders.get('x-mirai-locale')
+  const documentLocale = requestedLocale && ['it', 'en', 'es', 'fr', 'de'].includes(requestedLocale)
+    ? requestedLocale
+    : 'it'
+
   return (
-    <html lang="it" data-scroll-behavior="smooth">
+    <html lang={documentLocale} data-scroll-behavior="smooth">
       <head>
         <Script id="google-consent-default" strategy="beforeInteractive">
           {`window.dataLayer = window.dataLayer || [];
