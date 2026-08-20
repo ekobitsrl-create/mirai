@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server"
-import { getDemoProduct, isProductPublished, type StoreProduct } from "@/lib/products"
+import { canAccessStoreProduct, getDemoProduct, type StoreProduct } from "@/lib/products"
 import {
   consumeRateLimit,
   contentLengthWithin,
@@ -50,16 +50,17 @@ export async function POST(request: Request) {
       : []
 
     const productIds = [...new Set(submittedItems.map((item) => item.productId))]
+    const user = await getServerUser()
     const supabase = createAdminClient()
     const { data: databaseProducts, error: productError } = productIds.length
-      ? await supabase.from("products").select("id, name, price, image_url, sizes, is_published").in("id", productIds)
+      ? await supabase.from("products").select("id, name, price, image_url, sizes, is_published, community_only").in("id", productIds)
       : { data: [], error: null }
     if (productError) throw productError
 
     const products = [
       ...(databaseProducts || []),
       ...productIds.map(getDemoProduct).filter((product): product is StoreProduct => product !== null),
-    ].filter(isProductPublished)
+    ].filter((product) => canAccessStoreProduct(product, Boolean(user)))
     const cleanItems = submittedItems.flatMap((item) => {
       const product = products.find((candidate) => candidate.id === item.productId)
       if (!product) return []
@@ -79,8 +80,6 @@ export async function POST(request: Request) {
 
     const itemCount = cleanItems.reduce((sum, item) => sum + item.quantity, 0)
     const total = Number(cleanItems.reduce((sum, item) => sum + item.price * item.quantity, 0).toFixed(2))
-    const user = await getServerUser()
-
     const { data, error } = await supabase
       .from("cart_sessions")
       .upsert({

@@ -54,6 +54,7 @@ function parseProductDetails(formData: FormData) {
     composition: text(formData.get("composition")),
     care: text(formData.get("care")),
     detail_items: detailItems.length ? detailItems : null,
+    community_only: formData.get("community_only") === "on",
     is_preorder: formData.get("is_preorder") === "on",
     preorder_release_at: text(formData.get("preorder_release_at")),
     drop_name: text(formData.get("drop_name")),

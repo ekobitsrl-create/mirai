@@ -3,7 +3,7 @@
 import type Stripe from 'stripe'
 import { assertStripeCheckoutConfigured, stripe } from '@/lib/stripe'
 import { createAdminClient, getServerUser } from '@/lib/supabase/server'
-import { getDemoProduct, getSupplierProfile, isBlackIslandProduct, isProductPublished, type StoreProduct } from '@/lib/products'
+import { canAccessStoreProduct, getDemoProduct, getSupplierProfile, isBlackIslandProduct, type StoreProduct } from '@/lib/products'
 import {
   getShippingCostCents,
   getStripeShippingOptions,
@@ -164,7 +164,7 @@ async function validateCheckoutDiscountInternal(
   const productIds = [...new Set(cartItems.map((item) => item.productId))]
   const { data: products, error } = await supabase
     .from('products')
-    .select('id, price, is_published')
+    .select('id, price, is_published, community_only')
     .in('id', productIds)
 
   const demoProducts = productIds
@@ -174,7 +174,7 @@ async function validateCheckoutDiscountInternal(
   if (error && checkoutProducts.length === 0) {
     throw new Error('Errore nel recupero dei prodotti')
   }
-  if (checkoutProducts.some((product) => !isProductPublished(product))) {
+  if (checkoutProducts.some((product) => !canAccessStoreProduct(product, Boolean(user)))) {
     throw new Error('Uno dei prodotti selezionati non è al momento disponibile')
   }
 
@@ -252,7 +252,7 @@ async function createCheckoutSessionInternal(
   const productIds = cartItems.map((item) => item.productId)
   let { data: products, error } = await supabase
     .from('products')
-    .select('id, name, description, price, image_url, stock_by_size, supplier_sku, color_name, is_published, is_preorder, preorder_release_at')
+    .select('id, name, description, price, image_url, stock_by_size, supplier_sku, color_name, is_published, community_only, is_preorder, preorder_release_at')
     .in('id', productIds)
 
   if (error?.message.includes('stock_by_size')) {
@@ -276,7 +276,7 @@ async function createCheckoutSessionInternal(
   if (checkoutProducts.some(isBlackIslandProduct)) {
     throw new Error('Uno dei prodotti selezionati non è più disponibile')
   }
-  if (checkoutProducts.some((product) => !isProductPublished(product))) {
+  if (checkoutProducts.some((product) => !canAccessStoreProduct(product, Boolean(user)))) {
     throw new Error('Uno dei prodotti selezionati è in bozza e non può essere acquistato')
   }
 
@@ -457,11 +457,12 @@ function isMissingDiscountOrderColumns(error: { code?: string; message?: string 
 export async function getCashOnDeliveryEligibility(cartItems: CartLineItem[]) {
   if (!cartItems.length) return { eligible: false }
 
+  const user = await getServerUser()
   const supabase = createAdminClient()
   const productIds = [...new Set(cartItems.map((item) => item.productId))]
   const { data: products, error } = await supabase
     .from('products')
-    .select('id, brand, supplier_profile, is_published')
+    .select('id, brand, supplier_profile, is_published, community_only')
     .in('id', productIds)
 
   const demoProducts = productIds
@@ -470,7 +471,7 @@ export async function getCashOnDeliveryEligibility(cartItems: CartLineItem[]) {
   const checkoutProducts = [...(products || []), ...demoProducts]
 
   if (error && checkoutProducts.length === 0) return { eligible: false }
-  if (checkoutProducts.some((product) => !isProductPublished(product))) return { eligible: false }
+  if (checkoutProducts.some((product) => !canAccessStoreProduct(product, Boolean(user)))) return { eligible: false }
 
   const eligible = productIds.every((productId) => {
     const product = checkoutProducts.find((candidate) => candidate?.id === productId)
@@ -521,7 +522,7 @@ export async function createCashOnDeliveryOrder(cartItems: CartLineItem[], detai
   const productIds = [...new Set(cartItems.map((item) => item.productId))]
   let { data: products, error } = await supabase
     .from('products')
-    .select('id, name, description, price, image_url, stock_by_size, supplier_sku, color_name, supplier_profile, brand, is_published, is_preorder, preorder_release_at')
+    .select('id, name, description, price, image_url, stock_by_size, supplier_sku, color_name, supplier_profile, brand, is_published, community_only, is_preorder, preorder_release_at')
     .in('id', productIds)
 
   if (error?.message.includes('stock_by_size')) {
@@ -542,7 +543,7 @@ export async function createCashOnDeliveryOrder(cartItems: CartLineItem[], detai
   if (checkoutProducts.some(isBlackIslandProduct)) {
     throw new Error('Uno dei prodotti selezionati non e piu disponibile')
   }
-  if (checkoutProducts.some((product) => !isProductPublished(product))) {
+  if (checkoutProducts.some((product) => !canAccessStoreProduct(product, Boolean(user)))) {
     throw new Error('Uno dei prodotti selezionati è in bozza e non può essere acquistato')
   }
 

@@ -13,6 +13,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const { locale, slug: rawSlug } = await params
   if (!isPrefixedOrganicLocale(locale)) return { robots: { index: false, follow: false } }
   const slug = decodeURIComponent(rawSlug).trim().toLowerCase().replace(/\s+/g, "-")
+  if (slug === "drop") {
+    return {
+      title: "MIRAI Community Drop",
+      description: "Early access to selected products for MIRAI community members.",
+      robots: { index: false, follow: false },
+    }
+  }
   const supabase = await createClient()
   const { data: category } = await supabase
     .from("categories")

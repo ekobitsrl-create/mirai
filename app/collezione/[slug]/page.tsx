@@ -1,6 +1,6 @@
 import type { Metadata } from "next"
 import { Suspense } from "react"
-import { createClient } from "@/lib/supabase/server"
+import { createClient, createUserClient, getServerUser } from "@/lib/supabase/server"
 import { Navbar } from "@/components/navbar"
 import { Footer } from "@/components/footer"
 import { CollectionProducts } from "@/components/collection-products"
@@ -25,6 +25,7 @@ const STATIC_CATEGORY_NAMES: Record<string, string> = {
   pantaloni: "Pantaloni e Bermuda",
   bermuda: "Bermuda",
   shorts: "Shorts e Bermuda",
+  drop: "Drop Community",
 }
 
 const LEGACY_CATEGORY_SLUGS: Record<string, string> = {
@@ -88,6 +89,13 @@ async function getStaticCategory(slug: string, supabase: SupabaseClient) {
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug: rawSlug } = await params
   const slug = normalizeCategorySlug(rawSlug)
+  if (slug === "drop") {
+    return {
+      title: "Drop Community MIRAI",
+      description: "Accesso anticipato ai prodotti selezionati per la community MIRAI.",
+      robots: { index: false, follow: false },
+    }
+  }
   const supabase = await createClient()
   let category = await getCategoryByCanonicalSlug(supabase, slug)
   if (!category) {
@@ -124,8 +132,20 @@ export default async function CollezionePage({ params }: { params: Promise<{ slu
   const slug = normalizeCategorySlug(rawSlug)
   if (requestedSlug !== slug) redirect(localizedOrganicPath(`/collezione/${slug}`, locale))
   if (slug === "abbigliamento") redirect(localizedOrganicPath("/collezioni", locale))
-  
-  const supabase = await createClient()
+
+  const isCommunityDrop = slug === "drop"
+  const communityUser = isCommunityDrop ? await getServerUser() : null
+  if (isCommunityDrop && !communityUser) {
+    const returnPath = localizedOrganicPath("/collezione/drop", locale)
+    redirect(`/auth/login?redirectTo=${encodeURIComponent(returnPath)}`)
+  }
+
+  const authenticatedClient = isCommunityDrop ? await createUserClient() : null
+  if (isCommunityDrop && !authenticatedClient) {
+    const returnPath = localizedOrganicPath("/collezione/drop", locale)
+    redirect(`/auth/login?redirectTo=${encodeURIComponent(returnPath)}`)
+  }
+  const supabase = authenticatedClient || await createClient()
 
   // Get category by slug (try normalized slug first, then original)
   let category = await getCategoryByCanonicalSlug(supabase, slug)
@@ -164,7 +184,15 @@ export default async function CollezionePage({ params }: { params: Promise<{ slu
   // Get products: if parent, get all products in any of its subcategory slugs
   // If subcategory, get products matching this slug
   let products: any[] = []
-  if (isParent && subcategories.length > 0) {
+  if (isCommunityDrop) {
+    const { data } = await supabase
+      .from("products")
+      .select("*")
+      .eq("community_only", true)
+      .eq("is_published", true)
+      .order("created_at", { ascending: false })
+    products = withDemoProducts((data || []) as StoreProduct[])
+  } else if (isParent && subcategories.length > 0) {
     const subSlugs = subcategories.map((s: any) => s.slug)
     const { data } = await supabase
       .from("products")

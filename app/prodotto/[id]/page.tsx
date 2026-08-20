@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server"
+import { createClient, createUserClient, getServerUser } from "@/lib/supabase/server"
 import { notFound } from "next/navigation"
 import { Navbar } from "@/components/navbar"
 import { FirstProductDiscountModal } from "@/components/first-product-discount-modal"
@@ -22,7 +22,7 @@ import type { Locale } from "@/lib/translations"
 import { localizeProduct } from "@/lib/catalog-localization"
 import { translateCategory } from "@/lib/site-localization"
 
-export const revalidate = 300
+export const dynamic = "force-dynamic"
 
 function absoluteProductImage(imageUrl: string | null | undefined) {
   if (!imageUrl) return undefined
@@ -40,10 +40,12 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   const demoProduct = getDemoProduct(id)
   let product: any = demoProduct
   if (!product) {
-    const supabase = await createClient()
+    const communityUser = await getServerUser()
+    const authenticatedClient = communityUser ? await createUserClient() : null
+    const supabase = authenticatedClient || await createClient()
     const { data } = await supabase
       .from("products")
-      .select("id, name, description, price, category, image_url, brand, supplier_sku, in_stock, stock_by_size, color_name, is_preorder, preorder_release_at, drop_name")
+      .select("id, name, description, price, category, image_url, brand, supplier_sku, in_stock, stock_by_size, color_name, community_only, is_preorder, preorder_release_at, drop_name")
       .eq("id", id)
       .single()
     product = data ? mapProductRow(data) : null
@@ -58,10 +60,10 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   return {
     title: product.name,
     description,
-    robots: isPrivateCheckoutProduct(product) ? { index: false, follow: false } : undefined,
+    robots: isPrivateCheckoutProduct(product) || product.community_only ? { index: false, follow: false } : undefined,
     alternates: {
       canonical: productPath,
-      languages: isPrivateCheckoutProduct(product) ? undefined : getOrganicLanguageAlternates(productPath),
+      languages: isPrivateCheckoutProduct(product) || product.community_only ? undefined : getOrganicLanguageAlternates(productPath),
     },
     openGraph: {
       title: `${product.name} - MIRAI`,
@@ -81,7 +83,9 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
 
 export default async function ProductPage({ params }: { params: Promise<{ id: string; locale?: Locale }> }) {
   const { id, locale = "it" } = await params
-  const supabase = await createClient()
+  const communityUser = await getServerUser()
+  const authenticatedClient = communityUser ? await createUserClient() : null
+  const supabase = authenticatedClient || await createClient()
 
   let product: any = getDemoProduct(id)
   if (!product) {
@@ -101,6 +105,7 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
     .from("products")
     .select("*")
     .eq("category", product.category)
+    .eq("community_only", product.community_only === true)
     .neq("id", product.id)
     .eq("in_stock", true)
     .limit(32)

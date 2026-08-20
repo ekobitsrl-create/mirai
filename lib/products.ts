@@ -105,6 +105,7 @@ export type StoreProduct = {
   in_stock: boolean
   is_new: boolean
   is_published?: boolean
+  community_only?: boolean
   is_preorder?: boolean
   preorder_release_at?: string
   drop_name?: string
@@ -191,6 +192,17 @@ export function isProductPublished(product: { is_published?: boolean | null }) {
   return product.is_published !== false
 }
 
+export function isCommunityOnlyProduct(product: { community_only?: boolean | null }) {
+  return product.community_only === true
+}
+
+export function canAccessStoreProduct(
+  product: { is_published?: boolean | null; community_only?: boolean | null },
+  isCommunityMember: boolean,
+) {
+  return isProductPublished(product) && (!isCommunityOnlyProduct(product) || isCommunityMember)
+}
+
 export function withoutBlackIslandProducts<T extends ProductIdentity>(products: T[]) {
   return products.filter((product) => !isBlackIslandProduct(product))
 }
@@ -263,6 +275,7 @@ export function mapProductRow(row: Record<string, any>): StoreProduct {
     in_stock: Boolean(row.in_stock),
     is_new: Boolean(row.is_new),
     is_published: row.is_published !== false,
+    community_only: Boolean(row.community_only),
     is_preorder: Boolean(row.is_preorder),
     preorder_release_at: (row.preorder_release_at as string) ?? undefined,
     drop_name: (row.drop_name as string) ?? undefined,

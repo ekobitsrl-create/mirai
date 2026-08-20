@@ -31,6 +31,7 @@ type Product = {
   in_stock: boolean
   is_new: boolean
   is_published?: boolean
+  community_only?: boolean
   is_preorder?: boolean
   preorder_release_at?: string | null
   drop_name?: string | null
@@ -372,6 +373,7 @@ export function AdminProductTable({ products, categories = [] }: { products: Pro
                       </span>
                       <span className="uppercase tracking-widest">{product.category}</span>
                       {product.is_preorder && <span className="font-semibold uppercase tracking-widest text-primary">Preordine</span>}
+                      {product.community_only && <span className="font-semibold uppercase tracking-widest text-fuchsia-400">Community Drop</span>}
                       <span>{product.sizes?.join(", ") || "N/A"}</span>
                       {product.stock_by_size && (
                         <span>
@@ -540,6 +542,15 @@ function ProductForm({ product, categories = [] }: { product?: Product; categori
             className="rounded border-border"
           />
           <span className="text-xs uppercase tracking-widest text-muted-foreground">Pubblicato</span>
+        </label>
+        <label className="flex items-center gap-2 cursor-pointer">
+          <input
+            type="checkbox"
+            name="community_only"
+            defaultChecked={product?.community_only ?? false}
+            className="rounded border-border"
+          />
+          <span className="text-xs uppercase tracking-widest text-fuchsia-300">Solo community · Drop</span>
         </label>
         <label className="flex items-center gap-2 cursor-pointer">
           <input
