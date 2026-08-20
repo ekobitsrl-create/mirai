@@ -1,6 +1,7 @@
 export const COMMUNITY_MEDIA_BUCKET = "community-media"
 export const COMMUNITY_POST_MAX_LENGTH = 1200
 export const COMMUNITY_MESSAGE_MAX_LENGTH = 500
+export const COMMUNITY_COMMENT_MAX_LENGTH = 500
 export const COMMUNITY_MEDIA_MAX_BYTES = 50 * 1024 * 1024
 
 export type CommunityMediaType = "image" | "audio" | "video"
@@ -29,6 +30,20 @@ export type CommunityPost = {
   media_type: CommunityMediaType | null
   media_mime: string | null
   media_url?: string | null
+  created_at: string
+  updated_at: string
+  like_count: number
+  liked_by_current_user: boolean
+  comments: CommunityPostComment[]
+}
+
+export type CommunityPostComment = {
+  id: string
+  post_id: string
+  author_id: string
+  author_name: string
+  author_role: "user" | "admin"
+  body: string
   created_at: string
   updated_at: string
 }

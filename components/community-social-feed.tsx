@@ -4,9 +4,17 @@ import Image from "next/image"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useEffect, useRef, useState } from "react"
-import { ArrowLeft, AudioLines, ImageIcon, Loader2, Pencil, Save, Send, Trash2, Upload, Video, X } from "lucide-react"
-import { createCommunityPost, deleteCommunityPost, updateCommunityPost } from "@/app/community/actions"
+import { ArrowLeft, AudioLines, Heart, ImageIcon, Loader2, MessageCircle, Pencil, Save, Send, Trash2, Upload, Video, X } from "lucide-react"
 import {
+  createCommunityPost,
+  createCommunityPostComment,
+  deleteCommunityPost,
+  deleteCommunityPostComment,
+  setCommunityPostLike,
+  updateCommunityPost,
+} from "@/app/community/actions"
+import {
+  COMMUNITY_COMMENT_MAX_LENGTH,
   COMMUNITY_MEDIA_BUCKET,
   COMMUNITY_MEDIA_MAX_BYTES,
   COMMUNITY_POST_MAX_LENGTH,
@@ -58,6 +66,9 @@ export function CommunitySocialFeed({ initialPosts, currentUserId, isAdmin }: Pr
   const [editingFile, setEditingFile] = useState<File | null>(null)
   const [removeExistingMedia, setRemoveExistingMedia] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
+  const [engagementBusy, setEngagementBusy] = useState<string[]>([])
+  const [openComments, setOpenComments] = useState<string[]>([])
+  const [commentDrafts, setCommentDrafts] = useState<Record<string, string>>({})
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => setPosts(initialPosts), [initialPosts])
@@ -65,8 +76,10 @@ export function CommunitySocialFeed({ initialPosts, currentUserId, isAdmin }: Pr
   useEffect(() => {
     const supabase = createClient()
     const channel = supabase
-      .channel("mirai-community-posts")
+      .channel("mirai-community-social")
       .on("postgres_changes", { event: "*", schema: "public", table: "community_posts" }, () => router.refresh())
+      .on("postgres_changes", { event: "*", schema: "public", table: "community_post_likes" }, () => router.refresh())
+      .on("postgres_changes", { event: "*", schema: "public", table: "community_post_comments" }, () => router.refresh())
       .subscribe()
 
     return () => { void supabase.removeChannel(channel) }
@@ -189,6 +202,73 @@ export function CommunitySocialFeed({ initialPosts, currentUserId, isAdmin }: Pr
     } finally {
       setIsSaving(false)
     }
+  }
+
+  const toggleLike = async (post: CommunityPost) => {
+    if (engagementBusy.includes(`like:${post.id}`)) return
+
+    const shouldLike = !post.liked_by_current_user
+    setEngagementBusy((current) => [...current, `like:${post.id}`])
+    setError(null)
+    setPosts((current) => current.map((item) => item.id === post.id
+      ? {
+          ...item,
+          liked_by_current_user: shouldLike,
+          like_count: Math.max(0, item.like_count + (shouldLike ? 1 : -1)),
+        }
+      : item))
+
+    const result = await setCommunityPostLike(post.id, shouldLike)
+    if (!result.ok) {
+      setError(result.error)
+      setPosts((current) => current.map((item) => item.id === post.id
+        ? { ...item, liked_by_current_user: post.liked_by_current_user, like_count: post.like_count }
+        : item))
+    } else {
+      setPosts((current) => current.map((item) => item.id === post.id
+        ? { ...item, liked_by_current_user: result.liked, like_count: result.likeCount }
+        : item))
+    }
+    setEngagementBusy((current) => current.filter((key) => key !== `like:${post.id}`))
+  }
+
+  const submitComment = async (event: React.FormEvent, postId: string) => {
+    event.preventDefault()
+    const body = (commentDrafts[postId] || "").trim()
+    if (!body || engagementBusy.includes(`comment:${postId}`)) return
+
+    setEngagementBusy((current) => [...current, `comment:${postId}`])
+    setError(null)
+    const formData = new FormData()
+    formData.set("postId", postId)
+    formData.set("body", body)
+    const result = await createCommunityPostComment(formData)
+
+    if (!result.ok) {
+      setError(result.error)
+    } else {
+      setCommentDrafts((current) => ({ ...current, [postId]: "" }))
+      setPosts((current) => current.map((post) => post.id === postId
+        ? { ...post, comments: [...post.comments, result.comment] }
+        : post))
+    }
+    setEngagementBusy((current) => current.filter((key) => key !== `comment:${postId}`))
+  }
+
+  const removeComment = async (postId: string, commentId: string) => {
+    if (engagementBusy.includes(`delete-comment:${commentId}`)) return
+
+    setEngagementBusy((current) => [...current, `delete-comment:${commentId}`])
+    setError(null)
+    const result = await deleteCommunityPostComment(commentId)
+    if (!result.ok) {
+      setError(result.error)
+    } else {
+      setPosts((current) => current.map((post) => post.id === postId
+        ? { ...post, comments: post.comments.filter((comment) => comment.id !== commentId) }
+        : post))
+    }
+    setEngagementBusy((current) => current.filter((key) => key !== `delete-comment:${commentId}`))
   }
 
   return (
@@ -337,6 +417,83 @@ export function CommunitySocialFeed({ initialPosts, currentUserId, isAdmin }: Pr
               <>
                 {post.content && <p className="mt-5 whitespace-pre-wrap break-words text-sm leading-7 text-white/75">{post.content}</p>}
                 <MediaPreview post={post} />
+                <div className="mt-5 flex items-center gap-2 border-t border-white/10 pt-4">
+                  <button
+                    type="button"
+                    onClick={() => void toggleLike(post)}
+                    disabled={engagementBusy.includes(`like:${post.id}`)}
+                    aria-pressed={post.liked_by_current_user}
+                    aria-label={post.liked_by_current_user ? "Rimuovi like" : "Metti like"}
+                    className={`inline-flex min-h-11 items-center gap-2 rounded-full border px-4 py-2 text-xs font-bold transition-colors ${post.liked_by_current_user ? "border-primary/55 bg-primary/15 text-primary" : "border-white/10 text-white/55 hover:border-primary/40 hover:text-white"}`}
+                  >
+                    <Heart className={`h-4 w-4 ${post.liked_by_current_user ? "fill-current" : ""}`} />
+                    <span>{post.like_count}</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setOpenComments((current) => current.includes(post.id) ? current.filter((id) => id !== post.id) : [...current, post.id])}
+                    aria-expanded={openComments.includes(post.id)}
+                    className="inline-flex min-h-11 items-center gap-2 rounded-full border border-white/10 px-4 py-2 text-xs font-bold text-white/55 transition-colors hover:border-primary/40 hover:text-white"
+                  >
+                    <MessageCircle className="h-4 w-4" />
+                    <span>{post.comments.length}</span>
+                    <span className="sr-only">commenti</span>
+                  </button>
+                </div>
+
+                {openComments.includes(post.id) && (
+                  <div className="mt-4 rounded-2xl border border-white/10 bg-black/20 p-4">
+                    <div className="space-y-3" aria-live="polite">
+                      {post.comments.length === 0 && (
+                        <p className="text-xs text-white/35">Nessun commento. Inizia tu la conversazione.</p>
+                      )}
+                      {post.comments.map((comment) => (
+                        <div key={comment.id} className="flex items-start justify-between gap-3 rounded-xl bg-white/[0.035] p-3">
+                          <div className="min-w-0">
+                            <div className="flex flex-wrap items-center gap-2">
+                              <p className="truncate text-xs font-bold text-white/80">{comment.author_name}</p>
+                              {comment.author_role === "admin" && <span className="rounded-full bg-primary/15 px-2 py-1 text-[7px] font-bold uppercase tracking-[0.14em] text-primary">Admin</span>}
+                              <span className="text-[9px] text-white/25">{formatCommunityDate(comment.created_at)}</span>
+                            </div>
+                            <p className="mt-1.5 whitespace-pre-wrap break-words text-sm leading-6 text-white/65">{comment.body}</p>
+                          </div>
+                          {(isAdmin || comment.author_id === currentUserId) && (
+                            <button
+                              type="button"
+                              onClick={() => void removeComment(post.id, comment.id)}
+                              disabled={engagementBusy.includes(`delete-comment:${comment.id}`)}
+                              aria-label="Elimina commento"
+                              className="shrink-0 rounded-full p-2 text-white/25 hover:bg-red-400/10 hover:text-red-300"
+                            >
+                              {engagementBusy.includes(`delete-comment:${comment.id}`) ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Trash2 className="h-3.5 w-3.5" />}
+                            </button>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+
+                    <form onSubmit={(event) => void submitComment(event, post.id)} className="mt-4 flex items-end gap-2 border-t border-white/10 pt-4">
+                      <label htmlFor={`comment-${post.id}`} className="sr-only">Scrivi un commento</label>
+                      <textarea
+                        id={`comment-${post.id}`}
+                        value={commentDrafts[post.id] || ""}
+                        onChange={(event) => setCommentDrafts((current) => ({ ...current, [post.id]: event.target.value }))}
+                        maxLength={COMMUNITY_COMMENT_MAX_LENGTH}
+                        rows={2}
+                        placeholder="Scrivi un commento..."
+                        className="min-h-11 flex-1 resize-none rounded-xl border border-white/10 bg-black/25 px-3 py-2.5 text-sm leading-5 text-white outline-none placeholder:text-white/25 focus:border-primary/60"
+                      />
+                      <button
+                        type="submit"
+                        disabled={!commentDrafts[post.id]?.trim() || engagementBusy.includes(`comment:${post.id}`)}
+                        aria-label="Pubblica commento"
+                        className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary text-white disabled:cursor-not-allowed disabled:opacity-40"
+                      >
+                        {engagementBusy.includes(`comment:${post.id}`) ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+                      </button>
+                    </form>
+                  </div>
+                )}
               </>
             )}
           </article>

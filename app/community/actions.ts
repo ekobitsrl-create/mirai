@@ -5,13 +5,17 @@ import { isAdminEmail } from "@/lib/admin"
 import {
   COMMUNITY_MEDIA_BUCKET,
   COMMUNITY_MEDIA_MIME_TYPES,
+  COMMUNITY_COMMENT_MAX_LENGTH,
   COMMUNITY_POST_MAX_LENGTH,
+  type CommunityPostComment,
   type CommunityMediaType,
 } from "@/lib/community"
 import { createAdminClient, getServerUserWithProfile } from "@/lib/supabase/server"
 
 type ActionError = { ok: false; error: string }
 type ActionResult = { ok: true } | ActionError
+type LikeActionResult = { ok: true; liked: boolean; likeCount: number } | ActionError
+type CommentActionResult = { ok: true; comment: CommunityPostComment } | ActionError
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
 
 async function requireCommunityMember() {
@@ -163,6 +167,114 @@ export async function updateCommunityPost(formData: FormData): Promise<ActionRes
       const { error: storageError } = await admin.storage.from(COMMUNITY_MEDIA_BUCKET).remove([post.media_path])
       if (storageError) console.error("[community-social] Old post media cleanup failed", { code: storageError.name })
     }
+
+    revalidatePath("/community/social")
+    return { ok: true }
+  } catch (error) {
+    return actionError(error)
+  }
+}
+
+export async function setCommunityPostLike(postId: string, shouldLike: boolean): Promise<LikeActionResult> {
+  try {
+    const member = await requireCommunityMember()
+    if (!UUID_PATTERN.test(postId)) throw new Error("Post non valido.")
+
+    const admin = createAdminClient()
+    const { data: post, error: postError } = await admin
+      .from("community_posts")
+      .select("id")
+      .eq("id", postId)
+      .maybeSingle()
+    if (postError || !post) throw new Error("Post non trovato.")
+
+    if (shouldLike) {
+      const { error } = await admin.from("community_post_likes").upsert(
+        { post_id: postId, user_id: member.user.id },
+        { onConflict: "post_id,user_id", ignoreDuplicates: true },
+      )
+      if (error) throw new Error("Non è stato possibile aggiungere il like.")
+    } else {
+      const { error } = await admin
+        .from("community_post_likes")
+        .delete()
+        .eq("post_id", postId)
+        .eq("user_id", member.user.id)
+      if (error) throw new Error("Non è stato possibile rimuovere il like.")
+    }
+
+    const { count, error: countError } = await admin
+      .from("community_post_likes")
+      .select("post_id", { count: "exact", head: true })
+      .eq("post_id", postId)
+    if (countError) throw new Error("Non è stato possibile aggiornare i like.")
+
+    revalidatePath("/community/social")
+    return { ok: true, liked: shouldLike, likeCount: count || 0 }
+  } catch (error) {
+    return actionError(error)
+  }
+}
+
+export async function createCommunityPostComment(formData: FormData): Promise<CommentActionResult> {
+  try {
+    const member = await requireCommunityMember()
+    const postId = String(formData.get("postId") || "").trim()
+    const body = String(formData.get("body") || "").trim()
+
+    if (!UUID_PATTERN.test(postId)) throw new Error("Post non valido.")
+    if (!body) throw new Error("Scrivi un commento.")
+    if (body.length > COMMUNITY_COMMENT_MAX_LENGTH) {
+      throw new Error(`Il commento può contenere al massimo ${COMMUNITY_COMMENT_MAX_LENGTH} caratteri.`)
+    }
+
+    const admin = createAdminClient()
+    const tenMinutesAgo = new Date(Date.now() - 10 * 60 * 1000).toISOString()
+    const { count } = await admin
+      .from("community_post_comments")
+      .select("id", { count: "exact", head: true })
+      .eq("author_id", member.user.id)
+      .gte("created_at", tenMinutesAgo)
+    if ((count || 0) >= 20) throw new Error("Hai inviato troppi commenti. Riprova tra qualche minuto.")
+
+    const { data, error } = await admin
+      .from("community_post_comments")
+      .insert({
+        post_id: postId,
+        author_id: member.user.id,
+        author_name: member.authorName,
+        author_role: member.isAdmin ? "admin" : "user",
+        body,
+      })
+      .select("id, post_id, author_id, author_name, author_role, body, created_at, updated_at")
+      .single()
+    if (error || !data) throw new Error("Non è stato possibile pubblicare il commento.")
+
+    revalidatePath("/community/social")
+    return { ok: true, comment: data as CommunityPostComment }
+  } catch (error) {
+    return actionError(error)
+  }
+}
+
+export async function deleteCommunityPostComment(commentId: string): Promise<ActionResult> {
+  try {
+    const member = await requireCommunityMember()
+    if (!UUID_PATTERN.test(commentId)) throw new Error("Commento non valido.")
+
+    const admin = createAdminClient()
+    const { data: comment, error: readError } = await admin
+      .from("community_post_comments")
+      .select("id, author_id")
+      .eq("id", commentId)
+      .maybeSingle()
+    if (readError || !comment) throw new Error("Commento non trovato.")
+    if (comment.author_id !== member.user.id && !member.isAdmin) {
+      throw new Error("Non puoi eliminare questo commento.")
+    }
+
+    const { error } = await admin.from("community_post_comments").delete().eq("id", commentId)
+    if (error) throw new Error("Non è stato possibile eliminare il commento.")
 
     revalidatePath("/community/social")
     return { ok: true }
