@@ -1,7 +1,6 @@
 "use client"
 
 import Link from "next/link"
-import { useRouter } from "next/navigation"
 import { useEffect, useRef, useState } from "react"
 import { ArrowLeft, Loader2, MessageCircleMore, Send, ShieldCheck, Trash2 } from "lucide-react"
 import { createCommunityMessage, deleteCommunityMessage } from "@/app/community/actions"
@@ -15,7 +14,6 @@ type Props = {
 }
 
 export function CommunityChat({ initialMessages, currentUserId, isAdmin }: Props) {
-  const router = useRouter()
   const endRef = useRef<HTMLDivElement>(null)
   const [messages, setMessages] = useState(initialMessages)
   const [body, setBody] = useState("")
@@ -28,35 +26,66 @@ export function CommunityChat({ initialMessages, currentUserId, isAdmin }: Props
 
   useEffect(() => {
     const supabase = createClient()
+    let active = true
     const channel = supabase
       .channel("mirai-community-chat")
-      .on("postgres_changes", { event: "*", schema: "public", table: "community_messages" }, () => router.refresh())
+      .on(
+        "postgres_changes",
+        { event: "INSERT", schema: "public", table: "community_messages" },
+        (payload) => {
+          if (!active) return
+          const message = payload.new as CommunityMessage
+          setMessages((current) => current.some((item) => item.id === message.id) ? current : [...current, message])
+        },
+      )
+      .on(
+        "postgres_changes",
+        { event: "DELETE", schema: "public", table: "community_messages" },
+        (payload) => {
+          if (!active) return
+          const deletedId = String(payload.old?.id || "")
+          if (deletedId) setMessages((current) => current.filter((item) => item.id !== deletedId))
+        },
+      )
       .subscribe()
 
-    return () => { void supabase.removeChannel(channel) }
-  }, [router])
+    return () => {
+      active = false
+      void supabase.removeChannel(channel)
+    }
+  }, [])
 
   const sendMessage = async (event: React.FormEvent) => {
     event.preventDefault()
     if (!body.trim()) return
     setIsSending(true)
     setError(null)
-    const result = await createCommunityMessage(body)
-    if (!result.ok) setError(result.error)
-    else {
-      setBody("")
-      router.refresh()
+    try {
+      const result = await createCommunityMessage(body)
+      if (!result.ok) setError(result.error)
+      else {
+        setMessages((current) => current.some((item) => item.id === result.message.id) ? current : [...current, result.message])
+        setBody("")
+      }
+    } catch {
+      setError("Connessione interrotta. Il messaggio potrebbe essere stato inviato: aggiorna la chat prima di riprovare.")
+    } finally {
+      setIsSending(false)
     }
-    setIsSending(false)
   }
 
   const removeMessage = async (messageId: string) => {
     setDeletingId(messageId)
     setError(null)
-    const result = await deleteCommunityMessage(messageId)
-    if (!result.ok) setError(result.error)
-    else router.refresh()
-    setDeletingId(null)
+    try {
+      const result = await deleteCommunityMessage(messageId)
+      if (!result.ok) setError(result.error)
+      else setMessages((current) => current.filter((item) => item.id !== messageId))
+    } catch {
+      setError("Connessione interrotta. Aggiorna la chat e riprova.")
+    } finally {
+      setDeletingId(null)
+    }
   }
 
   return (

@@ -7,11 +7,16 @@ import {
   COMMUNITY_MEDIA_MIME_TYPES,
   COMMUNITY_MESSAGE_MAX_LENGTH,
   COMMUNITY_POST_MAX_LENGTH,
+  type CommunityMessage,
   type CommunityMediaType,
 } from "@/lib/community"
 import { createAdminClient, getServerUserWithProfile } from "@/lib/supabase/server"
 
-type ActionResult = { ok: true } | { ok: false; error: string }
+type ActionError = { ok: false; error: string }
+type ActionResult = { ok: true } | ActionError
+type MessageActionResult =
+  | { ok: true; message: CommunityMessage }
+  | ActionError
 
 async function requireCommunityMember() {
   const { user, profile } = await getServerUserWithProfile()
@@ -31,7 +36,7 @@ async function requireCommunityMember() {
   }
 }
 
-function actionError(error: unknown): ActionResult {
+function actionError(error: unknown): ActionError {
   return { ok: false, error: error instanceof Error ? error.message : "Operazione non riuscita." }
 }
 
@@ -106,7 +111,7 @@ export async function deleteCommunityPost(postId: string): Promise<ActionResult>
   }
 }
 
-export async function createCommunityMessage(body: string): Promise<ActionResult> {
+export async function createCommunityMessage(body: string): Promise<MessageActionResult> {
   try {
     const member = await requireCommunityMember()
     const message = body.trim()
@@ -125,16 +130,20 @@ export async function createCommunityMessage(body: string): Promise<ActionResult
 
     if ((count || 0) >= 20) throw new Error("Stai inviando troppi messaggi. Attendi qualche secondo.")
 
-    const { error } = await admin.from("community_messages").insert({
-      author_id: member.user.id,
-      author_name: member.authorName,
-      author_role: member.isAdmin ? "admin" : "user",
-      body: message,
-    })
-    if (error) throw new Error("Non è stato possibile inviare il messaggio.")
+    const { data, error } = await admin
+      .from("community_messages")
+      .insert({
+        author_id: member.user.id,
+        author_name: member.authorName,
+        author_role: member.isAdmin ? "admin" : "user",
+        body: message,
+      })
+      .select("id, author_id, author_name, author_role, body, created_at")
+      .single()
+    if (error || !data) throw new Error("Non è stato possibile inviare il messaggio.")
 
     revalidatePath("/community/chat")
-    return { ok: true }
+    return { ok: true, message: data as CommunityMessage }
   } catch (error) {
     return actionError(error)
   }
