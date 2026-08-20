@@ -10,13 +10,22 @@ function safeNextPath(value: string | null) {
   return value && value.startsWith("/") && !value.startsWith("//") ? value : "/community/hub"
 }
 
+type SupportedOtpType = "signup" | "magiclink"
+
+function supportedOtpType(value: string | null): SupportedOtpType | null {
+  return value === "signup" || value === "magiclink" ? value : null
+}
+
 export default function ConfirmAccountPage() {
   const [status, setStatus] = useState<"loading" | "success" | "error">("loading")
   const [nextPath, setNextPath] = useState("/community/hub")
   const completed = useRef(false)
 
   useEffect(() => {
-    const destination = safeNextPath(new URLSearchParams(window.location.search).get("next"))
+    const searchParams = new URLSearchParams(window.location.search)
+    const destination = safeNextPath(searchParams.get("next"))
+    const tokenHash = searchParams.get("token_hash")
+    const otpType = supportedOtpType(searchParams.get("type"))
     setNextPath(destination)
     const supabase = createClient()
 
@@ -47,15 +56,38 @@ export default function ConfirmAccountPage() {
       if (session) void completeSession(session.access_token, session.refresh_token)
     })
 
-    void supabase.auth.getSession().then(({ data }) => {
-      if (data.session) {
-        void completeSession(data.session.access_token, data.session.refresh_token)
-      } else {
-        window.setTimeout(() => {
-          if (!completed.current) setStatus("error")
-        }, 4500)
+    async function verifyOrRecoverSession() {
+      if (tokenHash && otpType) {
+        const { data, error } = await supabase.auth.verifyOtp({
+          token_hash: tokenHash,
+          type: otpType,
+        })
+
+        const cleanUrl = new URL("/auth/confirm", window.location.origin)
+        cleanUrl.searchParams.set("next", destination)
+        window.history.replaceState({}, "", cleanUrl)
+
+        if (error || !data.session) {
+          setStatus("error")
+          return
+        }
+
+        await completeSession(data.session.access_token, data.session.refresh_token)
+        return
       }
-    })
+
+      const { data } = await supabase.auth.getSession()
+      if (data.session) {
+        await completeSession(data.session.access_token, data.session.refresh_token)
+        return
+      }
+
+      window.setTimeout(() => {
+        if (!completed.current) setStatus("error")
+      }, 4500)
+    }
+
+    void verifyOrRecoverSession()
 
     return () => listener.subscription.unsubscribe()
   }, [])

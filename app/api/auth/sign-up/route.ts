@@ -15,6 +15,7 @@ export const runtime = "nodejs"
 
 const MAX_BODY_BYTES = 16 * 1024
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+const SUPPORTED_CONFIRMATION_TYPES = new Set(["signup", "magiclink"])
 
 type SignUpPayload = {
   firstName?: unknown
@@ -154,16 +155,30 @@ export async function POST(request: Request) {
     }
 
     createdUserId ||= data.user?.id || null
-    const actionLink = data.properties?.action_link
-    if (!createdUserId || !actionLink) {
-      throw new Error("Supabase non ha restituito il link di conferma")
+    const tokenHash = data.properties?.hashed_token
+    const verificationType = data.properties?.verification_type
+    if (
+      !createdUserId
+      || !tokenHash
+      || !verificationType
+      || !SUPPORTED_CONFIRMATION_TYPES.has(verificationType)
+    ) {
+      throw new Error("Supabase non ha restituito un token di conferma valido")
     }
+
+    const emailConfirmationUrl = new URL("/auth/confirm", SITE_URL)
+    emailConfirmationUrl.searchParams.set("token_hash", tokenHash)
+    emailConfirmationUrl.searchParams.set("type", verificationType)
+    emailConfirmationUrl.searchParams.set("next", nextPath)
 
     const delivery = await sendEmail({
       to: email,
       eventKey: `auth-confirmation:${createdUserId}:${randomUUID()}`,
       category: "transactional",
-      ...accountConfirmationTemplate({ firstName, confirmationUrl: actionLink }),
+      ...accountConfirmationTemplate({
+        firstName,
+        confirmationUrl: emailConfirmationUrl.toString(),
+      }),
     })
 
     if (!delivery.sent) {

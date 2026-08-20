@@ -1,11 +1,17 @@
 const DEFAULT_SITE_URL = "https://www.mirailabstore.com"
+const LOCAL_HOSTNAMES = new Set(["localhost", "127.0.0.1", "::1"])
 
 function normalizeSiteUrl(value: string | undefined) {
   const candidate = value?.trim()
   if (!candidate) return DEFAULT_SITE_URL
 
   try {
-    return new URL(candidate).origin
+    const url = new URL(candidate)
+    if (!["http:", "https:"].includes(url.protocol)) return DEFAULT_SITE_URL
+    if (process.env.NODE_ENV === "production" && LOCAL_HOSTNAMES.has(url.hostname)) {
+      return DEFAULT_SITE_URL
+    }
+    return url.origin
   } catch {
     return DEFAULT_SITE_URL
   }
