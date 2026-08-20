@@ -31,6 +31,15 @@ export type AbandonedCartItem = {
   size?: string | null
 }
 
+export type CommunityDiscountEmail = {
+  code: string
+  discountType: "percentage" | "fixed"
+  value: number
+  minimumSubtotal: number
+  firstOrderOnly: boolean
+  endsAt: string | null
+}
+
 const STATUS_LABELS: Record<string, string> = {
   pending: "in attesa",
   confirmed: "confermato",
@@ -266,5 +275,48 @@ Different by design.
 
 Scopri le selezioni: ${SITE_URL}/collezioni
 Disiscriviti: ${unsubscribeUrl}`,
+  }
+}
+
+export function communityDiscountTemplate(input: {
+  discount: CommunityDiscountEmail
+  subject: string
+  message: string
+  unsubscribeUrl: string
+}): EmailContent {
+  const { discount, subject, message, unsubscribeUrl } = input
+  const discountLabel = discount.discountType === "percentage"
+    ? `${Number(discount.value).toLocaleString("it-IT", { maximumFractionDigits: 2 })}% di sconto`
+    : `${money(Number(discount.value))} di sconto`
+  const conditions = [
+    discount.firstOrderOnly ? "Valido sul primo ordine." : null,
+    discount.minimumSubtotal > 0
+      ? `Ordine minimo: ${money(discount.minimumSubtotal)}.`
+      : null,
+    discount.endsAt
+      ? `Utilizzabile fino al ${new Intl.DateTimeFormat("it-IT", {
+          dateStyle: "long",
+          timeStyle: "short",
+          timeZone: "Europe/Rome",
+        }).format(new Date(discount.endsAt))}.`
+      : null,
+  ].filter(Boolean) as string[]
+  const safeMessage = escapeHtml(message).replaceAll("\n", "<br>")
+
+  return {
+    subject,
+    html: layout(
+      `${discountLabel} riservato alla community MIRAI.`,
+      "Un vantaggio per la community MIRAI",
+      `<p style="margin:0 0 22px;color:#c9c2d2;line-height:1.7">${safeMessage}</p>
+      <div style="margin:24px 0;padding:22px;border:1px solid #7c3aed;background:#0f0918;text-align:center">
+        <div style="color:#aaa1b8;font-size:11px;letter-spacing:2px;text-transform:uppercase">${escapeHtml(discountLabel)}</div>
+        <div style="margin-top:9px;color:#ffffff;font-size:28px;font-weight:800;letter-spacing:3px">${escapeHtml(discount.code)}</div>
+      </div>
+      ${conditions.length > 0 ? `<p style="margin:0 0 24px;color:#aaa1b8;font-size:13px;line-height:1.7">${conditions.map(escapeHtml).join("<br>")}</p>` : ""}
+      <div>${button("Usa il codice", `${SITE_URL}/collezioni`)}</div>`,
+      `Hai ricevuto questa email perché hai scelto di ricevere novità e offerte MIRAI. <a href="${escapeHtml(unsubscribeUrl)}" style="color:#c4b5fd">Disiscriviti</a>.<br>MIRAI LAB STORE, Via Umberto 95, 95129 Catania.`,
+    ),
+    text: `${subject}\n\n${message}\n\n${discountLabel.toUpperCase()}\nCODICE: ${discount.code}${conditions.length > 0 ? `\n\n${conditions.join("\n")}` : ""}\n\nUsa il codice: ${SITE_URL}/collezioni\nDisiscriviti: ${unsubscribeUrl}`,
   }
 }

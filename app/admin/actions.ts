@@ -551,6 +551,55 @@ export async function deleteDiscountCode(formData: FormData) {
   revalidatePath("/admin")
 }
 
+export async function sendDiscountCodeToCommunity(formData: FormData) {
+  const { supabase } = await assertAdmin()
+  const id = String(formData.get("id") || "")
+  const campaignId = String(formData.get("campaign_id") || "")
+  const subject = String(formData.get("subject") || "").trim()
+  const message = String(formData.get("message") || "").trim()
+
+  if (!/^[0-9a-f-]{36}$/i.test(id)) throw new Error("Codice sconto non trovato")
+  if (!/^[0-9a-f-]{36}$/i.test(campaignId)) throw new Error("Campagna email non valida")
+  if (subject.length < 3 || subject.length > 120) throw new Error("L'oggetto deve contenere 3-120 caratteri")
+  if (message.length < 10 || message.length > 1200) throw new Error("Il messaggio deve contenere 10-1200 caratteri")
+
+  const { data: discount, error } = await supabase
+    .from("discount_codes")
+    .select("code, discount_type, value, active, first_order_only, minimum_subtotal, starts_at, ends_at, max_uses, times_used")
+    .eq("id", id)
+    .maybeSingle()
+
+  if (error) throw new Error(error.message)
+  if (!discount) throw new Error("Codice sconto non trovato")
+  if (!discount.active) throw new Error("Attiva il codice prima di inviarlo")
+
+  const now = Date.now()
+  if (discount.starts_at && new Date(discount.starts_at).getTime() > now) {
+    throw new Error("Il codice non è ancora attivo")
+  }
+  if (discount.ends_at && new Date(discount.ends_at).getTime() <= now) {
+    throw new Error("Il codice è scaduto")
+  }
+  if (discount.max_uses !== null && Number(discount.times_used || 0) >= Number(discount.max_uses)) {
+    throw new Error("Il codice ha già raggiunto il limite di utilizzi")
+  }
+
+  const { sendCommunityDiscountEmails } = await import("@/lib/email/community-discount")
+  return sendCommunityDiscountEmails({
+    campaignId,
+    subject,
+    message,
+    discount: {
+      code: discount.code,
+      discountType: discount.discount_type === "fixed" ? "fixed" : "percentage",
+      value: Number(discount.value),
+      minimumSubtotal: Number(discount.minimum_subtotal || 0),
+      firstOrderOnly: Boolean(discount.first_order_only),
+      endsAt: discount.ends_at,
+    },
+  })
+}
+
 // --- Categories ---
 
 export async function createCategory(formData: FormData) {

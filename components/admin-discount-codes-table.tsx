@@ -1,10 +1,11 @@
 "use client"
 
 import { useState } from "react"
-import { BadgePercent, Check, Pencil, Plus, Trash2, X } from "lucide-react"
+import { BadgePercent, Check, Mail, Pencil, Plus, Send, Trash2, X } from "lucide-react"
 import {
   createDiscountCode,
   deleteDiscountCode,
+  sendDiscountCodeToCommunity,
   updateDiscountCode,
 } from "@/app/admin/actions"
 
@@ -155,7 +156,38 @@ export function AdminDiscountCodesTable({
 }) {
   const [showCreate, setShowCreate] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
+  const [mailingId, setMailingId] = useState<string | null>(null)
+  const [campaignId, setCampaignId] = useState("")
+  const [isSending, setIsSending] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [success, setSuccess] = useState<string | null>(null)
+
+  const openMailing = (discount: DiscountCode) => {
+    setMailingId(discount.id)
+    setCampaignId(crypto.randomUUID())
+    setEditingId(null)
+    setShowCreate(false)
+    setError(null)
+    setSuccess(null)
+  }
+
+  const submitMailing = async (formData: FormData) => {
+    if (!confirm("Inviare questa email a tutti i membri community idonei?")) return
+    setIsSending(true)
+    setError(null)
+    setSuccess(null)
+    try {
+      const result = await sendDiscountCodeToCommunity(formData)
+      const retryText = result.duplicate > 0 ? ` · ${result.duplicate} già inviati` : ""
+      setSuccess(`Email inviate: ${result.sent}/${result.eligible}${retryText}${result.failed > 0 ? ` · ${result.failed} non riuscite` : ""}`)
+      setMailingId(null)
+      setCampaignId(crypto.randomUUID())
+    } catch (submitError) {
+      setError(submitError instanceof Error ? submitError.message : "Impossibile inviare le email")
+    } finally {
+      setIsSending(false)
+    }
+  }
 
   const submitCreate = async (formData: FormData) => {
     try {
@@ -224,6 +256,12 @@ export function AdminDiscountCodesTable({
         </div>
       )}
 
+      {success && (
+        <div className="rounded-md border border-emerald-400/30 bg-emerald-400/10 p-3 text-sm text-emerald-300">
+          {success}
+        </div>
+      )}
+
       {showCreate && <DiscountForm onSubmit={submitCreate} onCancel={() => setShowCreate(false)} />}
 
       {discountCodes.length === 0 ? (
@@ -275,6 +313,15 @@ export function AdminDiscountCodesTable({
                     <div className="flex shrink-0 gap-2">
                       <button
                         type="button"
+                        onClick={() => openMailing(discount)}
+                        aria-label={`Invia ${discount.code} alla community`}
+                        title="Invia alla community"
+                        className="rounded-md border border-primary/30 p-2 text-primary transition-colors hover:bg-primary/10"
+                      >
+                        <Mail className="h-4 w-4" />
+                      </button>
+                      <button
+                        type="button"
                         onClick={() => {
                           setEditingId(discount.id)
                           setShowCreate(false)
@@ -295,6 +342,60 @@ export function AdminDiscountCodesTable({
                     </div>
                   )}
                 </div>
+              )}
+              {mailingId === discount.id && (
+                <form action={submitMailing} className="mt-3 space-y-4 rounded-lg border border-primary/25 bg-primary/5 p-5">
+                  <input type="hidden" name="id" value={discount.id} />
+                  <input type="hidden" name="campaign_id" value={campaignId} />
+                  <div>
+                    <h3 className="text-sm font-semibold text-foreground">Invia {discount.code} alla community</h3>
+                    <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+                      Solo membri con email confermata e consenso marketing. Admin e utenti disiscritti sono esclusi.
+                    </p>
+                  </div>
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <label className="block">
+                      <span className="mb-1 block text-[10px] uppercase tracking-widest text-muted-foreground">Oggetto email</span>
+                      <input
+                        name="subject"
+                        required
+                        minLength={3}
+                        maxLength={120}
+                        defaultValue={`${discount.code}: un vantaggio riservato alla community MIRAI`}
+                        className="h-10 w-full rounded-md border border-border bg-secondary px-3 text-sm text-foreground"
+                      />
+                    </label>
+                    <label className="block md:row-span-2">
+                      <span className="mb-1 block text-[10px] uppercase tracking-widest text-muted-foreground">Messaggio</span>
+                      <textarea
+                        name="message"
+                        required
+                        minLength={10}
+                        maxLength={1200}
+                        rows={5}
+                        defaultValue="Abbiamo riservato questo codice sconto ai membri della community MIRAI. Inseriscilo al checkout per approfittare del vantaggio."
+                        className="w-full resize-y rounded-md border border-border bg-secondary px-3 py-2 text-sm leading-relaxed text-foreground"
+                      />
+                    </label>
+                  </div>
+                  <div className="flex flex-wrap gap-3">
+                    <button
+                      type="submit"
+                      disabled={isSending}
+                      className="inline-flex items-center gap-2 rounded-md bg-primary px-5 py-2 text-xs font-bold uppercase tracking-widest text-primary-foreground disabled:opacity-50"
+                    >
+                      <Send className="h-4 w-4" /> {isSending ? "Invio in corso..." : "Invia alla community"}
+                    </button>
+                    <button
+                      type="button"
+                      disabled={isSending}
+                      onClick={() => setMailingId(null)}
+                      className="inline-flex items-center gap-2 rounded-md border border-border px-5 py-2 text-xs uppercase tracking-widest text-muted-foreground disabled:opacity-50"
+                    >
+                      <X className="h-4 w-4" /> Annulla
+                    </button>
+                  </div>
+                </form>
               )}
             </div>
           ))}
