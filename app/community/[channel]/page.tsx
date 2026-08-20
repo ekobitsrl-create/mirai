@@ -51,6 +51,7 @@ export const metadata: Metadata = {
 
 export default async function CommunityChannelPage({ params }: { params: Promise<{ channel: string }> }) {
   const { channel: channelSlug } = await params
+  if (channelSlug === "inner-circle") redirect("/community/social")
   if (!(channelSlug in CHANNELS)) notFound()
 
   const channel = CHANNELS[channelSlug as ChannelKey]

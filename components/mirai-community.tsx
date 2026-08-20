@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { ArrowRight, AudioLines, Eye, MessageCircleMore, Radio, ShieldCheck, Sparkles, TicketCheck, UsersRound } from "lucide-react"
+import { ArrowRight, AudioLines, Eye, MessageCircleMore, MessagesSquare, Radio, ShieldCheck, Sparkles, TicketCheck, UsersRound } from "lucide-react"
 
 type CommunityMember = {
   id: string
@@ -29,11 +29,20 @@ const CHANNELS = [
   },
   {
     icon: MessageCircleMore,
-    slug: "inner-circle",
+    slug: "social",
     name: "Inner Circle",
     label: "Social room",
     description: "Uno spazio per parlare di outfit, musica, idee e cultura urbana.",
     status: "Aperto",
+    memberOpen: true,
+  },
+  {
+    icon: MessagesSquare,
+    slug: "chat",
+    name: "Society Chat",
+    label: "Live channel",
+    description: "La chat privata in tempo reale tra membri della Society e admin MIRAI.",
+    status: "Live",
     memberOpen: true,
   },
   {
