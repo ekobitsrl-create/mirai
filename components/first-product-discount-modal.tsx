@@ -6,7 +6,7 @@ import { BadgePercent, Check, Copy, Sparkles, Timer, X } from "lucide-react"
 import { useLanguage } from "@/lib/language-context"
 import { MINIMAL_PROMO_END_ISO } from "@/lib/minimal-promo"
 
-const STORAGE_KEY = "mirai-minimal-days-modal-seen-2026-08-20-v3"
+const STORAGE_KEY = "mirai-minimal-days-modal-seen-2026-08-20-v4"
 const DISCOUNT_CODE = "MIRAI10"
 
 export function FirstProductDiscountModal() {
