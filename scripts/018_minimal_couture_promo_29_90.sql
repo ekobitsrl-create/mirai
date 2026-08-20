@@ -1,5 +1,5 @@
 -- Promo automatica Minimal Days: nessun codice richiesto.
--- Durata globale: fino al 20 agosto 2026 alle 16:40 UTC (18:40 in Italia).
+-- Durata globale: fino al 22 agosto 2026 alle 18:30 UTC (20:30 in Italia).
 -- Limita volutamente l'aggiornamento al brand Minimal Couture e non al profilo
 -- fornitore "minimal", che include anche prodotti di altri marchi.
 create extension if not exists pg_cron with schema extensions;
@@ -26,7 +26,7 @@ begin
 
   perform cron.schedule(
     'mirai_minimal_days_expiry',
-    '40 16 20 8 *',
+    '30 18 22 8 *',
     $job$
       update public.products
       set price = case id
