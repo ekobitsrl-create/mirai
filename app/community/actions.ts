@@ -12,6 +12,7 @@ import { createAdminClient, getServerUserWithProfile } from "@/lib/supabase/serv
 
 type ActionError = { ok: false; error: string }
 type ActionResult = { ok: true } | ActionError
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
 
 async function requireCommunityMember() {
   const { user, profile } = await getServerUserWithProfile()
@@ -98,6 +99,70 @@ export async function deleteCommunityPost(postId: string): Promise<ActionResult>
     const { error } = await admin.from("community_posts").delete().eq("id", postId)
     if (error) throw new Error("Non è stato possibile eliminare il post.")
     if (post.media_path) await admin.storage.from(COMMUNITY_MEDIA_BUCKET).remove([post.media_path])
+
+    revalidatePath("/community/social")
+    return { ok: true }
+  } catch (error) {
+    return actionError(error)
+  }
+}
+
+export async function updateCommunityPost(formData: FormData): Promise<ActionResult> {
+  let uploadedMediaPath = ""
+
+  try {
+    const member = await requireCommunityMember()
+    const postId = String(formData.get("postId") || "").trim()
+    const content = String(formData.get("content") || "").trim()
+    const removeMedia = String(formData.get("removeMedia") || "") === "true"
+    uploadedMediaPath = String(formData.get("mediaPath") || "").trim()
+    const uploadedMediaType = String(formData.get("mediaType") || "").trim() as CommunityMediaType
+    const uploadedMediaMime = String(formData.get("mediaMime") || "").trim().toLowerCase()
+
+    if (!UUID_PATTERN.test(postId)) throw new Error("Post non valido.")
+    if (content.length > COMMUNITY_POST_MAX_LENGTH) {
+      throw new Error(`Il post può contenere al massimo ${COMMUNITY_POST_MAX_LENGTH} caratteri.`)
+    }
+    if (uploadedMediaPath) {
+      if (!uploadedMediaPath.startsWith(`${member.user.id}/`)) throw new Error("Percorso allegato non valido.")
+      if (!("image audio video".split(" ") as string[]).includes(uploadedMediaType)) {
+        throw new Error("Tipo di allegato non valido.")
+      }
+      if (!COMMUNITY_MEDIA_MIME_TYPES.has(uploadedMediaMime)) throw new Error("Formato allegato non supportato.")
+    }
+
+    const admin = createAdminClient()
+    const { data: post, error: readError } = await admin
+      .from("community_posts")
+      .select("id, author_id, media_path, media_type, media_mime")
+      .eq("id", postId)
+      .maybeSingle()
+
+    if (readError || !post) throw new Error("Post non trovato.")
+    if (post.author_id !== member.user.id && !member.isAdmin) throw new Error("Non puoi modificare questo post.")
+
+    const nextMediaPath = uploadedMediaPath || (removeMedia ? null : post.media_path)
+    const nextMediaType = uploadedMediaPath ? uploadedMediaType : (removeMedia ? null : post.media_type)
+    const nextMediaMime = uploadedMediaPath ? uploadedMediaMime : (removeMedia ? null : post.media_mime)
+    if (!content && !nextMediaPath) throw new Error("Il post deve contenere un testo o un allegato.")
+
+    const { error } = await admin
+      .from("community_posts")
+      .update({
+        content: content || null,
+        media_path: nextMediaPath,
+        media_type: nextMediaType,
+        media_mime: nextMediaMime,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", postId)
+
+    if (error) throw new Error("Non è stato possibile modificare il post.")
+
+    if (post.media_path && post.media_path !== nextMediaPath) {
+      const { error: storageError } = await admin.storage.from(COMMUNITY_MEDIA_BUCKET).remove([post.media_path])
+      if (storageError) console.error("[community-social] Old post media cleanup failed", { code: storageError.name })
+    }
 
     revalidatePath("/community/social")
     return { ok: true }

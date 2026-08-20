@@ -4,8 +4,8 @@ import Image from "next/image"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useEffect, useRef, useState } from "react"
-import { ArrowLeft, AudioLines, ImageIcon, Loader2, Send, Trash2, Upload, Video } from "lucide-react"
-import { createCommunityPost, deleteCommunityPost } from "@/app/community/actions"
+import { ArrowLeft, AudioLines, ImageIcon, Loader2, Pencil, Save, Send, Trash2, Upload, Video, X } from "lucide-react"
+import { createCommunityPost, deleteCommunityPost, updateCommunityPost } from "@/app/community/actions"
 import {
   COMMUNITY_MEDIA_BUCKET,
   COMMUNITY_MEDIA_MAX_BYTES,
@@ -53,6 +53,11 @@ export function CommunitySocialFeed({ initialPosts, currentUserId, isAdmin }: Pr
   const [file, setFile] = useState<File | null>(null)
   const [isPublishing, setIsPublishing] = useState(false)
   const [deletingId, setDeletingId] = useState<string | null>(null)
+  const [editingId, setEditingId] = useState<string | null>(null)
+  const [editingContent, setEditingContent] = useState("")
+  const [editingFile, setEditingFile] = useState<File | null>(null)
+  const [removeExistingMedia, setRemoveExistingMedia] = useState(false)
+  const [isSaving, setIsSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => setPosts(initialPosts), [initialPosts])
@@ -120,6 +125,72 @@ export function CommunitySocialFeed({ initialPosts, currentUserId, isAdmin }: Pr
     setDeletingId(null)
   }
 
+  const clearDraftFile = () => {
+    setFile(null)
+    if (fileInputRef.current) fileInputRef.current.value = ""
+  }
+
+  const startEditing = (post: CommunityPost) => {
+    setEditingId(post.id)
+    setEditingContent(post.content || "")
+    setEditingFile(null)
+    setRemoveExistingMedia(false)
+    setError(null)
+  }
+
+  const cancelEditing = () => {
+    setEditingId(null)
+    setEditingContent("")
+    setEditingFile(null)
+    setRemoveExistingMedia(false)
+  }
+
+  const savePost = async (post: CommunityPost) => {
+    if (!editingContent.trim() && !editingFile && (!post.media_path || removeExistingMedia)) {
+      setError("Il post deve contenere un testo o un allegato.")
+      return
+    }
+
+    setIsSaving(true)
+    setError(null)
+    const supabase = createClient()
+    let uploadedPath: string | null = null
+
+    try {
+      const formData = new FormData()
+      formData.set("postId", post.id)
+      formData.set("content", editingContent.trim())
+      formData.set("removeMedia", String(removeExistingMedia))
+
+      if (editingFile) {
+        if (editingFile.size > COMMUNITY_MEDIA_MAX_BYTES) throw new Error("Il file supera il limite di 50 MB.")
+        const mediaType = getCommunityMediaType(editingFile.type)
+        if (!mediaType) throw new Error("Formato non supportato. Usa immagini, audio o video compatibili.")
+
+        uploadedPath = `${currentUserId}/${safeFileName(editingFile.name)}`
+        const { error: uploadError } = await supabase.storage
+          .from(COMMUNITY_MEDIA_BUCKET)
+          .upload(uploadedPath, editingFile, { cacheControl: "3600", contentType: editingFile.type, upsert: false })
+        if (uploadError) throw new Error("Caricamento non riuscito. Controlla formato e dimensione del file.")
+
+        formData.set("mediaPath", uploadedPath)
+        formData.set("mediaType", mediaType)
+        formData.set("mediaMime", editingFile.type)
+      }
+
+      const result = await updateCommunityPost(formData)
+      if (!result.ok) throw new Error(result.error)
+
+      cancelEditing()
+      router.refresh()
+    } catch (saveError) {
+      if (uploadedPath) await supabase.storage.from(COMMUNITY_MEDIA_BUCKET).remove([uploadedPath])
+      setError(saveError instanceof Error ? saveError.message : "Modifica non riuscita.")
+    } finally {
+      setIsSaving(false)
+    }
+  }
+
   return (
     <div className="mx-auto max-w-3xl px-5 pb-24 pt-36 text-white sm:px-6 sm:pt-40">
       <Link href="/community/hub" className="inline-flex items-center gap-2 text-[9px] font-bold uppercase tracking-[0.2em] text-white/45 hover:text-white">
@@ -155,7 +226,14 @@ export function CommunitySocialFeed({ initialPosts, currentUserId, isAdmin }: Pr
                 onChange={(event) => setFile(event.target.files?.[0] || null)}
               />
             </label>
-            {file && <span className="max-w-[220px] truncate text-xs text-white/45">{file.name}</span>}
+            {file && (
+              <span className="inline-flex max-w-[260px] items-center gap-2 rounded-full border border-white/10 px-3 py-2 text-xs text-white/55">
+                <span className="truncate">{file.name}</span>
+                <button type="button" onClick={clearDraftFile} aria-label="Rimuovi allegato" className="shrink-0 rounded-full p-0.5 hover:bg-white/10 hover:text-white">
+                  <X className="h-3.5 w-3.5" />
+                </button>
+              </span>
+            )}
           </div>
           <button type="submit" disabled={isPublishing || (!content.trim() && !file)} className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-3 text-[9px] font-black uppercase tracking-[0.18em] text-white disabled:cursor-not-allowed disabled:opacity-40">
             {isPublishing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />} Pubblica
@@ -188,13 +266,79 @@ export function CommunitySocialFeed({ initialPosts, currentUserId, isAdmin }: Pr
                 </div>
               </div>
               {(isAdmin || post.author_id === currentUserId) && (
-                <button type="button" onClick={() => void removePost(post.id)} disabled={deletingId === post.id} aria-label="Elimina post" className="rounded-full border border-white/10 p-2.5 text-white/35 hover:border-red-400/40 hover:text-red-300">
-                  {deletingId === post.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
-                </button>
+                <div className="flex items-center gap-2">
+                  <button type="button" onClick={() => startEditing(post)} disabled={editingId === post.id || deletingId === post.id} aria-label="Modifica post" className="rounded-full border border-white/10 p-2.5 text-white/35 hover:border-primary/50 hover:text-primary">
+                    <Pencil className="h-4 w-4" />
+                  </button>
+                  <button type="button" onClick={() => void removePost(post.id)} disabled={deletingId === post.id || editingId === post.id} aria-label="Elimina post" className="rounded-full border border-white/10 p-2.5 text-white/35 hover:border-red-400/40 hover:text-red-300">
+                    {deletingId === post.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
+                  </button>
+                </div>
               )}
             </div>
-            {post.content && <p className="mt-5 whitespace-pre-wrap break-words text-sm leading-7 text-white/75">{post.content}</p>}
-            <MediaPreview post={post} />
+            {editingId === post.id ? (
+              <div className="mt-5 rounded-2xl border border-primary/20 bg-black/20 p-4">
+                <label htmlFor={`edit-post-${post.id}`} className="text-[8px] font-bold uppercase tracking-[0.18em] text-primary">Modifica post</label>
+                <textarea
+                  id={`edit-post-${post.id}`}
+                  value={editingContent}
+                  onChange={(event) => setEditingContent(event.target.value)}
+                  maxLength={COMMUNITY_POST_MAX_LENGTH}
+                  rows={4}
+                  className="mt-3 w-full resize-none rounded-xl border border-white/10 bg-black/25 p-4 text-sm leading-6 text-white outline-none focus:border-primary/60"
+                />
+
+                <div className="mt-3 flex flex-wrap items-center gap-3">
+                  <label className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-white/10 px-4 py-2.5 text-[8px] font-bold uppercase tracking-[0.16em] text-white/60 hover:border-primary/45 hover:text-white">
+                    <Upload className="h-3.5 w-3.5" /> {post.media_path ? "Sostituisci allegato" : "Allega media"}
+                    <input
+                      key={`${post.id}-${editingId}`}
+                      type="file"
+                      accept="image/jpeg,image/png,image/webp,image/gif,audio/mpeg,audio/wav,audio/ogg,audio/mp4,video/mp4,video/webm,video/quicktime"
+                      className="sr-only"
+                      onChange={(event) => {
+                        setEditingFile(event.target.files?.[0] || null)
+                        if (event.target.files?.[0]) setRemoveExistingMedia(true)
+                      }}
+                    />
+                  </label>
+
+                  {post.media_path && !removeExistingMedia && !editingFile && (
+                    <button type="button" onClick={() => setRemoveExistingMedia(true)} className="inline-flex items-center gap-2 rounded-full border border-red-400/25 px-4 py-2.5 text-[8px] font-bold uppercase tracking-[0.16em] text-red-200 hover:border-red-400/60">
+                      <Trash2 className="h-3.5 w-3.5" /> Rimuovi allegato
+                    </button>
+                  )}
+
+                  {editingFile && (
+                    <span className="inline-flex max-w-full items-center gap-2 rounded-full border border-white/10 px-3 py-2 text-xs text-white/55">
+                      <span className="max-w-[220px] truncate">{editingFile.name}</span>
+                      <button type="button" onClick={() => {
+                        setEditingFile(null)
+                        setRemoveExistingMedia(false)
+                      }} aria-label="Annulla sostituzione allegato" className="shrink-0 rounded-full p-0.5 hover:bg-white/10 hover:text-white">
+                        <X className="h-3.5 w-3.5" />
+                      </button>
+                    </span>
+                  )}
+
+                  {post.media_path && removeExistingMedia && !editingFile && (
+                    <button type="button" onClick={() => setRemoveExistingMedia(false)} className="text-xs text-white/45 underline underline-offset-4 hover:text-white">Mantieni l’allegato</button>
+                  )}
+                </div>
+
+                <div className="mt-4 flex flex-wrap justify-end gap-3 border-t border-white/10 pt-4">
+                  <button type="button" onClick={cancelEditing} disabled={isSaving} className="rounded-full border border-white/10 px-5 py-3 text-[8px] font-bold uppercase tracking-[0.16em] text-white/60 hover:text-white">Annulla</button>
+                  <button type="button" onClick={() => void savePost(post)} disabled={isSaving || (!editingContent.trim() && !editingFile && (!post.media_path || removeExistingMedia))} className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-3 text-[8px] font-black uppercase tracking-[0.16em] text-white disabled:opacity-40">
+                    {isSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />} Salva modifiche
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <>
+                {post.content && <p className="mt-5 whitespace-pre-wrap break-words text-sm leading-7 text-white/75">{post.content}</p>}
+                <MediaPreview post={post} />
+              </>
+            )}
           </article>
         ))}
       </section>
