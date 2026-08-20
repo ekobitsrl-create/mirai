@@ -3,7 +3,6 @@
 import Link from "next/link"
 import { useEffect, useRef, useState } from "react"
 import { ArrowLeft, Loader2, MessageCircleMore, Send, ShieldCheck, Trash2 } from "lucide-react"
-import { createCommunityMessage, deleteCommunityMessage } from "@/app/community/actions"
 import { COMMUNITY_MESSAGE_MAX_LENGTH, formatCommunityDate, type CommunityMessage } from "@/lib/community"
 import { createClient } from "@/lib/supabase/client"
 
@@ -11,6 +10,24 @@ type Props = {
   initialMessages: CommunityMessage[]
   currentUserId: string
   isAdmin: boolean
+}
+
+type ChatApiResult =
+  | { ok: true; message?: CommunityMessage }
+  | { ok: false; error: string }
+
+async function mutateMessage(method: "POST" | "DELETE", payload: Record<string, string>): Promise<ChatApiResult> {
+  const response = await fetch("/api/community/messages", {
+    method,
+    credentials: "same-origin",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  })
+  const result = await response.json().catch(() => null) as ChatApiResult | null
+
+  if (!result) return { ok: false, error: "Risposta non valida. Aggiorna la chat e riprova." }
+  if (!response.ok && result.ok) return { ok: false, error: "Operazione non riuscita." }
+  return result
 }
 
 export function CommunityChat({ initialMessages, currentUserId, isAdmin }: Props) {
@@ -61,11 +78,14 @@ export function CommunityChat({ initialMessages, currentUserId, isAdmin }: Props
     setIsSending(true)
     setError(null)
     try {
-      const result = await createCommunityMessage(body)
+      const result = await mutateMessage("POST", { body })
       if (!result.ok) setError(result.error)
-      else {
-        setMessages((current) => current.some((item) => item.id === result.message.id) ? current : [...current, result.message])
+      else if (result.message) {
+        const sentMessage = result.message
+        setMessages((current) => current.some((item) => item.id === sentMessage.id) ? current : [...current, sentMessage])
         setBody("")
+      } else {
+        setError("Il server non ha restituito il messaggio. Aggiorna la chat e riprova.")
       }
     } catch {
       setError("Connessione interrotta. Il messaggio potrebbe essere stato inviato: aggiorna la chat prima di riprovare.")
@@ -78,7 +98,7 @@ export function CommunityChat({ initialMessages, currentUserId, isAdmin }: Props
     setDeletingId(messageId)
     setError(null)
     try {
-      const result = await deleteCommunityMessage(messageId)
+      const result = await mutateMessage("DELETE", { messageId })
       if (!result.ok) setError(result.error)
       else setMessages((current) => current.filter((item) => item.id !== messageId))
     } catch {

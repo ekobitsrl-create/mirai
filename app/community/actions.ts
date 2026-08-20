@@ -5,18 +5,13 @@ import { isAdminEmail } from "@/lib/admin"
 import {
   COMMUNITY_MEDIA_BUCKET,
   COMMUNITY_MEDIA_MIME_TYPES,
-  COMMUNITY_MESSAGE_MAX_LENGTH,
   COMMUNITY_POST_MAX_LENGTH,
-  type CommunityMessage,
   type CommunityMediaType,
 } from "@/lib/community"
 import { createAdminClient, getServerUserWithProfile } from "@/lib/supabase/server"
 
 type ActionError = { ok: false; error: string }
 type ActionResult = { ok: true } | ActionError
-type MessageActionResult =
-  | { ok: true; message: CommunityMessage }
-  | ActionError
 
 async function requireCommunityMember() {
   const { user, profile } = await getServerUserWithProfile()
@@ -105,67 +100,6 @@ export async function deleteCommunityPost(postId: string): Promise<ActionResult>
     if (post.media_path) await admin.storage.from(COMMUNITY_MEDIA_BUCKET).remove([post.media_path])
 
     revalidatePath("/community/social")
-    return { ok: true }
-  } catch (error) {
-    return actionError(error)
-  }
-}
-
-export async function createCommunityMessage(body: string): Promise<MessageActionResult> {
-  try {
-    const member = await requireCommunityMember()
-    const message = body.trim()
-    if (!message) throw new Error("Scrivi un messaggio.")
-    if (message.length > COMMUNITY_MESSAGE_MAX_LENGTH) {
-      throw new Error(`Il messaggio può contenere al massimo ${COMMUNITY_MESSAGE_MAX_LENGTH} caratteri.`)
-    }
-
-    const admin = createAdminClient()
-    const oneMinuteAgo = new Date(Date.now() - 60 * 1000).toISOString()
-    const { count } = await admin
-      .from("community_messages")
-      .select("id", { count: "exact", head: true })
-      .eq("author_id", member.user.id)
-      .gte("created_at", oneMinuteAgo)
-
-    if ((count || 0) >= 20) throw new Error("Stai inviando troppi messaggi. Attendi qualche secondo.")
-
-    const { data, error } = await admin
-      .from("community_messages")
-      .insert({
-        author_id: member.user.id,
-        author_name: member.authorName,
-        author_role: member.isAdmin ? "admin" : "user",
-        body: message,
-      })
-      .select("id, author_id, author_name, author_role, body, created_at")
-      .single()
-    if (error || !data) throw new Error("Non è stato possibile inviare il messaggio.")
-
-    revalidatePath("/community/chat")
-    return { ok: true, message: data as CommunityMessage }
-  } catch (error) {
-    return actionError(error)
-  }
-}
-
-export async function deleteCommunityMessage(messageId: string): Promise<ActionResult> {
-  try {
-    const member = await requireCommunityMember()
-    const admin = createAdminClient()
-    const { data: message, error: readError } = await admin
-      .from("community_messages")
-      .select("id, author_id")
-      .eq("id", messageId)
-      .maybeSingle()
-
-    if (readError || !message) throw new Error("Messaggio non trovato.")
-    if (message.author_id !== member.user.id && !member.isAdmin) throw new Error("Non puoi eliminare questo messaggio.")
-
-    const { error } = await admin.from("community_messages").delete().eq("id", messageId)
-    if (error) throw new Error("Non è stato possibile eliminare il messaggio.")
-
-    revalidatePath("/community/chat")
     return { ok: true }
   } catch (error) {
     return actionError(error)
