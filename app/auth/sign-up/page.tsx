@@ -1,6 +1,5 @@
 "use client"
 
-import { createClient } from "@/lib/supabase/client"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
@@ -29,7 +28,6 @@ function SignUpForm() {
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault()
-    const supabase = createClient()
     setIsLoading(true)
     setError(null)
 
@@ -53,41 +51,23 @@ function SignUpForm() {
     }
 
     try {
-      const confirmationUrl = new URL(
-        process.env.NEXT_PUBLIC_DEV_SUPABASE_REDIRECT_URL || "/auth/confirm",
-        window.location.origin
-      )
-      confirmationUrl.searchParams.set("next", nextPath)
-
-      const { data, error } = await supabase.auth.signUp({
-        email: normalizedEmail,
-        password,
-        options: {
-          emailRedirectTo: confirmationUrl.toString(),
-          data: {
-            first_name: firstName,
-            last_name: lastName,
-            membership: "mirai-society",
-            marketing_consent: marketingConsent,
-            marketing_consent_at: marketingConsent ? new Date().toISOString() : null,
-          },
-        },
+      const response = await fetch("/api/auth/sign-up", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({
+          firstName,
+          lastName,
+          email: normalizedEmail,
+          password,
+          marketingConsent,
+          next: nextPath,
+        }),
       })
-      if (error) throw error
 
-      if (data.session) {
-        const response = await fetch("/api/auth/set-session", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include",
-          body: JSON.stringify({
-            access_token: data.session.access_token,
-            refresh_token: data.session.refresh_token,
-          }),
-        })
-        if (!response.ok) throw new Error("Impossibile attivare l'account MIRAI Society")
-        window.location.href = nextPath
-        return
+      const result = await response.json().catch(() => ({})) as { error?: string }
+      if (!response.ok) {
+        throw new Error(result.error || "La registrazione non è andata a buon fine. Riprova tra poco.")
       }
 
       router.push(`/auth/sign-up-success?next=${encodeURIComponent(nextPath)}`)

@@ -97,6 +97,32 @@ function layout(preheader: string, title: string, body: string, footer?: string)
 </html>`
 }
 
+export function accountConfirmationTemplate(input: {
+  firstName: string
+  confirmationUrl: string
+}): EmailContent {
+  const greeting = input.firstName ? `Ciao ${input.firstName},` : "Ciao,"
+
+  return {
+    subject: "Attiva il tuo account MIRAI Society",
+    html: layout(
+      "Conferma il tuo indirizzo email e accedi alla community MIRAI.",
+      "WELCOME TO MIRAI.",
+      `<p style="margin:0 0 20px;color:#c9c2d2;line-height:1.7">${escapeHtml(greeting)}</p>
+      <p style="margin:0 0 26px;color:#c9c2d2;line-height:1.7">Conferma il tuo indirizzo email per attivare l'account MIRAI Society e accedere alla community.</p>
+      <div>${button("Attiva il tuo account", input.confirmationUrl)}</div>
+      <p style="margin:26px 0 0;color:#82788f;font-size:12px;line-height:1.7">Se non hai richiesto tu la registrazione, puoi ignorare questa email.</p>`,
+    ),
+    text: `${greeting}
+
+Conferma il tuo indirizzo email per attivare l'account MIRAI Society e accedere alla community.
+
+Attiva il tuo account: ${input.confirmationUrl}
+
+Se non hai richiesto tu la registrazione, puoi ignorare questa email.`,
+  }
+}
+
 function orderRows(items: EmailOrderItem[]) {
   return items.map((item) => `
     <tr>
