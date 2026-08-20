@@ -29,6 +29,7 @@ export default async function AdminPage() {
     categoriesRes,
     ordersRes,
     usersRes,
+    authUsersRes,
     discountCodesRes,
     cartsCreatedRes,
     cartsAbandonedRes,
@@ -38,6 +39,7 @@ export default async function AdminPage() {
     adminSupabase.from("categories").select("*").order("sort_order", { ascending: true }),
     adminSupabase.from("orders").select("*, order_items(*)").order("created_at", { ascending: false }),
     adminSupabase.from("profiles").select("*").order("created_at", { ascending: false }),
+    adminSupabase.auth.admin.listUsers({ page: 1, perPage: 1000 }),
     adminSupabase.from("discount_codes").select("*").order("created_at", { ascending: false }),
     adminSupabase
       .from("cart_sessions")
@@ -60,7 +62,74 @@ export default async function AdminPage() {
   const products = productsRes.data || []
   const categories = categoriesRes.data || []
   const orders = ordersRes.data || []
-  const users = usersRes.data || []
+  const profiles = usersRes.data || []
+  const authMembershipById = new Map(
+    (authUsersRes.data?.users || []).map((authUser) => [
+      authUser.id,
+      authUser.user_metadata?.membership === "mirai-society",
+    ]),
+  )
+  const normalizeEmail = (value: unknown) => typeof value === "string" ? value.trim().toLowerCase() : ""
+  const profileByEmail = new Map(
+    profiles
+      .map((profile: any) => [normalizeEmail(profile.email), profile] as const)
+      .filter(([email]) => Boolean(email)),
+  )
+  const ordersByUserId = new Map<string, any[]>()
+  const ordersByEmail = new Map<string, any[]>()
+
+  for (const order of orders) {
+    if (order.user_id) {
+      const userOrders = ordersByUserId.get(order.user_id) || []
+      userOrders.push(order)
+      ordersByUserId.set(order.user_id, userOrders)
+    }
+
+    const email = normalizeEmail(order.email)
+    if (email) {
+      const emailOrders = ordersByEmail.get(email) || []
+      emailOrders.push(order)
+      ordersByEmail.set(email, emailOrders)
+    }
+  }
+
+  const registeredUsers = profiles.map((profile: any) => {
+    const email = normalizeEmail(profile.email)
+    const matchingOrders = new Map<string, any>()
+
+    for (const order of ordersByUserId.get(profile.id) || []) matchingOrders.set(order.id, order)
+    for (const order of ordersByEmail.get(email) || []) matchingOrders.set(order.id, order)
+
+    return {
+      ...profile,
+      is_registered: true,
+      is_customer: matchingOrders.size > 0,
+      is_community_member: authMembershipById.get(profile.id) === true,
+      order_count: matchingOrders.size,
+    }
+  })
+
+  const guestCustomers = Array.from(ordersByEmail.entries()).flatMap(([email, customerOrders]) => {
+    if (profileByEmail.has(email)) return []
+
+    const latestOrder = customerOrders.reduce((latest, order) =>
+      new Date(order.created_at).getTime() > new Date(latest.created_at).getTime() ? order : latest,
+    )
+
+    return [{
+      id: `guest:${email}`,
+      first_name: latestOrder.shipping_name || "Cliente ospite",
+      last_name: null,
+      email,
+      role: "guest",
+      created_at: latestOrder.created_at,
+      is_registered: false,
+      is_customer: true,
+      is_community_member: false,
+      order_count: customerOrders.length,
+    }]
+  })
+  const users = [...registeredUsers, ...guestCustomers]
   const discountCodesReadOnly = Boolean(discountCodesRes.error)
   const discountCodes = discountCodesReadOnly
     ? getEnvironmentDiscountCodes().map((discount) => ({
