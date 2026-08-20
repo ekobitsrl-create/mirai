@@ -42,6 +42,37 @@ export type CommunityMessage = {
   created_at: string
 }
 
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null
+}
+
+/**
+ * Realtime payloads and API responses cross a network boundary, so their
+ * compile-time cast cannot guarantee that every field is actually present.
+ * Invalid rows are ignored instead of being allowed to crash the whole chat.
+ */
+export function normalizeCommunityMessage(value: unknown): CommunityMessage | null {
+  if (!isRecord(value)) return null
+
+  const id = typeof value.id === "string" ? value.id.trim() : ""
+  const authorId = typeof value.author_id === "string" ? value.author_id.trim() : ""
+  const authorName = typeof value.author_name === "string" ? value.author_name.trim() : ""
+  const body = typeof value.body === "string" ? value.body : ""
+  const createdAt = typeof value.created_at === "string" ? value.created_at : ""
+  const timestamp = Date.parse(createdAt)
+
+  if (!id || !authorId || !authorName || !body.trim() || !Number.isFinite(timestamp)) return null
+
+  return {
+    id,
+    author_id: authorId,
+    author_name: authorName,
+    author_role: value.author_role === "admin" ? "admin" : "user",
+    body,
+    created_at: new Date(timestamp).toISOString(),
+  }
+}
+
 export function getCommunityMediaType(mime: string): CommunityMediaType | null {
   if (!COMMUNITY_MEDIA_MIME_TYPES.has(mime)) return null
   if (mime.startsWith("image/")) return "image"
@@ -50,11 +81,18 @@ export function getCommunityMediaType(mime: string): CommunityMediaType | null {
   return null
 }
 
-export function formatCommunityDate(value: string) {
-  return new Intl.DateTimeFormat("it-IT", {
-    day: "2-digit",
-    month: "short",
-    hour: "2-digit",
-    minute: "2-digit",
-  }).format(new Date(value))
+export function formatCommunityDate(value: unknown) {
+  const timestamp = typeof value === "string" ? Date.parse(value) : Number.NaN
+  if (!Number.isFinite(timestamp)) return "Ora"
+
+  try {
+    return new Intl.DateTimeFormat("it-IT", {
+      day: "2-digit",
+      month: "short",
+      hour: "2-digit",
+      minute: "2-digit",
+    }).format(new Date(timestamp))
+  } catch {
+    return "Ora"
+  }
 }

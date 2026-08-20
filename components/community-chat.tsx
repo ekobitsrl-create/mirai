@@ -3,7 +3,12 @@
 import Link from "next/link"
 import { useEffect, useRef, useState } from "react"
 import { ArrowLeft, Loader2, MessageCircleMore, Send, ShieldCheck, Trash2 } from "lucide-react"
-import { COMMUNITY_MESSAGE_MAX_LENGTH, formatCommunityDate, type CommunityMessage } from "@/lib/community"
+import {
+  COMMUNITY_MESSAGE_MAX_LENGTH,
+  formatCommunityDate,
+  normalizeCommunityMessage,
+  type CommunityMessage,
+} from "@/lib/community"
 import { createClient } from "@/lib/supabase/client"
 
 type Props = {
@@ -31,15 +36,38 @@ async function mutateMessage(method: "POST" | "DELETE", payload: Record<string, 
 }
 
 export function CommunityChat({ initialMessages, currentUserId, isAdmin }: Props) {
-  const endRef = useRef<HTMLDivElement>(null)
-  const [messages, setMessages] = useState(initialMessages)
+  const messagesRef = useRef<HTMLDivElement>(null)
+  const [messages, setMessages] = useState(() => initialMessages.flatMap((message) => {
+    const normalized = normalizeCommunityMessage(message)
+    return normalized ? [normalized] : []
+  }))
   const [body, setBody] = useState("")
   const [isSending, setIsSending] = useState(false)
   const [deletingId, setDeletingId] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
 
-  useEffect(() => setMessages(initialMessages), [initialMessages])
-  useEffect(() => endRef.current?.scrollIntoView({ behavior: "smooth", block: "end" }), [messages])
+  useEffect(() => {
+    setMessages(initialMessages.flatMap((message) => {
+      const normalized = normalizeCommunityMessage(message)
+      return normalized ? [normalized] : []
+    }))
+  }, [initialMessages])
+
+  useEffect(() => {
+    const container = messagesRef.current
+    if (!container) return
+
+    const frame = window.requestAnimationFrame(() => {
+      try {
+        container.scrollTop = container.scrollHeight
+      } catch {
+        // Some in-app mobile browsers can detach the scrolling element while
+        // updating the layout. A failed auto-scroll must never break the chat.
+      }
+    })
+
+    return () => window.cancelAnimationFrame(frame)
+  }, [messages])
 
   useEffect(() => {
     const supabase = createClient()
@@ -51,7 +79,8 @@ export function CommunityChat({ initialMessages, currentUserId, isAdmin }: Props
         { event: "INSERT", schema: "public", table: "community_messages" },
         (payload) => {
           if (!active) return
-          const message = payload.new as CommunityMessage
+          const message = normalizeCommunityMessage(payload.new)
+          if (!message) return
           setMessages((current) => current.some((item) => item.id === message.id) ? current : [...current, message])
         },
       )
@@ -81,7 +110,11 @@ export function CommunityChat({ initialMessages, currentUserId, isAdmin }: Props
       const result = await mutateMessage("POST", { body })
       if (!result.ok) setError(result.error)
       else if (result.message) {
-        const sentMessage = result.message
+        const sentMessage = normalizeCommunityMessage(result.message)
+        if (!sentMessage) {
+          setError("Il messaggio è stato inviato, ma la risposta non è valida. Aggiorna la chat.")
+          return
+        }
         setMessages((current) => current.some((item) => item.id === sentMessage.id) ? current : [...current, sentMessage])
         setBody("")
       } else {
@@ -129,7 +162,7 @@ export function CommunityChat({ initialMessages, currentUserId, isAdmin }: Props
           <MessageCircleMore className="h-4 w-4 text-primary" /> Canale privato MIRAI Society
         </div>
 
-        <div className="max-h-[62vh] flex-1 space-y-3 overflow-y-auto p-4 sm:p-6">
+        <div ref={messagesRef} className="max-h-[62vh] flex-1 space-y-3 overflow-y-auto p-4 sm:p-6">
           {messages.length === 0 && <p className="py-20 text-center text-sm text-white/35">La chat è aperta. Inizia la conversazione.</p>}
           {messages.map((message) => {
             const mine = message.author_id === currentUserId
@@ -153,7 +186,6 @@ export function CommunityChat({ initialMessages, currentUserId, isAdmin }: Props
               </div>
             )
           })}
-          <div ref={endRef} />
         </div>
 
         <form onSubmit={sendMessage} className="border-t border-white/10 p-4 sm:p-5">

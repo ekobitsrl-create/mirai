@@ -4,7 +4,7 @@ import { CommunityChat } from "@/components/community-chat"
 import { Footer } from "@/components/footer"
 import { Navbar } from "@/components/navbar"
 import { isAdminEmail } from "@/lib/admin"
-import type { CommunityMessage } from "@/lib/community"
+import { normalizeCommunityMessage } from "@/lib/community"
 import { createAdminClient, getServerUserWithProfile } from "@/lib/supabase/server"
 
 export const metadata: Metadata = {
@@ -27,7 +27,12 @@ export default async function CommunityChatPage() {
     .limit(150)
 
   if (error) throw new Error("Impossibile caricare la chat della community.")
-  const messages = ((data || []) as CommunityMessage[]).reverse()
+  const messages = (data || [])
+    .flatMap((message) => {
+      const normalized = normalizeCommunityMessage(message)
+      return normalized ? [normalized] : []
+    })
+    .reverse()
 
   return (
     <main className="min-h-screen overflow-hidden bg-[#08070b]">

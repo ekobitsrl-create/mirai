@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server"
 import { isAdminEmail } from "@/lib/admin"
-import { COMMUNITY_MESSAGE_MAX_LENGTH, type CommunityMessage } from "@/lib/community"
+import { COMMUNITY_MESSAGE_MAX_LENGTH, normalizeCommunityMessage, type CommunityMessage } from "@/lib/community"
 import { isSameOriginRequest, readJsonBody, RequestBodyTooLargeError } from "@/lib/request-security"
 import { createAdminClient, getServerUserWithProfile } from "@/lib/supabase/server"
 
@@ -85,7 +85,13 @@ export async function POST(request: Request) {
       return jsonError("Non è stato possibile inviare il messaggio.", 500)
     }
 
-    return NextResponse.json<MessageResponse>({ ok: true, message: data as CommunityMessage })
+    const normalizedMessage = normalizeCommunityMessage(data)
+    if (!normalizedMessage) {
+      console.error("[community-chat] Invalid inserted message payload")
+      return jsonError("Il messaggio è stato inviato, ma non è stato possibile aggiornare la chat.", 500)
+    }
+
+    return NextResponse.json<MessageResponse>({ ok: true, message: normalizedMessage })
   } catch (error) {
     if (error instanceof RequestBodyTooLargeError) return jsonError("Messaggio troppo grande.", 413)
     if (error instanceof SyntaxError) return jsonError("Richiesta non valida.", 400)
