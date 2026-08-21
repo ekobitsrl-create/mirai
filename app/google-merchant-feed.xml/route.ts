@@ -12,7 +12,7 @@ import {
 import { createClient } from "@/lib/supabase/server"
 import { SITE_URL } from "@/lib/site-url"
 import { getCatalogItemId, normalizeCatalogIdentifier } from "@/lib/catalog-identifiers"
-import { getShippingCostCents, SHIPPING_CONFIG } from "@/lib/shipping"
+import { getShippingCostCents, SHIPPING_CONFIG, type EuCountryCode } from "@/lib/shipping"
 import { localizeColor, localizeProduct } from "@/lib/catalog-localization"
 import { HTML_LOCALES, localizedOrganicPath } from "@/lib/international-seo"
 import { MERCHANT_FEED_CONFIG, type MerchantFeedConfig } from "@/lib/merchant-feed-config"
@@ -432,6 +432,7 @@ function renderProductVariant(
   baseUrl: string,
   platform?: string | null,
   locale: Locale = "it",
+  targetCountries: readonly EuCountryCode[] = MERCHANT_FEED_CONFIG.it.targetCountries,
 ) {
   const itemId = getCatalogItemId(product, size)
   const productPath = `/prodotto/${encodeURIComponent(product.id)}`
@@ -543,7 +544,7 @@ function renderProductVariant(
     ...(supplierSettings.merchantCustomLabel4
       ? [`      <g:custom_label_4>${escapeXml(supplierSettings.merchantCustomLabel4)}</g:custom_label_4>`]
       : []),
-    ...SHIPPING_CONFIG.allowedCountries.flatMap((countryCode) => [
+    ...targetCountries.flatMap((countryCode) => [
       "      <g:shipping>",
       `        <g:country>${countryCode}</g:country>`,
       "        <g:service>Standard</g:service>",
@@ -574,6 +575,9 @@ export async function getMerchantFeedResponse(
   const supplierProfile: SupplierProfile | null = requestedSupplier === "minimal" || requestedSupplier === "mirai"
     ? requestedSupplier
     : null
+  const shippingCountries = requestedPlatform === "meta"
+    ? SHIPPING_CONFIG.allowedCountries
+    : feedConfig.targetCountries
   const platformLabel = requestedPlatform === "meta" ? "Meta Catalog" : "Google Merchant Center"
   const catalogProducts = await getCatalogProducts()
   const products = catalogProducts.filter(
@@ -583,7 +587,14 @@ export async function getMerchantFeedResponse(
       && (!supplierProfile || getSupplierProfile(product) === supplierProfile),
   )
   const items = products.flatMap((product) =>
-    getSizes(product).map((size) => renderProductVariant(product, size, baseUrl, requestedPlatform, locale)),
+    getSizes(product).map((size) => renderProductVariant(
+      product,
+      size,
+      baseUrl,
+      requestedPlatform,
+      locale,
+      shippingCountries,
+    )),
   )
 
   const xml = [
