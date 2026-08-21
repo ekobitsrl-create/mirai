@@ -3,9 +3,9 @@ import { redirect } from "next/navigation"
 import { CommunitySocialFeed } from "@/components/community-social-feed"
 import { Footer } from "@/components/footer"
 import { Navbar } from "@/components/navbar"
-import { isAdminEmail } from "@/lib/admin"
+import { getCommunityMemberIdentity } from "@/lib/community-auth"
 import { COMMUNITY_MEDIA_BUCKET, type CommunityPost, type CommunityPostComment } from "@/lib/community"
-import { createAdminClient, getServerUserWithProfile } from "@/lib/supabase/server"
+import { createAdminClient } from "@/lib/supabase/server"
 
 export const metadata: Metadata = {
   title: "Inner Circle | MIRAI Society",
@@ -14,11 +14,10 @@ export const metadata: Metadata = {
 }
 
 export default async function CommunitySocialPage() {
-  const { user, profile } = await getServerUserWithProfile()
-  if (!user || !profile) redirect("/auth/login?redirectTo=/community/social")
+  const member = await getCommunityMemberIdentity()
+  if (!member) redirect("/auth/login?redirectTo=/community/social")
 
-  const typedProfile = profile as { role?: string | null }
-  const isAdmin = typedProfile.role === "admin" || isAdminEmail(user.email)
+  const { user, isAdmin } = member
   const admin = createAdminClient()
   const { data, error } = await admin
     .from("community_posts")

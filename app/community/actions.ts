@@ -1,7 +1,7 @@
 "use server"
 
 import { revalidatePath } from "next/cache"
-import { isAdminEmail } from "@/lib/admin"
+import { requireCommunityMemberIdentity } from "@/lib/community-auth"
 import {
   COMMUNITY_MEDIA_BUCKET,
   COMMUNITY_MEDIA_MIME_TYPES,
@@ -10,7 +10,7 @@ import {
   type CommunityPostComment,
   type CommunityMediaType,
 } from "@/lib/community"
-import { createAdminClient, getServerUserWithProfile } from "@/lib/supabase/server"
+import { createAdminClient } from "@/lib/supabase/server"
 
 type ActionError = { ok: false; error: string }
 type ActionResult = { ok: true } | ActionError
@@ -18,31 +18,13 @@ type LikeActionResult = { ok: true; liked: boolean; likeCount: number } | Action
 type CommentActionResult = { ok: true; comment: CommunityPostComment } | ActionError
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
 
-async function requireCommunityMember() {
-  const { user, profile } = await getServerUserWithProfile()
-  if (!user || !profile) throw new Error("Accedi alla MIRAI Society per continuare.")
-
-  const typedProfile = profile as {
-    first_name?: string | null
-    last_name?: string | null
-    role?: string | null
-  }
-  const fullName = [typedProfile.first_name, typedProfile.last_name].filter(Boolean).join(" ").trim()
-
-  return {
-    user,
-    authorName: fullName || user.email?.split("@")[0] || "MIRAI Member",
-    isAdmin: typedProfile.role === "admin" || isAdminEmail(user.email),
-  }
-}
-
 function actionError(error: unknown): ActionError {
   return { ok: false, error: error instanceof Error ? error.message : "Operazione non riuscita." }
 }
 
 export async function createCommunityPost(formData: FormData): Promise<ActionResult> {
   try {
-    const member = await requireCommunityMember()
+    const member = await requireCommunityMemberIdentity()
     const content = String(formData.get("content") || "").trim()
     const mediaPath = String(formData.get("mediaPath") || "").trim()
     const mediaType = String(formData.get("mediaType") || "").trim() as CommunityMediaType
@@ -89,7 +71,7 @@ export async function createCommunityPost(formData: FormData): Promise<ActionRes
 
 export async function deleteCommunityPost(postId: string): Promise<ActionResult> {
   try {
-    const member = await requireCommunityMember()
+    const member = await requireCommunityMemberIdentity()
     const admin = createAdminClient()
     const { data: post, error: readError } = await admin
       .from("community_posts")
@@ -115,7 +97,7 @@ export async function updateCommunityPost(formData: FormData): Promise<ActionRes
   let uploadedMediaPath = ""
 
   try {
-    const member = await requireCommunityMember()
+    const member = await requireCommunityMemberIdentity()
     const postId = String(formData.get("postId") || "").trim()
     const content = String(formData.get("content") || "").trim()
     const removeMedia = String(formData.get("removeMedia") || "") === "true"
@@ -177,13 +159,13 @@ export async function updateCommunityPost(formData: FormData): Promise<ActionRes
 
 export async function setCommunityPostLike(postId: string, shouldLike: boolean): Promise<LikeActionResult> {
   try {
-    const member = await requireCommunityMember()
+    const member = await requireCommunityMemberIdentity()
     if (!UUID_PATTERN.test(postId)) throw new Error("Post non valido.")
 
     const admin = createAdminClient()
     const { data: post, error: postError } = await admin
       .from("community_posts")
-      .select("id")
+      .select("id, author_id")
       .eq("id", postId)
       .maybeSingle()
     if (postError || !post) throw new Error("Post non trovato.")
@@ -194,6 +176,29 @@ export async function setCommunityPostLike(postId: string, shouldLike: boolean):
         { onConflict: "post_id,user_id", ignoreDuplicates: true },
       )
       if (error) throw new Error("Non è stato possibile aggiungere il like.")
+
+      if (post.author_id !== member.user.id) {
+        await admin
+          .from("community_notifications")
+          .delete()
+          .eq("recipient_id", post.author_id)
+          .eq("actor_id", member.user.id)
+          .eq("notification_type", "post_like")
+          .eq("post_id", postId)
+        const { error: notificationError } = await admin.from("community_notifications").insert({
+          recipient_id: post.author_id,
+          actor_id: member.user.id,
+          actor_name: member.authorName,
+          notification_type: "post_like",
+          post_id: postId,
+          comment_id: null,
+          excerpt: null,
+          read_at: null,
+        })
+        if (notificationError) {
+          console.error("[community-notifications] Like notification failed", { code: notificationError.code })
+        }
+      }
     } else {
       const { error } = await admin
         .from("community_post_likes")
@@ -201,6 +206,19 @@ export async function setCommunityPostLike(postId: string, shouldLike: boolean):
         .eq("post_id", postId)
         .eq("user_id", member.user.id)
       if (error) throw new Error("Non è stato possibile rimuovere il like.")
+
+      if (post.author_id !== member.user.id) {
+        const { error: notificationError } = await admin
+          .from("community_notifications")
+          .delete()
+          .eq("recipient_id", post.author_id)
+          .eq("actor_id", member.user.id)
+          .eq("notification_type", "post_like")
+          .eq("post_id", postId)
+        if (notificationError) {
+          console.error("[community-notifications] Like notification cleanup failed", { code: notificationError.code })
+        }
+      }
     }
 
     const { count, error: countError } = await admin
@@ -218,7 +236,7 @@ export async function setCommunityPostLike(postId: string, shouldLike: boolean):
 
 export async function createCommunityPostComment(formData: FormData): Promise<CommentActionResult> {
   try {
-    const member = await requireCommunityMember()
+    const member = await requireCommunityMemberIdentity()
     const postId = String(formData.get("postId") || "").trim()
     const body = String(formData.get("body") || "").trim()
 
@@ -229,6 +247,13 @@ export async function createCommunityPostComment(formData: FormData): Promise<Co
     }
 
     const admin = createAdminClient()
+    const { data: post, error: postError } = await admin
+      .from("community_posts")
+      .select("id, author_id")
+      .eq("id", postId)
+      .maybeSingle()
+    if (postError || !post) throw new Error("Post non trovato.")
+
     const tenMinutesAgo = new Date(Date.now() - 10 * 60 * 1000).toISOString()
     const { count } = await admin
       .from("community_post_comments")
@@ -250,6 +275,21 @@ export async function createCommunityPostComment(formData: FormData): Promise<Co
       .single()
     if (error || !data) throw new Error("Non è stato possibile pubblicare il commento.")
 
+    if (post.author_id !== member.user.id) {
+      const { error: notificationError } = await admin.from("community_notifications").insert({
+        recipient_id: post.author_id,
+        actor_id: member.user.id,
+        actor_name: member.authorName,
+        notification_type: "post_comment",
+        post_id: postId,
+        comment_id: data.id,
+        excerpt: body.slice(0, 180),
+      })
+      if (notificationError) {
+        console.error("[community-notifications] Comment notification failed", { code: notificationError.code })
+      }
+    }
+
     revalidatePath("/community/social")
     return { ok: true, comment: data as CommunityPostComment }
   } catch (error) {
@@ -259,7 +299,7 @@ export async function createCommunityPostComment(formData: FormData): Promise<Co
 
 export async function deleteCommunityPostComment(commentId: string): Promise<ActionResult> {
   try {
-    const member = await requireCommunityMember()
+    const member = await requireCommunityMemberIdentity()
     if (!UUID_PATTERN.test(commentId)) throw new Error("Commento non valido.")
 
     const admin = createAdminClient()

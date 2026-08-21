@@ -23,6 +23,7 @@ import {
   type CommunityPost,
 } from "@/lib/community"
 import { createClient } from "@/lib/supabase/client"
+import { CommunityNotifications } from "@/components/community-notifications"
 
 type Props = {
   initialPosts: CommunityPost[]
@@ -277,10 +278,13 @@ export function CommunitySocialFeed({ initialPosts, currentUserId, isAdmin }: Pr
         <ArrowLeft className="h-3.5 w-3.5" /> Society Hub
       </Link>
 
-      <header className="mt-9">
-        <p className="text-[9px] font-bold uppercase tracking-[0.28em] text-primary">Members social</p>
-        <h1 className="mt-3 text-4xl font-black uppercase tracking-[-0.05em] sm:text-6xl">Inner Circle.</h1>
-        <p className="mt-4 max-w-2xl text-sm leading-7 text-white/50">Post, immagini, video e audio condivisi esclusivamente tra i membri della MIRAI Society e gli admin.</p>
+      <header className="mt-9 flex items-start justify-between gap-5">
+        <div>
+          <p className="text-[9px] font-bold uppercase tracking-[0.28em] text-primary">Members social</p>
+          <h1 className="mt-3 text-4xl font-black uppercase tracking-[-0.05em] sm:text-6xl">Inner Circle.</h1>
+          <p className="mt-4 max-w-2xl text-sm leading-7 text-white/50">Post, immagini, video e audio condivisi esclusivamente tra i membri della MIRAI Society e gli admin.</p>
+        </div>
+        <CommunityNotifications />
       </header>
 
       <form onSubmit={publish} className="mt-10 rounded-[1.5rem] border border-primary/25 bg-[#120d19] p-5 shadow-[0_20px_60px_rgba(0,0,0,.35)] sm:p-6">
@@ -333,7 +337,7 @@ export function CommunitySocialFeed({ initialPosts, currentUserId, isAdmin }: Pr
           <div className="rounded-2xl border border-white/10 bg-white/[0.025] p-8 text-center text-sm text-white/40">Il feed è pronto. Pubblica il primo contenuto della Society.</div>
         )}
         {posts.map((post) => (
-          <article key={post.id} className="rounded-[1.5rem] border border-white/10 bg-white/[0.025] p-5 sm:p-6">
+          <article id={`post-${post.id}`} key={post.id} className="scroll-mt-32 rounded-[1.5rem] border border-white/10 bg-white/[0.025] p-5 sm:p-6">
             <div className="flex items-start justify-between gap-4">
               <div className="flex min-w-0 items-center gap-3">
                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-primary/30 bg-primary/10 text-sm font-black text-primary">{post.author_name.slice(0, 1).toUpperCase()}</div>

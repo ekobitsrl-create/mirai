@@ -18,6 +18,20 @@ export function formatLocalizedPrice(value: number, locale: Locale, currency = "
 type PhraseRow = readonly [it: string, en: string, es: string, de: string, fr: string]
 
 const phraseRows: PhraseRow[] = [
+  ["Notifiche", "Notifications", "Notificaciones", "Benachrichtigungen", "Notifications"],
+  ["Apri notifiche", "Open notifications", "Abrir notificaciones", "Benachrichtigungen öffnen", "Ouvrir les notifications"],
+  ["Chiudi notifiche", "Close notifications", "Cerrar notificaciones", "Benachrichtigungen schließen", "Fermer les notifications"],
+  ["notifiche non lette", "unread notifications", "notificaciones sin leer", "ungelesene Benachrichtigungen", "notifications non lues"],
+  ["nuove", "new", "nuevas", "neu", "nouvelles"],
+  ["da leggere", "to read", "por leer", "ungelesen", "à lire"],
+  ["Tutto aggiornato", "All caught up", "Todo al día", "Alles gelesen", "Tout est à jour"],
+  ["Segna tutte come lette", "Mark all as read", "Marcar todo como leído", "Alle als gelesen markieren", "Tout marquer comme lu"],
+  ["Nessuna notifica per ora", "No notifications yet", "Aún no hay notificaciones", "Noch keine Benachrichtigungen", "Aucune notification pour le moment"],
+  ["Quando qualcuno interagisce con i tuoi post, lo vedrai qui.", "When someone interacts with your posts, you will see it here.", "Cuando alguien interactúe con tus publicaciones, lo verás aquí.", "Wenn jemand mit deinen Beiträgen interagiert, siehst du es hier.", "Lorsqu’une personne interagit avec vos publications, vous le verrez ici."],
+  ["ha messo like al tuo post", "liked your post", "ha indicado que le gusta tu publicación", "gefällt dein Beitrag", "a aimé votre publication"],
+  ["ha commentato il tuo post", "commented on your post", "ha comentado tu publicación", "hat deinen Beitrag kommentiert", "a commenté votre publication"],
+  ["Non è stato possibile caricare le notifiche.", "Notifications could not be loaded.", "No se pudieron cargar las notificaciones.", "Die Benachrichtigungen konnten nicht geladen werden.", "Impossible de charger les notifications."],
+  ["Non è stato possibile aggiornare le notifiche.", "Notifications could not be updated.", "No se pudieron actualizar las notificaciones.", "Die Benachrichtigungen konnten nicht aktualisiert werden.", "Impossible de mettre à jour les notifications."],
   ["MINIMAL DAYS: TUTTI I PRODOTTI MINIMAL A 29,90 €", "MINIMAL DAYS: ALL MINIMAL PRODUCTS €29.90", "MINIMAL DAYS: TODOS LOS PRODUCTOS MINIMAL A 29,90 €", "MINIMAL DAYS: ALLE MINIMAL-PRODUKTE FÜR 29,90 €", "MINIMAL DAYS : TOUS LES PRODUITS MINIMAL À 29,90 €"],
   ["SCONTO AUTOMATICO — NESSUN CODICE", "AUTOMATIC DISCOUNT — NO CODE NEEDED", "DESCUENTO AUTOMÁTICO — SIN CÓDIGO", "AUTOMATISCHER RABATT — KEIN CODE NÖTIG", "REMISE AUTOMATIQUE — SANS CODE"],
   ["TERMINA TRA", "ENDS IN", "TERMINA EN", "ENDET IN", "SE TERMINE DANS"],

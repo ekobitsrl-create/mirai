@@ -48,6 +48,19 @@ export type CommunityPostComment = {
   updated_at: string
 }
 
+export type CommunityNotificationType = "post_like" | "post_comment"
+
+export type CommunityNotification = {
+  id: string
+  actor_id: string
+  actor_name: string
+  notification_type: CommunityNotificationType
+  post_id: string
+  excerpt: string | null
+  read_at: string | null
+  created_at: string
+}
+
 export type CommunityMessage = {
   id: string
   author_id: string
