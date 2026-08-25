@@ -528,6 +528,44 @@ body.mirai-mobile-menu-open [data-background-music-control] {
   }
 }
 
+@keyframes mira-model-roaming {
+  0%, 100% {
+    transform: translate3d(0, 0, 0) rotate(-1deg) scaleX(var(--mira-flip));
+  }
+  25% {
+    transform: translate3d(0, -7px, 0) rotate(1.4deg) scaleX(var(--mira-flip));
+  }
+  50% {
+    transform: translate3d(0, -1px, 0) rotate(-1.2deg) scaleX(var(--mira-flip));
+  }
+  75% {
+    transform: translate3d(0, -6px, 0) rotate(1deg) scaleX(var(--mira-flip));
+  }
+}
+
+@keyframes mira-model-sleeping {
+  0%, 100% {
+    transform: translate3d(0, 18px, 0) rotate(-7deg) scale(0.93) scaleX(var(--mira-flip));
+    filter: saturate(0.72) brightness(0.82);
+  }
+  50% {
+    transform: translate3d(0, 15px, 0) rotate(-6deg) scale(0.95) scaleX(var(--mira-flip));
+    filter: saturate(0.8) brightness(0.9);
+  }
+}
+
+@keyframes mira-sleep-float {
+  0% { opacity: 0; transform: translate3d(0, 8px, 0) scale(0.72); }
+  35% { opacity: 0.9; }
+  100% { opacity: 0; transform: translate3d(18px, -30px, 0) scale(1.15); }
+}
+
+@keyframes mira-spark-pop {
+  0% { opacity: 0; transform: translate3d(0, 12px, 0) scale(0.2) rotate(0deg); }
+  35% { opacity: 1; }
+  100% { opacity: 0; transform: translate3d(var(--spark-x), var(--spark-y), 0) scale(1) rotate(150deg); }
+}
+
 @keyframes mira-model-scan {
   0% {
     top: 15%;
@@ -658,6 +696,14 @@ body.mirai-mobile-menu-open [data-background-music-control] {
   filter: drop-shadow(0 0 24px rgba(159, 134, 255, 0.9));
 }
 
+.mira-model-roaming {
+  animation: mira-model-roaming 0.56s ease-in-out infinite;
+}
+
+.mira-model-sleeping {
+  animation: mira-model-sleeping 3.6s ease-in-out infinite;
+}
+
 .mira-model-glow {
   animation: mira-model-glow 3.2s ease-in-out infinite;
 }
@@ -669,6 +715,65 @@ body.mirai-mobile-menu-open [data-background-music-control] {
   height: 8rem;
   will-change: left, top;
 }
+
+.mira-is-roaming {
+  transition:
+    left 2.8s cubic-bezier(0.33, 0.72, 0.25, 1),
+    top 2.8s cubic-bezier(0.33, 0.72, 0.25, 1);
+}
+
+.mira-is-roaming .mira-model-glow {
+  transform: scaleX(1.25);
+  opacity: 0.72;
+}
+
+.mira-is-sleeping .mira-model-scan {
+  animation-play-state: paused;
+  opacity: 0;
+}
+
+.mira-sleep-sign,
+.mira-celebration-sparks {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+}
+
+.mira-sleep-sign span {
+  position: absolute;
+  right: 7%;
+  top: 25%;
+  color: #cfc3ff;
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-shadow: 0 0 12px rgba(159, 134, 255, 0.95);
+  animation: mira-sleep-float 2.8s ease-out infinite;
+}
+
+.mira-sleep-sign span:nth-child(2) { animation-delay: 0.9s; }
+.mira-sleep-sign span:nth-child(3) { animation-delay: 1.8s; }
+
+.mira-celebration-sparks span {
+  --spark-x: 0px;
+  --spark-y: -54px;
+  position: absolute;
+  left: 50%;
+  top: 42%;
+  width: 5px;
+  height: 5px;
+  border-radius: 1px;
+  background: #cfc3ff;
+  box-shadow: 0 0 10px rgba(159, 134, 255, 0.95);
+  animation: mira-spark-pop 0.95s ease-out infinite;
+}
+
+.mira-celebration-sparks span:nth-child(2) { --spark-x: 42px; --spark-y: -42px; animation-delay: 0.12s; }
+.mira-celebration-sparks span:nth-child(3) { --spark-x: 54px; --spark-y: -2px; animation-delay: 0.24s; }
+.mira-celebration-sparks span:nth-child(4) { --spark-x: 35px; --spark-y: 34px; animation-delay: 0.36s; }
+.mira-celebration-sparks span:nth-child(5) { --spark-x: -38px; --spark-y: 30px; animation-delay: 0.18s; }
+.mira-celebration-sparks span:nth-child(6) { --spark-x: -55px; --spark-y: -7px; animation-delay: 0.3s; }
+.mira-celebration-sparks span:nth-child(7) { --spark-x: -38px; --spark-y: -45px; animation-delay: 0.42s; }
 
 .mira-character-button {
   cursor: pointer;
@@ -796,6 +901,8 @@ body.mirai-mobile-menu-open [data-background-music-control] {
   .mira-model-curious,
   .mira-model-dragging,
   .mira-model-celebrating,
+  .mira-model-roaming,
+  .mira-model-sleeping,
   .mira-model-scan,
   .mira-model-glow,
   .mira-neon-bubble,
@@ -805,6 +912,10 @@ body.mirai-mobile-menu-open [data-background-music-control] {
   .mira-peek,
   .mira-is-dragging .mira-character-button {
     animation: none !important;
+  }
+
+  .mira-is-roaming {
+    transition: none !important;
   }
 
   .mirai-aurora-orb,

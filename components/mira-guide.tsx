@@ -20,7 +20,7 @@ import type { Locale } from "@/lib/translations"
 
 type MiraVariant = "male" | "female"
 type MiraAssetPose = "idle" | "listening" | "speaking"
-type MiraPose = MiraAssetPose | "curious" | "dragging" | "celebrating"
+type MiraPose = MiraAssetPose | "curious" | "dragging" | "celebrating" | "roaming" | "sleeping"
 
 const MIRA_POSE_ASSET: Record<MiraPose, MiraAssetPose> = {
   idle: "speaking",
@@ -29,6 +29,8 @@ const MIRA_POSE_ASSET: Record<MiraPose, MiraAssetPose> = {
   curious: "listening",
   dragging: "speaking",
   celebrating: "speaking",
+  roaming: "listening",
+  sleeping: "listening",
 }
 
 type MiraPosition = {
@@ -227,6 +229,9 @@ export function MiraGuide() {
   const [isHovering, setIsHovering] = useState(false)
   const [ambientCurious, setAmbientCurious] = useState(false)
   const [isCelebrating, setIsCelebrating] = useState(false)
+  const [isRoaming, setIsRoaming] = useState(false)
+  const [isSleeping, setIsSleeping] = useState(false)
+  const [roamFaceRight, setRoamFaceRight] = useState(false)
   const [lookOffset, setLookOffset] = useState({ x: 0, y: 0 })
   const [speechSupported, setSpeechSupported] = useState(false)
   const [isDragging, setIsDragging] = useState(false)
@@ -239,6 +244,9 @@ export function MiraGuide() {
   const positionRef = useRef(position)
   const holdTimerRef = useRef<number | null>(null)
   const poseTimerRef = useRef<number | null>(null)
+  const ambientTimerRef = useRef<number | null>(null)
+  const roamTimerRef = useRef<number | null>(null)
+  const lastInteractionRef = useRef(Date.now())
   const recognitionRef = useRef<SpeechRecognitionInstance | null>(null)
   const conversationRef = useRef<MiraTurn[]>([])
   const requestInFlightRef = useRef(false)
@@ -385,27 +393,80 @@ export function MiraGuide() {
       || isListening
       || isThinking
       || isSpeaking
+      || isCelebrating
+      || isSleeping
     ) {
       setAmbientCurious(false)
+      setIsRoaming(false)
       return
     }
 
-    let resetTimer: number | null = null
-    const lookTimer = window.setTimeout(() => {
-      setAmbientCurious(true)
-      resetTimer = window.setTimeout(() => setAmbientCurious(false), 1800)
-    }, 8500 + Math.random() * 6500)
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return
+
+    const scheduleNextAction = () => {
+      if (ambientTimerRef.current) window.clearTimeout(ambientTimerRef.current)
+      ambientTimerRef.current = window.setTimeout(() => {
+        const idleFor = Date.now() - lastInteractionRef.current
+        if (idleFor > 48_000) {
+          setIsSleeping(true)
+          setAmbientCurious(false)
+          setIsRoaming(false)
+          return
+        }
+
+        if (Math.random() < 0.62) {
+          const stage = getStageSize()
+          const distance = window.innerWidth >= 768
+            ? 54 + Math.random() * 96
+            : 28 + Math.random() * 52
+          let direction = Math.random() > 0.5 ? 1 : -1
+          let next = clampPosition({
+            x: positionRef.current.x + distance * direction,
+            y: positionRef.current.y + (Math.random() - 0.5) * 18,
+          })
+          if (Math.abs(next.x - positionRef.current.x) < 8) {
+            direction *= -1
+            next = clampPosition({
+              x: positionRef.current.x + distance * direction,
+              y: positionRef.current.y + (Math.random() - 0.5) * 18,
+            })
+          }
+          const actuallyMovingRight = next.x >= positionRef.current.x
+          setRoamFaceRight(actuallyMovingRight)
+          setAmbientCurious(false)
+          setIsRoaming(true)
+          positionRef.current = next
+          setPosition(next)
+          if (roamTimerRef.current) window.clearTimeout(roamTimerRef.current)
+          roamTimerRef.current = window.setTimeout(() => {
+            setIsRoaming(false)
+            scheduleNextAction()
+          }, stage.width >= 144 ? 2900 : 2300)
+          return
+        }
+
+        setAmbientCurious(true)
+        ambientTimerRef.current = window.setTimeout(() => {
+          setAmbientCurious(false)
+          scheduleNextAction()
+        }, 1900)
+      }, 5200 + Math.random() * 4800)
+    }
+
+    scheduleNextAction()
 
     return () => {
-      window.clearTimeout(lookTimer)
-      if (resetTimer) window.clearTimeout(resetTimer)
+      if (ambientTimerRef.current) window.clearTimeout(ambientTimerRef.current)
+      if (roamTimerRef.current) window.clearTimeout(roamTimerRef.current)
     }
-  }, [expanded, isDragging, isListening, isSpeaking, isThinking, minimized, pathname, showSelector, variant])
+  }, [expanded, isCelebrating, isDragging, isListening, isSleeping, isSpeaking, isThinking, minimized, pathname, showSelector, variant])
 
   useEffect(() => {
     return () => {
       if (holdTimerRef.current) window.clearTimeout(holdTimerRef.current)
       if (poseTimerRef.current) window.clearTimeout(poseTimerRef.current)
+      if (ambientTimerRef.current) window.clearTimeout(ambientTimerRef.current)
+      if (roamTimerRef.current) window.clearTimeout(roamTimerRef.current)
       recognitionRef.current?.abort()
       requestAbortRef.current?.abort()
     }
@@ -429,6 +490,13 @@ export function MiraGuide() {
     } catch {
       // The position remains valid for the current visit.
     }
+  }
+
+  function wakeMira() {
+    lastInteractionRef.current = Date.now()
+    setIsSleeping(false)
+    setIsRoaming(false)
+    setAmbientCurious(false)
   }
 
   function chooseVariant() {
@@ -484,6 +552,7 @@ export function MiraGuide() {
   async function askMira(rawMessage: string, voiceRequest = false) {
     const cleanMessage = rawMessage.trim()
     if (!cleanMessage || requestInFlightRef.current) return
+    wakeMira()
 
     if (poseTimerRef.current) window.clearTimeout(poseTimerRef.current)
     requestAbortRef.current?.abort()
@@ -574,6 +643,7 @@ export function MiraGuide() {
   }
 
   function toggleListening() {
+    wakeMira()
     if (isListening) {
       recognitionRef.current?.stop()
       return
@@ -626,6 +696,7 @@ export function MiraGuide() {
 
   function handlePointerDown(event: ReactPointerEvent<HTMLButtonElement>) {
     if (event.pointerType === "mouse" && event.button !== 0) return
+    wakeMira()
     const rect = stageRef.current?.getBoundingClientRect()
     if (!rect) return
 
@@ -662,7 +733,16 @@ export function MiraGuide() {
 
   function handlePointerMove(event: ReactPointerEvent<HTMLButtonElement>) {
     const drag = dragRef.current
-    if (drag.pointerId !== event.pointerId) return
+    if (drag.pointerId !== event.pointerId) {
+      if (event.pointerType === "mouse") {
+        const rect = event.currentTarget.getBoundingClientRect()
+        setLookOffset({
+          x: ((event.clientX - rect.left) / rect.width - 0.5) * 8,
+          y: ((event.clientY - rect.top) / rect.height - 0.5) * 5,
+        })
+      }
+      return
+    }
 
     if (!drag.dragging) {
       if (event.pointerType === "mouse") {
@@ -720,6 +800,7 @@ export function MiraGuide() {
       suppressClickRef.current = false
       return
     }
+    wakeMira()
     setReply({ text: ui("Yo, dimmi pure. Che cosa cerchi?") })
     setShowNudge(false)
     setExpanded(true)
@@ -734,7 +815,7 @@ export function MiraGuide() {
     setExpanded(false)
   }
 
-  if (!hydrated || pathname.startsWith("/prodotto/") || pathname.startsWith("/checkout")) return null
+  if (!hydrated) return null
 
   const activeVariant = variant
   const stageSize = getStageSize()
@@ -768,13 +849,17 @@ export function MiraGuide() {
     ? "dragging"
     : isCelebrating
       ? "celebrating"
-    : isListening || isThinking
-      ? "listening"
-      : isSpeaking || showNudge || isHovering
-        ? "speaking"
-        : ambientCurious
-          ? "curious"
-          : "idle"
+      : isListening || isThinking
+        ? "listening"
+        : isSpeaking || showNudge || isHovering
+          ? "speaking"
+          : isRoaming
+            ? "roaming"
+            : isSleeping
+              ? "sleeping"
+              : ambientCurious
+                ? "curious"
+                : "idle"
   const peekOnRight = position.x + stageSize.width / 2 > viewportWidth / 2
   const peekHeight = viewportWidth >= 768 ? 80 : 64
   const peekTop = Math.min(
@@ -857,7 +942,7 @@ export function MiraGuide() {
       {variant && !showSelector && positionReady && !minimized && (
         <aside
           ref={stageRef}
-          className={`mira-presence ${isDragging ? "mira-is-dragging" : ""}`}
+          className={`mira-presence ${isDragging ? "mira-is-dragging" : ""} ${isRoaming ? "mira-is-roaming" : ""} ${isSleeping ? "mira-is-sleeping" : ""}`}
           style={{ left: position.x, top: position.y }}
           aria-label={ui("MIRA, guida del sito")}
         >
@@ -973,6 +1058,18 @@ export function MiraGuide() {
             </div>
           )}
 
+          {isSleeping && (
+            <div className="mira-sleep-sign" aria-hidden="true">
+              <span>Z</span><span>Z</span><span>Z</span>
+            </div>
+          )}
+
+          {isCelebrating && (
+            <div className="mira-celebration-sparks" aria-hidden="true">
+              {Array.from({ length: 7 }, (_, index) => <span key={index} />)}
+            </div>
+          )}
+
           <button
             type="button"
             onClick={handleCharacterClick}
@@ -995,7 +1092,7 @@ export function MiraGuide() {
               className="mira-model-reactive-shell"
               style={{ transform: `translate3d(${lookOffset.x}px, ${lookOffset.y}px, 0)` }}
             >
-              <MiraModel variant={activeVariant} pose={currentPose} faceRight={!bubbleOnLeft} />
+              <MiraModel variant={activeVariant} pose={currentPose} faceRight={isRoaming ? roamFaceRight : !bubbleOnLeft} />
             </div>
             <span className="absolute bottom-1.5 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full border border-primary/30 bg-black/70 px-2.5 py-1 text-[7px] font-semibold uppercase tracking-[0.18em] text-white/85 backdrop-blur-md">
               {isListening ? "ASCOLTO" : "MIRA"}
