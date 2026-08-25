@@ -44,8 +44,9 @@ type MiraSpriteSequence = "idle"
   | "think"
   | "dance"
   | "sit"
+  | "hang"
   | "sleep"
-type MiraSpriteSheet = "sprite" | "motion" | "gesture" | "emotion" | "rest"
+type MiraSpriteSheet = "sprite" | "motion" | "gesture" | "emotion" | "rest" | "drag"
 type MiraAmbientPose = Exclude<MiraPose, MiraAssetPose | "dragging" | "celebrating" | "roaming" | "sleeping">
 
 const MIRA_POSE_ASSET: Record<MiraPose, MiraAssetPose> = {
@@ -70,6 +71,7 @@ const MIRA_SPRITE_SEQUENCE: Partial<Record<MiraPose, MiraSpriteSequence>> = {
   listening: "listen",
   speaking: "talk",
   curious: "curious",
+  dragging: "hang",
   celebrating: "dance",
   roaming: "run",
   jumping: "jump",
@@ -94,6 +96,7 @@ const MIRA_SPRITE_SHEET: Record<MiraSpriteSequence, MiraSpriteSheet> = {
   think: "emotion",
   dance: "emotion",
   sit: "rest",
+  hang: "drag",
   sleep: "rest",
 }
 
@@ -107,7 +110,7 @@ const MIRA_AMBIENT_ACTIONS: Array<{ pose: MiraAmbientPose; duration: number }> =
   { pose: "sitting", duration: 3200 },
 ]
 
-const MIRA_SPRITE_SHEETS: MiraSpriteSheet[] = ["sprite", "motion", "gesture", "emotion", "rest"]
+const MIRA_SPRITE_SHEETS: MiraSpriteSheet[] = ["sprite", "motion", "gesture", "emotion", "rest", "drag"]
 
 type MiraPosition = {
   x: number
@@ -202,6 +205,14 @@ function clampPosition(position: MiraPosition) {
     x: Math.min(maxX, Math.max(minX, position.x)),
     y: Math.min(maxY, Math.max(minY, position.y)),
   }
+}
+
+function getAnchoredDragPosition(clientX: number, clientY: number) {
+  const stage = getStageSize()
+  return clampPosition({
+    x: clientX - stage.width * 0.5,
+    y: clientY - stage.height * 0.07,
+  })
 }
 
 function MiraModel({
@@ -327,7 +338,6 @@ export function MiraGuide() {
   const [viewportWidth, setViewportWidth] = useState(1280)
   const [viewportHeight, setViewportHeight] = useState(800)
 
-  const stageRef = useRef<HTMLElement>(null)
   const positionRef = useRef(position)
   const holdTimerRef = useRef<number | null>(null)
   const poseTimerRef = useRef<number | null>(null)
@@ -345,8 +355,8 @@ export function MiraGuide() {
     pointerId: -1,
     startX: 0,
     startY: 0,
-    offsetX: 0,
-    offsetY: 0,
+    currentX: 0,
+    currentY: 0,
     dragging: false,
   })
 
@@ -799,8 +809,6 @@ export function MiraGuide() {
   function handlePointerDown(event: ReactPointerEvent<HTMLButtonElement>) {
     if (event.pointerType === "mouse" && event.button !== 0) return
     wakeMira()
-    const rect = stageRef.current?.getBoundingClientRect()
-    if (!rect) return
 
     try {
       event.currentTarget.setPointerCapture(event.pointerId)
@@ -811,8 +819,8 @@ export function MiraGuide() {
       pointerId: event.pointerId,
       startX: event.clientX,
       startY: event.clientY,
-      offsetX: event.clientX - rect.left,
-      offsetY: event.clientY - rect.top,
+      currentX: event.clientX,
+      currentY: event.clientY,
       dragging: false,
     }
 
@@ -830,6 +838,12 @@ export function MiraGuide() {
     setLookOffset({ x: 0, y: 0 })
     setExpanded(false)
     setShowNudge(false)
+    const anchoredPosition = getAnchoredDragPosition(
+      dragRef.current.currentX,
+      dragRef.current.currentY,
+    )
+    positionRef.current = anchoredPosition
+    setPosition(anchoredPosition)
     navigator.vibrate?.(18)
   }
 
@@ -846,6 +860,9 @@ export function MiraGuide() {
       return
     }
 
+    drag.currentX = event.clientX
+    drag.currentY = event.clientY
+
     if (!drag.dragging) {
       if (event.pointerType === "mouse") {
         const rect = event.currentTarget.getBoundingClientRect()
@@ -857,21 +874,13 @@ export function MiraGuide() {
 
       const distance = Math.hypot(event.clientX - drag.startX, event.clientY - drag.startY)
       if (distance > 6) {
-        if (event.pointerType === "touch" || event.pointerType === "pen") {
-          beginDragging()
-        } else if (holdTimerRef.current) {
-          window.clearTimeout(holdTimerRef.current)
-          holdTimerRef.current = null
-        }
+        beginDragging()
       }
       if (!drag.dragging) return
     }
 
     event.preventDefault()
-    const next = clampPosition({
-      x: event.clientX - drag.offsetX,
-      y: event.clientY - drag.offsetY,
-    })
+    const next = getAnchoredDragPosition(event.clientX, event.clientY)
     positionRef.current = next
     setPosition(next)
   }
@@ -1053,7 +1062,6 @@ export function MiraGuide() {
 
       {variant && !showSelector && positionReady && !minimized && (
         <aside
-          ref={stageRef}
           className={`mira-presence ${isDragging ? "mira-is-dragging" : ""} ${isRoaming ? "mira-is-roaming" : ""} ${isSleeping ? "mira-is-sleeping" : ""}`}
           style={{ left: position.x, top: position.y }}
           aria-label={ui("MIRA, guida del sito")}
@@ -1200,6 +1208,7 @@ export function MiraGuide() {
             aria-label={ui("Apri MIRA. Tieni premuto per spostarla")}
           >
             <span className="absolute inset-x-[12%] bottom-[6%] h-14 rounded-full border border-primary/22 bg-[#120c19]/45 shadow-[0_0_38px_rgba(159,134,255,0.34)] backdrop-blur-sm transition-all group-hover:border-primary/55 group-hover:shadow-[0_0_54px_rgba(159,134,255,0.55)]" />
+            {isDragging && <span className="mira-drag-anchor" aria-hidden="true" />}
             <div
               className="mira-model-reactive-shell"
               style={{ transform: `translate3d(${lookOffset.x}px, ${lookOffset.y}px, 0)` }}
