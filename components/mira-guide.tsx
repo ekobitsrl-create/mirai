@@ -20,8 +20,33 @@ import type { Locale } from "@/lib/translations"
 
 type MiraVariant = "male" | "female"
 type MiraAssetPose = "idle" | "listening" | "speaking"
-type MiraPose = MiraAssetPose | "curious" | "dragging" | "celebrating" | "roaming" | "sleeping"
-type MiraSpriteSequence = "idle" | "walk" | "listen" | "talk" | "curious" | "celebrate" | "sleep"
+type MiraPose = MiraAssetPose
+  | "curious"
+  | "dragging"
+  | "celebrating"
+  | "roaming"
+  | "jumping"
+  | "waving"
+  | "presenting"
+  | "thinking"
+  | "dancing"
+  | "sitting"
+  | "sleeping"
+type MiraSpriteSequence = "idle"
+  | "walk"
+  | "listen"
+  | "talk"
+  | "curious"
+  | "run"
+  | "jump"
+  | "wave"
+  | "present"
+  | "think"
+  | "dance"
+  | "sit"
+  | "sleep"
+type MiraSpriteSheet = "sprite" | "motion" | "gesture" | "emotion" | "rest"
+type MiraAmbientPose = Exclude<MiraPose, MiraAssetPose | "dragging" | "celebrating" | "roaming" | "sleeping">
 
 const MIRA_POSE_ASSET: Record<MiraPose, MiraAssetPose> = {
   idle: "speaking",
@@ -31,6 +56,12 @@ const MIRA_POSE_ASSET: Record<MiraPose, MiraAssetPose> = {
   dragging: "speaking",
   celebrating: "speaking",
   roaming: "listening",
+  jumping: "speaking",
+  waving: "speaking",
+  presenting: "speaking",
+  thinking: "listening",
+  dancing: "speaking",
+  sitting: "listening",
   sleeping: "listening",
 }
 
@@ -39,10 +70,44 @@ const MIRA_SPRITE_SEQUENCE: Partial<Record<MiraPose, MiraSpriteSequence>> = {
   listening: "listen",
   speaking: "talk",
   curious: "curious",
-  celebrating: "celebrate",
-  roaming: "walk",
+  celebrating: "dance",
+  roaming: "run",
+  jumping: "jump",
+  waving: "wave",
+  presenting: "present",
+  thinking: "think",
+  dancing: "dance",
+  sitting: "sit",
   sleeping: "sleep",
 }
+
+const MIRA_SPRITE_SHEET: Record<MiraSpriteSequence, MiraSpriteSheet> = {
+  idle: "sprite",
+  walk: "sprite",
+  listen: "sprite",
+  talk: "sprite",
+  curious: "sprite",
+  run: "motion",
+  jump: "motion",
+  wave: "gesture",
+  present: "gesture",
+  think: "emotion",
+  dance: "emotion",
+  sit: "rest",
+  sleep: "rest",
+}
+
+const MIRA_AMBIENT_ACTIONS: Array<{ pose: MiraAmbientPose; duration: number }> = [
+  { pose: "curious", duration: 1900 },
+  { pose: "jumping", duration: 2200 },
+  { pose: "waving", duration: 2600 },
+  { pose: "presenting", duration: 2900 },
+  { pose: "thinking", duration: 3100 },
+  { pose: "dancing", duration: 2800 },
+  { pose: "sitting", duration: 3200 },
+]
+
+const MIRA_SPRITE_SHEETS: MiraSpriteSheet[] = ["sprite", "motion", "gesture", "emotion", "rest"]
 
 type MiraPosition = {
   x: number
@@ -151,6 +216,7 @@ function MiraModel({
   className?: string
 }) {
   const spriteSequence = MIRA_SPRITE_SEQUENCE[pose]
+  const spriteSheet = spriteSequence ? MIRA_SPRITE_SHEET[spriteSequence] : null
 
   return (
     <div
@@ -167,7 +233,7 @@ function MiraModel({
         {spriteSequence ? (
           <span
             className={`mira-frame-sprite mira-frame-${spriteSequence}`}
-            style={{ backgroundImage: `url(/mascot/mira-${variant}-sprite.webp)` }}
+            style={{ backgroundImage: `url(/mascot/mira-${variant}-${spriteSheet}.webp)` }}
             aria-hidden="true"
           />
         ) : (
@@ -248,7 +314,7 @@ export function MiraGuide() {
   const [isSpeaking, setIsSpeaking] = useState(false)
   const [isListening, setIsListening] = useState(false)
   const [isHovering, setIsHovering] = useState(false)
-  const [ambientCurious, setAmbientCurious] = useState(false)
+  const [ambientPose, setAmbientPose] = useState<MiraAmbientPose | null>(null)
   const [isCelebrating, setIsCelebrating] = useState(false)
   const [isRoaming, setIsRoaming] = useState(false)
   const [isSleeping, setIsSleeping] = useState(false)
@@ -373,6 +439,20 @@ export function MiraGuide() {
   }, [])
 
   useEffect(() => {
+    const preloadedImages = MIRA_SPRITE_SHEETS.map((sheet) => {
+      const image = new window.Image()
+      image.src = `/mascot/mira-${variant}-${sheet}.webp`
+      return image
+    })
+
+    return () => {
+      preloadedImages.forEach((image) => {
+        image.src = ""
+      })
+    }
+  }, [variant])
+
+  useEffect(() => {
     let celebrationTimer: number | null = null
     const handleCartItemAdded = (event: Event) => {
       if (minimized) return
@@ -417,7 +497,7 @@ export function MiraGuide() {
       || isCelebrating
       || isSleeping
     ) {
-      setAmbientCurious(false)
+      setAmbientPose(null)
       setIsRoaming(false)
       return
     }
@@ -430,7 +510,7 @@ export function MiraGuide() {
         const idleFor = Date.now() - lastInteractionRef.current
         if (idleFor > 48_000) {
           setIsSleeping(true)
-          setAmbientCurious(false)
+          setAmbientPose(null)
           setIsRoaming(false)
           return
         }
@@ -454,7 +534,7 @@ export function MiraGuide() {
           }
           const actuallyMovingRight = next.x >= positionRef.current.x
           setRoamFaceRight(actuallyMovingRight)
-          setAmbientCurious(false)
+          setAmbientPose(null)
           setIsRoaming(true)
           positionRef.current = next
           setPosition(next)
@@ -466,11 +546,12 @@ export function MiraGuide() {
           return
         }
 
-        setAmbientCurious(true)
+        const action = MIRA_AMBIENT_ACTIONS[Math.floor(Math.random() * MIRA_AMBIENT_ACTIONS.length)]
+        setAmbientPose(action.pose)
         ambientTimerRef.current = window.setTimeout(() => {
-          setAmbientCurious(false)
+          setAmbientPose(null)
           scheduleNextAction()
-        }, 1900)
+        }, action.duration)
       }, 5200 + Math.random() * 4800)
     }
 
@@ -517,7 +598,7 @@ export function MiraGuide() {
     lastInteractionRef.current = Date.now()
     setIsSleeping(false)
     setIsRoaming(false)
-    setAmbientCurious(false)
+    setAmbientPose(null)
   }
 
   function chooseVariant() {
@@ -878,8 +959,8 @@ export function MiraGuide() {
             ? "roaming"
             : isSleeping
               ? "sleeping"
-              : ambientCurious
-                ? "curious"
+              : ambientPose
+                ? ambientPose
                 : "idle"
   const peekOnRight = position.x + stageSize.width / 2 > viewportWidth / 2
   const peekHeight = viewportWidth >= 768 ? 80 : 64
