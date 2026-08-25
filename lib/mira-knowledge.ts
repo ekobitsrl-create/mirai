@@ -1,4 +1,4 @@
-import { type StoreProduct } from "@/lib/products"
+import type { StoreProduct } from "@/lib/products"
 
 export type MiraIntent =
   | "greeting"
@@ -38,6 +38,8 @@ export type MiraKnowledgeContext = {
 export type MiraKnowledgeReply = {
   text: string
   intent: MiraIntent
+  confidence: number
+  heard?: string[]
   href?: string
   label?: string
   productId?: string
@@ -112,7 +114,97 @@ function answer(
   label?: string,
   productId?: string,
 ): MiraKnowledgeReply {
-  return { intent, text, href, label, productId }
+  return { intent, text, confidence: intent === "unknown" ? 0 : 0.55, href, label, productId }
+}
+
+type IntentDefinition = {
+  intent: MiraIntent
+  canonical: string
+  terms: string[]
+}
+
+const INTENT_DEFINITIONS: IntentDefinition[] = [
+  { intent: "shipping", canonical: "spedizione consegna", terms: ["spedizione", "spedire", "consegna", "corriere", "quanto ci mette", "quando arriva", "costo invio", "spese di spedizione"] },
+  { intent: "tracking", canonical: "tracking tracciare pacco", terms: ["tracking", "tracciare", "tracciamento", "dove e il pacco", "dov e il mio ordine", "stato ordine"] },
+  { intent: "returns", canonical: "reso restituzione", terms: ["reso", "restituire", "restituzione", "rimandare indietro", "non mi va", "non mi piace"] },
+  { intent: "refund", canonical: "rimborso", terms: ["rimborso", "rimborsare", "soldi indietro", "riavere i soldi", "accredito"] },
+  { intent: "payments", canonical: "pagamento", terms: ["pagamento", "pagare", "carta", "paypal", "klarna", "scalapay", "apple pay", "google pay", "contrassegno", "rate"] },
+  { intent: "discount", canonical: "sconto coupon", terms: ["sconto", "coupon", "codice promo", "promozione", "primo ordine", "risparmiare"] },
+  { intent: "size", canonical: "taglia misura", terms: ["taglia", "taglie", "misura", "che taglia", "torace", "lunghezza", "manica"] },
+  { intent: "fit", canonical: "fit vestibilita", terms: ["fit", "vestibilita", "come veste", "oversize", "largo", "stretto", "aderente"] },
+  { intent: "stock", canonical: "disponibilita stock", terms: ["disponibile", "disponibilita", "stock", "rimasto", "esaurito", "sold out"] },
+  { intent: "care", canonical: "lavaggio cura", terms: ["lavare", "lavaggio", "lavatrice", "stirare", "cura", "candeggina"] },
+  { intent: "colors", canonical: "colore", terms: ["colore", "colori", "tonalita", "foto dal vivo", "come si vede"] },
+  { intent: "budget", canonical: "budget spendere euro", terms: ["budget", "spendere", "massimo", "sotto", "entro", "euro"] },
+  { intent: "customization", canonical: "custom personalizzare", terms: ["custom", "personalizzare", "personalizzato", "mia grafica", "mia scritta", "stampare", "custom lab"] },
+  { intent: "order", canonical: "ordine", terms: ["ordine", "annullare ordine", "modificare ordine", "conferma ordine", "numero ordine"] },
+  { intent: "account", canonical: "account login", terms: ["account", "login", "accedere", "registrazione", "password"] },
+  { intent: "contact", canonical: "contatto assistenza", terms: ["contatto", "contattare", "email", "telefono", "assistenza", "operatore", "persona vera"] },
+  { intent: "store", canonical: "negozio store", terms: ["negozio", "store fisico", "dove siete", "sede", "ritiro in negozio"] },
+  { intent: "product", canonical: "prodotto shop consiglio", terms: ["prodotto", "capo", "maglietta", "t shirt", "felpa", "pantalone", "cappello", "comprare", "consiglio"] },
+  { intent: "greeting", canonical: "ciao", terms: ["ciao", "salve", "buongiorno", "buonasera", "hey", "ehi", "yo"] },
+  { intent: "thanks", canonical: "grazie", terms: ["grazie", "gentile", "perfetto", "sei stata utile", "sei stato utile"] },
+  { intent: "identity", canonical: "chi sei", terms: ["chi sei", "come ti chiami", "sei un bot", "sei vera", "cosa sei"] },
+  { intent: "capabilities", canonical: "cosa sai fare", terms: ["cosa sai fare", "come puoi aiutarmi", "cosa posso chiedere", "aiutami"] },
+]
+
+const MEANINGLESS_WORDS = new Set(["a", "al", "alla", "che", "come", "con", "da", "del", "di", "e", "gli", "ho", "i", "il", "in", "io", "la", "le", "lo", "mi", "ne", "o", "per", "puoi", "si", "su", "un", "una", "vorrei"])
+
+function wordSimilarity(left: string, right: string) {
+  if (left === right) return 1
+  if (left.length < 4 || right.length < 4) return 0
+  const distance = editDistance(left, right)
+  return Math.max(0, 1 - distance / Math.max(left.length, right.length))
+}
+
+function classifyIntent(rawMessage: string) {
+  const message = normalize(rawMessage)
+  const words = message.split(" ").filter((word) => word.length > 1 && !MEANINGLESS_WORDS.has(word))
+  let best = { intent: "unknown" as MiraIntent, canonical: "", confidence: 0 }
+
+  for (const definition of INTENT_DEFINITIONS) {
+    let score = 0
+    for (const rawTerm of definition.terms) {
+      const term = normalize(rawTerm)
+      if (message.includes(term)) {
+        score += term.includes(" ") ? 1.15 : 0.82
+        continue
+      }
+
+      const termWords = term.split(" ").filter((word) => word.length > 2)
+      const similarities = termWords.map((termWord) =>
+        words.reduce((highest, word) => Math.max(highest, wordSimilarity(word, termWord)), 0),
+      )
+      const similarity = similarities.length
+        ? similarities.reduce((total, value) => total + value, 0) / similarities.length
+        : 0
+      if (similarity >= 0.72) score += similarity * (termWords.length > 1 ? 0.72 : 0.58)
+    }
+
+    const confidence = Math.min(0.99, score / (score + 0.62))
+    if (confidence > best.confidence) {
+      best = { intent: definition.intent, canonical: definition.canonical, confidence }
+    }
+  }
+
+  return best
+}
+
+function extractHeardDetails(rawMessage: string, intent: MiraIntent) {
+  const message = normalize(rawMessage)
+  const heard: string[] = []
+  const size = message.match(/(?:taglia|misura)?\s*\b(xxs|xs|s|m|l|xl|xxl|xxxl)\b/i)?.[1]
+  const budget = message.match(/(?:€\s*|euro\s*)?(\d{1,4})(?:\s*(?:€|euro))?/i)?.[1]
+  const colors = ["nero", "bianco", "rosso", "blu", "azzurro", "verde", "viola", "rosa", "grigio", "beige", "marrone", "giallo", "arancione", "bordeaux"]
+  const countries = ["italia", "francia", "germania", "spagna", "austria", "belgio", "olanda", "portogallo", "grecia", "irlanda", "polonia", "svizzera", "regno unito"]
+  const color = colors.find((candidate) => message.includes(candidate))
+  const country = countries.find((candidate) => message.includes(candidate))
+
+  if (["size", "fit", "stock", "product"].includes(intent) && size) heard.push(`taglia ${size.toUpperCase()}`)
+  if (["budget", "product"].includes(intent) && budget) heard.push(`budget ${budget} €`)
+  if (["colors", "product", "stock", "size", "fit"].includes(intent) && color) heard.push(`colore ${color}`)
+  if (intent === "shipping" && country) heard.push(country === "italia" ? "consegna in Italia" : `consegna in ${country[0].toUpperCase()}${country.slice(1)}`)
+  return heard
 }
 
 function productFromContext(message: string, context: MiraKnowledgeContext) {
@@ -213,8 +305,8 @@ function contextualFollowUp(message: string, context: MiraKnowledgeContext) {
   return null
 }
 
-export function getMiraLocalReply(rawMessage: string, context: MiraKnowledgeContext = {}): MiraKnowledgeReply {
-  const message = normalize(rawMessage)
+function getMiraScriptedReply(rawMessage: string, context: MiraKnowledgeContext = {}, inferredCanonical = ""): MiraKnowledgeReply {
+  const message = normalize(`${rawMessage} ${inferredCanonical}`)
 
   if (!message) {
     return answer("unknown", "Dimmi pure: posso aiutarti con capi, taglie, ordini, spedizioni, resi e pagamenti.")
@@ -418,4 +510,21 @@ export function getMiraLocalReply(rawMessage: string, context: MiraKnowledgeCont
     "/faq",
     "Guarda le FAQ",
   )
+}
+
+export function getMiraLocalReply(rawMessage: string, context: MiraKnowledgeContext = {}): MiraKnowledgeReply {
+  const match = classifyIntent(rawMessage)
+  const inferredCanonical = match.confidence >= 0.46 ? match.canonical : ""
+  const reply = getMiraScriptedReply(rawMessage, context, inferredCanonical)
+  const heard = extractHeardDetails(rawMessage, reply.intent)
+  const confidence = reply.intent === "unknown"
+    ? 0
+    : Math.max(reply.confidence, reply.intent === match.intent ? match.confidence : 0.58)
+
+  return {
+    ...reply,
+    confidence,
+    heard,
+    text: heard.length ? `Ho capito: ${heard.join(" e ")}. ${reply.text}` : reply.text,
+  }
 }

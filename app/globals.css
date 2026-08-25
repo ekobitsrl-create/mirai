@@ -513,6 +513,21 @@ body.mirai-mobile-menu-open [data-background-music-control] {
   }
 }
 
+@keyframes mira-model-celebrating {
+  0%, 100% {
+    transform: translate3d(0, 0, 0) rotate(0) scaleX(var(--mira-flip));
+  }
+  22% {
+    transform: translate3d(-2px, -12px, 0) rotate(-4deg) scale(1.04) scaleX(var(--mira-flip));
+  }
+  48% {
+    transform: translate3d(2px, -3px, 0) rotate(4deg) scale(0.98) scaleX(var(--mira-flip));
+  }
+  72% {
+    transform: translate3d(0, -9px, 0) rotate(-2deg) scale(1.03) scaleX(var(--mira-flip));
+  }
+}
+
 @keyframes mira-model-scan {
   0% {
     top: 15%;
@@ -634,6 +649,13 @@ body.mirai-mobile-menu-open [data-background-music-control] {
   animation:
     mira-model-in 0.22s ease both,
     mira-model-dragging 0.78s ease-in-out 0.22s infinite;
+}
+
+.mira-model-celebrating {
+  animation:
+    mira-model-in 0.2s ease both,
+    mira-model-celebrating 0.86s cubic-bezier(0.2, 0.8, 0.2, 1) 0.2s 3;
+  filter: drop-shadow(0 0 24px rgba(159, 134, 255, 0.9));
 }
 
 .mira-model-glow {
@@ -773,6 +795,7 @@ body.mirai-mobile-menu-open [data-background-music-control] {
   .mira-model-speaking,
   .mira-model-curious,
   .mira-model-dragging,
+  .mira-model-celebrating,
   .mira-model-scan,
   .mira-model-glow,
   .mira-neon-bubble,

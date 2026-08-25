@@ -20,7 +20,7 @@ import type { Locale } from "@/lib/translations"
 
 type MiraVariant = "male" | "female"
 type MiraAssetPose = "idle" | "listening" | "speaking"
-type MiraPose = MiraAssetPose | "curious" | "dragging"
+type MiraPose = MiraAssetPose | "curious" | "dragging" | "celebrating"
 
 const MIRA_POSE_ASSET: Record<MiraPose, MiraAssetPose> = {
   idle: "speaking",
@@ -28,6 +28,7 @@ const MIRA_POSE_ASSET: Record<MiraPose, MiraAssetPose> = {
   speaking: "idle",
   curious: "listening",
   dragging: "speaking",
+  celebrating: "speaking",
 }
 
 type MiraPosition = {
@@ -225,6 +226,7 @@ export function MiraGuide() {
   const [isListening, setIsListening] = useState(false)
   const [isHovering, setIsHovering] = useState(false)
   const [ambientCurious, setAmbientCurious] = useState(false)
+  const [isCelebrating, setIsCelebrating] = useState(false)
   const [lookOffset, setLookOffset] = useState({ x: 0, y: 0 })
   const [speechSupported, setSpeechSupported] = useState(false)
   const [isDragging, setIsDragging] = useState(false)
@@ -340,6 +342,38 @@ export function MiraGuide() {
       window.removeEventListener("resize", handleResize)
     }
   }, [])
+
+  useEffect(() => {
+    let celebrationTimer: number | null = null
+    const handleCartItemAdded = (event: Event) => {
+      if (minimized) return
+      const detail = (event as CustomEvent<{ name?: string }>).detail
+      const productName = detail?.name?.trim()
+      const messages: Record<Locale, string> = {
+        it: `${productName || "Il capo"} è nel carrello. Scelta forte!`,
+        en: `${productName || "Your item"} is in the cart. Great choice!`,
+        es: `${productName || "La prenda"} está en el carrito. ¡Gran elección!`,
+        de: `${productName || "Der Artikel"} ist im Warenkorb. Starke Wahl!`,
+        fr: `${productName || "L’article"} est dans le panier. Très bon choix !`,
+      }
+
+      if (celebrationTimer) window.clearTimeout(celebrationTimer)
+      setReply({ text: messages[locale] })
+      setExpanded(false)
+      setShowNudge(true)
+      setIsCelebrating(true)
+      celebrationTimer = window.setTimeout(() => {
+        setIsCelebrating(false)
+        setShowNudge(false)
+      }, 3200)
+    }
+
+    window.addEventListener("mirai:cart-item-added", handleCartItemAdded)
+    return () => {
+      window.removeEventListener("mirai:cart-item-added", handleCartItemAdded)
+      if (celebrationTimer) window.clearTimeout(celebrationTimer)
+    }
+  }, [locale, minimized])
 
   useEffect(() => {
     if (
@@ -478,28 +512,36 @@ export function MiraGuide() {
     const timeout = window.setTimeout(() => controller.abort(), 17_000)
 
     try {
-      const [response] = await Promise.all([
-        fetch("/api/mira", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            message: cleanMessage,
-            pathname,
-            locale,
-            history: conversationRef.current,
-          }),
-          signal: controller.signal,
-        }),
-        new Promise((resolve) => window.setTimeout(resolve, 520)),
-      ])
+      const useScriptedReply = locale === "it"
+        && fallbackReply.intent !== "unknown"
+        && fallbackReply.confidence >= 0.55
 
-      if (response.ok) {
-        const payload = await response.json() as MiraApiResponse
-        if (payload.reply?.trim()) {
-          nextReply = {
-            text: payload.reply.trim(),
-            href: payload.href,
-            label: payload.label,
+      if (useScriptedReply) {
+        await new Promise((resolve) => window.setTimeout(resolve, 420))
+      } else {
+        const [response] = await Promise.all([
+          fetch("/api/mira", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              message: cleanMessage,
+              pathname,
+              locale,
+              history: conversationRef.current,
+            }),
+            signal: controller.signal,
+          }),
+          new Promise((resolve) => window.setTimeout(resolve, 520)),
+        ])
+
+        if (response.ok) {
+          const payload = await response.json() as MiraApiResponse
+          if (payload.reply?.trim()) {
+            nextReply = {
+              text: payload.reply.trim(),
+              href: payload.href,
+              label: payload.label,
+            }
           }
         }
       }
@@ -724,6 +766,8 @@ export function MiraGuide() {
   )
   const currentPose: MiraPose = isDragging
     ? "dragging"
+    : isCelebrating
+      ? "celebrating"
     : isListening || isThinking
       ? "listening"
       : isSpeaking || showNudge || isHovering
