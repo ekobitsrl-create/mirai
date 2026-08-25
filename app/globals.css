@@ -554,6 +554,41 @@ body.mirai-mobile-menu-open [data-background-music-control] {
   }
 }
 
+@keyframes mira-sprite-walk {
+  0%, 24.99% { background-position: 0% 0%; }
+  25%, 49.99% { background-position: 33.333% 0%; }
+  50%, 74.99% { background-position: 66.667% 0%; }
+  75%, 100% { background-position: 100% 0%; }
+}
+
+@keyframes mira-sprite-idle {
+  0%, 34.99% { background-position: 0% 100%; }
+  35%, 44.99% { background-position: 33.333% 100%; }
+  45%, 69.99% { background-position: 0% 100%; }
+  70%, 84.99% { background-position: 66.667% 100%; }
+  85%, 100% { background-position: 0% 100%; }
+}
+
+@keyframes mira-sprite-listen {
+  0%, 39.99% { background-position: 0% 100%; }
+  40%, 59.99% { background-position: 33.333% 100%; }
+  60%, 79.99% { background-position: 66.667% 100%; }
+  80%, 100% { background-position: 0% 100%; }
+}
+
+@keyframes mira-sprite-talk {
+  0%, 24.99% { background-position: 0% 100%; }
+  25%, 49.99% { background-position: 66.667% 100%; }
+  50%, 74.99% { background-position: 33.333% 100%; }
+  75%, 100% { background-position: 0% 100%; }
+}
+
+@keyframes mira-sprite-curious {
+  0%, 39.99% { background-position: 0% 100%; }
+  40%, 74.99% { background-position: 66.667% 100%; }
+  75%, 100% { background-position: 33.333% 100%; }
+}
+
 @keyframes mira-sleep-float {
   0% { opacity: 0; transform: translate3d(0, 8px, 0) scale(0.72); }
   35% { opacity: 0.9; }
@@ -687,6 +722,45 @@ body.mirai-mobile-menu-open [data-background-music-control] {
   animation:
     mira-model-in 0.22s ease both,
     mira-model-dragging 0.78s ease-in-out 0.22s infinite;
+}
+
+.mira-frame-sprite {
+  position: absolute;
+  inset: 0 -4%;
+  display: block;
+  background-repeat: no-repeat;
+  background-size: 400% 200%;
+  background-position: 0% 100%;
+  image-rendering: auto;
+  will-change: background-position;
+}
+
+.mira-frame-walk {
+  animation: mira-sprite-walk 0.68s steps(1, end) infinite;
+}
+
+.mira-frame-idle {
+  animation: mira-sprite-idle 4.8s steps(1, end) infinite;
+}
+
+.mira-frame-listen {
+  animation: mira-sprite-listen 1.8s steps(1, end) infinite;
+}
+
+.mira-frame-talk {
+  animation: mira-sprite-talk 0.82s steps(1, end) infinite;
+}
+
+.mira-frame-curious {
+  animation: mira-sprite-curious 1.5s steps(1, end) infinite;
+}
+
+.mira-frame-celebrate {
+  background-position: 100% 100%;
+}
+
+.mira-frame-sleep {
+  background-position: 33.333% 100%;
 }
 
 .mira-model-celebrating {
@@ -903,6 +977,11 @@ body.mirai-mobile-menu-open [data-background-music-control] {
   .mira-model-celebrating,
   .mira-model-roaming,
   .mira-model-sleeping,
+  .mira-frame-walk,
+  .mira-frame-idle,
+  .mira-frame-listen,
+  .mira-frame-talk,
+  .mira-frame-curious,
   .mira-model-scan,
   .mira-model-glow,
   .mira-neon-bubble,

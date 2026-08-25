@@ -21,6 +21,7 @@ import type { Locale } from "@/lib/translations"
 type MiraVariant = "male" | "female"
 type MiraAssetPose = "idle" | "listening" | "speaking"
 type MiraPose = MiraAssetPose | "curious" | "dragging" | "celebrating" | "roaming" | "sleeping"
+type MiraSpriteSequence = "idle" | "walk" | "listen" | "talk" | "curious" | "celebrate" | "sleep"
 
 const MIRA_POSE_ASSET: Record<MiraPose, MiraAssetPose> = {
   idle: "speaking",
@@ -31,6 +32,16 @@ const MIRA_POSE_ASSET: Record<MiraPose, MiraAssetPose> = {
   celebrating: "speaking",
   roaming: "listening",
   sleeping: "listening",
+}
+
+const MIRA_SPRITE_SEQUENCE: Partial<Record<MiraPose, MiraSpriteSequence>> = {
+  idle: "idle",
+  listening: "listen",
+  speaking: "talk",
+  curious: "curious",
+  celebrating: "celebrate",
+  roaming: "walk",
+  sleeping: "sleep",
 }
 
 type MiraPosition = {
@@ -139,6 +150,8 @@ function MiraModel({
   faceRight?: boolean
   className?: string
 }) {
+  const spriteSequence = MIRA_SPRITE_SEQUENCE[pose]
+
   return (
     <div
       className={`mira-model mira-model-state-${pose} relative h-32 w-24 md:h-52 md:w-36 ${className}`}
@@ -151,14 +164,22 @@ function MiraModel({
         key={`${variant}-${pose}-${faceRight}`}
         className={`mira-model-sprite mira-model-${pose} absolute inset-0 ${faceRight ? "mira-model-flipped" : ""}`}
       >
-        <Image
-          src={`/mascot/mira-${variant}-${MIRA_POSE_ASSET[pose]}.webp`}
-          alt=""
-          fill
-          sizes="(min-width: 768px) 144px, 96px"
-          className="select-none object-contain object-bottom"
-          draggable={false}
-        />
+        {spriteSequence ? (
+          <span
+            className={`mira-frame-sprite mira-frame-${spriteSequence}`}
+            style={{ backgroundImage: `url(/mascot/mira-${variant}-sprite.webp)` }}
+            aria-hidden="true"
+          />
+        ) : (
+          <Image
+            src={`/mascot/mira-${variant}-${MIRA_POSE_ASSET[pose]}.webp`}
+            alt=""
+            fill
+            sizes="(min-width: 768px) 144px, 96px"
+            className="select-none object-contain object-bottom"
+            draggable={false}
+          />
+        )}
       </div>
     </div>
   )
