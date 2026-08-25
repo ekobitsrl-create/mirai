@@ -515,7 +515,7 @@ export function MiraGuide() {
           return
         }
 
-        if (Math.random() < 0.62) {
+        if (Math.random() < 0.36) {
           const stage = getStageSize()
           const distance = window.innerWidth >= 768
             ? 54 + Math.random() * 96
@@ -552,7 +552,7 @@ export function MiraGuide() {
           setAmbientPose(null)
           scheduleNextAction()
         }, action.duration)
-      }, 5200 + Math.random() * 4800)
+      }, 3200 + Math.random() * 3600)
     }
 
     scheduleNextAction()
@@ -951,17 +951,27 @@ export function MiraGuide() {
     ? "dragging"
     : isCelebrating
       ? "celebrating"
-      : isListening || isThinking
+      : isListening
         ? "listening"
-        : isSpeaking || showNudge || isHovering
-          ? "speaking"
-          : isRoaming
-            ? "roaming"
-            : isSleeping
-              ? "sleeping"
-              : ambientPose
-                ? ambientPose
-                : "idle"
+        : isThinking
+          ? "thinking"
+          : isSpeaking
+            ? "speaking"
+            : showNudge
+              ? "presenting"
+              : expanded
+                ? input.trim()
+                  ? "listening"
+                  : "curious"
+                : isHovering
+                  ? "waving"
+                  : isRoaming
+                    ? "roaming"
+                    : isSleeping
+                      ? "sleeping"
+                      : ambientPose
+                        ? ambientPose
+                        : "idle"
   const peekOnRight = position.x + stageSize.width / 2 > viewportWidth / 2
   const peekHeight = viewportWidth >= 768 ? 80 : 64
   const peekTop = Math.min(
