@@ -2,7 +2,7 @@
 
 import Image from "next/image"
 import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import { ArrowRight, Mic, MicOff, Move, Send, Sparkles, UserRoundCog, X } from "lucide-react"
 import {
   FormEvent,
@@ -15,6 +15,7 @@ import {
 import { getMiraLocalReply, setMiraCatalog, type MiraIntent } from "@/lib/mira-knowledge"
 import type { StoreProduct } from "@/lib/products"
 import { useLanguage } from "@/lib/language-context"
+import { localizedOrganicPath } from "@/lib/international-seo"
 import { localeTags, translateSiteText } from "@/lib/site-localization"
 import type { Locale } from "@/lib/translations"
 
@@ -46,7 +47,7 @@ type MiraSpriteSequence = "idle"
   | "sit"
   | "hang"
   | "sleep"
-type MiraSpriteSheet = "sprite" | "motion" | "gesture" | "emotion" | "rest" | "drag"
+type MiraSpriteSheet = "sprite" | "conversation" | "motion" | "gesture" | "emotion" | "rest" | "drag"
 type MiraAmbientPose = Exclude<MiraPose, MiraAssetPose | "dragging" | "celebrating" | "roaming" | "sleeping">
 
 const MIRA_POSE_ASSET: Record<MiraPose, MiraAssetPose> = {
@@ -84,11 +85,11 @@ const MIRA_SPRITE_SEQUENCE: Partial<Record<MiraPose, MiraSpriteSequence>> = {
 }
 
 const MIRA_SPRITE_SHEET: Record<MiraSpriteSequence, MiraSpriteSheet> = {
-  idle: "sprite",
+  idle: "conversation",
   walk: "sprite",
-  listen: "sprite",
-  talk: "sprite",
-  curious: "sprite",
+  listen: "conversation",
+  talk: "conversation",
+  curious: "conversation",
   run: "motion",
   jump: "motion",
   wave: "gesture",
@@ -101,16 +102,14 @@ const MIRA_SPRITE_SHEET: Record<MiraSpriteSequence, MiraSpriteSheet> = {
 }
 
 const MIRA_AMBIENT_ACTIONS: Array<{ pose: MiraAmbientPose; duration: number }> = [
-  { pose: "curious", duration: 1900 },
-  { pose: "jumping", duration: 2200 },
-  { pose: "waving", duration: 2600 },
-  { pose: "presenting", duration: 2900 },
-  { pose: "thinking", duration: 3100 },
-  { pose: "dancing", duration: 2800 },
-  { pose: "sitting", duration: 3200 },
+  { pose: "curious", duration: 3200 },
+  { pose: "waving", duration: 3400 },
+  { pose: "presenting", duration: 3800 },
+  { pose: "thinking", duration: 4200 },
+  { pose: "sitting", duration: 4600 },
 ]
 
-const MIRA_SPRITE_SHEETS: MiraSpriteSheet[] = ["sprite", "motion", "gesture", "emotion", "rest", "drag"]
+const MIRA_SPRITE_SHEETS: MiraSpriteSheet[] = ["sprite", "conversation", "motion", "gesture", "emotion", "rest", "drag"]
 
 type MiraPosition = {
   x: number
@@ -121,6 +120,7 @@ type MiraReply = {
   text: string
   href?: string
   label?: string
+  autoNavigate?: boolean
 }
 
 type MiraTurn = {
@@ -309,6 +309,7 @@ function VariantCard({
 
 export function MiraGuide() {
   const pathname = usePathname()
+  const router = useRouter()
   const { locale } = useLanguage()
   const ui = (value: string) => translateSiteText(value, locale)
   const contextualPrompt = useMemo(() => getContextPrompt(pathname, locale), [locale, pathname])
@@ -341,6 +342,7 @@ export function MiraGuide() {
   const positionRef = useRef(position)
   const holdTimerRef = useRef<number | null>(null)
   const poseTimerRef = useRef<number | null>(null)
+  const navigationTimerRef = useRef<number | null>(null)
   const ambientTimerRef = useRef<number | null>(null)
   const roamTimerRef = useRef<number | null>(null)
   const lastInteractionRef = useRef(Date.now())
@@ -525,11 +527,11 @@ export function MiraGuide() {
           return
         }
 
-        if (Math.random() < 0.36) {
+        if (Math.random() < 0.18) {
           const stage = getStageSize()
           const distance = window.innerWidth >= 768
-            ? 54 + Math.random() * 96
-            : 28 + Math.random() * 52
+            ? 44 + Math.random() * 72
+            : 24 + Math.random() * 38
           let direction = Math.random() > 0.5 ? 1 : -1
           let next = clampPosition({
             x: positionRef.current.x + distance * direction,
@@ -562,7 +564,7 @@ export function MiraGuide() {
           setAmbientPose(null)
           scheduleNextAction()
         }, action.duration)
-      }, 3200 + Math.random() * 3600)
+      }, 9000 + Math.random() * 6000)
     }
 
     scheduleNextAction()
@@ -577,6 +579,7 @@ export function MiraGuide() {
     return () => {
       if (holdTimerRef.current) window.clearTimeout(holdTimerRef.current)
       if (poseTimerRef.current) window.clearTimeout(poseTimerRef.current)
+      if (navigationTimerRef.current) window.clearTimeout(navigationTimerRef.current)
       if (ambientTimerRef.current) window.clearTimeout(ambientTimerRef.current)
       if (roamTimerRef.current) window.clearTimeout(roamTimerRef.current)
       recognitionRef.current?.abort()
@@ -667,6 +670,7 @@ export function MiraGuide() {
     wakeMira()
 
     if (poseTimerRef.current) window.clearTimeout(poseTimerRef.current)
+    if (navigationTimerRef.current) window.clearTimeout(navigationTimerRef.current)
     requestAbortRef.current?.abort()
     const controller = new AbortController()
     requestAbortRef.current = controller
@@ -689,7 +693,7 @@ export function MiraGuide() {
     if (fallbackReply.productId) lastLocalProductRef.current = fallbackReply.productId
     let nextReply: MiraReply = locale === "it"
       ? fallbackReply
-      : { text: contextualPrompt, href: fallbackReply.href, label: fallbackReply.label }
+      : { text: contextualPrompt, href: fallbackReply.href, label: fallbackReply.label, autoNavigate: fallbackReply.autoNavigate }
     const timeout = window.setTimeout(() => controller.abort(), 17_000)
 
     try {
@@ -746,6 +750,13 @@ export function MiraGuide() {
       if (voiceRequest) speakReply(nextReply.text)
 
       poseTimerRef.current = window.setTimeout(() => setIsSpeaking(false), 5200)
+      if (nextReply.autoNavigate && nextReply.href) {
+        const destination = localizedOrganicPath(nextReply.href, locale)
+        navigationTimerRef.current = window.setTimeout(() => {
+          setExpanded(false)
+          router.push(destination)
+        }, 1150)
+      }
     }
   }
 

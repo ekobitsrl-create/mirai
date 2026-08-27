@@ -458,25 +458,25 @@ body.mirai-mobile-menu-open [data-background-music-control] {
 
 @keyframes mira-model-idle {
   0%, 100% {
-    transform: translate3d(0, 0, 0) rotate(0.35deg) scaleX(var(--mira-flip));
+    transform: translate3d(0, 0, 0) rotate(0.15deg) scaleX(var(--mira-flip));
   }
-  28% {
-    transform: translate3d(-1px, -4px, 0) rotate(-0.55deg) scaleX(var(--mira-flip));
+  34% {
+    transform: translate3d(0, -1px, 0) rotate(-0.2deg) scaleX(var(--mira-flip));
   }
-  54% {
-    transform: translate3d(1px, -7px, 0) rotate(0.6deg) scaleX(var(--mira-flip));
+  62% {
+    transform: translate3d(0, -2px, 0) rotate(0.22deg) scaleX(var(--mira-flip));
   }
-  78% {
-    transform: translate3d(-1px, -2px, 0) rotate(-0.25deg) scaleX(var(--mira-flip));
+  82% {
+    transform: translate3d(0, -1px, 0) rotate(-0.12deg) scaleX(var(--mira-flip));
   }
 }
 
 @keyframes mira-model-listening {
   0%, 100% {
-    transform: translate3d(0, 0, 0) rotate(-1deg) scaleX(var(--mira-flip));
+    transform: translate3d(0, 0, 0) rotate(-0.35deg) scaleX(var(--mira-flip));
   }
   50% {
-    transform: translate3d(-2px, -4px, 0) rotate(-2.4deg) scaleX(var(--mira-flip));
+    transform: translate3d(-1px, -1px, 0) rotate(-0.8deg) scaleX(var(--mira-flip));
   }
 }
 
@@ -485,22 +485,22 @@ body.mirai-mobile-menu-open [data-background-music-control] {
     transform: translate3d(0, 0, 0) rotate(0) scaleX(var(--mira-flip));
   }
   35% {
-    transform: translate3d(0, -7px, 0) rotate(1.2deg) scaleX(var(--mira-flip));
+    transform: translate3d(0, -2px, 0) rotate(0.35deg) scaleX(var(--mira-flip));
   }
   68% {
-    transform: translate3d(0, -2px, 0) rotate(-0.8deg) scaleX(var(--mira-flip));
+    transform: translate3d(0, -1px, 0) rotate(-0.25deg) scaleX(var(--mira-flip));
   }
 }
 
 @keyframes mira-model-curious {
   0%, 100% {
-    transform: translate3d(0, 0, 0) rotate(-1deg) scaleX(var(--mira-flip));
+    transform: translate3d(0, 0, 0) rotate(-0.4deg) scaleX(var(--mira-flip));
   }
   45% {
-    transform: translate3d(-3px, -5px, 0) rotate(-3deg) scaleX(var(--mira-flip));
+    transform: translate3d(-1px, -2px, 0) rotate(-1.25deg) scaleX(var(--mira-flip));
   }
   72% {
-    transform: translate3d(1px, -3px, 0) rotate(-1.7deg) scaleX(var(--mira-flip));
+    transform: translate3d(0, -1px, 0) rotate(-0.75deg) scaleX(var(--mira-flip));
   }
 }
 
@@ -587,6 +587,46 @@ body.mirai-mobile-menu-open [data-background-music-control] {
   0%, 39.99% { background-position: 0% 100%; }
   40%, 74.99% { background-position: 66.667% 100%; }
   75%, 100% { background-position: 33.333% 100%; }
+}
+
+@keyframes mira-sprite-conversation-idle {
+  0%, 31.99%, 76%, 100% { background-position: 0% 0%; }
+  32%, 38.99% { background-position: 16.667% 0%; }
+  39%, 45.99% { background-position: 33.333% 0%; }
+  46%, 52.99% { background-position: 50% 0%; }
+  53%, 59.99% { background-position: 66.667% 0%; }
+  60%, 67.99% { background-position: 83.333% 0%; }
+  68%, 75.99% { background-position: 100% 0%; }
+}
+
+@keyframes mira-sprite-conversation-listen {
+  0%, 14.27%, 100% { background-position: 0% 33.333%; }
+  14.28%, 28.55% { background-position: 16.667% 33.333%; }
+  28.56%, 42.83% { background-position: 33.333% 33.333%; }
+  42.84%, 57.11% { background-position: 50% 33.333%; }
+  57.12%, 71.39% { background-position: 66.667% 33.333%; }
+  71.4%, 85.67% { background-position: 83.333% 33.333%; }
+  85.68%, 99.99% { background-position: 100% 33.333%; }
+}
+
+@keyframes mira-sprite-conversation-talk {
+  0%, 14.27%, 100% { background-position: 0% 66.667%; }
+  14.28%, 28.55% { background-position: 16.667% 66.667%; }
+  28.56%, 42.83% { background-position: 33.333% 66.667%; }
+  42.84%, 57.11% { background-position: 50% 66.667%; }
+  57.12%, 71.39% { background-position: 66.667% 66.667%; }
+  71.4%, 85.67% { background-position: 83.333% 66.667%; }
+  85.68%, 99.99% { background-position: 100% 66.667%; }
+}
+
+@keyframes mira-sprite-conversation-curious {
+  0%, 14.27%, 100% { background-position: 0% 100%; }
+  14.28%, 28.55% { background-position: 16.667% 100%; }
+  28.56%, 42.83% { background-position: 33.333% 100%; }
+  42.84%, 57.11% { background-position: 50% 100%; }
+  57.12%, 71.39% { background-position: 66.667% 100%; }
+  71.4%, 85.67% { background-position: 83.333% 100%; }
+  85.68%, 99.99% { background-position: 100% 100%; }
 }
 
 @keyframes mira-sprite-cycle-top {
@@ -712,25 +752,25 @@ body.mirai-mobile-menu-open [data-background-music-control] {
 .mira-model-idle {
   animation:
     mira-model-in 0.32s ease both,
-    mira-model-idle 4.2s ease-in-out 0.32s infinite;
+    mira-model-idle 7.8s ease-in-out 0.32s infinite;
 }
 
 .mira-model-listening {
   animation:
     mira-model-in 0.32s ease both,
-    mira-model-listening 1.25s ease-in-out 0.32s infinite;
+    mira-model-listening 3.8s ease-in-out 0.32s infinite;
 }
 
 .mira-model-speaking {
   animation:
     mira-model-in 0.32s ease both,
-    mira-model-speaking 1.45s ease-in-out 0.32s infinite;
+    mira-model-speaking 3.4s ease-in-out 0.32s infinite;
 }
 
 .mira-model-curious {
   animation:
     mira-model-in 0.32s ease both,
-    mira-model-curious 1.8s ease-in-out 0.32s infinite;
+    mira-model-curious 4.8s ease-in-out 0.32s infinite;
 }
 
 .mira-model-dragging {
@@ -754,19 +794,27 @@ body.mirai-mobile-menu-open [data-background-music-control] {
 }
 
 .mira-frame-idle {
-  animation: mira-sprite-idle 4.8s steps(1, end) infinite;
+  inset: 0 -7%;
+  background-size: 700% 400%;
+  animation: mira-sprite-conversation-idle 8.8s steps(1, end) infinite;
 }
 
 .mira-frame-listen {
-  animation: mira-sprite-listen 1.8s steps(1, end) infinite;
+  inset: 0 -7%;
+  background-size: 700% 400%;
+  animation: mira-sprite-conversation-listen 3.8s steps(1, end) infinite;
 }
 
 .mira-frame-talk {
-  animation: mira-sprite-talk 0.82s steps(1, end) infinite;
+  inset: 0 -7%;
+  background-size: 700% 400%;
+  animation: mira-sprite-conversation-talk 3.4s steps(1, end) infinite;
 }
 
 .mira-frame-curious {
-  animation: mira-sprite-curious 1.5s steps(1, end) infinite;
+  inset: 0 -7%;
+  background-size: 700% 400%;
+  animation: mira-sprite-conversation-curious 4.8s steps(1, end) infinite;
 }
 
 .mira-frame-run {
@@ -803,6 +851,15 @@ body.mirai-mobile-menu-open [data-background-music-control] {
 
 .mira-frame-sleep {
   animation: mira-sprite-cycle-bottom 3.2s steps(1, end) infinite;
+}
+
+@media (min-width: 768px) {
+  .mira-frame-idle,
+  .mira-frame-listen,
+  .mira-frame-talk,
+  .mira-frame-curious {
+    inset: 0 -12%;
+  }
 }
 
 .mira-model-celebrating {

@@ -7,6 +7,7 @@ export type MiraIntent =
   | "identity"
   | "capabilities"
   | "brand"
+  | "navigation"
   | "product"
   | "budget"
   | "size"
@@ -43,6 +44,7 @@ export type MiraKnowledgeReply = {
   href?: string
   label?: string
   productId?: string
+  autoNavigate?: boolean
 }
 
 // The offline fallback catalog is populated at runtime from the database
@@ -113,8 +115,9 @@ function answer(
   href?: string,
   label?: string,
   productId?: string,
+  autoNavigate = false,
 ): MiraKnowledgeReply {
-  return { intent, text, confidence: intent === "unknown" ? 0 : 0.55, href, label, productId }
+  return { intent, text, confidence: intent === "unknown" ? 0 : 0.55, href, label, productId, autoNavigate }
 }
 
 type IntentDefinition = {
@@ -124,13 +127,14 @@ type IntentDefinition = {
 }
 
 const INTENT_DEFINITIONS: IntentDefinition[] = [
-  { intent: "shipping", canonical: "spedizione consegna", terms: ["spedizione", "spedire", "consegna", "corriere", "quanto ci mette", "quando arriva", "costo invio", "spese di spedizione"] },
+  { intent: "navigation", canonical: "portami alla categoria", terms: ["portami", "accompagnami", "mostrami", "fammi vedere", "vai alle", "vai alla", "apri categoria", "mandami", "dove trovo", "sto cercando"] },
+  { intent: "shipping", canonical: "spedizione consegna", terms: ["spedizione", "spedire", "consegna", "corriere", "quanto ci mette", "quando arriva", "costo invio", "spese di spedizione", "tempi di arrivo", "recapito", "spedite in"] },
   { intent: "tracking", canonical: "tracking tracciare pacco", terms: ["tracking", "tracciare", "tracciamento", "dove e il pacco", "dov e il mio ordine", "stato ordine"] },
-  { intent: "returns", canonical: "reso restituzione", terms: ["reso", "restituire", "restituzione", "rimandare indietro", "non mi va", "non mi piace"] },
+  { intent: "returns", canonical: "reso restituzione", terms: ["reso", "restituire", "restituzione", "rimandare indietro", "non mi va", "non mi piace", "fare il reso", "cambiare capo", "rendere il prodotto"] },
   { intent: "refund", canonical: "rimborso", terms: ["rimborso", "rimborsare", "soldi indietro", "riavere i soldi", "accredito"] },
   { intent: "payments", canonical: "pagamento", terms: ["pagamento", "pagare", "carta", "paypal", "klarna", "scalapay", "apple pay", "google pay", "contrassegno", "rate"] },
   { intent: "discount", canonical: "sconto coupon", terms: ["sconto", "coupon", "codice promo", "promozione", "primo ordine", "risparmiare"] },
-  { intent: "size", canonical: "taglia misura", terms: ["taglia", "taglie", "misura", "che taglia", "torace", "lunghezza", "manica"] },
+  { intent: "size", canonical: "taglia misura", terms: ["taglia", "taglie", "misura", "che taglia", "quale taglia", "torace", "lunghezza", "manica", "size guide", "guida taglie"] },
   { intent: "fit", canonical: "fit vestibilita", terms: ["fit", "vestibilita", "come veste", "oversize", "largo", "stretto", "aderente"] },
   { intent: "stock", canonical: "disponibilita stock", terms: ["disponibile", "disponibilita", "stock", "rimasto", "esaurito", "sold out"] },
   { intent: "care", canonical: "lavaggio cura", terms: ["lavare", "lavaggio", "lavatrice", "stirare", "cura", "candeggina"] },
@@ -141,12 +145,117 @@ const INTENT_DEFINITIONS: IntentDefinition[] = [
   { intent: "account", canonical: "account login", terms: ["account", "login", "accedere", "registrazione", "password"] },
   { intent: "contact", canonical: "contatto assistenza", terms: ["contatto", "contattare", "email", "telefono", "assistenza", "operatore", "persona vera"] },
   { intent: "store", canonical: "negozio store", terms: ["negozio", "store fisico", "dove siete", "sede", "ritiro in negozio"] },
-  { intent: "product", canonical: "prodotto shop consiglio", terms: ["prodotto", "capo", "maglietta", "t shirt", "felpa", "pantalone", "cappello", "comprare", "consiglio"] },
+  { intent: "product", canonical: "prodotto shop consiglio", terms: ["prodotto", "capo", "maglietta", "t shirt", "tee", "felpa", "hoodie", "pantalone", "jeans", "camicia", "cappello", "canotta", "shorts", "profumo", "comprare", "acquistare", "consiglio", "outfit"] },
   { intent: "greeting", canonical: "ciao", terms: ["ciao", "salve", "buongiorno", "buonasera", "hey", "ehi", "yo"] },
   { intent: "thanks", canonical: "grazie", terms: ["grazie", "gentile", "perfetto", "sei stata utile", "sei stato utile"] },
   { intent: "identity", canonical: "chi sei", terms: ["chi sei", "come ti chiami", "sei un bot", "sei vera", "cosa sei"] },
   { intent: "capabilities", canonical: "cosa sai fare", terms: ["cosa sai fare", "come puoi aiutarmi", "cosa posso chiedere", "aiutami"] },
 ]
+
+type CategoryDestination = {
+  slug: string
+  label: string
+  aliases: string[]
+  alternativeSlugs?: string[]
+  path?: string
+}
+
+const CATEGORY_DESTINATIONS: CategoryDestination[] = [
+  { slug: "camicie", label: "camicie", aliases: ["camicie", "camicia", "shirt", "shirts", "camisas", "chemises", "hemden"] },
+  { slug: "felpe", label: "felpe", aliases: ["felpe", "felpa", "hoodie", "hoodies", "sweatshirt", "sudaderas", "sweats", "kapuzenpullover"] },
+  { slug: "t-shirt-mirai", label: "T-shirt", aliases: ["t shirt", "tshirt", "tshirts", "tee", "tees", "maglietta", "magliette", "camisetas"], alternativeSlugs: ["t-shirt"] },
+  { slug: "canotte", label: "canotte", aliases: ["canotte", "canotta", "tank top", "tanktop", "debardeurs"] },
+  { slug: "pantaloni", label: "pantaloni", aliases: ["pantaloni", "pantalone", "cargo", "cargos", "pantalones", "hosen"], alternativeSlugs: ["jeans"] },
+  { slug: "jeans", label: "jeans", aliases: ["jeans", "denim"] },
+  { slug: "shorts", label: "shorts", aliases: ["shorts", "short", "bermuda", "pantaloncini", "pantaloncino"] },
+  { slug: "cappelli", label: "cappelli", aliases: ["cappelli", "cappello", "cap", "caps", "berretto", "berretti"] },
+  { slug: "profumi", label: "profumi", aliases: ["profumi", "profumo", "fragranze", "fragranza", "parfum"] },
+  { slug: "drop", label: "nuovo drop", aliases: ["drop", "nuovo drop", "novita", "nuovi arrivi", "new arrivals"] },
+  { slug: "collezioni", label: "tutte le collezioni", aliases: ["shop", "negozio online", "catalogo", "collezioni", "tutti i prodotti"], path: "/collezioni" },
+  { slug: "custom-lab", label: "Custom Lab", aliases: ["custom lab", "personalizzazioni", "personalizzati", "crea maglietta"], path: "/custom-lab" },
+]
+
+const NAVIGATION_TERMS = [
+  "portami",
+  "accompagnami",
+  "mostrami",
+  "fammi vedere",
+  "vai alla",
+  "vai alle",
+  "vai ai",
+  "apri",
+  "mandami",
+  "dirigimi",
+  "dove trovo",
+  "dove sono",
+  "voglio vedere",
+  "vorrei vedere",
+  "cerco",
+  "sto cercando",
+  "take me to",
+  "show me",
+  "open",
+  "go to",
+  "where are",
+  "llevame",
+  "muestrame",
+  "abre",
+  "enseñame",
+  "emmene moi",
+  "montre moi",
+  "ouvre",
+  "bring mich",
+  "zeig mir",
+  "offne",
+]
+
+function categoryAliasScore(message: string, alias: string) {
+  const normalizedAlias = normalize(alias)
+  const paddedMessage = ` ${message} `
+  if (paddedMessage.includes(` ${normalizedAlias} `)) {
+    return normalizedAlias.split(" ").length * 10 + normalizedAlias.length
+  }
+  if (normalizedAlias.includes(" ")) return 0
+
+  return message
+    .split(" ")
+    .reduce((best, word) => {
+      const similarity = wordSimilarity(word, normalizedAlias)
+      return similarity >= 0.72 ? Math.max(best, similarity * 10) : best
+    }, 0)
+}
+
+function categoryNavigationReply(rawMessage: string) {
+  const message = normalize(rawMessage)
+  if (!hasAny(message, NAVIGATION_TERMS)) return null
+
+  let best: { destination: CategoryDestination; score: number } | null = null
+  for (const destination of CATEGORY_DESTINATIONS) {
+    const score = destination.aliases.reduce(
+      (highest, alias) => Math.max(highest, categoryAliasScore(message, alias)),
+      0,
+    )
+    if (score > (best?.score || 0)) best = { destination, score }
+  }
+  if (!best || best.score < 7.2) return null
+
+  const availableCategories = new Set(miraCatalog.map((product) => normalize(product.category)))
+  const categorySlugs = [best.destination.slug, ...(best.destination.alternativeSlugs || [])]
+  const availableSlug = categorySlugs.find((slug) => availableCategories.has(normalize(slug)))
+    || best.destination.slug
+  const href = best.destination.path || `/collezione/${availableSlug}`
+  const text = pick(message, [
+    `Certo, apro subito la categoria ${best.destination.label}.`,
+    `Ho capito: cerchi ${best.destination.label}. Andiamo.`,
+    `Perfetto, ti porto alla sezione ${best.destination.label}.`,
+  ])
+
+  return {
+    ...answer("navigation", text, href, `Apri ${best.destination.label}`, undefined, true),
+    confidence: 0.96,
+    heard: [best.destination.label],
+  }
+}
 
 const MEANINGLESS_WORDS = new Set(["a", "al", "alla", "che", "come", "con", "da", "del", "di", "e", "gli", "ho", "i", "il", "in", "io", "la", "le", "lo", "mi", "ne", "o", "per", "puoi", "si", "su", "un", "una", "vorrei"])
 
@@ -312,6 +421,9 @@ function getMiraScriptedReply(rawMessage: string, context: MiraKnowledgeContext 
     return answer("unknown", "Dimmi pure: posso aiutarti con capi, taglie, ordini, spedizioni, resi e pagamenti.")
   }
 
+  const navigationReply = categoryNavigationReply(rawMessage)
+  if (navigationReply) return navigationReply
+
   const asksShipping = hasAny(message, ["spedizione", "spedire", "consegna", "corriere", "estero"])
   const asksReturns = hasAny(message, ["reso", "restituire", "restituzione", "rimandare indietro", "rimborso"])
   const asksPayments = hasAny(message, ["pagamento", "pagare", "paypal", "klarna", "scalapay", "visa", "mastercard", "postepay", "carta", "apple pay", "google pay", "stripe", "contrassegno", "alla consegna"])
@@ -362,7 +474,7 @@ function getMiraScriptedReply(rawMessage: string, context: MiraKnowledgeContext 
   }
 
   if (hasAny(message, ["cosa sai fare", "come puoi aiutarmi", "cosa posso chiedere", "aiutami", "serve aiuto"])) {
-    return answer("capabilities", "Posso consigliarti capi in base a budget e taglia, spiegare fit e disponibilità e guidarti su ordini, pagamenti, spedizioni, resi, sconti e personalizzazioni.", "/faq", "Apri le FAQ")
+    return answer("capabilities", "Posso consigliarti capi in base a budget e taglia, spiegare fit e disponibilità, guidarti su ordini, pagamenti, spedizioni e resi, oppure portarti direttamente in una categoria: prova a scrivere “portami alle camicie”.", "/faq", "Apri le FAQ")
   }
 
   if (hasAny(message, ["bella", "carina", "forte", "brava", "mi piaci", "sei figa", "sei bella"])) {
@@ -496,8 +608,12 @@ function getMiraScriptedReply(rawMessage: string, context: MiraKnowledgeContext 
 
   if (product) return productReply(product)
 
-  if (hasAny(message, ["maglietta", "t-shirt", "felpa", "pantalone", "cappello", "capo", "prodotto", "shop", "comprare", "consiglio"])) {
-    return answer("product", "Dimmi categoria, taglia e budget e provo a restringere la scelta. Puoi anche usare ricerca e filtri nello shop.", "/collezioni#shop-search", "Cerca nello shop")
+  if (hasAny(message, ["maglietta", "t-shirt", "tee", "felpa", "hoodie", "camicia", "pantalone", "jeans", "shorts", "canotta", "cappello", "profumo", "capo", "prodotto", "shop", "comprare", "acquistare", "outfit", "consiglio"])) {
+    return answer("product", pick(message, [
+      "Dimmi categoria, taglia e budget e provo a restringere la scelta. Puoi anche usare ricerca e filtri nello shop.",
+      "Posso restringere la ricerca: che tipo di capo vuoi, quale taglia porti e quanto vuoi spendere?",
+      "Raccontami il capo che hai in mente, anche con parole semplici: colore, taglia e budget mi aiutano a trovarti qualcosa di preciso.",
+    ]), "/collezioni#shop-search", "Cerca nello shop")
   }
 
   return answer(
@@ -516,7 +632,7 @@ export function getMiraLocalReply(rawMessage: string, context: MiraKnowledgeCont
   const match = classifyIntent(rawMessage)
   const inferredCanonical = match.confidence >= 0.46 ? match.canonical : ""
   const reply = getMiraScriptedReply(rawMessage, context, inferredCanonical)
-  const heard = extractHeardDetails(rawMessage, reply.intent)
+  const heard = reply.heard?.length ? reply.heard : extractHeardDetails(rawMessage, reply.intent)
   const confidence = reply.intent === "unknown"
     ? 0
     : Math.max(reply.confidence, reply.intent === match.intent ? match.confidence : 0.58)
@@ -525,6 +641,8 @@ export function getMiraLocalReply(rawMessage: string, context: MiraKnowledgeCont
     ...reply,
     confidence,
     heard,
-    text: heard.length ? `Ho capito: ${heard.join(" e ")}. ${reply.text}` : reply.text,
+    text: heard.length && reply.intent !== "navigation"
+      ? `Ho capito: ${heard.join(" e ")}. ${reply.text}`
+      : reply.text,
   }
 }
