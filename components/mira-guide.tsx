@@ -47,7 +47,7 @@ type MiraSpriteSequence = "idle"
   | "sit"
   | "hang"
   | "sleep"
-type MiraSpriteSheet = "sprite" | "conversation" | "motion" | "gesture" | "emotion" | "rest" | "drag"
+type MiraSpriteSheet = "sprite" | "conversation-calm" | "conversation-active" | "motion" | "gesture" | "emotion" | "rest" | "drag"
 type MiraAmbientPose = Exclude<MiraPose, MiraAssetPose | "dragging" | "celebrating" | "roaming" | "sleeping">
 
 const MIRA_POSE_ASSET: Record<MiraPose, MiraAssetPose> = {
@@ -85,11 +85,11 @@ const MIRA_SPRITE_SEQUENCE: Partial<Record<MiraPose, MiraSpriteSequence>> = {
 }
 
 const MIRA_SPRITE_SHEET: Record<MiraSpriteSequence, MiraSpriteSheet> = {
-  idle: "conversation",
+  idle: "conversation-calm",
   walk: "sprite",
-  listen: "conversation",
-  talk: "conversation",
-  curious: "conversation",
+  listen: "conversation-calm",
+  talk: "conversation-active",
+  curious: "conversation-active",
   run: "motion",
   jump: "motion",
   wave: "gesture",
@@ -109,7 +109,7 @@ const MIRA_AMBIENT_ACTIONS: Array<{ pose: MiraAmbientPose; duration: number }> =
   { pose: "sitting", duration: 4600 },
 ]
 
-const MIRA_SPRITE_SHEETS: MiraSpriteSheet[] = ["sprite", "conversation", "motion", "gesture", "emotion", "rest", "drag"]
+const MIRA_SPRITE_SHEETS: MiraSpriteSheet[] = ["sprite", "conversation-calm", "conversation-active", "motion", "gesture", "emotion", "rest", "drag"]
 
 type MiraPosition = {
   x: number
@@ -1055,18 +1055,17 @@ export function MiraGuide() {
           aria-label={ui("Mostra MIRA")}
           title={ui("Mostra MIRA")}
         >
-          <span className="absolute inset-0 bg-[#120c19]/88 backdrop-blur-md" />
-          <span className="absolute left-1/2 top-0 h-40 w-20 -translate-x-1/2 md:h-48 md:w-24">
-            <Image
-              src={`/mascot/mira-${activeVariant}-speaking.webp`}
-              alt=""
-              fill
-              sizes="96px"
-              className="origin-top scale-[1.45] select-none object-contain object-top"
-              draggable={false}
-            />
+          <span className="mira-peek-backdrop" />
+          <span className="mira-peek-orbit" aria-hidden="true" />
+          <span
+            className="mira-peek-avatar"
+            style={{ backgroundImage: `url(/mascot/mira-${activeVariant}-conversation-calm.webp)` }}
+            aria-hidden="true"
+          />
+          <span className="mira-peek-caption" aria-hidden="true">
+            <span>MIRA</span>
+            <ArrowRight className="h-3 w-3" />
           </span>
-          <span className="absolute inset-x-0 bottom-0 h-4 bg-gradient-to-t from-[#120c19] to-transparent" />
           <span className="sr-only">{ui("Riapri MIRA")}</span>
         </button>
       )}
