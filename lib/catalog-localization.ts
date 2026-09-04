@@ -1,5 +1,6 @@
 import type { StoreProduct } from "@/lib/products"
 import type { Locale } from "@/lib/translations"
+import { stylizeBrandText } from "@/lib/brand"
 
 type ForeignLocale = Exclude<Locale, "it">
 
@@ -98,17 +99,17 @@ function translateCommercialTerms(value: string, locale: ForeignLocale) {
 }
 
 export function translateProductName(name: string, locale: Locale) {
-  if (!name || locale === "it") return name
+  if (!name || locale === "it") return stylizeBrandText(name)
   const exact = exactNames[name]?.[locale]
-  if (exact) return exact
+  if (exact) return stylizeBrandText(exact)
   const parts = name.split(/\s+[–-]\s+/)
-  return parts
+  return stylizeBrandText(parts
     .map((part, index) => {
       const localizedColor = localizeColor(part, locale)
       if (localizedColor !== part) return localizedColor
       return index === 0 ? translateCommercialTerms(part, locale) : part
     })
-    .join(" - ")
+    .join(" - "))
 }
 
 const categoryDescriptions: Record<string, Record<Locale, string>> = {
@@ -133,7 +134,7 @@ const categoryDescriptions: Record<string, Record<Locale, string>> = {
 
 export function translateCategoryDescription(slug: string, fallback: string | null | undefined, locale: Locale) {
   const exact = categoryDescriptions[slug.toLowerCase()]?.[locale]
-  if (exact || locale === "it") return exact || fallback || ""
+  if (exact || locale === "it") return stylizeBrandText(exact || fallback || "")
 
   const generic: Record<ForeignLocale, string> = {
     en: "Explore this MIRAI selection, curated for contemporary streetwear outfits with distinctive fits, materials and details.",
@@ -141,7 +142,7 @@ export function translateCategoryDescription(slug: string, fallback: string | nu
     de: "Entdecke diese MIRAI-Auswahl für zeitgemäße Streetwear-Looks mit markanten Passformen, Materialien und Details.",
     fr: "Découvrez cette sélection MIRAI, pensée pour des looks streetwear contemporains aux coupes, matières et détails distinctifs.",
   }
-  return generic[locale]
+  return stylizeBrandText(generic[locale])
 }
 
 type CategoryGuide = {
@@ -322,24 +323,24 @@ function localizedCare(locale: ForeignLocale) {
 export function localizeProduct(product: StoreProduct, locale: Locale) {
   if (locale === "it") {
     return {
-      name: product.name,
-      description: product.description || "",
+      name: stylizeBrandText(product.name),
+      description: stylizeBrandText(product.description || ""),
       colorName: product.color_name || "",
-      fitNote: product.fit_note || "",
-      detailItems: product.detail_items || [],
-      composition: product.composition || "",
-      care: product.care || "",
+      fitNote: stylizeBrandText(product.fit_note || ""),
+      detailItems: (product.detail_items || []).map(stylizeBrandText),
+      composition: stylizeBrandText(product.composition || ""),
+      care: stylizeBrandText(product.care || ""),
     }
   }
   const name = translateProductName(product.name, locale)
   const colorName = localizeColor(product.color_name, locale)
   return {
-    name,
+    name: stylizeBrandText(name),
     colorName,
-    description: localizedDescription(product, locale, name, colorName),
-    fitNote: localizedFit(product, locale),
-    detailItems: localizedDetails(product, locale, colorName),
-    composition: localizedComposition(product, locale),
-    care: localizedCare(locale),
+    description: stylizeBrandText(localizedDescription(product, locale, name, colorName)),
+    fitNote: stylizeBrandText(localizedFit(product, locale)),
+    detailItems: localizedDetails(product, locale, colorName).map(stylizeBrandText),
+    composition: stylizeBrandText(localizedComposition(product, locale)),
+    care: stylizeBrandText(localizedCare(locale)),
   }
 }

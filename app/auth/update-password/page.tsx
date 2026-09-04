@@ -61,7 +61,7 @@ export default function UpdatePasswordPage() {
 
         {saved ? (
           <>
-            <p className="mt-3 text-sm leading-6 text-muted-foreground">La nuova password del tuo MIRAI PASS e attiva.</p>
+            <p className="mt-3 text-sm leading-6 text-muted-foreground">La nuova password del tuo MIRΛI PASS e attiva.</p>
             <Link href="/auth/login" className="mt-7 inline-flex min-h-11 w-full items-center justify-center bg-primary px-5 text-xs font-bold uppercase tracking-widest text-primary-foreground">
               Vai al login
             </Link>

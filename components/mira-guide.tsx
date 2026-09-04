@@ -18,6 +18,7 @@ import { useLanguage } from "@/lib/language-context"
 import { localizedOrganicPath } from "@/lib/international-seo"
 import { localeTags, translateSiteText } from "@/lib/site-localization"
 import type { Locale } from "@/lib/translations"
+import { stylizeBrandText } from "@/lib/brand"
 
 type MiraVariant = "male" | "female"
 type MiraAssetPose = "idle" | "listening" | "speaking"
@@ -233,7 +234,7 @@ function MiraModel({
     <div
       className={`mira-model mira-model-state-${pose} relative h-32 w-24 md:h-52 md:w-36 ${className}`}
       role="img"
-      aria-label={`MIRA, avatar ${variant === "female" ? "femminile" : "maschile"}, posa ${pose}`}
+      aria-label={`MIRΛ, avatar ${variant === "female" ? "femminile" : "maschile"}, posa ${pose}`}
     >
       <div className="mira-model-glow absolute inset-x-[7%] bottom-[1%] h-[24%] rounded-full bg-primary/45 blur-2xl" />
       <div className="mira-model-scan pointer-events-none absolute inset-x-[15%] z-10 h-px bg-gradient-to-r from-transparent via-primary/70 to-transparent shadow-[0_0_9px_rgba(159,134,255,0.8)]" />
@@ -290,7 +291,7 @@ function VariantCard({
       />
       <span className="absolute inset-x-3 bottom-3 flex items-end justify-between rounded-xl border border-white/10 bg-black/65 px-3 py-2 backdrop-blur-md">
         <span>
-          <span className="block text-[8px] uppercase tracking-[0.22em] text-primary">MIRA</span>
+          <span className="block text-[8px] uppercase tracking-[0.22em] text-primary">MIRΛ</span>
           <span className="mt-0.5 block text-[11px] font-semibold uppercase tracking-[0.12em] text-white">
             {variant === "female" ? "Femminile" : "Maschile"}
           </span>
@@ -311,7 +312,7 @@ export function MiraGuide() {
   const pathname = usePathname()
   const router = useRouter()
   const { locale } = useLanguage()
-  const ui = (value: string) => translateSiteText(value, locale)
+  const ui = (value: string) => stylizeBrandText(translateSiteText(value, locale))
   const contextualPrompt = useMemo(() => getContextPrompt(pathname, locale), [locale, pathname])
   const [hydrated, setHydrated] = useState(false)
   const [variant, setVariant] = useState<MiraVariant>("male")
@@ -1063,7 +1064,7 @@ export function MiraGuide() {
             aria-hidden="true"
           />
           <span className="mira-peek-caption" aria-hidden="true">
-            <span>MIRA</span>
+            <span>MIRΛ</span>
             <ArrowRight className="h-3 w-3" />
           </span>
           <span className="sr-only">{ui("Riapri MIRA")}</span>
@@ -1082,7 +1083,7 @@ export function MiraGuide() {
                 bubbleOnLeft ? "mira-bubble-left" : "mira-bubble-right"
               }`}
               style={{ left: bubbleLeft, top: bubbleTop, width: bubbleWidth }}
-              aria-label={expanded ? "Parla con MIRA" : "Suggerimento di MIRA"}
+              aria-label={expanded ? "Parla con MIRΛ" : "Suggerimento di MIRΛ"}
               aria-live="polite"
             >
               {expanded ? (
@@ -1090,11 +1091,11 @@ export function MiraGuide() {
                   <div className="flex items-center justify-between border-b border-white/10 px-4 py-3">
                     <div>
                       <div className="flex items-center gap-2">
-                        <p className="text-[9px] font-semibold uppercase tracking-[0.22em] text-primary">MIRA</p>
+                        <p className="text-[9px] font-semibold uppercase tracking-[0.22em] text-primary">MIRΛ</p>
                         <span className="h-1.5 w-1.5 rounded-full bg-emerald-300 shadow-[0_0_8px_rgba(110,231,183,0.9)]" />
                       </div>
                       <p className="mt-0.5 text-[8px] uppercase tracking-[0.13em] text-white/35">
-                        {isListening ? "Ti ascolto" : isThinking ? "Ci sto pensando" : isSpeaking ? "Ti rispondo" : "Guida MIRAI"}
+                        {isListening ? "Ti ascolto" : isThinking ? "Ci sto pensando" : isSpeaking ? "Ti rispondo" : "Guida MIRΛI"}
                       </p>
                     </div>
                     <button
@@ -1109,14 +1110,14 @@ export function MiraGuide() {
 
                   <div className="px-4 pb-3 pt-3.5">
                     <div className="min-h-16 rounded-2xl border border-white/[0.08] bg-white/[0.035] px-3.5 py-3 text-[12px] leading-5 text-white/78">
-                      <p>{reply.text}</p>
+                      <p>{stylizeBrandText(reply.text)}</p>
                       {reply.href && reply.label && (
                         <Link
                           href={reply.href}
                           onClick={() => setExpanded(false)}
                           className="mt-2.5 inline-flex items-center gap-1.5 text-[9px] font-semibold uppercase tracking-[0.14em] text-primary transition-colors hover:text-white"
                         >
-                          {reply.label} <ArrowRight className="h-3 w-3" />
+                          {stylizeBrandText(reply.label)} <ArrowRight className="h-3 w-3" />
                         </Link>
                       )}
                     </div>
@@ -1174,7 +1175,7 @@ export function MiraGuide() {
                   }}
                   className="block w-full p-3.5 text-left"
                 >
-                  <span className="block text-[8px] font-semibold uppercase tracking-[0.22em] text-primary">MIRA</span>
+                  <span className="block text-[8px] font-semibold uppercase tracking-[0.22em] text-primary">MIRΛ</span>
                   <span className="mt-1.5 block pr-3 text-[13px] font-medium leading-5 text-white/90">{contextualPrompt}</span>
                   <span className="mt-2 block text-[8px] uppercase tracking-[0.14em] text-white/35">{ui("Tocca per chiedere")}</span>
                 </button>
@@ -1226,7 +1227,7 @@ export function MiraGuide() {
               <MiraModel variant={activeVariant} pose={currentPose} faceRight={isRoaming ? roamFaceRight : !bubbleOnLeft} />
             </div>
             <span className="absolute bottom-1.5 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full border border-primary/30 bg-black/70 px-2.5 py-1 text-[7px] font-semibold uppercase tracking-[0.18em] text-white/85 backdrop-blur-md">
-              {isListening ? "ASCOLTO" : "MIRA"}
+              {isListening ? "ASCOLTO" : "MIRΛ"}
             </span>
           </button>
 

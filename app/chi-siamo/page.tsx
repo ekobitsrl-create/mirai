@@ -6,7 +6,7 @@ import { Footer } from "@/components/footer"
 import { buildSeoMetadata, createBreadcrumbJsonLd, createWebPageJsonLd } from "@/lib/seo"
 
 const ABOUT_DESCRIPTION =
-  "MIRAI è un concept store streetwear nato a Catania: moda urban, custom culture e tecnologia si incontrano online e nel futuro MIRAI LAB STORE."
+  "MIRΛI è un concept store streetwear nato a Catania: moda urban, custom culture e tecnologia si incontrano online e nel futuro MIRΛI LAB STORE."
 
 export const metadata = buildSeoMetadata({
   title: "Concept store streetwear Catania | Chi siamo",
@@ -15,9 +15,9 @@ export const metadata = buildSeoMetadata({
   keywords: [
     "concept store streetwear Catania",
     "concept store Catania",
-    "MIRAI Concept Store",
-    "MIRAI Lab Store",
-    "MIRAI streetwear",
+    "MIRΛI Concept Store",
+    "MIRΛI Lab Store",
+    "MIRΛI streetwear",
   ],
 })
 
@@ -32,7 +32,7 @@ export default function ChiSiamoPage() {
           dangerouslySetInnerHTML={{
             __html: JSON.stringify(createWebPageJsonLd({
               type: "AboutPage",
-              name: "MIRAI - Concept store streetwear Catania",
+              name: "MIRΛI - Concept store streetwear Catania",
               description: ABOUT_DESCRIPTION,
               path: "/chi-siamo",
             })),
@@ -52,7 +52,7 @@ export default function ChiSiamoPage() {
           <div className="relative w-full max-w-4xl mx-auto">
             <Image
               src="/images/about-mirai-store-interior.png"
-              alt="Lo spazio MIRAI - Interno del negozio streetwear"
+              alt="Lo spazio MIRΛI - Interno del negozio streetwear"
               width={1122}
               height={1402}
               className="w-full h-auto"
@@ -69,7 +69,7 @@ export default function ChiSiamoPage() {
               Torna alla Home
             </Link>
             <h1 className="font-[family-name:var(--font-space-grotesk)] text-3xl font-bold tracking-tight text-foreground text-balance md:text-4xl">
-              MIRAI: concept store streetwear a Catania
+              MIRΛI: concept store streetwear a Catania
             </h1>
           </div>
         </section>
@@ -84,7 +84,7 @@ export default function ChiSiamoPage() {
                 {"\u004DIR\u039BI \u00e8 un progetto di impresa innovativo nato a Catania con l\u2019obiettivo di rivoluzionare il settore dello streetwear attraverso una fusione tra moda, tecnologia e cultura urbana."}
               </p>
               <p className="text-muted-foreground leading-relaxed">
-                {"Il brand prende il nome dal termine giapponese \u201cMirai\u201d (\u672a\u6765), che significa \u201cfuturo\u201d: un simbolo di evoluzione, visione e avanguardia."}
+                {"Il brand prende il nome dal termine giapponese \u201cMirΛi\u201d (\u672a\u6765), che significa \u201cfuturo\u201d: un simbolo di evoluzione, visione e avanguardia."}
               </p>
             </div>
 
@@ -129,10 +129,10 @@ export default function ChiSiamoPage() {
             {/* MIRAI LAB STORE */}
             <div className="flex flex-col gap-4">
               <h2 className="font-[family-name:var(--font-space-grotesk)] text-2xl md:text-3xl font-bold tracking-tight text-foreground">
-                MIRAI LAB STORE
+                MIRΛI LAB STORE
               </h2>
               <p className="text-muted-foreground leading-relaxed">
-                {"Il progetto prevede la realizzazione a Catania del MIRAI LAB STORE: uno spazio streetwear futuristico con area shooting integrata e postazione per la customizzazione dei capi."}
+                {"Il progetto prevede la realizzazione a Catania del MIRΛI LAB STORE: uno spazio streetwear futuristico con area shooting integrata e postazione per la customizzazione dei capi."}
               </p>
               <p className="text-muted-foreground leading-relaxed">
                 {"All\u2019interno verr\u00e0 sviluppato un software basato su intelligenza artificiale capace di generare design e contenuti digitali, potenziando la creativit\u00e0 del team e migliorando l\u2019esperienza cliente."}

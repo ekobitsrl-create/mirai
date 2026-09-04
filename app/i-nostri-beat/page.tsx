@@ -4,9 +4,9 @@ import { Footer } from "@/components/footer"
 import { BeatTurntable } from "@/components/beat-turntable"
 
 export const metadata: Metadata = {
-  title: "I Nostri Beat - MIRAI",
+  title: "I Nostri Beat - MIRΛI",
   alternates: { canonical: "/i-nostri-beat" },
-  description: "Ascolta le tracce MIRAI con giradischi animato, player e tracklist.",
+  description: "Ascolta le tracce MIRΛI con giradischi animato, player e tracklist.",
 }
 
 export default function INostriBeatPage() {

@@ -10,13 +10,13 @@ export default function AppError({
   reset: () => void
 }) {
   useEffect(() => {
-    console.error("Errore client MIRAI", error)
+    console.error("Errore client MIRΛI", error)
   }, [error])
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-background px-6 text-center">
       <div className="w-full max-w-lg border border-border bg-card p-8">
-        <p className="text-xs font-bold uppercase tracking-[0.24em] text-primary">MIRAI</p>
+        <p className="text-xs font-bold uppercase tracking-[0.24em] text-primary">MIRΛI</p>
         <h1 className="mt-4 text-2xl font-bold text-foreground">
           La pagina non si è caricata correttamente
         </h1>

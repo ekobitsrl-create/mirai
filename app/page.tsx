@@ -18,10 +18,10 @@ import { localizedOrganicPath } from "@/lib/international-seo"
 export const revalidate = 300
 
 const HOME_DESCRIPTION =
-  "MIRAI LAB STORE: streetwear a Catania e online. Scopri abbigliamento urban uomo, t-shirt oversize, cappelli custom e il Custom Lab."
+  "MIRΛI LAB STORE: streetwear a Catania e online. Scopri abbigliamento urban uomo, t-shirt oversize, cappelli custom e il Custom Lab."
 
 export const metadata = buildSeoMetadata({
-  title: "Streetwear Catania | MIRAI LAB STORE",
+  title: "Streetwear Catania | MIRΛI LAB STORE",
   description: HOME_DESCRIPTION,
   path: "/",
   localizedAlternates: true,
@@ -29,9 +29,9 @@ export const metadata = buildSeoMetadata({
   keywords: [
     "streetwear Catania",
     "abbigliamento streetwear Catania",
-    "MIRAI Lab Store",
-    "MIRAI Concept Store",
-    "MIRAI streetwear",
+    "MIRΛI Lab Store",
+    "MIRΛI Concept Store",
+    "MIRΛI streetwear",
     "abbigliamento urban uomo",
   ],
 })

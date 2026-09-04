@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label"
 import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
 import { Suspense, useState } from "react"
-import Image from "next/image"
+import { BrandMark } from "@/components/brand-mark"
 
 function safeNextPath(value: string | null) {
   return value && value.startsWith("/") && !value.startsWith("//") ? value : "/community/hub"
@@ -85,12 +85,12 @@ function SignUpForm() {
       <div className="w-full max-w-md">
         <div className="flex flex-col items-center gap-8">
           <Link href="/">
-            <Image src="/images/logo.png" alt="MIRAI" width={120} height={40} className="invert" style={{ width: "auto", height: "auto" }} />
+            <BrandMark className="text-xl text-white" />
           </Link>
 
           <div className="w-full border border-border rounded-lg p-8 bg-card">
             <div className="mb-8 flex flex-col gap-2">
-              <h1 className="font-sans text-2xl font-bold tracking-tight text-foreground">Entra nella MIRAI Society</h1>
+              <h1 className="font-sans text-2xl font-bold tracking-tight text-foreground">Entra nella MIRΛI Society</h1>
               <p className="text-sm text-muted-foreground">Crea il tuo account per accedere alla community, alle anteprime e agli eventi.</p>
             </div>
 
@@ -125,7 +125,7 @@ function SignUpForm() {
                     onCheckedChange={(checked) => setMarketingConsent(checked === true)}
                   />
                   <Label htmlFor="signup-marketing-consent" className="cursor-pointer text-sm font-normal leading-5 text-muted-foreground">
-                    Desidero ricevere novità, offerte e vantaggi riservati della community MIRAI via email. Posso revocare il consenso in qualsiasi momento. Consulta la{" "}
+                    Desidero ricevere novità, offerte e vantaggi riservati della community MIRΛI via email. Posso revocare il consenso in qualsiasi momento. Consulta la{" "}
                     <Link href="/privacy" className="text-foreground underline underline-offset-4">Privacy Policy</Link>.
                   </Label>
                 </div>

@@ -223,11 +223,11 @@ export async function POST(request: NextRequest) {
   }
 
   if (!message) {
-    return NextResponse.json({ error: "Scrivi una richiesta per MIRA." }, { status: 400 })
+    return NextResponse.json({ error: "Scrivi una richiesta per MIRΛ." }, { status: 400 })
   }
 
   const products = await getCatalog()
-  const systemPrompt = `Sei MIRA, la guida digitale di MIRAI LAB STORE, un negozio streetwear italiano.
+  const systemPrompt = `Sei MIRΛ, la guida digitale di MIRΛI LAB STORE, un negozio streetwear italiano.
 
 STILE:
 - Rispondi sempre in ${responseLanguages[locale]}, la lingua selezionata dall'utente, in modo amichevole, sicuro e conciso.
@@ -274,12 +274,12 @@ ${JSON.stringify(catalogForPrompt(products, locale))}`
     const payload = await openAIResponse.json() as OpenAIResponse
     if (!openAIResponse.ok) {
       console.error("[MIRA] OpenAI request failed:", openAIResponse.status, payload.error?.message)
-      return NextResponse.json({ error: "MIRA non riesce a rispondere in questo momento." }, { status: 502 })
+      return NextResponse.json({ error: "MIRΛ non riesce a rispondere in questo momento." }, { status: 502 })
     }
 
     const reply = extractText(payload)
     if (!reply) {
-      return NextResponse.json({ error: "MIRA non ha prodotto una risposta." }, { status: 502 })
+      return NextResponse.json({ error: "MIRΛ non ha prodotto una risposta." }, { status: 502 })
     }
 
     return NextResponse.json({
@@ -289,6 +289,6 @@ ${JSON.stringify(catalogForPrompt(products, locale))}`
     })
   } catch (error) {
     console.error("[MIRA] OpenAI connection failed:", error)
-    return NextResponse.json({ error: "MIRA non riesce a collegarsi in questo momento." }, { status: 502 })
+    return NextResponse.json({ error: "MIRΛ non riesce a collegarsi in questo momento." }, { status: 502 })
   }
 }

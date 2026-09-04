@@ -10,6 +10,7 @@ import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTr
 import { customizationSummary } from "@/lib/customization"
 import { formatLocalizedPrice } from "@/lib/site-localization"
 import { translateProductName } from "@/lib/catalog-localization"
+import { stylizeBrandText } from "@/lib/brand"
 
 export function CartSidebar() {
   const { items, removeItem, updateQuantity, getTotal, itemCount, clearCart } = useCart()
@@ -64,14 +65,14 @@ export function CartSidebar() {
                     <div className="relative w-20 h-24 flex-shrink-0 bg-card rounded-sm overflow-hidden">
                       <Image
                         src={item.image_url || "/placeholder.jpg"}
-                        alt={translateProductName(item.name, locale)}
+                        alt={stylizeBrandText(translateProductName(item.name, locale))}
                         fill
                         className="object-cover"
                       />
                     </div>
                     <div className="flex-1 flex flex-col justify-between min-w-0">
                       <div>
-                        <h4 className="text-sm font-medium text-foreground truncate">{translateProductName(item.name, locale)}</h4>
+                        <h4 className="text-sm font-medium text-foreground truncate">{stylizeBrandText(translateProductName(item.name, locale))}</h4>
                         <p className="text-xs text-muted-foreground mt-0.5">{t.cart.size}: {item.size}</p>
                         {item.customization && (
                           <p className="mt-1 line-clamp-2 text-[10px] leading-relaxed text-primary/80">

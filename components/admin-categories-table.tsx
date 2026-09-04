@@ -5,6 +5,7 @@ import { createCategory, updateCategory, deleteCategory } from "@/app/admin/acti
 import { Plus, Pencil, Trash2, X, Check, ImageIcon } from "lucide-react"
 import Image from "next/image"
 import { ImageUpload } from "@/components/image-upload"
+import { stylizeBrandText } from "@/lib/brand"
 
 type Category = {
   id: string
@@ -153,7 +154,7 @@ export function AdminCategoriesTable({ categories }: { categories: Category[] })
                       <span className="text-xs text-muted-foreground font-mono">{cat.slug}</span>
                     </td>
                     <td className="px-4 py-3 hidden lg:table-cell">
-                      <span className="text-xs text-muted-foreground line-clamp-1">{cat.description || "---"}</span>
+                      <span className="text-xs text-muted-foreground line-clamp-1">{cat.description ? stylizeBrandText(cat.description) : "---"}</span>
                     </td>
                     <td className="px-4 py-3 text-center">
                       <span className="text-sm text-foreground">{cat.sort_order}</span>

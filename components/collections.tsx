@@ -11,6 +11,7 @@ import {
 import { ArrowRight } from "lucide-react"
 import { translateCategoryDescription } from "@/lib/catalog-localization"
 import { translateCategory } from "@/lib/site-localization"
+import { stylizeBrandText } from "@/lib/brand"
 import { localizedOrganicPath } from "@/lib/international-seo"
 
 type Category = {
@@ -70,7 +71,7 @@ export function Collections({ categories = [] }: { categories?: Category[] }) {
                 />
                 <Image
                   src={cardImage}
-                  alt={translateCategory(cat.slug, cat.name, locale)}
+                  alt={stylizeBrandText(translateCategory(cat.slug, cat.name, locale))}
                   fill
                   className={`${
                     hasFittedCategoryCardImage(cat.slug)
@@ -89,10 +90,10 @@ export function Collections({ categories = [] }: { categories?: Category[] }) {
                     className="text-xl md:text-2xl font-bold text-white mb-1"
                     style={{ fontFamily: "var(--font-space-grotesk)" }}
                   >
-                    {translateCategory(cat.slug, cat.name, locale)}
+                    {stylizeBrandText(translateCategory(cat.slug, cat.name, locale))}
                   </h3>
                   {cat.description && (
-                    <p className="text-white/70 text-sm mb-3 line-clamp-2">{translateCategoryDescription(cat.slug, cat.description, locale)}</p>
+                    <p className="text-white/70 text-sm mb-3 line-clamp-2">{stylizeBrandText(translateCategoryDescription(cat.slug, cat.description, locale))}</p>
                   )}
                   <span className="inline-flex items-center gap-2 text-xs font-semibold tracking-widest uppercase text-white group-hover:text-primary transition-colors duration-300">
                     {t.collections.shopNow}

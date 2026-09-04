@@ -23,6 +23,7 @@ import { getCatalogItemId } from "@/lib/catalog-identifiers"
 import { localizedOrganicPath } from "@/lib/international-seo"
 import { formatLocalizedPrice, translateCategory } from "@/lib/site-localization"
 import { localizeProduct, translateProductName } from "@/lib/catalog-localization"
+import { stylizeBrandText } from "@/lib/brand"
 
 type Category = {
   id: string
@@ -205,8 +206,8 @@ export function ShopGrid({
   }, [filtersOpen, quickAddProduct])
 
   const categoryLabels = useMemo(() => {
-    const labels = new Map(subcategories.map((category) => [category.slug, translateCategory(category.slug, category.name, locale)]))
-    parentCategories.forEach((category) => labels.set(category.slug, translateCategory(category.slug, category.name, locale)))
+    const labels = new Map(subcategories.map((category) => [category.slug, stylizeBrandText(translateCategory(category.slug, category.name, locale))]))
+    parentCategories.forEach((category) => labels.set(category.slug, stylizeBrandText(translateCategory(category.slug, category.name, locale))))
     return labels
   }, [locale, parentCategories, subcategories])
 
@@ -318,7 +319,7 @@ export function ShopGrid({
     })
     setQuickAddProduct(null)
     setQuickAddSize(null)
-    setNotice(`${translateProductName(product.name, locale)} · ${size} ${shopCopy[locale].addedToCart}`)
+    setNotice(`${stylizeBrandText(translateProductName(product.name, locale))} · ${size} ${shopCopy[locale].addedToCart}`)
   }
 
   return (
@@ -337,7 +338,7 @@ export function ShopGrid({
                 {labels.title}
               </h1>
               <p className="mt-6 max-w-xl text-sm leading-6 text-white/55 md:text-base">
-                Silhouette oversize, grafiche decise e dettagli custom. Ogni capo MIRAI nasce per vivere la strada, non per seguire una stagione.
+                Silhouette oversize, grafiche decise e dettagli custom. Ogni capo MIRΛI nasce per vivere la strada, non per seguire una stagione.
               </p>
             </div>
             <div className="grid grid-cols-3 border-y border-white/10 py-5 text-center lg:min-w-[390px]">
@@ -479,7 +480,7 @@ export function ShopGrid({
                 key={product.id}
                 product={product}
                 index={index}
-                categoryName={categoryLabels.get(product.category) || translateCategory(product.category, formatCategory(product.category), locale)}
+                categoryName={categoryLabels.get(product.category) || stylizeBrandText(translateCategory(product.category, formatCategory(product.category), locale))}
                 wished={wishlist.includes(product.id)}
                 onWishlist={() => toggleWishlist(product.id)}
                 onQuickAdd={() => openQuickAdd(product)}
@@ -565,7 +566,7 @@ function ProductCard({
           {product.image_url ? (
             <Image
               src={product.image_url}
-              alt={translateProductName(product.name, locale)}
+              alt={stylizeBrandText(translateProductName(product.name, locale))}
               fill
               className={`${product.category === "drop" ? "object-contain" : "object-cover"} object-center transition-transform duration-700 ease-out group-hover:scale-[1.035]`}
               sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
@@ -606,7 +607,7 @@ function ProductCard({
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
             <p className="mb-1 text-[8px] font-semibold uppercase tracking-[0.25em] text-primary md:text-[9px]">{categoryName}</p>
-            <h2 className="truncate text-xs font-medium text-white transition-colors group-hover:text-primary md:text-sm">{translateProductName(product.name, locale)}</h2>
+            <h2 className="truncate text-xs font-medium text-white transition-colors group-hover:text-primary md:text-sm">{stylizeBrandText(translateProductName(product.name, locale))}</h2>
           </div>
           <p className="shrink-0 text-xs font-medium text-white md:text-sm">{formatLocalizedPrice(product.price, locale)}</p>
         </div>
@@ -681,7 +682,7 @@ function FilterDrawer({
                       onChange={() => onCategory(category.slug)}
                       className="h-4 w-4 accent-primary"
                     />
-                    {category.name}
+                    {stylizeBrandText(category.name)}
                   </span>
                   <span className="text-[10px] text-white/30">{category.count}</span>
                 </label>
@@ -770,13 +771,13 @@ function QuickAdd({
       <div className="relative w-full max-w-xl border border-white/10 bg-card p-5 text-white shadow-2xl animate-in slide-in-from-bottom-5 duration-300 md:p-7">
         <div className="flex gap-4">
           <div className="relative h-28 w-24 shrink-0 overflow-hidden bg-white/5">
-            {product.image_url && <Image src={product.image_url} alt={translateProductName(product.name, locale)} fill className={product.category === "drop" ? "object-contain" : "object-cover"} sizes="96px" />}
+            {product.image_url && <Image src={product.image_url} alt={stylizeBrandText(translateProductName(product.name, locale))} fill className={product.category === "drop" ? "object-contain" : "object-cover"} sizes="96px" />}
           </div>
           <div className="min-w-0 flex-1">
             <div className="flex items-start justify-between gap-4">
               <div>
                 <p className="text-[9px] uppercase tracking-[0.24em] text-primary">{labels.quickAdd}</p>
-                <h2 className="mt-1 text-lg font-medium">{translateProductName(product.name, locale)}</h2>
+                <h2 className="mt-1 text-lg font-medium">{stylizeBrandText(translateProductName(product.name, locale))}</h2>
                 <p className="mt-1 text-sm text-white/55">{formatLocalizedPrice(product.price, locale)}</p>
               </div>
               <button type="button" onClick={onClose} className="p-1.5 text-white/40 hover:text-white" aria-label={labels.close}><X className="h-5 w-5" /></button>

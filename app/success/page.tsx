@@ -24,6 +24,7 @@ import { PostHogCommerceEvent } from "@/components/posthog-commerce-event"
 import { useLanguage } from "@/lib/language-context"
 import { formatLocalizedPrice, translateSiteText } from "@/lib/site-localization"
 import { translateProductName } from "@/lib/catalog-localization"
+import { stylizeBrandText } from "@/lib/brand"
 
 type OrderSummary = {
   id: string
@@ -233,7 +234,7 @@ function SuccessContent() {
           <AlertCircle className="mx-auto h-12 w-12 text-destructive" />
           <h1 className="mt-5 text-2xl font-bold text-foreground">Ordine non disponibile</h1>
           <p className="mt-3 text-sm leading-6 text-muted-foreground">
-            Accedi con il MIRAI PASS usato per il pagamento per visualizzare la conferma e i tuoi ordini.
+            Accedi con il MIRΛI PASS usato per il pagamento per visualizzare la conferma e i tuoi ordini.
           </p>
           <Link href="/account" className="mt-7 inline-flex w-full">
             <Button className="w-full">Vai al mio account</Button>
@@ -321,7 +322,7 @@ function SuccessContent() {
           <div className="divide-y divide-border px-6">
             {order.items.map((item, index) => (
               <div key={`${item.name}-${index}`} className="flex items-center justify-between gap-6 py-4 text-sm">
-                <p className="min-w-0 text-foreground">{translateProductName(item.name, locale)} <span className="text-muted-foreground">x{item.quantity}</span></p>
+                <p className="min-w-0 text-foreground">{stylizeBrandText(translateProductName(item.name, locale))} <span className="text-muted-foreground">x{item.quantity}</span></p>
                 <p className="shrink-0 text-muted-foreground">{formatPrice(item.amount, order.currency)}</p>
               </div>
             ))}

@@ -10,6 +10,8 @@ import { useLanguage } from "@/lib/language-context"
 import { LanguageSwitcher } from "@/components/language-switcher"
 import { localizedOrganicPath } from "@/lib/international-seo"
 import { translateCategory } from "@/lib/site-localization"
+import { stylizeBrandText } from "@/lib/brand"
+import { BrandMark } from "@/components/brand-mark"
 
 type CategoryNode = {
   id: string
@@ -198,12 +200,7 @@ export function Navbar() {
           <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
           <div className="flex items-center gap-8">
             <Link href={localizedOrganicPath("/", locale)} className="flex items-center shrink-0">
-              <span
-                className="text-xl font-bold tracking-[0.25em] uppercase text-white"
-                style={{ fontFamily: "var(--font-space-grotesk)" }}
-              >
-                {"MIR\u039BI"}
-              </span>
+              <BrandMark className="text-xl text-white" />
             </Link>
 
             <div className="hidden items-center gap-5 whitespace-nowrap 2xl:flex">
@@ -218,7 +215,7 @@ export function Navbar() {
                 className="inline-flex items-center gap-1.5 rounded-full border border-primary/45 bg-primary/5 px-3 py-2 text-[10px] font-bold uppercase tracking-[0.16em] text-primary transition-all hover:border-primary hover:bg-primary/15 hover:text-white hover:shadow-[0_0_24px_rgba(159,134,255,0.2)]"
               >
                 <WandSparkles className="h-3.5 w-3.5" />
-                Mirai Custom Lab
+                MirΛi Custom Lab
               </Link>
               <Link
                 href="/i-nostri-beat"
@@ -274,7 +271,7 @@ export function Navbar() {
                               className="mb-2.5 block text-xs font-bold uppercase tracking-[0.2em] text-white hover:text-primary transition-colors"
                               onClick={() => setDropdownOpen(false)}
                             >
-                              {translateCategory(parent.slug, parent.name, locale)}
+                              {stylizeBrandText(translateCategory(parent.slug, parent.name, locale))}
                             </Link>
                             {parent.children.length > 0 && (
                               <div className="flex flex-col gap-1">
@@ -285,7 +282,7 @@ export function Navbar() {
                                     className="text-sm text-white/45 hover:pl-1 hover:text-white transition-all duration-200"
                                     onClick={() => setDropdownOpen(false)}
                                   >
-                                    {translateCategory(sub.slug, sub.name, locale)}
+                                    {stylizeBrandText(translateCategory(sub.slug, sub.name, locale))}
                                   </Link>
                                 ))}
                               </div>
@@ -370,7 +367,7 @@ export function Navbar() {
               className="flex items-center justify-center gap-2 rounded-sm border border-primary/45 bg-primary/10 px-4 py-3 text-xs font-bold uppercase tracking-[0.2em] text-primary"
               onClick={() => setMobileOpen(false)}
             >
-              <WandSparkles className="h-4 w-4" /> Mirai Custom Lab
+              <WandSparkles className="h-4 w-4" /> MirΛi Custom Lab
             </Link>
             <Link
               href="/i-nostri-beat"
@@ -421,7 +418,7 @@ export function Navbar() {
                         className="mb-1.5 block text-xs font-bold uppercase tracking-[0.15em] text-white"
                         onClick={() => setMobileOpen(false)}
                       >
-                        {translateCategory(parent.slug, parent.name, locale)}
+                        {stylizeBrandText(translateCategory(parent.slug, parent.name, locale))}
                       </Link>
                       {parent.children.length > 0 && (
                         <div className="ml-3 flex flex-col gap-1">

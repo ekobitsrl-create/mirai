@@ -161,7 +161,7 @@ export default function AccountPage() {
   const fullName = [profile?.first_name, profile?.last_name].filter(Boolean).join(" ")
   const communityMember = {
     id: user.id,
-    name: fullName || user.email?.split("@")[0] || "MIRAI Member",
+    name: fullName || user.email?.split("@")[0] || "MIRΛI Member",
     email: user.email || "",
     createdAt: user.created_at,
   }

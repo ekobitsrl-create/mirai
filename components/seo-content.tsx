@@ -10,32 +10,32 @@ import { localizedOrganicPath } from "@/lib/international-seo"
 
 const MARKET_HOME_COPY = {
   en: {
-    eyebrow: "MIRAI / Italian urban streetwear",
+    eyebrow: "MIRΛI / Italian urban streetwear",
     title: "Italian urban streetwear, delivered across Europe.",
-    text: "MIRAI LAB STORE brings Italian streetwear culture to Europe through oversized silhouettes, statement denim, custom caps and curated urban drops.",
+    text: "MIRΛI LAB STORE brings Italian streetwear culture to Europe through oversized silhouettes, statement denim, custom caps and curated urban drops.",
     primaryLink: "Shop European streetwear",
-    conceptLink: "Discover MIRAI",
+    conceptLink: "Discover MIRΛI",
   },
   es: {
-    eyebrow: "MIRAI / Streetwear urbano italiano",
+    eyebrow: "MIRΛI / Streetwear urbano italiano",
     title: "Streetwear urbano italiano para España y Europa.",
-    text: "MIRAI LAB STORE lleva la cultura streetwear italiana a Europa con siluetas oversize, denim con carácter, gorras custom y drops urbanos seleccionados.",
+    text: "MIRΛI LAB STORE lleva la cultura streetwear italiana a Europa con siluetas oversize, denim con carácter, gorras custom y drops urbanos seleccionados.",
     primaryLink: "Comprar streetwear en Europa",
-    conceptLink: "Descubre MIRAI",
+    conceptLink: "Descubre MIRΛI",
   },
   de: {
-    eyebrow: "MIRAI / Italienische Urban Streetwear",
+    eyebrow: "MIRΛI / Italienische Urban Streetwear",
     title: "Italienische Urban Streetwear für Deutschland und Europa.",
-    text: "MIRAI LAB STORE bringt italienische Streetwear-Kultur nach Europa: Oversized-Silhouetten, Statement-Denim, Custom Caps und kuratierte Urban Drops.",
+    text: "MIRΛI LAB STORE bringt italienische Streetwear-Kultur nach Europa: Oversized-Silhouetten, Statement-Denim, Custom Caps und kuratierte Urban Drops.",
     primaryLink: "Streetwear online kaufen",
-    conceptLink: "MIRAI entdecken",
+    conceptLink: "MIRΛI entdecken",
   },
   fr: {
-    eyebrow: "MIRAI / Streetwear urbain italien",
+    eyebrow: "MIRΛI / Streetwear urbain italien",
     title: "Le streetwear urbain italien livré en France et en Europe.",
-    text: "MIRAI LAB STORE diffuse la culture streetwear italienne en Europe avec des volumes oversize, du denim affirmé, des casquettes custom et des sélections urbaines.",
-    primaryLink: "Acheter le streetwear MIRAI",
-    conceptLink: "Découvrir MIRAI",
+    text: "MIRΛI LAB STORE diffuse la culture streetwear italienne en Europe avec des volumes oversize, du denim affirmé, des casquettes custom et des sélections urbaines.",
+    primaryLink: "Acheter le streetwear MIRΛI",
+    conceptLink: "Découvrir MIRΛI",
   },
 } as const
 
@@ -54,7 +54,7 @@ const HOME_PILLARS = [
   },
   {
     title: "T-shirt personalizzate online",
-    text: "Carica una grafica o aggiungi una scritta e crea la tua heavy tee nel MIRAI Custom Lab.",
+    text: "Carica una grafica o aggiungi una scritta e crea la tua heavy tee nel MIRΛI Custom Lab.",
     href: "/custom-lab",
     label: "Apri il Custom Lab",
   },
@@ -71,7 +71,7 @@ export function HomeSeoContent() {
         <div className="grid gap-8 lg:grid-cols-[0.8fr_1.2fr] lg:items-end">
           <div>
             <p className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.28em] text-primary">
-              <MapPin className="h-3.5 w-3.5" /> {marketCopy?.eyebrow || "MIRAI / Catania"}
+              <MapPin className="h-3.5 w-3.5" /> {marketCopy?.eyebrow || "MIRΛI / Catania"}
             </p>
             <h2 className="mt-4 max-w-xl font-[family-name:var(--font-space-grotesk)] text-3xl font-bold uppercase leading-tight tracking-[-0.04em] sm:text-5xl">
               {marketCopy?.title || "Streetwear a Catania, online e in store."}
@@ -79,14 +79,14 @@ export function HomeSeoContent() {
           </div>
           <div className="max-w-2xl lg:justify-self-end">
             <p className="text-sm leading-7 text-white/55 sm:text-base">
-              {marketCopy?.text || "MIRAI LAB STORE è un concept streetwear nato a Catania. Uniamo abbigliamento urban uomo, capi oversize e custom culture in uno shop online e nel futuro spazio fisico di Via Umberto 95."}
+              {marketCopy?.text || "MIRΛI LAB STORE è un concept streetwear nato a Catania. Uniamo abbigliamento urban uomo, capi oversize e custom culture in uno shop online e nel futuro spazio fisico di Via Umberto 95."}
             </p>
             <div className="mt-5 flex flex-wrap gap-4 text-[10px] font-bold uppercase tracking-[0.18em]">
               <Link href={marketCopy ? localizedOrganicPath("/collezioni", locale) : "/negozio"} className="inline-flex items-center gap-2 text-primary transition-colors hover:text-white">
                 {marketCopy?.primaryLink || "Negozio streetwear Catania"} <ArrowRight className="h-3.5 w-3.5" />
               </Link>
               <Link href="/chi-siamo" className="inline-flex items-center gap-2 text-white/55 transition-colors hover:text-white">
-                {marketCopy?.conceptLink || "Il concept MIRAI"} <ArrowRight className="h-3.5 w-3.5" />
+                {marketCopy?.conceptLink || "Il concept MIRΛI"} <ArrowRight className="h-3.5 w-3.5" />
               </Link>
             </div>
           </div>
@@ -125,12 +125,12 @@ export function CatalogSeoContent() {
     <section className="border-t border-white/10 bg-[#0d0b11] px-6 py-20 text-white">
       <div className="mx-auto max-w-7xl">
         <div className="max-w-3xl">
-          <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-primary">Shop MIRAI</p>
+          <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-primary">Shop MIRΛI</p>
           <h2 className="mt-4 font-[family-name:var(--font-space-grotesk)] text-3xl font-bold uppercase tracking-[-0.04em] sm:text-4xl">
             {ui("Abbigliamento streetwear online")}
           </h2>
           <p className="mt-5 text-sm leading-7 text-white/55 sm:text-base">
-            {ui("Scopri lo shop streetwear italiano MIRAI: abbigliamento oversize uomo, accessori custom e selezioni urban acquistabili online con schede dedicate a fit, taglie e composizione.")}
+            {ui("Scopri lo shop streetwear italiano MIRΛI: abbigliamento oversize uomo, accessori custom e selezioni urban acquistabili online con schede dedicate a fit, taglie e composizione.")}
           </p>
         </div>
         <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">

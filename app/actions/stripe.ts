@@ -36,6 +36,7 @@ import {
 import { consumeRateLimit } from '@/lib/request-security'
 import { sendMetaPurchaseEvent } from '@/lib/meta-conversions-server'
 import { parseQuickPaymentMethod, type QuickPaymentMethod } from '@/lib/quick-payment'
+import { stylizeBrandText } from '@/lib/brand'
 
 type CartLineItem = {
   productId: string
@@ -288,7 +289,7 @@ async function createCheckoutSessionInternal(
 
     const requestedQuantity = Number(cartItem.quantity)
     if (!Number.isInteger(requestedQuantity) || requestedQuantity < 1 || requestedQuantity > 10) {
-      throw new Error(`Quantità non valida per ${product.name}`)
+      throw new Error(`Quantità non valida per ${stylizeBrandText(product.name)}`)
     }
 
     const staticProduct = product as StoreProduct
@@ -296,10 +297,10 @@ async function createCheckoutSessionInternal(
       const requestedSize = cartItem.size || ""
       const sizeStock = staticProduct.stock_by_size[requestedSize]
       if (!sizeStock) {
-        throw new Error(`Taglia ${requestedSize || "non selezionata"} non disponibile per ${product.name}`)
+        throw new Error(`Taglia ${requestedSize || "non selezionata"} non disponibile per ${stylizeBrandText(product.name)}`)
       }
       if (requestedQuantity > sizeStock) {
-        throw new Error(`Sono disponibili solo ${sizeStock} pezzi di ${product.name} in taglia ${requestedSize}`)
+        throw new Error(`Sono disponibili solo ${sizeStock} pezzi di ${stylizeBrandText(product.name)} in taglia ${requestedSize}`)
       }
     }
 
@@ -314,8 +315,8 @@ async function createCheckoutSessionInternal(
       price_data: {
         currency: 'eur',
         product_data: {
-          name: product.name + (cartItem.size ? ` - Taglia ${cartItem.size}` : ''),
-          description: customization ? customizationSummary(customization) : product.description || undefined,
+          name: stylizeBrandText(product.name) + (cartItem.size ? ` - Taglia ${cartItem.size}` : ''),
+          description: customization ? customizationSummary(customization) : product.description ? stylizeBrandText(product.description) : undefined,
           images: product.image_url
             ? [product.image_url.startsWith('http') ? product.image_url : `${baseUrl}${product.image_url.startsWith('/') ? '' : '/'}${product.image_url}`]
             : undefined,
@@ -562,7 +563,7 @@ export async function createCashOnDeliveryOrder(cartItems: CartLineItem[], detai
 
     const quantity = Number(cartItem.quantity)
     if (!Number.isInteger(quantity) || quantity < 1 || quantity > 10) {
-      throw new Error(`Quantita non valida per ${product.name}`)
+      throw new Error(`Quantita non valida per ${stylizeBrandText(product.name)}`)
     }
 
     const staticProduct = product as StoreProduct
@@ -570,7 +571,7 @@ export async function createCashOnDeliveryOrder(cartItems: CartLineItem[], detai
       const requestedSize = cartItem.size || ''
       const sizeStock = staticProduct.stock_by_size[requestedSize]
       if (!sizeStock || quantity > sizeStock) {
-        throw new Error(`La taglia ${requestedSize || 'selezionata'} non e disponibile per ${product.name}`)
+        throw new Error(`La taglia ${requestedSize || 'selezionata'} non e disponibile per ${stylizeBrandText(product.name)}`)
       }
     }
 
@@ -600,7 +601,7 @@ export async function createCashOnDeliveryOrder(cartItems: CartLineItem[], detai
   const totalCents = discountedProductsTotalCents + shippingFeeCents + CASH_ON_DELIVERY_FEE_CENTS
   const customizations = validatedItems
     .filter((item) => item.customization)
-    .map((item) => `${item.product.name}: ${customizationSummary(item.customization!)}`)
+    .map((item) => `${stylizeBrandText(item.product.name)}: ${customizationSummary(item.customization!)}`)
   const orderNotes = [
     'Pagamento in contrassegno alla consegna',
     `Supplemento contrassegno: €${(CASH_ON_DELIVERY_FEE_CENTS / 100).toFixed(2)}`,

@@ -13,7 +13,7 @@ import { localizedOrganicPath } from "@/lib/international-seo"
 export const revalidate = 300
 
 const COLLECTIONS_DESCRIPTION =
-  "Acquista abbigliamento streetwear online: t-shirt oversize, camicie, bermuda, cappelli custom e selezioni urban uomo MIRAI."
+  "Acquista abbigliamento streetwear online: t-shirt oversize, camicie, bermuda, cappelli custom e selezioni urban uomo MIRΛI."
 
 export const metadata = buildSeoMetadata({
   title: "Abbigliamento streetwear online",

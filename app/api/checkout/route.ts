@@ -16,6 +16,7 @@ import {
 } from '@/lib/customization'
 import { getCatalogItemId } from '@/lib/catalog-identifiers'
 import { SITE_URL } from '@/lib/site-url'
+import { stylizeBrandText } from '@/lib/brand'
 import {
   CHECKOUT_CONFIRMATION_METADATA_KEY,
   createCheckoutConfirmation,
@@ -195,7 +196,7 @@ export async function POST(request: NextRequest) {
 
       const requestedQuantity = Number(cartItem.quantity)
       if (!Number.isInteger(requestedQuantity) || requestedQuantity < 1 || requestedQuantity > 10) {
-        throw new Error(`Quantità non valida per ${product.name}`)
+        throw new Error(`Quantità non valida per ${stylizeBrandText(product.name)}`)
       }
 
       const staticProduct = product as StoreProduct
@@ -203,10 +204,10 @@ export async function POST(request: NextRequest) {
         const requestedSize = cartItem.size || ""
         const sizeStock = staticProduct.stock_by_size[requestedSize]
         if (!sizeStock) {
-          throw new Error(`Taglia ${requestedSize || "non selezionata"} non disponibile per ${product.name}`)
+          throw new Error(`Taglia ${requestedSize || "non selezionata"} non disponibile per ${stylizeBrandText(product.name)}`)
         }
         if (requestedQuantity > sizeStock) {
-          throw new Error(`Sono disponibili solo ${sizeStock} pezzi di ${product.name} in taglia ${requestedSize}`)
+          throw new Error(`Sono disponibili solo ${sizeStock} pezzi di ${stylizeBrandText(product.name)} in taglia ${requestedSize}`)
         }
       }
 
@@ -221,8 +222,8 @@ export async function POST(request: NextRequest) {
         price_data: {
           currency: 'eur',
           product_data: {
-            name: product.name + (cartItem.size ? ` - Taglia ${cartItem.size}` : ''),
-            description: customization ? customizationSummary(customization) : product.description || undefined,
+            name: stylizeBrandText(product.name) + (cartItem.size ? ` - Taglia ${cartItem.size}` : ''),
+            description: customization ? customizationSummary(customization) : product.description ? stylizeBrandText(product.description) : undefined,
             images: product.image_url
               ? [product.image_url.startsWith('http') ? product.image_url : `${baseUrl}${product.image_url.startsWith('/') ? '' : '/'}${product.image_url}`]
               : undefined,

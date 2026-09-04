@@ -6,7 +6,7 @@ import { Disc3, Pause, Play, SkipBack, SkipForward, Volume2 } from "lucide-react
 
 const TRACKS = [
   {
-    title: "Mirai Beat 1",
+    title: "MirΛi Beat 1",
     src: "/audio/mirai-soundtrack.mpeg",
   },
   {
@@ -126,13 +126,13 @@ export function BeatTurntable() {
       <div className="relative mx-auto grid max-w-7xl gap-12 lg:grid-cols-[minmax(300px,0.68fr)_minmax(580px,1.32fr)] lg:items-center">
         <div>
           <p className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.04] px-4 py-2 text-[9px] font-bold uppercase tracking-[0.24em] text-white/60">
-            <Disc3 className="h-3.5 w-3.5 text-[#5eead4]" /> MIRAI radio
+            <Disc3 className="h-3.5 w-3.5 text-[#5eead4]" /> MIRΛI radio
           </p>
           <h1 className="mt-7 max-w-3xl font-[family-name:var(--font-space-grotesk)] text-[clamp(3rem,8vw,7.4rem)] font-black uppercase leading-[0.86] tracking-tight">
             I Nostri<br /><span className="text-[#5eead4]">Beat</span>
           </h1>
           <p className="mt-7 max-w-xl text-sm leading-7 text-white/55 sm:text-base">
-            Ogni acquisto MIRAI puo sbloccare contenuti digitali esclusivi del nostro Lab: beat, visual e materiali creativi legati alla community.
+            Ogni acquisto MIRΛI puo sbloccare contenuti digitali esclusivi del nostro Lab: beat, visual e materiali creativi legati alla community.
           </p>
 
           <div className="mt-10 flex items-center gap-4">

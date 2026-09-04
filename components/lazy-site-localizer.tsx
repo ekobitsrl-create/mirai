@@ -1,7 +1,6 @@
 "use client"
 
 import dynamic from "next/dynamic"
-import { useLanguage } from "@/lib/language-context"
 
 const SiteLocalizer = dynamic(
   () => import("@/components/site-localizer").then((module) => module.SiteLocalizer),
@@ -9,9 +8,7 @@ const SiteLocalizer = dynamic(
 )
 
 export function LazySiteLocalizer() {
-  const { locale } = useLanguage()
-
-  // Italian is the source language. The large fallback dictionary is only
-  // needed after a visitor selects another language.
-  return locale === "it" ? null : <SiteLocalizer />
+  // The same pass also applies the MIRΛI/MIRΛ wordmarks in the source
+  // language, while preserving coupon codes and technical identifiers.
+  return <SiteLocalizer />
 }

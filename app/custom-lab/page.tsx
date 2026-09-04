@@ -7,7 +7,7 @@ import { buildSeoMetadata, createBreadcrumbJsonLd } from "@/lib/seo"
 import { getAbsoluteUrl, SITE_URL } from "@/lib/site-url"
 
 const CUSTOM_LAB_DESCRIPTION =
-  "Crea t-shirt personalizzate online con MIRAI Custom Lab: scegli colore e taglia, aggiungi una foto, una scritta o una grafica e guarda l'anteprima."
+  "Crea t-shirt personalizzate online con MIRΛI Custom Lab: scegli colore e taglia, aggiungi una foto, una scritta o una grafica e guarda l'anteprima."
 
 export const metadata = buildSeoMetadata({
   title: "T-shirt personalizzate online | Custom Lab",
@@ -22,7 +22,7 @@ export const metadata = buildSeoMetadata({
     "t-shirt personalizzata streetwear",
     "personalizzare t-shirt online",
     "t-shirt personalizzate Catania",
-    "MIRAI Custom Lab",
+    "MIRΛI Custom Lab",
   ],
 })
 
@@ -58,11 +58,11 @@ const FAQS = [
   },
   {
     question: "Il progetto viene controllato prima della stampa?",
-    answer: "Sì. Il team MIRAI verifica qualità del file, posizione e fattibilità. Se qualcosa non è adatto alla produzione, ti contattiamo prima di procedere.",
+    answer: "Sì. Il team MIRΛI verifica qualità del file, posizione e fattibilità. Se qualcosa non è adatto alla produzione, ti contattiamo prima di procedere.",
   },
   {
     question: "Il servizio è disponibile anche a Catania?",
-    answer: "Puoi ordinare online da tutta Italia. MIRAI nasce a Catania e il futuro MIRAI LAB STORE di Via Umberto 95 ospiterà anche la custom culture del brand.",
+    answer: "Puoi ordinare online da tutta Italia. MIRΛI nasce a Catania e il futuro MIRΛI LAB STORE di Via Umberto 95 ospiterà anche la custom culture del brand.",
   },
 ]
 
@@ -70,7 +70,7 @@ const customLabJsonLd = {
   "@context": "https://schema.org",
   "@type": "Service",
   "@id": `${SITE_URL}/custom-lab#service`,
-  name: "MIRAI Custom Lab - T-shirt personalizzate online",
+  name: "MIRΛI Custom Lab - T-shirt personalizzate online",
   description: CUSTOM_LAB_DESCRIPTION,
   url: getAbsoluteUrl("/custom-lab"),
   serviceType: "Personalizzazione premium di t-shirt streetwear",
@@ -103,7 +103,7 @@ export default function CustomLabPage() {
         dangerouslySetInnerHTML={{
           __html: JSON.stringify(createBreadcrumbJsonLd([
             { name: "Home", path: "/" },
-            { name: "MIRAI Custom Lab", path: "/custom-lab" },
+            { name: "MIRΛI Custom Lab", path: "/custom-lab" },
           ])),
         }}
       />
@@ -117,7 +117,7 @@ export default function CustomLabPage() {
           <div className="mb-10 grid items-end gap-8 lg:grid-cols-[1fr_420px] lg:gap-14">
             <div>
               <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-2 text-[9px] font-bold uppercase tracking-[0.25em] text-primary shadow-[0_0_28px_rgba(140,90,255,0.16)]">
-                <WandSparkles className="h-3.5 w-3.5" /> MIRAI Custom Lab
+                <WandSparkles className="h-3.5 w-3.5" /> MIRΛI Custom Lab
               </div>
               <h1 className="max-w-2xl font-bold uppercase leading-[0.9] tracking-[-0.055em] text-white" style={{ fontFamily: "var(--font-space-grotesk)" }}>
                 <span className="block text-[clamp(2.45rem,6.5vw,4.75rem)]">Crea la tua </span>
@@ -184,7 +184,7 @@ export default function CustomLabPage() {
 
       <section className="border-b border-white/10 bg-[#0b0910] px-6 py-20">
         <div className="mx-auto max-w-5xl">
-          <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-primary">MIRAI Custom Lab</p>
+          <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-primary">MIRΛI Custom Lab</p>
           <h2 className="mt-4 max-w-3xl font-[family-name:var(--font-space-grotesk)] text-2xl font-bold uppercase tracking-[-0.035em] sm:text-4xl">
             T-shirt personalizzate online: domande frequenti
           </h2>

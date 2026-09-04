@@ -100,7 +100,7 @@ export function CustomTeeEditor() {
   const [garmentColor, setGarmentColor] = useState(GARMENT_COLORS[0])
   const [side, setSide] = useState<CustomPrintSide>("front")
   const [mode, setMode] = useState<CustomDesignMode>("text")
-  const [customText, setCustomText] = useState("MIRAI LAB")
+  const [customText, setCustomText] = useState("MIRΛI LAB")
   const [textColor, setTextColor] = useState("#ffffff")
   const [font, setFont] = useState<CustomFont>("grotesk")
   const [size, setSize] = useState("M")
@@ -222,7 +222,7 @@ export function CustomTeeEditor() {
     addItem({
       productId: CUSTOM_TEE_PRODUCT_ID,
       lineId: designId,
-      name: "MIRAI Custom Heavy Tee",
+      name: "MIRΛI Custom Heavy Tee",
       price: CUSTOM_TEE_PRICE,
       image_url: shirtImage,
       size,
@@ -262,7 +262,7 @@ export function CustomTeeEditor() {
             <Image
               key={shirtImage}
               src={shirtImage}
-              alt={`MIRAI Custom Heavy Tee, vista ${side === "front" ? "frontale" : "posteriore"}`}
+              alt={`MIRΛI Custom Heavy Tee, vista ${side === "front" ? "frontale" : "posteriore"}`}
               fill
               priority
               sizes="(min-width: 1024px) 58vw, 94vw"
@@ -310,7 +310,7 @@ export function CustomTeeEditor() {
         <section className="bg-[#15111b] p-5 sm:p-7 lg:max-h-[760px] lg:overflow-y-auto">
           <div className="mb-7 flex items-start justify-between gap-4">
             <div>
-              <p className="text-[9px] font-bold uppercase tracking-[0.28em] text-primary">MIRAI Custom Lab</p>
+              <p className="text-[9px] font-bold uppercase tracking-[0.28em] text-primary">MIRΛI Custom Lab</p>
               <h2 className="mt-2 text-xl font-bold uppercase tracking-[-0.03em] text-white sm:text-2xl">Crea il tuo pezzo</h2>
             </div>
             <div className="text-right">
@@ -351,7 +351,7 @@ export function CustomTeeEditor() {
               {mode === "text" ? (
                 <div className="mt-3 space-y-3">
                   <div className="grid grid-cols-3 gap-2">
-                    <button type="button" onClick={() => applyTextPreset("MIRAI LAB", "grotesk", "#ffffff")} className="rounded-lg border border-white/10 bg-white/[0.025] px-2 py-2 text-[9px] uppercase tracking-[0.08em] text-white/55 hover:border-primary/50 hover:text-white">Core</button>
+                    <button type="button" onClick={() => applyTextPreset("MIRΛI LAB", "grotesk", "#ffffff")} className="rounded-lg border border-white/10 bg-white/[0.025] px-2 py-2 text-[9px] uppercase tracking-[0.08em] text-white/55 hover:border-primary/50 hover:text-white">Core</button>
                     <button type="button" onClick={() => applyTextPreset("NO SIGNAL", "mono", "#d7ff3f")} className="rounded-lg border border-white/10 bg-white/[0.025] px-2 py-2 text-[9px] uppercase tracking-[0.08em] text-white/55 hover:border-primary/50 hover:text-white">No Signal</button>
                     <button type="button" onClick={() => applyTextPreset("FUTURE IS NOW", "serif", "#9f86ff")} className="rounded-lg border border-white/10 bg-white/[0.025] px-2 py-2 text-[9px] uppercase tracking-[0.08em] text-white/55 hover:border-primary/50 hover:text-white">Future</button>
                   </div>

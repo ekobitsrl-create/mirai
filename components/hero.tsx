@@ -5,6 +5,7 @@ import Link from "next/link"
 import { useEffect, useState, useCallback } from "react"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import { useLanguage } from "@/lib/language-context"
+import { stylizeBrandText } from "@/lib/brand"
 
 type HeroSlideImage = {
   src: string
@@ -134,13 +135,13 @@ export function Hero() {
           <p
             className={`text-[10px] md:text-xs tracking-[0.4em] uppercase text-primary mb-4 font-sans transition-all duration-500 ${loaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}
           >
-            {slides[current]?.subtitle}
+            {stylizeBrandText(slides[current]?.subtitle || "")}
           </p>
           <h1
             className={`text-3xl md:text-5xl lg:text-6xl font-bold tracking-tight text-foreground mb-6 whitespace-pre-line text-balance transition-all duration-500 ${loaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"}`}
             style={{ fontFamily: "var(--font-space-grotesk)" }}
           >
-            {slides[current]?.title}
+            {stylizeBrandText(slides[current]?.title || "")}
           </h1>
           <Link
             href={slideHrefs[current]}

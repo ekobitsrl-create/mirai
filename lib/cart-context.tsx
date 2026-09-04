@@ -102,7 +102,7 @@ function normalizeStoredCartItem(value: unknown): CartItem | null {
     productId,
     name: typeof candidate.name === "string" && candidate.name.trim()
       ? candidate.name
-      : "Prodotto MIRAI",
+      : "Prodotto MIRΛI",
     price,
     image_url: typeof candidate.image_url === "string" ? candidate.image_url : null,
     quantity,

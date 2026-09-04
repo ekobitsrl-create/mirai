@@ -137,7 +137,7 @@ export async function saveStripeOrder(session: Stripe.Checkout.Session) {
     return {
       order_id: order.id,
       product_id: metadata.product_id || null,
-      product_name: item.description || product?.name || 'Prodotto MIRAI',
+      product_name: item.description || product?.name || 'Prodotto MIRΛI',
       product_image: product?.images?.[0] || null,
       size: metadata.size || null,
       quantity,

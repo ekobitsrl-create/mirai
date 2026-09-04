@@ -21,6 +21,7 @@ import { HTML_LOCALES, localizedOrganicPath } from "@/lib/international-seo"
 import type { Locale } from "@/lib/translations"
 import { localizeProduct } from "@/lib/catalog-localization"
 import { translateCategory } from "@/lib/site-localization"
+import { stylizeBrandText } from "@/lib/brand"
 
 export const dynamic = "force-dynamic"
 
@@ -53,12 +54,13 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
 
   if (!product || isBlackIslandProduct(product)) return { title: "Prodotto non trovato" }
 
-  const description = product.description || `Scopri ${product.name} su MIRAI: design streetwear curato nei dettagli, disponibile nelle taglie indicate.`
+  const displayName = stylizeBrandText(product.name)
+  const description = product.description ? stylizeBrandText(product.description) : `Scopri ${displayName} su MIRΛI: design streetwear curato nei dettagli, disponibile nelle taglie indicate.`
   const imageUrl = absoluteProductImage(product.image_url)
   const productPath = `/prodotto/${encodeURIComponent(id)}`
 
   return {
-    title: product.name,
+    title: displayName,
     description,
     robots: isPrivateCheckoutProduct(product) || product.community_only ? { index: false, follow: false } : undefined,
     alternates: {
@@ -66,15 +68,15 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
       languages: isPrivateCheckoutProduct(product) || product.community_only ? undefined : getOrganicLanguageAlternates(productPath),
     },
     openGraph: {
-      title: `${product.name} - MIRAI`,
+      title: `${displayName} - MIRΛI`,
       description,
       type: "website",
       url: getAbsoluteUrl(productPath),
-      images: imageUrl ? [{ url: imageUrl, width: 800, height: 1067, alt: product.name }] : undefined,
+      images: imageUrl ? [{ url: imageUrl, width: 800, height: 1067, alt: displayName }] : undefined,
     },
     twitter: {
       card: "summary_large_image",
-      title: `${product.name} - MIRAI`,
+      title: `${displayName} - MIRΛI`,
       description,
       images: imageUrl ? [imageUrl] : undefined,
     },
@@ -153,8 +155,8 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
     "@context": "https://schema.org",
     "@type": "Product",
     "@id": `${productUrl}#product`,
-    name: localized.name,
-    description: localized.description || `${localized.name} - MIRAI`,
+    name: stylizeBrandText(localized.name),
+    description: localized.description ? stylizeBrandText(localized.description) : `${stylizeBrandText(localized.name)} - MIRΛI`,
     inLanguage: HTML_LOCALES[locale],
     image: productImages.length ? productImages : undefined,
     sku: product.supplier_sku || product.id,
@@ -162,7 +164,7 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
     gtin: supplierSettings.gtin,
     brand: {
       "@type": "Brand",
-      name: supplierSettings.brand,
+      name: stylizeBrandText(supplierSettings.brand),
     },
     color: localized.colorName || undefined,
     material: localized.composition || undefined,
@@ -246,7 +248,7 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
       {
         "@type": "ListItem",
         position: 3,
-        name: localized.name,
+        name: stylizeBrandText(localized.name),
         item: productUrl,
       },
     ],

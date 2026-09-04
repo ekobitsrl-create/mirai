@@ -20,7 +20,7 @@ function normalizeEmail(email: string) {
 
 function sanitizeItems(items: AbandonedCartItem[]) {
   return items.slice(0, 25).map((item) => ({
-    name: String(item.name || "Prodotto MIRAI").slice(0, 180),
+    name: String(item.name || "Prodotto MIRΛI").slice(0, 180),
     quantity: Math.max(1, Math.min(10, Number(item.quantity) || 1)),
     price: Math.max(0, Number(item.price) || 0),
     image: item.image ? String(item.image).slice(0, 1000) : null,

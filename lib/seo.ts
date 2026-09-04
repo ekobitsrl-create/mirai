@@ -7,9 +7,10 @@ import {
   localizedOrganicPath,
   OPEN_GRAPH_LOCALES,
 } from "@/lib/international-seo"
+import { stylizeBrandText } from "@/lib/brand"
 
-export const SEO_BRAND_NAME = "MIRAI LAB STORE"
-export const SEO_SHORT_BRAND_NAME = "MIRAI"
+export const SEO_BRAND_NAME = "MIRΛI LAB STORE"
+export const SEO_SHORT_BRAND_NAME = "MIRΛI"
 export const SEO_DEFAULT_IMAGE = "/images/categories/shorts.jpeg"
 
 type SeoMetadataInput = {
@@ -36,11 +37,14 @@ export function buildSeoMetadata({
   const localizedPath = localizedOrganicPath(path, locale)
   const canonical = getAbsoluteUrl(localizedPath)
   const imageUrl = image ? getAbsoluteUrl(image) : undefined
+  const displayTitle = stylizeBrandText(title)
+  const displayDescription = stylizeBrandText(description)
+  const displayKeywords = keywords.map(stylizeBrandText)
 
   return {
-    title: absoluteTitle ? { absolute: title } : title,
-    description,
-    keywords,
+    title: absoluteTitle ? { absolute: displayTitle } : displayTitle,
+    description: displayDescription,
+    keywords: displayKeywords,
     alternates: {
       canonical,
       languages: localizedAlternates ? getOrganicLanguageAlternates(path) : undefined,
@@ -50,16 +54,16 @@ export function buildSeoMetadata({
       locale: OPEN_GRAPH_LOCALES[locale],
       siteName: SEO_BRAND_NAME,
       url: canonical,
-      title,
-      description,
+      title: displayTitle,
+      description: displayDescription,
       images: imageUrl
-        ? [{ url: imageUrl, width: 1536, height: 1024, alt: `${title} - ${SEO_BRAND_NAME}` }]
+        ? [{ url: imageUrl, width: 1536, height: 1024, alt: `${displayTitle} - ${SEO_BRAND_NAME}` }]
         : undefined,
     },
     twitter: {
       card: "summary_large_image",
-      title,
-      description,
+      title: displayTitle,
+      description: displayDescription,
       images: imageUrl ? [imageUrl] : undefined,
     },
   }
@@ -79,10 +83,10 @@ const TSHIRT_SEO: CategorySeo = {
   primaryKeyword: "t-shirt oversize streetwear",
   title: "T-shirt oversize streetwear da uomo",
   description:
-    "Scopri le t-shirt oversize streetwear MIRAI: fit boxy, grafiche urban e cotone strutturato. Acquista online con spedizione gratuita in Italia.",
+    "Scopri le t-shirt oversize streetwear MIRΛI: fit boxy, grafiche urban e cotone strutturato. Acquista online con spedizione gratuita in Italia.",
   heading: "T-shirt oversize streetwear: fit, peso e identità",
   intro:
-    "La selezione MIRAI unisce proporzioni oversize, spalle rilassate e grafiche pensate per outfit urban. Dalle heavy tee alle silhouette boxy, ogni modello è presentato con indicazioni su taglia, composizione e vestibilità.",
+    "La selezione MIRΛI unisce proporzioni oversize, spalle rilassate e grafiche pensate per outfit urban. Dalle heavy tee alle silhouette boxy, ogni modello è presentato con indicazioni su taglia, composizione e vestibilità.",
   details: [
     {
       title: "Fit oversize e boxy",
@@ -108,10 +112,10 @@ const HATS_SEO: CategorySeo = {
   primaryKeyword: "cappelli custom",
   title: "Cappelli custom e streetwear",
   description:
-    "Cappelli custom MIRAI con cristalli, strass e dettagli premium. Scopri online i modelli streetwear personalizzati anche a Catania.",
+    "Cappelli custom MIRΛI con cristalli, strass e dettagli premium. Scopri online i modelli streetwear personalizzati anche a Catania.",
   heading: "Cappelli custom: dettagli che rendono unico ogni pezzo",
   intro:
-    "I cappelli custom MIRAI trasformano un accessorio streetwear in un elemento personale. Cristalli, strass e applicazioni vengono scelti per dialogare con forma, colore e grafica del modello di partenza.",
+    "I cappelli custom MIRΛI trasformano un accessorio streetwear in un elemento personale. Cristalli, strass e applicazioni vengono scelti per dialogare con forma, colore e grafica del modello di partenza.",
   details: [
     {
       title: "Personalizzazione premium",
@@ -119,7 +123,7 @@ const HATS_SEO: CategorySeo = {
     },
     {
       title: "Online e a Catania",
-      text: "Puoi acquistare i modelli disponibili online e seguire l'apertura del MIRAI LAB STORE di Catania per scoprire il progetto fisico.",
+      text: "Puoi acquistare i modelli disponibili online e seguire l'apertura del MIRΛI LAB STORE di Catania per scoprire il progetto fisico.",
     },
   ],
   keywords: [
@@ -136,10 +140,10 @@ const SHIRTS_SEO: CategorySeo = {
   primaryKeyword: "camicie oversize uomo",
   title: "Camicie oversize uomo streetwear",
   description:
-    "Camicie oversize uomo dallo stile streetwear: volumi rilassati, pattern urban e modelli camouflage selezionati da MIRAI.",
+    "Camicie oversize uomo dallo stile streetwear: volumi rilassati, pattern urban e modelli camouflage selezionati da MIRΛI.",
   heading: "Camicie oversize uomo per un layering streetwear",
   intro:
-    "Una camicia oversize può funzionare come strato leggero sopra una tee oppure come protagonista del look. MIRAI seleziona volumi rilassati, pattern urban e proporzioni facili da inserire nel guardaroba quotidiano.",
+    "Una camicia oversize può funzionare come strato leggero sopra una tee oppure come protagonista del look. MIRΛI seleziona volumi rilassati, pattern urban e proporzioni facili da inserire nel guardaroba quotidiano.",
   details: [
     {
       title: "Aperta o abbottonata",
@@ -157,7 +161,7 @@ const BERMUDA_SEO: CategorySeo = {
   primaryKeyword: "bermuda streetwear uomo",
   title: "Bermuda streetwear uomo e shorts oversize",
   description:
-    "Bermuda streetwear uomo, shorts oversize e pantaloni urban selezionati da MIRAI. Scopri modelli e vestibilità online.",
+    "Bermuda streetwear uomo, shorts oversize e pantaloni urban selezionati da MIRΛI. Scopri modelli e vestibilità online.",
   heading: "Bermuda streetwear uomo: proporzioni e comfort",
   intro:
     "Bermuda e shorts streetwear lavorano sulle proporzioni: gamba ampia, lunghezze rilassate e materiali pratici creano una base equilibrata per tee oversize, camicie e sneaker.",
@@ -178,10 +182,10 @@ const APPAREL_SEO: CategorySeo = {
   primaryKeyword: "abbigliamento urban uomo",
   title: "Abbigliamento urban uomo",
   description:
-    "Abbigliamento urban uomo MIRAI: t-shirt oversize, camicie, bermuda e capi streetwear selezionati online e a Catania.",
+    "Abbigliamento urban uomo MIRΛI: t-shirt oversize, camicie, bermuda e capi streetwear selezionati online e a Catania.",
   heading: "Abbigliamento urban uomo, costruito per esprimersi",
   intro:
-    "La collezione abbigliamento MIRAI riunisce silhouette oversize, grafiche decise e capi facili da combinare. Esplora t-shirt, camicie, bermuda e nuovi drop streetwear.",
+    "La collezione abbigliamento MIRΛI riunisce silhouette oversize, grafiche decise e capi facili da combinare. Esplora t-shirt, camicie, bermuda e nuovi drop streetwear.",
   details: [
     {
       title: "Silhouette coerenti",
@@ -228,7 +232,7 @@ export function createBreadcrumbJsonLd(items: Array<{ name: string; path: string
     itemListElement: items.map((item, index) => ({
       "@type": "ListItem",
       position: index + 1,
-      name: item.name,
+      name: stylizeBrandText(item.name),
       item: getAbsoluteUrl(item.path),
     })),
   }
@@ -253,8 +257,8 @@ export function createWebPageJsonLd({
     "@type": type,
     "@id": `${url}#webpage`,
     url,
-    name,
-    description,
+    name: stylizeBrandText(name),
+    description: stylizeBrandText(description),
     inLanguage: HTML_LOCALES[locale],
     isPartOf: { "@id": `${SITE_URL}/#website` },
     about: { "@id": `${SITE_URL}/#organization` },

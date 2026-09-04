@@ -73,7 +73,7 @@ export function MiraiMemberPass({ member, compact = false }: { member: Community
       <div className="relative flex items-start justify-between gap-4">
         <div>
           <p className="text-[8px] font-bold uppercase tracking-[0.32em] text-primary">Digital membership</p>
-          <h2 className="mt-2 text-xl font-black uppercase tracking-[0.16em]" style={{ fontFamily: "var(--font-space-grotesk)" }}>MIRAI PASS</h2>
+          <h2 className="mt-2 text-xl font-black uppercase tracking-[0.16em]" style={{ fontFamily: "var(--font-space-grotesk)" }}>MIRΛI PASS</h2>
         </div>
         <div className="flex items-center gap-2 rounded-full border border-emerald-300/20 bg-emerald-300/10 px-3 py-1.5 text-[8px] font-bold uppercase tracking-[0.18em] text-emerald-200">
           <span className="h-1.5 w-1.5 rounded-full bg-emerald-300 shadow-[0_0_10px_rgba(110,231,183,0.9)]" /> Attivo
@@ -108,9 +108,9 @@ export function CommunityPreview({ member }: { member: CommunityMember }) {
         <MiraiMemberPass member={member} compact />
         <div>
           <div className="inline-flex items-center gap-2 rounded-full border border-primary/25 bg-primary/10 px-3 py-2 text-[8px] font-bold uppercase tracking-[0.22em] text-primary">
-            <UsersRound className="h-3.5 w-3.5" /> MIRAI Society
+            <UsersRound className="h-3.5 w-3.5" /> MIRΛI Society
           </div>
-          <h2 className="mt-5 text-2xl font-bold uppercase tracking-[-0.035em] sm:text-3xl" style={{ fontFamily: "var(--font-space-grotesk)" }}>Il tuo accesso alla parte interna di MIRAI.</h2>
+          <h2 className="mt-5 text-2xl font-bold uppercase tracking-[-0.035em] sm:text-3xl" style={{ fontFamily: "var(--font-space-grotesk)" }}>Il tuo accesso alla parte interna di MIRΛI.</h2>
           <p className="mt-4 max-w-xl text-sm leading-7 text-white/50">
             Il tuo account apre il Society Hub e i suoi canali. Il pass digitale resta separato
             e verrà collegato alle future esperienze NFC.
@@ -139,7 +139,7 @@ function AdminCommunityAccess() {
       <p className="relative mt-10 text-[8px] font-bold uppercase tracking-[0.28em] text-primary">Amministratore</p>
       <h2 className="relative mt-2 text-2xl font-black uppercase tracking-[-0.03em]" style={{ fontFamily: "var(--font-space-grotesk)" }}>Tutte le aree sono aperte.</h2>
       <p className="relative mt-3 max-w-lg text-sm leading-6 text-white/45">
-        L&apos;account admin entra direttamente nei canali e nelle funzioni della community. Non usa MIRAI PASS, livelli o requisiti membership.
+        L&apos;account admin entra direttamente nei canali e nelle funzioni della community. Non usa MIRΛI PASS, livelli o requisiti membership.
       </p>
     </div>
   )
@@ -154,10 +154,10 @@ export function CommunityHub({ member, isAdmin = false }: { member: CommunityMem
             <Sparkles className="h-3.5 w-3.5" /> {isAdmin ? "Accesso amministratore" : "Members only"}
           </div>
           <h1 className="mt-6 text-[clamp(2.4rem,6vw,5rem)] font-black uppercase leading-[0.9] tracking-[-0.055em]" style={{ fontFamily: "var(--font-space-grotesk)" }}>
-            MIRAI<br /><span className="text-primary">Society.</span>
+            MIRΛI<br /><span className="text-primary">Society.</span>
           </h1>
           <p className="mt-6 max-w-xl text-sm leading-7 text-white/50 sm:text-base">
-            Non solo prodotti: uno spazio riservato a chi vuole vedere prima, ascoltare prima e partecipare alla costruzione di MIRAI.
+            Non solo prodotti: uno spazio riservato a chi vuole vedere prima, ascoltare prima e partecipare alla costruzione di MIRΛI.
           </p>
         </div>
         {isAdmin ? <AdminCommunityAccess /> : <MiraiMemberPass member={member} />}
@@ -204,7 +204,7 @@ export function CommunityHub({ member, isAdmin = false }: { member: CommunityMem
             <p className="mt-2 max-w-2xl text-sm leading-6 text-white/45">
               {isAdmin
                 ? "Puoi entrare in ogni area della community senza pass, livelli o altre limitazioni."
-                : "L'account apre la community. Il MIRAI PASS verrà usato in seguito per NFC, identificazione membro ed esperienze fisiche dedicate."}
+                : "L'account apre la community. Il MIRΛI PASS verrà usato in seguito per NFC, identificazione membro ed esperienze fisiche dedicate."}
             </p>
           </div>
         </div>

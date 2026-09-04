@@ -1,4 +1,5 @@
 import type { StoreProduct } from "@/lib/products"
+import { stylizeBrandText } from "@/lib/brand"
 
 export type MiraIntent =
   | "greeting"
@@ -117,7 +118,15 @@ function answer(
   productId?: string,
   autoNavigate = false,
 ): MiraKnowledgeReply {
-  return { intent, text, confidence: intent === "unknown" ? 0 : 0.55, href, label, productId, autoNavigate }
+  return {
+    intent,
+    text: stylizeBrandText(text),
+    confidence: intent === "unknown" ? 0 : 0.55,
+    href,
+    label: label ? stylizeBrandText(label) : undefined,
+    productId,
+    autoNavigate,
+  }
 }
 
 type IntentDefinition = {

@@ -22,7 +22,7 @@ const CHANNELS = {
     description: "Puntate, ospiti e note audio disponibili in anticipo per i membri.",
     openToMembers: true,
     eyebrow: "Audio room",
-    notes: ["Podcast MIRAI", "Interviste e backstage", "Ascolto anticipato per i membri"],
+    notes: ["Podcast MIRΛI", "Interviste e backstage", "Ascolto anticipato per i membri"],
   },
   "inner-circle": {
     label: "Social room",
@@ -30,7 +30,7 @@ const CHANNELS = {
     description: "Uno spazio moderato per parlare di outfit, musica, idee e cultura urbana.",
     openToMembers: true,
     eyebrow: "Community room",
-    notes: ["Profili e conversazioni", "Room tematiche", "Moderazione MIRAI"],
+    notes: ["Profili e conversazioni", "Room tematiche", "Moderazione MIRΛI"],
   },
   signal: {
     label: "News & eventi",
@@ -45,7 +45,7 @@ const CHANNELS = {
 type ChannelKey = keyof typeof CHANNELS
 
 export const metadata: Metadata = {
-  title: "MIRAI Community",
+  title: "MIRΛI Community",
   robots: { index: false, follow: false },
 }
 

@@ -15,6 +15,7 @@ import {
 import { ImageUpload } from "@/components/image-upload"
 import { getSupplierProfile, SUPPLIER_PROFILE_OPTIONS, type SupplierProfile } from "@/lib/products"
 import { CASH_ON_DELIVERY_FEE_EUROS } from "@/lib/checkout-fees"
+import { stylizeBrandText } from "@/lib/brand"
 
 type Tab = "products" | "categories" | "orders" | "users"
 
@@ -112,7 +113,7 @@ export function AdminPanel() {
         {/* Title */}
         <div className="mb-8">
           <h1 className="text-2xl font-bold tracking-tight text-foreground mb-1">Pannello di Controllo</h1>
-          <p className="text-sm text-muted-foreground">Gestisci il tuo negozio MIRAI</p>
+          <p className="text-sm text-muted-foreground">Gestisci il tuo negozio MIRΛI</p>
         </div>
 
         {/* Stats Cards */}
@@ -285,10 +286,10 @@ function ProductsTab({ products, categories, onRefresh }: { products: any[]; cat
                   )}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
-                      <h3 className="font-medium text-foreground truncate">{p.name}</h3>
+                      <h3 className="font-medium text-foreground truncate">{stylizeBrandText(p.name)}</h3>
                       {p.is_new && <span className="text-[9px] uppercase tracking-widest px-1.5 py-0.5 bg-primary/20 text-primary rounded">Nuovo</span>}
                       <span className="text-[9px] uppercase tracking-widest px-1.5 py-0.5 bg-secondary text-muted-foreground rounded">
-                        {getSupplierProfile(p) === "mirai" ? "Fornitore MIRAI" : "Fornitore Minimal"}
+                        {getSupplierProfile(p) === "mirai" ? "Fornitore MIRΛI" : "Fornitore Minimal"}
                       </span>
                       {!p.in_stock && <span className="text-[9px] uppercase tracking-widest px-1.5 py-0.5 bg-destructive/20 text-destructive rounded">Esaurito</span>}
                     </div>
@@ -401,7 +402,7 @@ function ProductForm({ product, categories, onSubmit, saving }: {
           ))}
         </select>
         <p className="text-[10px] leading-4 text-muted-foreground">
-          Minimal conserva l'impostazione attuale. MIRAI forza brand MIRAI, rimuove il GTIN e imposta la consegna in 7–12 giorni lavorativi.
+          Minimal conserva l'impostazione attuale. MIRΛI forza brand MIRΛI, rimuove il GTIN e imposta la consegna in 7–12 giorni lavorativi.
         </p>
       </div>
       <div className="flex flex-col gap-1.5">
@@ -418,7 +419,7 @@ function ProductForm({ product, categories, onSubmit, saving }: {
       <div className="flex flex-col gap-1.5">
         <Label className="text-[10px] uppercase tracking-widest text-muted-foreground">SKU / MPN</Label>
         <Input name="supplier_sku" defaultValue={product?.supplier_sku || ""} placeholder="Es. MIRAI-TEE-001" className="bg-secondary" />
-        <p className="text-[10px] leading-4 text-muted-foreground">Per i prodotti MIRAI viene inviato a Google come MPN, senza inventare un GTIN.</p>
+        <p className="text-[10px] leading-4 text-muted-foreground">Per i prodotti MIRΛI viene inviato a Google come MPN, senza inventare un GTIN.</p>
       </div>
       <div className="flex flex-col gap-1.5">
         <Label className="text-[10px] uppercase tracking-widest text-muted-foreground">GTIN</Label>
@@ -427,7 +428,7 @@ function ProductForm({ product, categories, onSubmit, saving }: {
           value={gtin}
           onChange={(event) => setGtin(event.target.value)}
           readOnly={isMiraiProfile}
-          placeholder={isMiraiProfile ? "Non previsto per prodotti MIRAI" : "EAN / GTIN del fornitore"}
+          placeholder={isMiraiProfile ? "Non previsto per prodotti MIRΛI" : "EAN / GTIN del fornitore"}
           className={`bg-secondary ${isMiraiProfile ? "cursor-not-allowed opacity-70" : ""}`}
         />
       </div>
@@ -608,7 +609,7 @@ function CategoriesTab({ categories, onRefresh }: { categories: any[]; onRefresh
                         <h3 className="font-semibold text-foreground">{parent.name}</h3>
                         <div className="flex items-center gap-3 text-xs text-muted-foreground mt-0.5">
                           <span>/{parent.slug}</span>
-                          {parent.description && <span className="truncate max-w-[200px]">{parent.description}</span>}
+                          {parent.description && <span className="truncate max-w-[200px]">{stylizeBrandText(parent.description)}</span>}
                           <span className="text-primary">{children.length} sottocategorie</span>
                         </div>
                       </div>
@@ -638,7 +639,7 @@ function CategoriesTab({ categories, onRefresh }: { categories: any[]; onRefresh
                               <h3 className="font-medium text-foreground text-sm">{c.name}</h3>
                               <div className="flex items-center gap-3 text-xs text-muted-foreground mt-0.5">
                                 <span>/{c.slug}</span>
-                                {c.description && <span className="truncate max-w-[200px]">{c.description}</span>}
+                                {c.description && <span className="truncate max-w-[200px]">{stylizeBrandText(c.description)}</span>}
                               </div>
                             </div>
                             <div className="flex gap-1">

@@ -17,6 +17,7 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Plus, Pencil, Trash2, X, Check, Package, Download, Eye, EyeOff } from "lucide-react"
 import { AdminProductGallery } from "@/components/admin-product-gallery"
+import { stylizeBrandText } from "@/lib/brand"
 
 type Product = {
   id: string
@@ -129,12 +130,12 @@ export function AdminProductTable({ products, categories = [] }: { products: Pro
       const result = await importMiraiSupplierCatalog()
       const categoryMessage = result.categoryCreated ? " Categorie mancanti create." : " Immagini categoria aggiornate."
       setFeedback(
-        `${result.inserted} prodotti MIRAI importati, ${result.skipped} già presenti su ${result.total}.${categoryMessage} `
+        `${result.inserted} prodotti MIRΛI importati, ${result.skipped} già presenti su ${result.total}.${categoryMessage} `
         + "Taglie e quantità sono state applicate dal catalogo fornitore.",
       )
     } catch (err) {
       console.error(err)
-      setFeedback(err instanceof Error ? err.message : "Importazione catalogo MIRAI non riuscita.")
+      setFeedback(err instanceof Error ? err.message : "Importazione catalogo MIRΛI non riuscita.")
     } finally {
       setIsSubmitting(false)
     }
@@ -149,8 +150,8 @@ export function AdminProductTable({ products, categories = [] }: { products: Pro
       formData.set("is_published", String(isPublished))
       await setProductPublication(formData)
       setFeedback(isPublished
-        ? `“${product.name}” pubblicato sul sito e nei feed.`
-        : `“${product.name}” spostato in bozze e nascosto da sito e feed.`)
+        ? `“${stylizeBrandText(product.name)}” pubblicato sul sito e nei feed.`
+        : `“${stylizeBrandText(product.name)}” spostato in bozze e nascosto da sito e feed.`)
       router.refresh()
     } catch (err) {
       console.error(err)
@@ -227,7 +228,7 @@ export function AdminProductTable({ products, categories = [] }: { products: Pro
           className="h-10 gap-2 border-primary/40 text-xs uppercase tracking-widest text-primary hover:bg-primary/10 hover:text-primary"
         >
           <Download className="h-4 w-4" />
-          {isSubmitting ? "Importazione..." : "Importa catalogo MIRAI"}
+          {isSubmitting ? "Importazione..." : "Importa catalogo MIRΛI"}
         </Button>
         {blackIslandCount > 0 && (
           <Button
@@ -330,7 +331,7 @@ export function AdminProductTable({ products, categories = [] }: { products: Pro
                     {product.image_url ? (
                       <img
                         src={product.image_url}
-                        alt={product.name}
+                        alt={stylizeBrandText(product.name)}
                         className="w-full h-full object-cover"
                       />
                     ) : (
@@ -343,7 +344,7 @@ export function AdminProductTable({ products, categories = [] }: { products: Pro
                   {/* Info */}
                   <div className="flex-1 min-w-0">
                     <div className="mb-1 flex flex-wrap items-center gap-2 sm:gap-3">
-                      <h3 className="min-w-0 basis-full font-semibold text-foreground sm:basis-auto sm:truncate">{product.name}</h3>
+                      <h3 className="min-w-0 basis-full font-semibold text-foreground sm:basis-auto sm:truncate">{stylizeBrandText(product.name)}</h3>
                       {product.is_new && (
                         <span className="text-[10px] uppercase tracking-widest px-2 py-0.5 bg-primary/10 text-primary rounded-full">
                           Nuovo
@@ -365,7 +366,7 @@ export function AdminProductTable({ products, categories = [] }: { products: Pro
                       )}
                     </div>
                     <p className="text-sm text-muted-foreground mb-2 truncate">
-                      {product.description || "Nessuna descrizione"}
+                      {product.description ? stylizeBrandText(product.description) : "Nessuna descrizione"}
                     </p>
                     <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
                       <span className="font-mono text-foreground">

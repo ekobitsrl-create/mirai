@@ -6,8 +6,8 @@ import { Footer } from "@/components/footer"
 import { COMPANY_INFO } from "@/lib/company-info"
 
 export const metadata: Metadata = {
-  title: "FAQ - MIRAI",
-  description: "Domande frequenti sugli acquisti, spedizioni, resi e molto altro su MIRAI.",
+  title: "FAQ - MIRΛI",
+  description: "Domande frequenti sugli acquisti, spedizioni, resi e molto altro su MIRΛI.",
   alternates: { canonical: "/faq" },
 }
 
@@ -55,7 +55,7 @@ const faqs = [
       },
       {
         q: "Il reso e gratuito?",
-        a: "Sì. Per ogni reso approvato in Italia, MIRAI invia un'etichetta prepagata e sostiene integralmente le spese di restituzione. Il costo per il cliente è 0,00 EUR e non è prevista alcuna commissione di restocking.",
+        a: "Sì. Per ogni reso approvato in Italia, MIRΛI invia un'etichetta prepagata e sostiene integralmente le spese di restituzione. Il costo per il cliente è 0,00 EUR e non è prevista alcuna commissione di restocking.",
       },
       {
         q: "Come devo spedire il reso?",
@@ -80,7 +80,7 @@ const faqs = [
       },
       {
         q: "Posso personalizzare un capo?",
-        a: "Si, nel nostro MIRAI LAB STORE di Catania offriamo un servizio di personalizzazione. Per il servizio online, contattaci per verificare le opzioni disponibili.",
+        a: "Si, nel nostro MIRΛI LAB STORE di Catania offriamo un servizio di personalizzazione. Per il servizio online, contattaci per verificare le opzioni disponibili.",
       },
     ],
   },

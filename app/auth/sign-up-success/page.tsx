@@ -1,6 +1,6 @@
 import Link from "next/link"
-import Image from "next/image"
 import { Mail } from "lucide-react"
+import { BrandMark } from "@/components/brand-mark"
 
 export default function SignUpSuccessPage() {
   return (
@@ -8,7 +8,7 @@ export default function SignUpSuccessPage() {
       <div className="w-full max-w-md">
         <div className="flex flex-col items-center gap-8">
           <Link href="/">
-            <Image src="/images/logo.png" alt="MIRAI" width={120} height={40} className="invert" style={{ width: 'auto', height: 'auto' }} />
+            <BrandMark className="text-xl text-white" />
           </Link>
 
           <div className="w-full border border-border rounded-lg p-8 bg-card text-center">
@@ -21,7 +21,7 @@ export default function SignUpSuccessPage() {
               Controlla la tua email
             </h1>
             <p className="text-sm text-muted-foreground leading-relaxed">
-              Ti abbiamo inviato il link per attivare il tuo account MIRAI Society. Dopo la
+              Ti abbiamo inviato il link per attivare il tuo account MIRΛI Society. Dopo la
               conferma entrerai direttamente nel Society Hub.
             </p>
           </div>

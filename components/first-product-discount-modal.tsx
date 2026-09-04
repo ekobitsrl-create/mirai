@@ -159,7 +159,7 @@ export function FirstProductDiscountModal() {
               <BadgePercent className="h-7 w-7" />
             </span>
             <div>
-              <p className="text-sm uppercase tracking-[0.22em] text-white/55">MIRAI Lab Store</p>
+              <p className="text-sm uppercase tracking-[0.22em] text-white/55">MIRΛI Lab Store</p>
               <h2 id="minimal-days-offer-title" className="mt-1 text-2xl font-black tracking-tight sm:text-4xl">
                 {t.nav.discountBanner}
               </h2>

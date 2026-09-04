@@ -98,7 +98,7 @@ export const SEO_GUIDES: SeoGuide[] = [
       "Boxy indica larghezza con lunghezza più compatta.",
       "Le misure reali contano più dell'etichetta usata per il fit.",
     ],
-    cta: { label: "Confronta i fit MIRAI", href: "/collezione/t-shirt" },
+    cta: { label: "Confronta i fit MIRΛI", href: "/collezione/t-shirt" },
     publishedAt: PUBLISHED_AT,
     updatedAt: PUBLISHED_AT,
   },
@@ -229,7 +229,7 @@ export const SEO_GUIDES: SeoGuide[] = [
     primaryKeyword: "come personalizzare una t-shirt",
     relatedKeywords: ["maglietta personalizzata con foto", "maglietta personalizzata con scritta", "personalizzare t-shirt online"],
     intro:
-      "Una t-shirt personalizzata riuscita parte da un'idea leggibile e da un file adatto alla stampa. Nel MIRAI Custom Lab puoi scegliere capo, colore, lato e grafica, vedere un'anteprima e inviare il progetto al controllo del team.",
+      "Una t-shirt personalizzata riuscita parte da un'idea leggibile e da un file adatto alla stampa. Nel MIRΛI Custom Lab puoi scegliere capo, colore, lato e grafica, vedere un'anteprima e inviare il progetto al controllo del team.",
     sections: [
       {
         heading: "Prepara foto, scritta o grafica",
@@ -296,7 +296,7 @@ export const SEO_GUIDES: SeoGuide[] = [
       "Segui sempre l'etichetta specifica del prodotto.",
       "Riduci calore, sfregamento e detergenti aggressivi.",
     ],
-    cta: { label: "Scopri il MIRAI Custom Lab", href: "/custom-lab" },
+    cta: { label: "Scopri il MIRΛI Custom Lab", href: "/custom-lab" },
     publishedAt: PUBLISHED_AT,
     updatedAt: PUBLISHED_AT,
   },
@@ -373,7 +373,7 @@ export const SEO_GUIDES: SeoGuide[] = [
       "Valuta quanto userai davvero il capo.",
       "Personalizzazione e piccola scala possono aumentare unicità e tempi di lavoro.",
     ],
-    cta: { label: "Conosci il concept MIRAI", href: "/chi-siamo" },
+    cta: { label: "Conosci il concept MIRΛI", href: "/chi-siamo" },
     publishedAt: PUBLISHED_AT,
     updatedAt: PUBLISHED_AT,
   },

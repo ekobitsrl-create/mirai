@@ -11,6 +11,7 @@ import { getCatalogItemId } from "@/lib/catalog-identifiers"
 import { localizedOrganicPath } from "@/lib/international-seo"
 import { translateProductName } from "@/lib/catalog-localization"
 import { formatLocalizedPrice } from "@/lib/site-localization"
+import { stylizeBrandText } from "@/lib/brand"
 
 type Product = {
   id: string
@@ -41,8 +42,8 @@ export function ProductGrid({ products, title, subtitle }: { products: Product[]
   const { ref, isVisible } = useScrollAnimation(0.05)
   const { t, locale } = useLanguage()
 
-  const displayTitle = title || t.products.title
-  const displaySubtitle = subtitle || t.products.subtitle
+  const displayTitle = stylizeBrandText(title || t.products.title)
+  const displaySubtitle = stylizeBrandText(subtitle || t.products.subtitle)
 
   const toggleWishlist = (id: string) => {
     setWishlist((prev) =>
@@ -74,7 +75,7 @@ export function ProductGrid({ products, title, subtitle }: { products: Product[]
                 <div className="mirai-neon-frame mirai-neon-lift relative mb-4 aspect-[3/4] overflow-hidden rounded-2xl bg-card">
                   <Image
                     src={product.image_url || "/placeholder.jpg"}
-                    alt={translateProductName(product.name, locale)}
+                    alt={stylizeBrandText(translateProductName(product.name, locale))}
                     fill
                     className="object-cover object-top transition-transform duration-700 ease-out group-hover:scale-110"
                     sizes="(max-width: 1024px) 50vw, 25vw"
@@ -133,7 +134,7 @@ export function ProductGrid({ products, title, subtitle }: { products: Product[]
               <div>
                 <p className="text-[10px] tracking-[0.2em] uppercase text-primary mb-0.5">{"MIR\u039BI"}</p>
                 <h3 className="text-xs md:text-sm font-medium text-foreground group-hover:text-primary transition-colors duration-300 line-clamp-2 mb-1">
-                  {translateProductName(product.name, locale)}
+                  {stylizeBrandText(translateProductName(product.name, locale))}
                 </h3>
                 <p className="text-sm font-semibold text-foreground">
                   {formatLocalizedPrice(Number(product.price), locale)}

@@ -3,7 +3,6 @@
 import { useState, type FormEvent } from "react"
 import Link from "next/link"
 import { ArrowLeft, Mail } from "lucide-react"
-import { createClient } from "@/lib/supabase/client"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -20,12 +19,17 @@ export default function ForgotPasswordPage() {
     setLoading(true)
 
     try {
-      const redirectTo = new URL("/auth/update-password", window.location.origin).toString()
-      const { error: resetError } = await createClient().auth.resetPasswordForEmail(
-        email.trim().toLowerCase(),
-        { redirectTo },
-      )
-      if (resetError) throw resetError
+      const formData = new FormData(event.currentTarget)
+      const response = await fetch("/api/auth/reset-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: email.trim().toLowerCase(),
+          website: formData.get("website"),
+        }),
+      })
+      const result = await response.json().catch(() => ({})) as { error?: string }
+      if (!response.ok) throw new Error(result.error || "Invio non riuscito")
       setSent(true)
     } catch (submitError) {
       setError(submitError instanceof Error ? submitError.message : "Invio non riuscito")
@@ -45,7 +49,7 @@ export default function ForgotPasswordPage() {
         </div>
         <h1 className="mt-6 text-2xl font-bold tracking-tight text-foreground">Recupera la password</h1>
         <p className="mt-2 text-sm leading-6 text-muted-foreground">
-          Inserisci l'email del tuo MIRAI PASS. Riceverai un link sicuro per scegliere una nuova password.
+          Inserisci l'email del tuo MIRΛI PASS. Riceverai un link sicuro per scegliere una nuova password.
         </p>
 
         {sent ? (
@@ -54,6 +58,7 @@ export default function ForgotPasswordPage() {
           </div>
         ) : (
           <form onSubmit={submit} className="mt-7">
+            <input name="website" type="text" tabIndex={-1} autoComplete="off" className="hidden" aria-hidden="true" />
             <Label htmlFor="email" className="text-xs uppercase tracking-widest text-muted-foreground">Email</Label>
             <Input
               id="email"

@@ -41,6 +41,7 @@ import {
   translateCategory,
 } from "@/lib/site-localization"
 import { localizeColor, localizeProduct, translateProductName } from "@/lib/catalog-localization"
+import { stylizeBrandText } from "@/lib/brand"
 import {
   QUICK_PAYMENT_METHOD_QUERY_KEY,
   QUICK_PAYMENT_METHOD_STORAGE_KEY,
@@ -74,7 +75,7 @@ function getGalleryViews(product: StoreProduct, labels: string[]): ProductGaller
   const originalGallery = product.image_gallery?.length
     ? product.image_gallery
     : product.image_url
-      ? [{ src: product.image_url, alt: product.name, fit: "contain" as const }]
+      ? [{ src: product.image_url, alt: stylizeBrandText(product.name), fit: "contain" as const }]
       : []
 
   if (!originalGallery.length) return []
@@ -121,8 +122,8 @@ export function ProductDetail({
       discountBeforePay: "Prima puoi applicare MIRAI10 o un altro codice sconto, poi scegliere il metodo di pagamento.", unavailable: "Momentaneamente non disponibile",
       freeShipping: "Spedizione", always: "Gratis in Italia", easyReturn: "Reso facile", within30: "Entro 30 giorni", payment: "Pagamento", stripe: "Protetto da Stripe",
       details: "Dettagli prodotto", composition: "Composizione e cura", shippingReturns: "Spedizioni e resi", expected: "Tempi previsti", tracked: "Spedizione tracciata: gratuita in Italia, supplemento fisso di 40 € negli altri Paesi UE.",
-      returnText: "Per gli ordini consegnati in Italia il reso è gratuito: puoi richiederlo entro 30 giorni di calendario dalla consegna", returnEnd: "MIRAI fornisce l'etichetta prepagata, non applica costi di restocking ed elabora il rimborso entro 3 giorni dal ricevimento del reso. Consulta la pagina", returns: "Resi e Rimborsi",
-      complete: "Complete the look", mayLike: "Potrebbe piacerti", shopAll: "Shop all", closeImage: "Chiudi immagine", chooseSize: "Scegli taglia", fitGuide: "MIRAI fit guide", availableSizes: "Taglie disponibili",
+      returnText: "Per gli ordini consegnati in Italia il reso è gratuito: puoi richiederlo entro 30 giorni di calendario dalla consegna", returnEnd: "MIRΛI fornisce l'etichetta prepagata, non applica costi di restocking ed elabora il rimborso entro 3 giorni dal ricevimento del reso. Consulta la pagina", returns: "Resi e Rimborsi",
+      complete: "Complete the look", mayLike: "Potrebbe piacerti", shopAll: "Shop all", closeImage: "Chiudi immagine", chooseSize: "Scegli taglia", fitGuide: "MIRΛI fit guide", availableSizes: "Taglie disponibili",
       chest: "Torace", length: "Lunghezza", sleeve: "Manica", close: "Chiudi", understood: "Ho capito", precise: "Le misure precise possono variare in base al modello. Per una verifica prima dell'acquisto contatta l'assistenza indicando il codice",
     },
     en: {
@@ -136,8 +137,8 @@ export function ProductDetail({
       discountBeforePay: "Apply MIRAI10 or another discount code first, then choose your payment method.", unavailable: "Temporarily unavailable",
       freeShipping: "Shipping", always: "Free in Italy", easyReturn: "Easy return", within30: "Within 30 days", payment: "Payment", stripe: "Secured by Stripe",
       details: "Product details", composition: "Composition and care", shippingReturns: "Shipping and returns", expected: "Expected timing", tracked: "Tracked shipping: free in Italy, fixed €40 surcharge in other EU countries.",
-      returnText: "Returns are free for orders delivered in Italy: request one within 30 calendar days of delivery", returnEnd: "MIRAI provides a prepaid label, charges no restocking fee and processes the refund within 3 days of receiving the return. See", returns: "Returns and Refunds",
-      complete: "Complete the look", mayLike: "You may also like", shopAll: "Shop all", closeImage: "Close image", chooseSize: "Choose size", fitGuide: "MIRAI fit guide", availableSizes: "Available sizes",
+      returnText: "Returns are free for orders delivered in Italy: request one within 30 calendar days of delivery", returnEnd: "MIRΛI provides a prepaid label, charges no restocking fee and processes the refund within 3 days of receiving the return. See", returns: "Returns and Refunds",
+      complete: "Complete the look", mayLike: "You may also like", shopAll: "Shop all", closeImage: "Close image", chooseSize: "Choose size", fitGuide: "MIRΛI fit guide", availableSizes: "Available sizes",
       chest: "Chest", length: "Length", sleeve: "Sleeve", close: "Close", understood: "Got it", precise: "Measurements may vary by style. To check before buying, contact support and quote code",
     },
     es: {
@@ -151,8 +152,8 @@ export function ProductDetail({
       discountBeforePay: "Primero aplica MIRAI10 u otro código de descuento y después elige el método de pago.", unavailable: "No disponible temporalmente",
       freeShipping: "Envío", always: "Gratis en Italia", easyReturn: "Devolución fácil", within30: "En 30 días", payment: "Pago", stripe: "Protegido por Stripe",
       details: "Detalles del producto", composition: "Composición y cuidado", shippingReturns: "Envíos y devoluciones", expected: "Plazo previsto", tracked: "Envío con seguimiento: gratuito en Italia, suplemento fijo de 40 € en los demás países de la UE.",
-      returnText: "Las devoluciones son gratuitas para los pedidos entregados en Italia: solicítala en los 30 días naturales siguientes a la entrega", returnEnd: "MIRAI proporciona una etiqueta prepagada, no cobra gastos de reposición y procesa el reembolso en un plazo de 3 días desde la recepción de la devolución. Consulta", returns: "Devoluciones y reembolsos",
-      complete: "Completa el look", mayLike: "También te puede gustar", shopAll: "Ver todo", closeImage: "Cerrar imagen", chooseSize: "Elegir talla", fitGuide: "Guía de tallas MIRAI", availableSizes: "Tallas disponibles",
+      returnText: "Las devoluciones son gratuitas para los pedidos entregados en Italia: solicítala en los 30 días naturales siguientes a la entrega", returnEnd: "MIRΛI proporciona una etiqueta prepagada, no cobra gastos de reposición y procesa el reembolso en un plazo de 3 días desde la recepción de la devolución. Consulta", returns: "Devoluciones y reembolsos",
+      complete: "Completa el look", mayLike: "También te puede gustar", shopAll: "Ver todo", closeImage: "Cerrar imagen", chooseSize: "Elegir talla", fitGuide: "Guía de tallas MIRΛI", availableSizes: "Tallas disponibles",
       chest: "Pecho", length: "Largo", sleeve: "Manga", close: "Cerrar", understood: "Entendido", precise: "Las medidas pueden variar según el modelo. Para comprobarlas antes de comprar, contacta con asistencia indicando el código",
     },
     de: {
@@ -166,8 +167,8 @@ export function ProductDetail({
       discountBeforePay: "Wende zuerst MIRAI10 oder einen anderen Rabattcode an und wähle dann die Zahlungsart.", unavailable: "Vorübergehend nicht verfügbar",
       freeShipping: "Versand", always: "Kostenlos in Italien", easyReturn: "Einfache Rückgabe", within30: "Innerhalb von 30 Tagen", payment: "Zahlung", stripe: "Durch Stripe geschützt",
       details: "Produktdetails", composition: "Material und Pflege", shippingReturns: "Versand und Rückgabe", expected: "Voraussichtliche Dauer", tracked: "Sendungsverfolgter Versand: kostenlos in Italien, 40 € Festzuschlag in den übrigen EU-Ländern.",
-      returnText: "Für nach Italien gelieferte Bestellungen ist die Rückgabe kostenlos: Beantrage sie innerhalb von 30 Kalendertagen nach Zustellung", returnEnd: "MIRAI stellt ein vorausbezahltes Etikett bereit, erhebt keine Wiedereinlagerungsgebühr und bearbeitet die Erstattung innerhalb von 3 Tagen nach Eingang der Rücksendung. Siehe", returns: "Rückgabe und Erstattung",
-      complete: "Vervollständige den Look", mayLike: "Das könnte dir gefallen", shopAll: "Alle ansehen", closeImage: "Bild schließen", chooseSize: "Größe wählen", fitGuide: "MIRAI Fit-Guide", availableSizes: "Verfügbare Größen",
+      returnText: "Für nach Italien gelieferte Bestellungen ist die Rückgabe kostenlos: Beantrage sie innerhalb von 30 Kalendertagen nach Zustellung", returnEnd: "MIRΛI stellt ein vorausbezahltes Etikett bereit, erhebt keine Wiedereinlagerungsgebühr und bearbeitet die Erstattung innerhalb von 3 Tagen nach Eingang der Rücksendung. Siehe", returns: "Rückgabe und Erstattung",
+      complete: "Vervollständige den Look", mayLike: "Das könnte dir gefallen", shopAll: "Alle ansehen", closeImage: "Bild schließen", chooseSize: "Größe wählen", fitGuide: "MIRΛI Fit-Guide", availableSizes: "Verfügbare Größen",
       chest: "Brust", length: "Länge", sleeve: "Ärmel", close: "Schließen", understood: "Verstanden", precise: "Die Maße können je nach Modell variieren. Kontaktiere vor dem Kauf den Support und nenne den Code",
     },
     fr: {
@@ -181,8 +182,8 @@ export function ProductDetail({
       discountBeforePay: "Appliquez d’abord MIRAI10 ou un autre code promo, puis choisissez le mode de paiement.", unavailable: "Temporairement indisponible",
       freeShipping: "Livraison", always: "Gratuite en Italie", easyReturn: "Retour facile", within30: "Sous 30 jours", payment: "Paiement", stripe: "Protégé par Stripe",
       details: "Détails du produit", composition: "Composition et entretien", shippingReturns: "Livraison et retours", expected: "Délai prévu", tracked: "Livraison suivie : gratuite en Italie, supplément fixe de 40 € dans les autres pays de l’UE.",
-      returnText: "Les retours sont gratuits pour les commandes livrées en Italie : faites-en la demande dans les 30 jours calendaires suivant la livraison", returnEnd: "MIRAI fournit une étiquette prépayée, ne facture aucuns frais de restockage et traite le remboursement sous 3 jours à compter de la réception du retour. Consultez", returns: "Retours et remboursements",
-      complete: "Complétez le look", mayLike: "Vous aimerez aussi", shopAll: "Tout voir", closeImage: "Fermer l’image", chooseSize: "Choisir la taille", fitGuide: "Guide de coupe MIRAI", availableSizes: "Tailles disponibles",
+      returnText: "Les retours sont gratuits pour les commandes livrées en Italie : faites-en la demande dans les 30 jours calendaires suivant la livraison", returnEnd: "MIRΛI fournit une étiquette prépayée, ne facture aucuns frais de restockage et traite le remboursement sous 3 jours à compter de la réception du retour. Consultez", returns: "Retours et remboursements",
+      complete: "Complétez le look", mayLike: "Vous aimerez aussi", shopAll: "Tout voir", closeImage: "Fermer l’image", chooseSize: "Choisir la taille", fitGuide: "Guide de coupe MIRΛI", availableSizes: "Tailles disponibles",
       chest: "Poitrine", length: "Longueur", sleeve: "Manche", close: "Fermer", understood: "Compris", precise: "Les mesures peuvent varier selon le modèle. Pour les vérifier avant l’achat, contactez le support en indiquant le code",
     },
   }[locale]
@@ -211,10 +212,10 @@ export function ProductDetail({
   const detailItems = localizedProduct.detailItems
   const gallery = useMemo(() => getGalleryViews(product, productCopy.gallery), [locale, product])
   const selectedImage = gallery[selectedImageIndex] || gallery[0]
-  const displayTitle = localizedProduct.name
+  const displayTitle = stylizeBrandText(localizedProduct.name)
 
   useEffect(() => {
-    const suffix = " | MIRAI"
+    const suffix = " | MIRΛI"
     document.title = `${displayTitle}${suffix}`
   }, [displayTitle])
   const firstOrderPrice = Math.round(
@@ -363,7 +364,7 @@ export function ProductDetail({
 
   async function shareProduct() {
     if (navigator.share) {
-      await navigator.share({ title: product.name, url: window.location.href })
+      await navigator.share({ title: displayTitle, url: window.location.href })
       return
     }
     await navigator.clipboard?.writeText(window.location.href)
@@ -402,7 +403,7 @@ export function ProductDetail({
         <ChevronRight className="h-3 w-3 shrink-0" />
         <Link href={localizedOrganicPath("/collezioni", locale)} className="shrink-0 hover:text-white">Shop</Link>
         <ChevronRight className="h-3 w-3 shrink-0" />
-        <Link href={localizedOrganicPath(`/collezione/${product.category}`, locale)} className="shrink-0 hover:text-white">{translateCategory(product.category, formatCategory(product.category), locale)}</Link>
+        <Link href={localizedOrganicPath(`/collezione/${product.category}`, locale)} className="shrink-0 hover:text-white">{stylizeBrandText(translateCategory(product.category, formatCategory(product.category), locale))}</Link>
         <ChevronRight className="h-3 w-3 shrink-0" />
         <span className="truncate text-white/85">{displayTitle}</span>
       </nav>
@@ -486,7 +487,7 @@ export function ProductDetail({
           <section className="mirai-neon-card relative overflow-hidden rounded-[1.75rem] p-5 sm:p-7 lg:p-7">
           <div className="relative sm:flex sm:items-start sm:justify-between sm:gap-6">
             <div className="min-w-0 flex-1">
-              <p className="pr-20 text-[9px] font-semibold uppercase tracking-[0.3em] text-[#9f86ff] sm:pr-0">MIRAI LAB / {product.brand || translateCategory(product.category, formatCategory(product.category), locale)}</p>
+              <p className="pr-20 text-[9px] font-semibold uppercase tracking-[0.3em] text-[#9f86ff] sm:pr-0">MIRΛI LAB / {stylizeBrandText(product.brand || translateCategory(product.category, formatCategory(product.category), locale))}</p>
               <h1 className="mt-5 max-w-xl text-xl font-medium leading-[1.08] tracking-[-0.035em] text-white sm:mt-3 sm:text-3xl lg:text-[2rem]">{displayTitle}</h1>
               <div className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-2">
                 <p className="text-xl font-semibold">{formatPrice(product.price)}</p>
@@ -618,7 +619,7 @@ export function ProductDetail({
             </button>
           </div>
 
-          {localizedProduct.description && <p className="mt-6 max-w-xl text-sm leading-6 text-white/70">{localizedProduct.description}</p>}
+          {localizedProduct.description && <p className="mt-6 max-w-xl text-sm leading-6 text-white/70">{stylizeBrandText(localizedProduct.description)}</p>}
           {product.supplier_sku && (
             <p className="mt-3 text-[9px] uppercase tracking-[0.2em] text-white/40">
               {productCopy.productCode} {product.supplier_sku}
@@ -686,9 +687,9 @@ export function ProductDetail({
             <Details title={productCopy.details} open>
               {detailItems.length > 0 ? (
                 <ul className="space-y-1.5">
-                  {detailItems.map((detail) => <li key={detail}>• {detail}</li>)}
+                  {detailItems.map((detail) => <li key={detail}>• {stylizeBrandText(detail)}</li>)}
                 </ul>
-              ) : localizedProduct.description}
+              ) : localizedProduct.description ? stylizeBrandText(localizedProduct.description) : null}
             </Details>
             {(product.composition || product.care) && (
               <Details title={productCopy.composition}>
@@ -717,9 +718,9 @@ export function ProductDetail({
             {suggestedProducts.map((item) => (
               <Link key={item.id} href={localizedOrganicPath(`/prodotto/${item.id}`, locale)} className="group min-w-0">
                 <div className="mirai-neon-frame mirai-neon-lift relative mb-3 aspect-[4/5] overflow-hidden rounded-2xl bg-white/5">
-                  {item.image_url && <Image src={item.image_url} alt={translateProductName(item.name, locale)} fill className={`${item.category === "drop" ? "object-contain" : "object-cover"} transition-transform duration-700 group-hover:scale-[1.035]`} sizes="(max-width: 768px) 50vw, 25vw" />}
+                  {item.image_url && <Image src={item.image_url} alt={stylizeBrandText(translateProductName(item.name, locale))} fill className={`${item.category === "drop" ? "object-contain" : "object-cover"} transition-transform duration-700 group-hover:scale-[1.035]`} sizes="(max-width: 768px) 50vw, 25vw" />}
                 </div>
-                <h3 className="truncate text-xs font-medium group-hover:text-[#9f86ff]">{translateProductName(item.name, locale)}</h3>
+                <h3 className="truncate text-xs font-medium group-hover:text-[#9f86ff]">{stylizeBrandText(translateProductName(item.name, locale))}</h3>
                 <p className="mt-1 text-xs text-white/45">{formatPrice(item.price)}</p>
               </Link>
             ))}

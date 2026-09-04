@@ -6,9 +6,9 @@ import { Footer } from "@/components/footer"
 import { COMPANY_INFO } from "@/lib/company-info"
 
 export const metadata: Metadata = {
-  title: "Termini e Condizioni - MIRAI",
+  title: "Termini e Condizioni - MIRΛI",
   alternates: { canonical: "/termini" },
-  description: "Termini e condizioni generali di vendita per gli acquisti su MIRAI.",
+  description: "Termini e condizioni generali di vendita per gli acquisti su MIRΛI.",
 }
 
 export default function TerminiPage() {
@@ -34,7 +34,7 @@ export default function TerminiPage() {
 
             <section className="flex flex-col gap-3">
               <h2 className="font-[family-name:var(--font-space-grotesk)] text-xl font-bold text-foreground">2. Prodotti, prezzi e disponibilita</h2>
-              <p>I prodotti sono descritti nelle rispettive pagine con prezzo in Euro, IVA inclusa ove applicabile, immagini, taglie e disponibilita. MIRAI puo aggiornare prezzi e disponibilita prima della conferma dell'ordine. Le immagini possono variare leggermente per impostazioni dello schermo o produzione artigianale.</p>
+              <p>I prodotti sono descritti nelle rispettive pagine con prezzo in Euro, IVA inclusa ove applicabile, immagini, taglie e disponibilita. MIRΛI puo aggiornare prezzi e disponibilita prima della conferma dell'ordine. Le immagini possono variare leggermente per impostazioni dello schermo o produzione artigianale.</p>
             </section>
 
             <section className="flex flex-col gap-3">
@@ -55,12 +55,12 @@ export default function TerminiPage() {
 
             <section className="flex flex-col gap-3">
               <h2 className="font-[family-name:var(--font-space-grotesk)] text-xl font-bold text-foreground">6. Garanzia legale</h2>
-              <p>I prodotti venduti a consumatori sono coperti dalla garanzia legale di conformita prevista dal Codice del Consumo. In caso di difetto o non conformita, contatta MIRAI con numero ordine, descrizione del problema e foto del prodotto.</p>
+              <p>I prodotti venduti a consumatori sono coperti dalla garanzia legale di conformita prevista dal Codice del Consumo. In caso di difetto o non conformita, contatta MIRΛI con numero ordine, descrizione del problema e foto del prodotto.</p>
             </section>
 
             <section className="flex flex-col gap-3">
               <h2 className="font-[family-name:var(--font-space-grotesk)] text-xl font-bold text-foreground">7. Prodotti personalizzati</h2>
-              <p>I capi custom o personalizzati sono realizzati su richiesta del cliente. Non possono essere restituiti per semplice ripensamento, salvo difetto, errore imputabile a MIRAI o non conformita rispetto all'ordine confermato.</p>
+              <p>I capi custom o personalizzati sono realizzati su richiesta del cliente. Non possono essere restituiti per semplice ripensamento, salvo difetto, errore imputabile a MIRΛI o non conformita rispetto all'ordine confermato.</p>
             </section>
 
             <section className="flex flex-col gap-3">

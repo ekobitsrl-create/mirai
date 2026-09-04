@@ -1,4 +1,5 @@
 import type { Locale } from "./translations"
+import { stylizeBrandText } from "./brand"
 
 export const localeTags: Record<Locale, string> = {
   it: "it-IT",
@@ -939,11 +940,12 @@ const canonicalPhraseMap = new Map(phraseRows.map((row) => [canonicalPhrase(row[
 function preserveWhitespace(source: string, value: string) {
   const leading = source.match(/^\s*/)?.[0] || ""
   const trailing = source.match(/\s*$/)?.[0] || ""
-  return `${leading}${value}${trailing}`
+  return `${leading}${stylizeBrandText(value)}${trailing}`
 }
 
 export function translateSiteText(source: string, locale: Locale) {
-  if (locale === "it" || !source.trim()) return source
+  if (!source.trim()) return source
+  if (locale === "it") return stylizeBrandText(source)
   const trimmed = source.trim()
   const exact = exactPhraseMap.get(trimmed)
     || normalizedPhraseMap.get(trimmed.replace(/\s+/g, " "))
@@ -1085,7 +1087,7 @@ export function translateSiteText(source: string, locale: Locale) {
     return preserveWhitespace(source, labels[locale])
   }
 
-  return source
+  return stylizeBrandText(source)
 }
 
 const categoryCopy: Record<string, Record<Locale, string>> = {
@@ -1125,13 +1127,13 @@ const categoryWordCopy: Record<Exclude<Locale, "it">, Array<readonly [RegExp, st
 export function translateCategory(slug: string, fallback: string, locale: Locale) {
   const normalizedSlug = slug.trim().toLowerCase()
   const exact = categoryCopy[normalizedSlug]?.[locale]
-  if (exact || locale === "it") return exact || fallback
+  if (exact || locale === "it") return stylizeBrandText(exact || fallback)
 
   const source = fallback || slug.replace(/-/g, " ")
-  return categoryWordCopy[locale].reduce(
+  return stylizeBrandText(categoryWordCopy[locale].reduce(
     (translated, [pattern, replacement]) => translated.replace(pattern, replacement),
     source,
-  )
+  ))
 }
 
 const catalogExactRows: PhraseRow[] = [

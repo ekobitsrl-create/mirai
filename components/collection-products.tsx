@@ -12,6 +12,7 @@ import { localizedOrganicPath } from "@/lib/international-seo"
 import { getCatalogItemId } from "@/lib/catalog-identifiers"
 import { formatLocalizedPrice, translateCategory } from "@/lib/site-localization"
 import { translateCategoryDescription, translateProductName } from "@/lib/catalog-localization"
+import { stylizeBrandText } from "@/lib/brand"
 
 type Product = {
   id: string
@@ -65,10 +66,10 @@ export function CollectionProducts({
   const [activeSubcategory, setActiveSubcategory] = useState<string | null>(null)
   const { addItem } = useCart()
   const { locale } = useLanguage()
-  const categoryName = translateCategory(category.slug, category.name, locale)
+  const categoryName = stylizeBrandText(translateCategory(category.slug, category.name, locale))
 
   useEffect(() => {
-    document.title = `${categoryName} | MIRAI`
+    document.title = `${categoryName} | MIRΛI`
   }, [categoryName])
 
   // Initialize activeSubcategory from URL parameter
@@ -133,7 +134,7 @@ export function CollectionProducts({
           </h1>
           {category.description && (
             <p className="text-muted-foreground mt-2 text-lg">
-              {translateCategoryDescription(category.slug, category.description, locale)}
+              {stylizeBrandText(translateCategoryDescription(category.slug, category.description, locale))}
             </p>
           )}
           <p className="text-sm text-primary mt-2">
@@ -161,7 +162,7 @@ export function CollectionProducts({
                       : "text-muted-foreground hover:text-foreground hover:bg-secondary"
                   }`}
                 >
-                  {translateCategory(cat.slug, cat.name, locale)}
+                  {stylizeBrandText(translateCategory(cat.slug, cat.name, locale))}
                 </Link>
               ))}
             </nav>
@@ -201,7 +202,7 @@ export function CollectionProducts({
                             : "text-muted-foreground hover:text-foreground hover:bg-secondary"
                         }`}
                       >
-                        {translateCategory(sub.slug, sub.name, locale)} ({count})
+                        {stylizeBrandText(translateCategory(sub.slug, sub.name, locale))} ({count})
                       </button>
                     )
                   })}
@@ -235,7 +236,7 @@ export function CollectionProducts({
                       <div className={`mirai-neon-frame mirai-neon-lift relative mb-4 aspect-[3/4] overflow-hidden rounded-2xl ${["t-shirt-godspeed", "t-shirt-god-street", "t-shirt-god-speed"].includes(product.category) ? "bg-white" : "bg-card"}`}>
                         <Image
                           src={product.image_url || "/placeholder.jpg"}
-                          alt={translateProductName(product.name, locale)}
+                          alt={stylizeBrandText(translateProductName(product.name, locale))}
                           fill
                           className={
                             ["t-shirt-godspeed", "t-shirt-god-street", "t-shirt-god-speed"].includes(product.category)
@@ -306,7 +307,7 @@ export function CollectionProducts({
                             {"MIR\u039BI"}
                           </p>
                           <h3 className="text-sm font-medium text-foreground group-hover:text-primary transition-colors duration-300">
-                            {translateProductName(product.name, locale)}
+                            {stylizeBrandText(translateProductName(product.name, locale))}
                           </h3>
                         </div>
                         <p className="text-sm font-semibold text-foreground">

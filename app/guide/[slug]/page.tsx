@@ -68,7 +68,7 @@ export default async function GuideArticlePage({ params }: { params: Promise<{ s
         type="application/ld+json"
         dangerouslySetInnerHTML={{
           __html: JSON.stringify(createBreadcrumbJsonLd([
-            { name: "MIRAI", path: localizedOrganicPath("/", locale) },
+            { name: "MIRΛI", path: localizedOrganicPath("/", locale) },
             { name: locale === "it" ? "Guide" : guide.primaryKeyword, path: localizedOrganicPath("/guide", locale) },
             { name: guide.title, path: localizedOrganicPath(`/guide/${guide.slug}`, locale) },
           ])),

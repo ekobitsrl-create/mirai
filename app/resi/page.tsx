@@ -6,14 +6,14 @@ import { Footer } from "@/components/footer"
 import { COMPANY_INFO } from "@/lib/company-info"
 
 export const metadata: Metadata = {
-  title: "Resi e Rimborsi - MIRAI",
+  title: "Resi e Rimborsi - MIRΛI",
   alternates: { canonical: "/resi" },
   description: "Resi gratuiti in Italia entro 30 giorni dalla consegna, con etichetta prepagata e nessun costo di restocking.",
 }
 
 const returnSteps = [
   `Scrivi entro 30 giorni di calendario dalla consegna a ${COMPANY_INFO.email} indicando numero ordine, email usata per l'acquisto e articoli da restituire.`,
-  "Quando il reso è approvato, MIRAI sostiene le spese di restituzione e invia un'etichetta prepagata con le istruzioni di rientro.",
+  "Quando il reso è approvato, MIRΛI sostiene le spese di restituzione e invia un'etichetta prepagata con le istruzioni di rientro.",
   "Imballa il prodotto in modo sicuro, preferibilmente nella confezione originale, con cartellini ed eventuali accessori.",
   "Consegna il pacco al corriere o al punto di consegna indicato nelle istruzioni: il reso avviene per posta tramite spedizione tracciata.",
   "Il rimborso viene elaborato entro 3 giorni dal ricevimento del reso sullo stesso metodo di pagamento usato dal cliente al checkout.",
@@ -24,7 +24,7 @@ const policyFacts = [
   { label: "Valuta", value: "Euro (EUR)" },
   { label: "Finestra di reso", value: "30 giorni di calendario dalla consegna" },
   { label: "Metodo", value: "Per posta, con consegna al corriere o al punto indicato" },
-  { label: "Costo del reso", value: "Gratuito: spese a carico di MIRAI" },
+  { label: "Costo del reso", value: "Gratuito: spese a carico di MIRΛI" },
   { label: "Costo di restocking", value: "Nessuno (0,00 EUR)" },
 ]
 
@@ -53,18 +53,18 @@ export default function ResiPage() {
             Torna alla Home
           </Link>
 
-          <p className="mb-3 text-xs font-bold uppercase tracking-[0.24em] text-primary">Politica di reso MIRAI</p>
+          <p className="mb-3 text-xs font-bold uppercase tracking-[0.24em] text-primary">Politica di reso MIRΛI</p>
           <h1 className="mb-4 font-[family-name:var(--font-space-grotesk)] text-3xl font-bold tracking-tight text-foreground text-balance md:text-4xl">
             Resi e Rimborsi
           </h1>
           <p className="mb-12 max-w-2xl text-lg text-muted-foreground text-pretty">
-            Questa politica si applica agli ordini MIRAI consegnati in Italia e riassume tempi, metodo di reso, costi e modalità di rimborso.
+            Questa politica si applica agli ordini MIRΛI consegnati in Italia e riassume tempi, metodo di reso, costi e modalità di rimborso.
           </p>
 
           <div className="mb-16 grid grid-cols-1 gap-4 md:grid-cols-3">
             {[
               { icon: Clock, title: "30 giorni", desc: "Puoi richiedere il reso dalla data di consegna." },
-              { icon: RotateCcw, title: "Spese a carico MIRAI", desc: "Etichetta prepagata per ogni reso approvato." },
+              { icon: RotateCcw, title: "Spese a carico MIRΛI", desc: "Etichetta prepagata per ogni reso approvato." },
               { icon: CheckCircle, title: "Elaborazione entro 3 giorni", desc: "Dal ricevimento del reso, sullo stesso metodo di pagamento." },
             ].map((item) => (
               <div key={item.title} className="rounded-lg border border-border bg-card p-6 text-center">
@@ -153,10 +153,10 @@ export default function ResiPage() {
                 Costi di restituzione
               </h2>
               <p className="leading-relaxed">
-                Per ogni reso approvato in Italia, MIRAI sostiene integralmente le spese di restituzione e invia un'etichetta prepagata. Il costo per il cliente è 0,00 EUR e non viene detratto alcun importo dal rimborso. Non spedire il prodotto prima di aver ricevuto le istruzioni via email.
+                Per ogni reso approvato in Italia, MIRΛI sostiene integralmente le spese di restituzione e invia un'etichetta prepagata. Il costo per il cliente è 0,00 EUR e non viene detratto alcun importo dal rimborso. Non spedire il prodotto prima di aver ricevuto le istruzioni via email.
               </p>
               <p className="leading-relaxed">
-                MIRAI non applica costi di reintegro magazzino o restocking fee: il costo è 0,00 EUR.
+                MIRΛI non applica costi di reintegro magazzino o restocking fee: il costo è 0,00 EUR.
               </p>
             </section>
 

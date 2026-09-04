@@ -6,10 +6,10 @@ import { Footer } from "@/components/footer"
 import { COMPANY_INFO } from "@/lib/company-info"
 
 export const metadata: Metadata = {
-  title: "Cookie Policy - MIRAI",
+  title: "Cookie Policy - MIRΛI",
   alternates: { canonical: "/cookie-policy" },
   robots: { index: false, follow: true },
-  description: "Informativa sui cookie utilizzati dal sito web MIRAI.",
+  description: "Informativa sui cookie utilizzati dal sito web MIRΛI.",
 }
 
 export default function CookiePolicyPage() {

@@ -7,6 +7,8 @@ import { PaymentBadges } from "@/components/payment-badges"
 import { Building2, Mail, MapPin } from "lucide-react"
 import { localizedOrganicPath } from "@/lib/international-seo"
 import { localeNames, type Locale } from "@/lib/translations"
+import { stylizeBrandText } from "@/lib/brand"
+import { BrandMark } from "@/components/brand-mark"
 
 const PUBLIC_LOCALES: Locale[] = ["it", "en", "es", "de", "fr"]
 
@@ -97,12 +99,7 @@ export function Footer() {
       <div className="relative max-w-7xl mx-auto px-6 py-16">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
           <div>
-            <span
-              className="text-xl font-bold tracking-[0.25em] uppercase text-foreground mb-6 inline-block"
-              style={{ fontFamily: "var(--font-space-grotesk)" }}
-            >
-              {"MIR\u039BI"}
-            </span>
+            <BrandMark className="mb-6 text-xl text-foreground" />
             <p className="text-muted-foreground text-sm leading-relaxed mb-6 max-w-xs">
               {t.footer.description}
             </p>
@@ -148,7 +145,7 @@ export function Footer() {
               </span>
               <div>
                 <p className="text-[9px] font-bold uppercase tracking-[0.25em] text-primary">{companyLabel}</p>
-                <p className="mt-2 text-sm font-semibold text-foreground">{COMPANY_INFO.legalName}</p>
+                <p className="mt-2 text-sm font-semibold text-foreground">{stylizeBrandText(COMPANY_INFO.legalName)}</p>
                 <a
                   href={COMPANY_INFO.websiteUrl}
                   className="mt-1 inline-block text-xs text-primary transition-colors hover:text-primary/80"
@@ -196,7 +193,7 @@ export function Footer() {
         <div className="mirai-neon-divider mt-12 flex flex-col items-center justify-between gap-6 pt-8 md:flex-row">
           <div className="flex flex-col items-center gap-2 md:items-start">
             <p className="text-xs text-muted-foreground">
-              &copy; 2026 {COMPANY_INFO.legalName}. {t.footer.allRightsReserved}
+              &copy; 2026 {stylizeBrandText(COMPANY_INFO.legalName)}. {t.footer.allRightsReserved}
             </p>
             <button
               type="button"

@@ -7,7 +7,7 @@ import { GUIDES_ORGANIC_SEO } from "@/lib/organic-seo-copy"
 import { localizedOrganicPath } from "@/lib/international-seo"
 
 const GUIDE_DESCRIPTION =
-  "Guide MIRAI su fit oversize, tessuti, outfit streetwear, cura dei capi, t-shirt personalizzate e cappelli custom."
+  "Guide MIRΛI su fit oversize, tessuti, outfit streetwear, cura dei capi, t-shirt personalizzate e cappelli custom."
 
 export const metadata = buildSeoMetadata({
   title: "Guide streetwear: fit, outfit e custom",
@@ -43,7 +43,7 @@ export default function GuidePage({ locale = "it" }: { locale?: Locale } = {}) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{
           __html: JSON.stringify(createBreadcrumbJsonLd([
-            { name: "MIRAI", path: localizedOrganicPath("/", locale) },
+            { name: "MIRΛI", path: localizedOrganicPath("/", locale) },
             { name: seoCopy.title, path: localizedOrganicPath("/guide", locale) },
           ])),
         }}

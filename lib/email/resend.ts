@@ -19,15 +19,15 @@ type ResendResponse = {
   name?: string
 }
 
-const DEFAULT_FROM = "MIRAI LAB STORE <customer@mirailabstore.com>"
+const DEFAULT_FROM = "MIRΛI LAB STORE <customer@mirailabstore.com>"
 const DEFAULT_REPLY_TO = "info@mirailabstore.com"
 
 function configuredSender() {
-  return process.env.RESEND_FROM_EMAIL?.trim() || DEFAULT_FROM
+  return process.env.RESEND_FROM_EMAIL?.trim() || process.env.EMAIL_FROM?.trim() || DEFAULT_FROM
 }
 
 function configuredReplyTo() {
-  return process.env.RESEND_REPLY_TO?.trim() || DEFAULT_REPLY_TO
+  return process.env.RESEND_REPLY_TO?.trim() || process.env.EMAIL_REPLY_TO?.trim() || DEFAULT_REPLY_TO
 }
 
 async function recordDelivery(

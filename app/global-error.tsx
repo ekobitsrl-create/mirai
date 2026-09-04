@@ -27,7 +27,7 @@ export default function GlobalError({ error, reset }: { error: Error & { digest?
   const [locale, setLocale] = useState<Locale>("it")
 
   useEffect(() => {
-    console.error("Errore globale MIRAI", error)
+    console.error("Errore globale MIRΛI", error)
     try {
       const saved = window.localStorage.getItem("mirai-locale") as Locale | null
       if (saved && saved in copy) setLocale(saved)
@@ -43,7 +43,7 @@ export default function GlobalError({ error, reset }: { error: Error & { digest?
       <body style={{ margin: 0 }}>
         <main style={pageStyle}>
           <div style={{ width: "100%", maxWidth: 520, border: "1px solid #3a2b4d", padding: 32 }}>
-            <p style={{ margin: 0, color: "#a855f7", fontSize: 12, fontWeight: 700, letterSpacing: "0.24em" }}>MIRAI</p>
+            <p style={{ margin: 0, color: "#a855f7", fontSize: 12, fontWeight: 700, letterSpacing: "0.24em" }}>MIRΛI</p>
             <h1 style={{ margin: "16px 0 0", fontSize: 26 }}>{text.title}</h1>
             <p style={{ margin: "12px 0 0", color: "#b7adc4", fontSize: 14, lineHeight: 1.6 }}>{text.body}</p>
             {error.digest && <p style={{ margin: "12px 0 0", color: "#8f849b", fontSize: 12 }}>{text.support}: {error.digest}</p>}

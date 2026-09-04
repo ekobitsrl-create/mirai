@@ -6,7 +6,7 @@ import { buildSeoMetadata, createBreadcrumbJsonLd } from "@/lib/seo"
 import { getAbsoluteUrl, SITE_URL } from "@/lib/site-url"
 
 const STORE_DESCRIPTION =
-  "Scopri il negozio streetwear MIRAI a Catania: concept store, cappelli custom e abbigliamento urban in Via Umberto 95. Prossima apertura."
+  "Scopri il negozio streetwear MIRΛI a Catania: concept store, cappelli custom e abbigliamento urban in Via Umberto 95. Prossima apertura."
 
 export const metadata = buildSeoMetadata({
   title: "Negozio streetwear Catania",
@@ -16,8 +16,8 @@ export const metadata = buildSeoMetadata({
     "negozio streetwear Catania",
     "concept store Catania",
     "abbigliamento streetwear Catania",
-    "MIRAI Store Catania",
-    "MIRAI Concept Store",
+    "MIRΛI Store Catania",
+    "MIRΛI Concept Store",
   ],
 })
 
@@ -25,8 +25,8 @@ const storeJsonLd = {
   "@context": "https://schema.org",
   "@type": "ClothingStore",
   "@id": `${SITE_URL}/negozio#store`,
-  name: "MIRAI LAB STORE",
-  alternateName: ["MIRAI Concept Store", "MIRAI Store Catania"],
+  name: "MIRΛI LAB STORE",
+  alternateName: ["MIRΛI Concept Store", "MIRΛI Store Catania"],
   description: STORE_DESCRIPTION,
   url: getAbsoluteUrl("/negozio"),
   image: getAbsoluteUrl("/images/store-interior.png"),
@@ -69,7 +69,7 @@ export default function NegozioPage() {
         <div className="relative mx-auto grid max-w-7xl items-center gap-12 lg:grid-cols-[0.82fr_1.18fr] lg:gap-16">
           <div className="order-2 lg:order-1">
             <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-2 text-[9px] font-bold uppercase tracking-[0.24em] text-primary shadow-[0_0_32px_rgba(159,134,255,0.16)]">
-              <MapPin className="h-3.5 w-3.5" /> MIRAI LAB / Spazio fisico
+              <MapPin className="h-3.5 w-3.5" /> MIRΛI LAB / Spazio fisico
             </div>
 
             <p className="mt-8 text-[10px] font-semibold uppercase tracking-[0.34em] text-white/40">Concept store / Prossima apertura</p>
@@ -80,7 +80,7 @@ export default function NegozioPage() {
             </h1>
 
             <p className="mt-7 max-w-lg text-sm leading-7 text-white/55 sm:text-base">
-              Un punto d’incontro tra streetwear, custom culture e persone. Stiamo preparando il primo spazio MIRAI in Via Umberto 95, Catania: data e accessi verranno svelati alla community.
+              Un punto d’incontro tra streetwear, custom culture e persone. Stiamo preparando il primo spazio MIRΛI in Via Umberto 95, Catania: data e accessi verranno svelati alla community.
             </p>
 
             <div className="mt-8 flex flex-wrap gap-3">
@@ -117,7 +117,7 @@ export default function NegozioPage() {
                 loop
                 playsInline
                 preload="auto"
-                aria-label="Anteprima del futuro negozio fisico MIRAI LAB STORE"
+                aria-label="Anteprima del futuro negozio fisico MIRΛI LAB STORE"
               />
               <div className="pointer-events-none absolute bottom-6 left-6 right-6 flex items-center justify-between rounded-full border border-white/10 bg-black/80 px-4 py-2.5 sm:bottom-8 sm:left-8 sm:right-8">
                 <span className="flex items-center gap-2 text-[8px] font-semibold uppercase tracking-[0.22em] text-white/70">
@@ -139,7 +139,7 @@ export default function NegozioPage() {
                 Via Umberto 95,<br />Catania.
               </h2>
               <p className="mt-5 max-w-md text-sm leading-7 text-white/55">
-                95129 Catania (CT). La mappa ti porta direttamente al futuro spazio MIRAI LAB STORE.
+                95129 Catania (CT). La mappa ti porta direttamente al futuro spazio MIRΛI LAB STORE.
               </p>
             </div>
             <a
@@ -154,7 +154,7 @@ export default function NegozioPage() {
 
           <div className="min-h-[360px] overflow-hidden border border-white/12 bg-[#111015] sm:min-h-[440px]">
             <iframe
-              title="Mappa del negozio MIRAI LAB STORE, Via Umberto 95 Catania"
+              title="Mappa del negozio MIRΛI LAB STORE, Via Umberto 95 Catania"
               src="https://www.google.com/maps?q=Via%20Umberto%2095%2C%2095129%20Catania%20CT&z=16&output=embed"
               className="h-full min-h-[360px] w-full border-0 sm:min-h-[440px]"
               loading="lazy"

@@ -5,9 +5,9 @@ import { Navbar } from "@/components/navbar"
 import { Footer } from "@/components/footer"
 
 export const metadata: Metadata = {
-  title: "Spedizioni - MIRAI",
+  title: "Spedizioni - MIRΛI",
   alternates: { canonical: "/spedizioni" },
-  description: "Informazioni su spedizioni, tempi di consegna e costi per gli ordini MIRAI.",
+  description: "Informazioni su spedizioni, tempi di consegna e costi per gli ordini MIRΛI.",
 }
 
 export default function SpedizioniPage() {
@@ -68,7 +68,7 @@ export default function SpedizioniPage() {
                 Preparazione e consegna
               </h2>
               <p className="leading-relaxed">
-                La consegna stimata è di 3–5 giorni lavorativi per i prodotti standard e di 7–12 giorni lavorativi per i prodotti che riportano questa indicazione nella scheda. La tempistica applicabile compare sempre nella pagina del prodotto e può variare in periodi di picco, festività o per cause non dipendenti da MIRAI.
+                La consegna stimata è di 3–5 giorni lavorativi per i prodotti standard e di 7–12 giorni lavorativi per i prodotti che riportano questa indicazione nella scheda. La tempistica applicabile compare sempre nella pagina del prodotto e può variare in periodi di picco, festività o per cause non dipendenti da MIRΛI.
               </p>
             </section>
 

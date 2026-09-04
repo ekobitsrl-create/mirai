@@ -460,7 +460,7 @@ export default function CheckoutPage() {
 
             {createAccount ? (
               <div className="mt-6 border-t border-border pt-6">
-                <p className="text-sm text-muted-foreground">Crea il MIRAI PASS prima del pagamento: al ritorno troverai il carrello pronto.</p>
+                <p className="text-sm text-muted-foreground">Crea il MIRΛI PASS prima del pagamento: al ritorno troverai il carrello pronto.</p>
                 <div className="mt-4 grid gap-3 sm:grid-cols-2">
                   <Link href={accountSignUpHref} className="inline-flex items-center justify-center gap-2 bg-primary px-5 py-3 text-xs font-bold uppercase tracking-widest text-primary-foreground">
                     <UserPlus className="h-4 w-4" /> Crea account
@@ -608,7 +608,7 @@ export default function CheckoutPage() {
                   onCheckedChange={(checked) => setMarketingConsent(checked === true)}
                 />
                 <Label htmlFor="marketing-consent" className="cursor-pointer text-sm leading-5 text-muted-foreground">
-                  Desidero ricevere promemoria sul carrello e novita MIRAI. Richiede un indirizzo email.
+                  Desidero ricevere promemoria sul carrello e novita MIRΛI. Richiede un indirizzo email.
                 </Label>
               </div>
             </section>
@@ -627,7 +627,7 @@ export default function CheckoutPage() {
 
                 <div className="mt-6 flex items-center gap-3 border border-border bg-secondary/40 px-4 py-3 text-sm text-muted-foreground">
                   <LockKeyhole className="h-4 w-4 shrink-0 text-primary" />
-                  <span>I dati di pagamento vengono gestiti direttamente da Stripe e non passano da MIRAI.</span>
+                  <span>I dati di pagamento vengono gestiti direttamente da Stripe e non passano da MIRΛI.</span>
                 </div>
 
                 <div className="relative min-h-[400px] border border-border bg-card p-1 mt-6">

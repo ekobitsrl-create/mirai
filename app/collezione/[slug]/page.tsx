@@ -79,7 +79,7 @@ async function getStaticCategory(slug: string, supabase: SupabaseClient) {
     id: `static-${slug}`,
     name: STATIC_CATEGORY_NAMES[slug] || slug.replace(/-/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase()),
     slug,
-    description: `Scopri i nuovi capi ${STATIC_CATEGORY_NAMES[slug] || slug} disponibili su MIRAI LAB STORE.`,
+    description: `Scopri i nuovi capi ${STATIC_CATEGORY_NAMES[slug] || slug} disponibili su MIRΛI LAB STORE.`,
     image_url: matchingProduct?.image_url || null,
     parent_id: null,
     sort_order: 99,
@@ -91,8 +91,8 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const slug = normalizeCategorySlug(rawSlug)
   if (slug === "drop") {
     return {
-      title: "Drop Community MIRAI",
-      description: "Accesso anticipato ai prodotti selezionati per la community MIRAI.",
+      title: "Drop Community MIRΛI",
+      description: "Accesso anticipato ai prodotti selezionati per la community MIRΛI.",
       robots: { index: false, follow: false },
     }
   }
@@ -112,7 +112,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const categoryName = category?.name || STATIC_CATEGORY_NAMES[slug] || slug
   const description = seo?.description
     || category?.description
-    || `Scopri la collezione ${categoryName} su MIRAI. Pezzi esclusivi di streetwear e accessori custom.`
+    || `Scopri la collezione ${categoryName} su MIRΛI. Pezzi esclusivi di streetwear e accessori custom.`
   const title = seo?.title || `${categoryName} - Collezione`
 
   return buildSeoMetadata({
@@ -120,7 +120,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     description,
     path: `/collezione/${encodeURIComponent(slug)}`,
     localizedAlternates: true,
-    keywords: seo?.keywords || [categoryName, `${categoryName} streetwear`, "MIRAI streetwear"],
+    keywords: seo?.keywords || [categoryName, `${categoryName} streetwear`, "MIRΛI streetwear"],
     image: category?.image_url ? getAbsoluteUrl(category.image_url) : undefined,
   })
 }
@@ -228,7 +228,7 @@ export default async function CollezionePage({ params }: { params: Promise<{ slu
           __html: safeJsonLd(createWebPageJsonLd({
             type: "CollectionPage",
             name: categoryName,
-            description: categoryDescription || seo?.description || `MIRAI ${categoryName}.`,
+            description: categoryDescription || seo?.description || `MIRΛI ${categoryName}.`,
             path: categoryPath,
             locale,
           })),
@@ -238,7 +238,7 @@ export default async function CollezionePage({ params }: { params: Promise<{ slu
         type="application/ld+json"
         dangerouslySetInnerHTML={{
           __html: safeJsonLd(createBreadcrumbJsonLd([
-            { name: locale === "it" ? "Home" : "MIRAI", path: localizedOrganicPath("/", locale) },
+            { name: locale === "it" ? "Home" : "MIRΛI", path: localizedOrganicPath("/", locale) },
             { name: translateCategory("collezioni", "Collezioni", locale), path: localizedOrganicPath("/collezioni", locale) },
             { name: categoryName, path: categoryPath },
           ])),

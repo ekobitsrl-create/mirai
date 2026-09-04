@@ -348,14 +348,14 @@ export async function importMiraiSupplierCatalog() {
     {
       name: "Canotte",
       slug: "canotte",
-      description: "Canotte e smanicati streetwear MIRAI.",
+      description: "Canotte e smanicati streetwear MIRΛI.",
       image_url: "/images/categories/canotte.webp",
       sort_order: 35,
     },
     {
       name: "Profumi",
       slug: "profumi",
-      description: "Fragranze e profumi MIRAI.",
+      description: "Fragranze e profumi MIRΛI.",
       image_url: "/images/categories/profumi-genesi.webp",
       sort_order: 55,
     },
