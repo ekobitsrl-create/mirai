@@ -1,0 +1,71 @@
+.mira-rig { position: absolute; inset: -5% -12%; pointer-events: none; }
+.mira-rig-canvas { width: 100%; height: 100%; overflow: visible; filter: drop-shadow(0 0 5px #9f86ff38); }
+.mira-rig-body { transition: transform 650ms cubic-bezier(.22,1,.36,1); }
+.mira-rig-breath { animation: mira-rig-breathe 4.6s ease-in-out infinite; }
+.mira-rig-head { animation: mira-rig-look 7.2s ease-in-out infinite; }
+.mira-rig-head-pose, .mira-rig-arm, .mira-rig-forearm, .mira-rig-leg { transition: transform 650ms cubic-bezier(.22,1,.36,1); }
+.mira-rig-arm-sway { animation: mira-rig-sway 5.3s ease-in-out infinite alternate; }
+.mira-rig-arm-destro .mira-rig-arm-sway { animation-delay: -2.7s; animation-direction: alternate-reverse; }
+.mira-rig-eyes { animation: mira-rig-blink 6.7s linear infinite; }
+.mira-rig-eye, .mira-rig-mouth { fill: #d3a1ff; filter: drop-shadow(0 0 3px #a568ff); }
+.mira-rig-smile { fill: none; stroke: #d3a1ff; stroke-width: 3; stroke-linecap: round; }
+.mira-rig-mouth { opacity: 0; }
+.mira-rig[data-facing="right"] .mira-rig-head-pose { transform: rotate(2deg); }
+.mira-rig-listening .mira-rig-head-pose, .mira-rig-curious .mira-rig-head-pose { transform: rotate(-8deg); }
+.mira-rig-listening .mira-rig-head { animation-duration: 9s; }
+.mira-rig-listening .mira-rig-arm-sinistro { transform: rotate(5deg); }
+.mira-rig-thinking .mira-rig-head-pose { transform: rotate(7deg) translateY(-2px); }
+.mira-rig-thinking .mira-rig-arm-destro { transform: rotate(-7deg); }
+.mira-rig-thinking .mira-rig-forearm-destro { transform: rotate(-24deg); }
+.mira-rig-speaking .mira-rig-head { animation: mira-rig-nod 2.2s ease-in-out infinite; }
+.mira-rig-speaking .mira-rig-arm-sinistro { transform: rotate(9deg); }
+.mira-rig-speaking .mira-rig-forearm-sinistro { transform: rotate(12deg); }
+.mira-rig-speaking .mira-rig-arm-sway { animation-duration: 1.7s; }
+.mira-rig-speaking .mira-rig-mouth { opacity: 1; animation: mira-rig-talk 470ms ease-in-out infinite alternate; }
+.mira-rig-speaking .mira-rig-smile { opacity: 0; }
+.mira-rig-waving .mira-rig-arm-destro { transform: rotate(-28deg); }
+.mira-rig-waving .mira-rig-forearm-destro { animation: mira-rig-wave 850ms ease-in-out infinite alternate; }
+.mira-rig-presenting .mira-rig-arm-sinistro { transform: rotate(20deg); }
+.mira-rig-presenting .mira-rig-forearm-sinistro { transform: rotate(22deg); }
+.mira-rig-dragging .mira-rig-body { transform: rotate(-5deg) translateY(5px); }
+.mira-rig-dragging .mira-rig-arm-sinistro { transform: rotate(24deg); }
+.mira-rig-dragging .mira-rig-arm-destro { transform: rotate(-24deg); }
+.mira-rig-celebrating .mira-rig-body, .mira-rig-dancing .mira-rig-body { animation: mira-rig-dance 1s ease-in-out infinite; }
+.mira-rig-celebrating .mira-rig-arm-sinistro, .mira-rig-dancing .mira-rig-arm-sinistro { transform: rotate(28deg); }
+.mira-rig-celebrating .mira-rig-arm-destro, .mira-rig-dancing .mira-rig-arm-destro { transform: rotate(-28deg); }
+.mira-rig-jumping .mira-rig-body { animation: mira-rig-jump 1.2s ease-in-out infinite; }
+.mira-rig-roaming .mira-rig-leg-sinistra { animation: mira-rig-step 650ms ease-in-out infinite alternate; }
+.mira-rig-roaming .mira-rig-leg-destra { animation: mira-rig-step 650ms ease-in-out -650ms infinite alternate-reverse; }
+.mira-rig-roaming .mira-rig-arm-sway { animation-duration: 650ms; }
+.mira-rig-sleeping .mira-rig-body { transform: rotate(-4deg) translateY(8px); }
+.mira-rig-sleeping .mira-rig-head-pose { transform: rotate(-9deg) translateY(4px); }
+.mira-rig-sleeping .mira-rig-eyes { animation: none; transform: scaleY(.12); }
+.mira-rig-sitting .mira-rig-body { transform: translateY(12px) scaleY(.96); }
+.mira-rig[data-paused="true"] * { animation-play-state: paused !important; }
+
+@keyframes mira-rig-breathe { 0%,100% { transform: scaleY(1); } 50% { transform: scaleY(1.012) translateY(-1px); } }
+@keyframes mira-rig-look { 0%,100% { transform: rotate(-1deg); } 35% { transform: rotate(2deg) translateY(-2px); } 70% { transform: rotate(-2deg); } }
+@keyframes mira-rig-sway { from { transform: rotate(-1.5deg); } to { transform: rotate(2deg); } }
+@keyframes mira-rig-blink { 0%,42%,46%,94%,98%,100% { transform: scaleY(1); } 44%,96% { transform: scaleY(.1); } }
+@keyframes mira-rig-nod { 0%,100% { transform: rotate(-2deg); } 35% { transform: rotate(2deg) translateY(3px); } 70% { transform: rotate(0) translateY(-2px); } }
+@keyframes mira-rig-talk { 0%,100% { transform: scale(.85,.25); } 30% { transform: scale(1,1); } 65% { transform: scale(.7,.5); } }
+@keyframes mira-rig-wave { from { transform: rotate(-25deg); } to { transform: rotate(-46deg); } }
+@keyframes mira-rig-dance { 0%,100% { transform: rotate(-3deg); } 50% { transform: rotate(3deg) translateY(-7px); } }
+@keyframes mira-rig-jump { 0%,100% { transform: translateY(0); } 20% { transform: scaleY(.96); } 55% { transform: translateY(-28px); } }
+@keyframes mira-rig-step { from { transform: rotate(-3deg); } to { transform: rotate(3deg) translateY(-5px); } }
+
+.mira-presence { will-change: transform; }
+.mira-is-roaming { transition: transform 2.8s cubic-bezier(.33,.72,.25,1); }
+.mira-bubble-expanded { display: flex; flex-direction: column; overflow: hidden; }
+.mira-bubble-expanded > div:first-child { flex-shrink: 0; }
+.mira-chat-content { display: flex; flex-direction: column; min-height: 0; }
+.mira-transcript { overflow-y: auto; min-height: 64px; max-height: 255px; overscroll-behavior: contain; scrollbar-width: thin; scrollbar-color: #9f86ff66 transparent; }
+.mira-message { border: 1px solid #ffffff14; border-radius: 16px; padding: 10px 12px; font-size: 12px; line-height: 1.65; overflow-wrap: anywhere; color: #ffffffe0; margin-bottom: 8px; }
+.mira-message-assistant { background: #ffffff09; margin-right: 10px; }
+.mira-message-user { margin-left: 30px; background: #9f86ff22; border-color: #9f86ff30; }
+.mira-stream-caret { display: inline-block; width: 3px; height: 12px; margin-left: 4px; vertical-align: middle; background: #c9b6ff; animation: mira-caret 1s ease-in-out infinite; }
+@keyframes mira-caret { 50% { opacity: .15; } }
+@media (prefers-reduced-motion: reduce) {
+  .mira-rig *, .mira-stream-caret { animation: none !important; transition: none !important; }
+  .mira-is-roaming, .mira-model-reactive-shell { transition: none; }
+}

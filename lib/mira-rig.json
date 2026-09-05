@@ -1,0 +1,254 @@
+{
+  "female": {
+    "width": 354,
+    "height": 675,
+    "pieces": {
+      "braccio-destro-inferiore": {
+        "x": 230,
+        "y": 262,
+        "width": 75,
+        "height": 103
+      },
+      "braccio-destro-superiore": {
+        "x": 224,
+        "y": 184,
+        "width": 72,
+        "height": 113
+      },
+      "braccio-sinistro-inferiore": {
+        "x": 58,
+        "y": 262,
+        "width": 75,
+        "height": 103
+      },
+      "braccio-sinistro-superiore": {
+        "x": 69,
+        "y": 184,
+        "width": 72,
+        "height": 113
+      },
+      "cinghia-destra": {
+        "x": 196,
+        "y": 326,
+        "width": 71,
+        "height": 209
+      },
+      "cinghia-sinistra": {
+        "x": 88,
+        "y": 326,
+        "width": 71,
+        "height": 209
+      },
+      "cintura-vita": {
+        "x": 93,
+        "y": 300,
+        "width": 169,
+        "height": 69
+      },
+      "coda": {
+        "x": 190,
+        "y": 0,
+        "width": 156,
+        "height": 250
+      },
+      "coscia-destra": {
+        "x": 173,
+        "y": 349,
+        "width": 102,
+        "height": 151
+      },
+      "coscia-sinistra": {
+        "x": 80,
+        "y": 349,
+        "width": 102,
+        "height": 151
+      },
+      "guscio-testa": {
+        "x": 67,
+        "y": 0,
+        "width": 215,
+        "height": 196
+      },
+      "mano-destra": {
+        "x": 242,
+        "y": 320,
+        "width": 112,
+        "height": 95
+      },
+      "mano-sinistra": {
+        "x": 0,
+        "y": 320,
+        "width": 122,
+        "height": 95
+      },
+      "scarpa-destra": {
+        "x": 168,
+        "y": 548,
+        "width": 106,
+        "height": 127
+      },
+      "scarpa-sinistra": {
+        "x": 80,
+        "y": 548,
+        "width": 106,
+        "height": 127
+      },
+      "stinco-destro": {
+        "x": 171,
+        "y": 470,
+        "width": 98,
+        "height": 109
+      },
+      "stinco-sinistro": {
+        "x": 85,
+        "y": 470,
+        "width": 98,
+        "height": 109
+      },
+      "tasca-fianco-destra": {
+        "x": 219,
+        "y": 349,
+        "width": 65,
+        "height": 103
+      },
+      "tasca-fianco-sinistra": {
+        "x": 77,
+        "y": 349,
+        "width": 65,
+        "height": 103
+      },
+      "top-torace": {
+        "x": 114,
+        "y": 204,
+        "width": 130,
+        "height": 126
+      },
+      "torso-giacca": {
+        "x": 77,
+        "y": 165,
+        "width": 201,
+        "height": 167
+      }
+    }
+  },
+  "male": {
+    "width": 310,
+    "height": 652,
+    "pieces": {
+      "braccio-destro-inferiore": {
+        "x": 206,
+        "y": 246,
+        "width": 77,
+        "height": 102
+      },
+      "braccio-destro-superiore": {
+        "x": 202,
+        "y": 163,
+        "width": 72,
+        "height": 111
+      },
+      "braccio-sinistro-inferiore": {
+        "x": 26,
+        "y": 246,
+        "width": 77,
+        "height": 102
+      },
+      "braccio-sinistro-superiore": {
+        "x": 37,
+        "y": 163,
+        "width": 72,
+        "height": 111
+      },
+      "cinghia-destra": {
+        "x": 173,
+        "y": 321,
+        "width": 76,
+        "height": 216
+      },
+      "cinghia-sinistra": {
+        "x": 60,
+        "y": 321,
+        "width": 76,
+        "height": 216
+      },
+      "cintura-vita": {
+        "x": 75,
+        "y": 293,
+        "width": 164,
+        "height": 72
+      },
+      "coscia-destra": {
+        "x": 155,
+        "y": 339,
+        "width": 105,
+        "height": 147
+      },
+      "coscia-sinistra": {
+        "x": 50,
+        "y": 339,
+        "width": 105,
+        "height": 147
+      },
+      "guscio-testa": {
+        "x": 31,
+        "y": 0,
+        "width": 246,
+        "height": 191
+      },
+      "mano-destra": {
+        "x": 214,
+        "y": 303,
+        "width": 96,
+        "height": 120
+      },
+      "mano-sinistra": {
+        "x": 0,
+        "y": 303,
+        "width": 96,
+        "height": 120
+      },
+      "scarpa-destra": {
+        "x": 149,
+        "y": 534,
+        "width": 109,
+        "height": 118
+      },
+      "scarpa-sinistra": {
+        "x": 52,
+        "y": 534,
+        "width": 109,
+        "height": 118
+      },
+      "stinco-destro": {
+        "x": 151,
+        "y": 457,
+        "width": 103,
+        "height": 109
+      },
+      "stinco-sinistro": {
+        "x": 55,
+        "y": 457,
+        "width": 103,
+        "height": 109
+      },
+      "tasca-fianco-destra": {
+        "x": 195,
+        "y": 340,
+        "width": 65,
+        "height": 103
+      },
+      "tasca-fianco-sinistra": {
+        "x": 49,
+        "y": 340,
+        "width": 65,
+        "height": 103
+      },
+      "torso-felpa": {
+        "x": 76,
+        "y": 151,
+        "width": 161,
+        "height": 202
+      }
+    }
+  }
+}

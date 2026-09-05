@@ -1,9 +1,8 @@
 "use client"
 
-import Image from "next/image"
 import Link from "next/link"
-import { usePathname, useRouter } from "next/navigation"
-import { ArrowRight, Mic, MicOff, Move, Send, Sparkles, UserRoundCog, X } from "lucide-react"
+import { usePathname } from "next/navigation"
+import { ArrowRight, Mic, MicOff, Move, Send, Sparkles, Square, RotateCcw, Volume2, UserRoundCog, X } from "lucide-react"
 import {
   FormEvent,
   PointerEvent as ReactPointerEvent,
@@ -19,6 +18,10 @@ import { localizedOrganicPath } from "@/lib/international-seo"
 import { localeTags, translateSiteText } from "@/lib/site-localization"
 import type { Locale } from "@/lib/translations"
 import { stylizeBrandText } from "@/lib/brand"
+import { readMiraEvents } from "@/lib/mira-stream"
+import { miraCopy } from "@/lib/mira-copy"
+import { MiraRig } from "@/components/mira-rig"
+import "@/styles/mira-rig.css"
 
 type MiraVariant = "male" | "female"
 type MiraAssetPose = "idle" | "listening" | "speaking"
@@ -34,73 +37,7 @@ type MiraPose = MiraAssetPose
   | "dancing"
   | "sitting"
   | "sleeping"
-type MiraSpriteSequence = "idle"
-  | "walk"
-  | "listen"
-  | "talk"
-  | "curious"
-  | "run"
-  | "jump"
-  | "wave"
-  | "present"
-  | "think"
-  | "dance"
-  | "sit"
-  | "hang"
-  | "sleep"
-type MiraSpriteSheet = "sprite" | "conversation-calm" | "conversation-active" | "motion" | "gesture" | "emotion" | "rest" | "drag"
 type MiraAmbientPose = Exclude<MiraPose, MiraAssetPose | "dragging" | "celebrating" | "roaming" | "sleeping">
-
-const MIRA_POSE_ASSET: Record<MiraPose, MiraAssetPose> = {
-  idle: "speaking",
-  listening: "listening",
-  speaking: "idle",
-  curious: "listening",
-  dragging: "speaking",
-  celebrating: "speaking",
-  roaming: "listening",
-  jumping: "speaking",
-  waving: "speaking",
-  presenting: "speaking",
-  thinking: "listening",
-  dancing: "speaking",
-  sitting: "listening",
-  sleeping: "listening",
-}
-
-const MIRA_SPRITE_SEQUENCE: Partial<Record<MiraPose, MiraSpriteSequence>> = {
-  idle: "idle",
-  listening: "listen",
-  speaking: "talk",
-  curious: "curious",
-  dragging: "hang",
-  celebrating: "dance",
-  roaming: "run",
-  jumping: "jump",
-  waving: "wave",
-  presenting: "present",
-  thinking: "think",
-  dancing: "dance",
-  sitting: "sit",
-  sleeping: "sleep",
-}
-
-const MIRA_SPRITE_SHEET: Record<MiraSpriteSequence, MiraSpriteSheet> = {
-  idle: "conversation-calm",
-  walk: "sprite",
-  listen: "conversation-calm",
-  talk: "conversation-active",
-  curious: "conversation-active",
-  run: "motion",
-  jump: "motion",
-  wave: "gesture",
-  present: "gesture",
-  think: "emotion",
-  dance: "emotion",
-  sit: "rest",
-  hang: "drag",
-  sleep: "rest",
-}
 
 const MIRA_AMBIENT_ACTIONS: Array<{ pose: MiraAmbientPose; duration: number }> = [
   { pose: "curious", duration: 3200 },
@@ -110,7 +47,6 @@ const MIRA_AMBIENT_ACTIONS: Array<{ pose: MiraAmbientPose; duration: number }> =
   { pose: "sitting", duration: 4600 },
 ]
 
-const MIRA_SPRITE_SHEETS: MiraSpriteSheet[] = ["sprite", "conversation-calm", "conversation-active", "motion", "gesture", "emotion", "rest", "drag"]
 
 type MiraPosition = {
   x: number
@@ -227,9 +163,6 @@ function MiraModel({
   faceRight?: boolean
   className?: string
 }) {
-  const spriteSequence = MIRA_SPRITE_SEQUENCE[pose]
-  const spriteSheet = spriteSequence ? MIRA_SPRITE_SHEET[spriteSequence] : null
-
   return (
     <div
       className={`mira-model mira-model-state-${pose} relative h-32 w-24 md:h-52 md:w-36 ${className}`}
@@ -238,27 +171,7 @@ function MiraModel({
     >
       <div className="mira-model-glow absolute inset-x-[7%] bottom-[1%] h-[24%] rounded-full bg-primary/45 blur-2xl" />
       <div className="mira-model-scan pointer-events-none absolute inset-x-[15%] z-10 h-px bg-gradient-to-r from-transparent via-primary/70 to-transparent shadow-[0_0_9px_rgba(159,134,255,0.8)]" />
-      <div
-        key={`${variant}-${pose}-${faceRight}`}
-        className={`mira-model-sprite mira-model-${pose} absolute inset-0 ${faceRight ? "mira-model-flipped" : ""}`}
-      >
-        {spriteSequence ? (
-          <span
-            className={`mira-frame-sprite mira-frame-${spriteSequence}`}
-            style={{ backgroundImage: `url(/mascot/mira-${variant}-${spriteSheet}.webp)` }}
-            aria-hidden="true"
-          />
-        ) : (
-          <Image
-            src={`/mascot/mira-${variant}-${MIRA_POSE_ASSET[pose]}.webp`}
-            alt=""
-            fill
-            sizes="(min-width: 768px) 144px, 96px"
-            className="select-none object-contain object-bottom"
-            draggable={false}
-          />
-        )}
-      </div>
+      <MiraRig variant={variant} pose={pose} faceRight={faceRight} />
     </div>
   )
 }
@@ -310,8 +223,8 @@ function VariantCard({
 
 export function MiraGuide() {
   const pathname = usePathname()
-  const router = useRouter()
   const { locale } = useLanguage()
+  const copy = miraCopy(locale)
   const ui = (value: string) => stylizeBrandText(translateSiteText(value, locale))
   const contextualPrompt = useMemo(() => getContextPrompt(pathname, locale), [locale, pathname])
   const [hydrated, setHydrated] = useState(false)
@@ -324,6 +237,9 @@ export function MiraGuide() {
   const [input, setInput] = useState("")
   const [reply, setReply] = useState<MiraReply>({ text: "Yo, dimmi pure. Che cosa cerchi?" })
   const [isThinking, setIsThinking] = useState(false)
+  const [conversation, setConversation] = useState<MiraTurn[]>([])
+  const [limitedReply, setLimitedReply] = useState(false)
+  const [voiceSupported, setVoiceSupported] = useState(false)
   const [isSpeaking, setIsSpeaking] = useState(false)
   const [isListening, setIsListening] = useState(false)
   const [isHovering, setIsHovering] = useState(false)
@@ -351,6 +267,9 @@ export function MiraGuide() {
   const conversationRef = useRef<MiraTurn[]>([])
   const requestInFlightRef = useRef(false)
   const requestAbortRef = useRef<AbortController | null>(null)
+  const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null)
+  const transcriptRef = useRef<HTMLDivElement | null>(null)
+  const followTranscriptRef = useRef(true)
   const lastLocalIntentRef = useRef<MiraIntent | null>(null)
   const lastLocalProductRef = useRef<string | null>(null)
   const suppressClickRef = useRef(false)
@@ -426,6 +345,7 @@ export function MiraGuide() {
     setVariant(initialVariant)
     setPendingVariant(initialVariant)
     setSpeechSupported(Boolean(window.SpeechRecognition || window.webkitSpeechRecognition))
+    setVoiceSupported("speechSynthesis" in window)
     setHydrated(true)
 
     if (!savedVariant) {
@@ -452,23 +372,9 @@ export function MiraGuide() {
   }, [])
 
   useEffect(() => {
-    const preloadedImages = MIRA_SPRITE_SHEETS.map((sheet) => {
-      const image = new window.Image()
-      image.src = `/mascot/mira-${variant}-${sheet}.webp`
-      return image
-    })
-
-    return () => {
-      preloadedImages.forEach((image) => {
-        image.src = ""
-      })
-    }
-  }, [variant])
-
-  useEffect(() => {
     let celebrationTimer: number | null = null
     const handleCartItemAdded = (event: Event) => {
-      if (minimized) return
+      if (minimized || expanded || isListening || isSpeaking || requestInFlightRef.current) return
       const detail = (event as CustomEvent<{ name?: string }>).detail
       const productName = detail?.name?.trim()
       const messages: Record<Locale, string> = {
@@ -495,7 +401,7 @@ export function MiraGuide() {
       window.removeEventListener("mirai:cart-item-added", handleCartItemAdded)
       if (celebrationTimer) window.clearTimeout(celebrationTimer)
     }
-  }, [locale, minimized])
+  }, [locale, minimized, expanded, isListening, isSpeaking])
 
   useEffect(() => {
     if (
@@ -583,10 +489,27 @@ export function MiraGuide() {
       if (navigationTimerRef.current) window.clearTimeout(navigationTimerRef.current)
       if (ambientTimerRef.current) window.clearTimeout(ambientTimerRef.current)
       if (roamTimerRef.current) window.clearTimeout(roamTimerRef.current)
-      recognitionRef.current?.abort()
-      requestAbortRef.current?.abort()
+      const recognition = recognitionRef.current
+      recognitionRef.current = null
+      if (recognition) {
+        recognition.onstart = null
+        recognition.onend = null
+        recognition.onresult = null
+        recognition.onerror = null
+        recognition.abort()
+      }
+      const request = requestAbortRef.current
+      requestAbortRef.current = null
+      request?.abort()
+      utteranceRef.current = null
+      window.speechSynthesis?.cancel()
     }
   }, [])
+
+  useEffect(() => {
+    const transcript = transcriptRef.current
+    if (transcript && followTranscriptRef.current) transcript.scrollTop = transcript.scrollHeight
+  }, [conversation, reply.text, expanded])
 
   function savePosition(nextPosition: MiraPosition) {
     const stage = getStageSize()
@@ -627,6 +550,7 @@ export function MiraGuide() {
   }
 
   function openSelector() {
+    stopActivity()
     if (variant) setPendingVariant(variant)
     setExpanded(false)
     setShowNudge(false)
@@ -635,13 +559,7 @@ export function MiraGuide() {
 
   function setMiraMinimized(nextMinimized: boolean) {
     if (nextMinimized) {
-      recognitionRef.current?.abort()
-      recognitionRef.current = null
-      requestAbortRef.current?.abort()
-      window.speechSynthesis?.cancel()
-      setIsListening(false)
-      setIsThinking(false)
-      setIsSpeaking(false)
+      stopActivity()
       setExpanded(false)
       setShowNudge(false)
       setShowSelector(false)
@@ -657,17 +575,59 @@ export function MiraGuide() {
 
   function speakReply(text: string) {
     if (!("speechSynthesis" in window)) return
+    utteranceRef.current = null
     window.speechSynthesis.cancel()
     const utterance = new SpeechSynthesisUtterance(text)
+    utteranceRef.current = utterance
     utterance.lang = localeTags[locale]
     utterance.rate = 0.98
     utterance.pitch = 1.04
+    const voice = window.speechSynthesis.getVoices().find((item) => item.lang === localeTags[locale])
+    if (voice) utterance.voice = voice
+    utterance.onstart = () => {
+      if (utteranceRef.current === utterance) setIsSpeaking(true)
+    }
+    const finish = () => {
+      if (utteranceRef.current !== utterance) return
+      utteranceRef.current = null
+      setIsSpeaking(false)
+    }
+    utterance.onend = finish
+    utterance.onerror = finish
     window.speechSynthesis.speak(utterance)
   }
 
+  function stopActivity() {
+    const recognition = recognitionRef.current
+    recognitionRef.current = null
+    if (recognition) {
+      recognition.onstart = null
+      recognition.onend = null
+      recognition.onresult = null
+      recognition.onerror = null
+      recognition.abort()
+    }
+    const request = requestAbortRef.current
+    requestAbortRef.current = null
+    request?.abort()
+    requestInFlightRef.current = false
+    utteranceRef.current = null
+    window.speechSynthesis?.cancel()
+    if (poseTimerRef.current) window.clearTimeout(poseTimerRef.current)
+    if (navigationTimerRef.current) window.clearTimeout(navigationTimerRef.current)
+    setIsListening(false)
+    setIsThinking(false)
+    setIsSpeaking(false)
+    if (request) {
+      setConversation(conversationRef.current)
+      setReply({ text: conversationRef.current.at(-1)?.content || contextualPrompt })
+    }
+  }
+
   async function askMira(rawMessage: string, voiceRequest = false) {
-    const cleanMessage = rawMessage.trim()
+    const cleanMessage = rawMessage.trim().slice(0, 1500)
     if (!cleanMessage || requestInFlightRef.current) return
+    stopActivity()
     wakeMira()
 
     if (poseTimerRef.current) window.clearTimeout(poseTimerRef.current)
@@ -681,9 +641,11 @@ export function MiraGuide() {
     setInput("")
     setIsThinking(true)
     setIsSpeaking(false)
-    setReply({
-      text: locale === "it" ? "Un attimo, ci penso io…" : locale === "en" ? "One moment, I’m on it…" : locale === "es" ? "Un momento, me ocupo…" : locale === "de" ? "Einen Moment, ich kümmere mich…" : "Un instant, je m’en occupe…",
-    })
+    setLimitedReply(false)
+    setReply({ text: copy.thinking })
+    followTranscriptRef.current = true
+    const pendingConversation: MiraTurn[] = [...conversationRef.current, { role: "user", content: cleanMessage }]
+    setConversation([...pendingConversation, { role: "assistant", content: "" }])
 
     const fallbackReply = getMiraLocalReply(cleanMessage, {
       pathname,
@@ -692,71 +654,72 @@ export function MiraGuide() {
     })
     lastLocalIntentRef.current = fallbackReply.intent
     if (fallbackReply.productId) lastLocalProductRef.current = fallbackReply.productId
-    let nextReply: MiraReply = locale === "it"
+    let nextReply: MiraReply = locale === "it" && fallbackReply.intent !== "unknown"
       ? fallbackReply
-      : { text: contextualPrompt, href: fallbackReply.href, label: fallbackReply.label, autoNavigate: fallbackReply.autoNavigate }
-    const timeout = window.setTimeout(() => controller.abort(), 17_000)
+      : { text: copy.unavailable }
+    // Fallback suggestions must not navigate the visitor away from their conversation.
+    nextReply = { ...nextReply, autoNavigate: false }
+    let aiAnswered = false
+    let streamedText = ""
+    const timeout = window.setTimeout(() => controller.abort(), 40_000)
 
     try {
-      const useScriptedReply = locale === "it"
-        && fallbackReply.intent !== "unknown"
-        && fallbackReply.confidence >= 0.55
-
-      if (useScriptedReply) {
-        await new Promise((resolve) => window.setTimeout(resolve, 420))
-      } else {
-        const [response] = await Promise.all([
-          fetch("/api/mira", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              message: cleanMessage,
-              pathname,
-              locale,
-              history: conversationRef.current,
-            }),
-            signal: controller.signal,
-          }),
-          new Promise((resolve) => window.setTimeout(resolve, 520)),
-        ])
-
-        if (response.ok) {
+      const response = await fetch("/api/mira", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Accept: "text/event-stream" },
+        body: JSON.stringify({ message: cleanMessage, pathname, locale, history: conversationRef.current }),
+        signal: controller.signal,
+      })
+      if (response.status === 429) nextReply = { text: copy.tooMany }
+      if (response.ok) {
+        if (response.headers.get("content-type")?.includes("text/event-stream") && response.body) {
+          let completed = false
+          for await (const event of readMiraEvents(response.body)) {
+            if (requestAbortRef.current !== controller) return
+            if (event.type === "delta" && typeof event.text === "string") {
+              streamedText += event.text
+              setReply({ text: streamedText })
+            } else if (event.type === "done") {
+              completed = true
+              nextReply = {
+                text: streamedText.trim(),
+                href: typeof event.href === "string" ? event.href : undefined,
+                label: typeof event.label === "string" ? event.label : undefined,
+              }
+              break
+            } else if (event.type === "error") {
+              throw new Error("MIRA response interrupted")
+            }
+          }
+          if (!completed || !streamedText.trim()) throw new Error("MIRA response incomplete")
+          aiAnswered = true
+        } else {
           const payload = await response.json() as MiraApiResponse
           if (payload.reply?.trim()) {
-            nextReply = {
-              text: payload.reply.trim(),
-              href: payload.href,
-              label: payload.label,
-            }
+            nextReply = { text: payload.reply.trim(), href: payload.href, label: payload.label }
+            aiAnswered = true
           }
         }
       }
     } catch {
-      // The local guide remains available if the AI service is unavailable.
+      if (streamedText.trim()) nextReply = { text: `${streamedText.trim()}\n\n${copy.interrupted}` }
     } finally {
       window.clearTimeout(timeout)
-      requestInFlightRef.current = false
-      requestAbortRef.current = null
-
-      const updatedConversation: MiraTurn[] = [
-        ...conversationRef.current,
-        { role: "user", content: cleanMessage },
-        { role: "assistant", content: nextReply.text },
-      ]
-      conversationRef.current = updatedConversation.slice(-6)
-
-      setReply(nextReply)
-      setIsThinking(false)
-      setIsSpeaking(true)
-      if (voiceRequest) speakReply(nextReply.text)
-
-      poseTimerRef.current = window.setTimeout(() => setIsSpeaking(false), 5200)
-      if (nextReply.autoNavigate && nextReply.href) {
-        const destination = localizedOrganicPath(nextReply.href, locale)
-        navigationTimerRef.current = window.setTimeout(() => {
-          setExpanded(false)
-          router.push(destination)
-        }, 1150)
+      // Closing, minimizing, or starting a new turn invalidates this request.
+      if (requestAbortRef.current === controller) {
+        requestInFlightRef.current = false
+        requestAbortRef.current = null
+        const updatedConversation: MiraTurn[] = [...pendingConversation, { role: "assistant", content: nextReply.text }]
+        conversationRef.current = updatedConversation.slice(-12)
+        setConversation(conversationRef.current)
+        setReply(nextReply)
+        setLimitedReply(!aiAnswered)
+        setIsThinking(false)
+        if (voiceRequest) speakReply(nextReply.text)
+        else {
+          setIsSpeaking(true)
+          poseTimerRef.current = window.setTimeout(() => setIsSpeaking(false), Math.min(4500, 1000 + nextReply.text.length * 12))
+        }
       }
     }
   }
@@ -773,6 +736,8 @@ export function MiraGuide() {
       return
     }
 
+    stopActivity()
+
     const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition
     if (!Recognition) {
       setReply({ text: locale === "it" ? "Il microfono vocale non è supportato da questo browser. Puoi scrivermi qui sotto." : locale === "en" ? "Voice input isn’t supported by this browser. You can type below." : locale === "es" ? "Este navegador no admite entrada de voz. Puedes escribir abajo." : locale === "de" ? "Dieser Browser unterstützt keine Spracheingabe. Du kannst unten schreiben." : "Ce navigateur ne prend pas en charge la saisie vocale. Vous pouvez écrire ci-dessous." })
@@ -787,6 +752,7 @@ export function MiraGuide() {
     let finalTranscript = ""
 
     recognition.onstart = () => {
+      if (recognitionRef.current !== recognition) return
       setExpanded(true)
       setShowNudge(false)
       setIsListening(true)
@@ -795,6 +761,7 @@ export function MiraGuide() {
     }
 
     recognition.onresult = (event) => {
+      if (recognitionRef.current !== recognition) return
       let transcript = ""
       for (let index = event.resultIndex; index < event.results.length; index += 1) {
         transcript += event.results[index][0].transcript
@@ -804,18 +771,25 @@ export function MiraGuide() {
     }
 
     recognition.onerror = () => {
+      if (recognitionRef.current !== recognition) return
       finalTranscript = ""
       setIsListening(false)
       setReply({ text: locale === "it" ? "Non ti ho sentito bene. Riprova oppure scrivimi la richiesta." : locale === "en" ? "I couldn’t hear you clearly. Try again or type your request." : locale === "es" ? "No te he oído bien. Inténtalo de nuevo o escribe tu solicitud." : locale === "de" ? "Ich habe dich nicht gut verstanden. Versuche es erneut oder schreibe deine Anfrage." : "Je ne vous ai pas bien entendu. Réessayez ou écrivez votre demande." })
     }
 
     recognition.onend = () => {
+      if (recognitionRef.current !== recognition) return
       setIsListening(false)
       recognitionRef.current = null
       if (finalTranscript.trim()) askMira(finalTranscript, true)
     }
 
-    recognition.start()
+    try {
+      recognition.start()
+    } catch {
+      recognitionRef.current = null
+      setIsListening(false)
+    }
   }
 
   function handlePointerDown(event: ReactPointerEvent<HTMLButtonElement>) {
@@ -924,17 +898,13 @@ export function MiraGuide() {
       return
     }
     wakeMira()
-    setReply({ text: ui("Yo, dimmi pure. Che cosa cerchi?") })
+    if (!conversationRef.current.length && !requestInFlightRef.current) setReply({ text: contextualPrompt })
     setShowNudge(false)
     setExpanded(true)
   }
 
   function closeBubble() {
-    recognitionRef.current?.abort()
-    recognitionRef.current = null
-    setIsListening(false)
-    setIsThinking(false)
-    setIsSpeaking(false)
+    stopActivity()
     setExpanded(false)
   }
 
@@ -943,9 +913,14 @@ export function MiraGuide() {
   const activeVariant = variant
   const stageSize = getStageSize()
   const bubbleOnLeft = position.x + stageSize.width / 2 > viewportWidth / 2
-  const bubbleWidth = Math.min(expanded ? 320 : 232, viewportWidth - 24)
-  const estimatedBubbleHeight = expanded ? 294 : 118
+  const bubbleWidth = Math.min(expanded ? 360 : 232, viewportWidth - 24)
   const compactViewport = viewportWidth < 640
+  const estimatedBubbleHeight = expanded ? Math.min(460, viewportHeight - (compactViewport ? stageSize.height + 120 : 112)) : 118
+  // Dock the conversation below MIRA on a phone, so the avatar stays visible.
+  const displayedPosition = expanded && compactViewport ? {
+    x: viewportWidth - stageSize.width - 24,
+    y: Math.max(92, viewportHeight - estimatedBubbleHeight - stageSize.height - 24),
+  } : position
   const bubbleLeft = Math.min(
     viewportWidth - bubbleWidth - 12,
     Math.max(
@@ -957,7 +932,7 @@ export function MiraGuide() {
           : position.x + stageSize.width + 12,
     ),
   )
-  const bubbleTop = Math.min(
+  const bubbleTop = expanded && compactViewport ? viewportHeight - estimatedBubbleHeight - 12 : Math.min(
     viewportHeight - estimatedBubbleHeight - 12,
     Math.max(
       92,
@@ -1074,7 +1049,7 @@ export function MiraGuide() {
       {variant && !showSelector && positionReady && !minimized && (
         <aside
           className={`mira-presence ${isDragging ? "mira-is-dragging" : ""} ${isRoaming ? "mira-is-roaming" : ""} ${isSleeping ? "mira-is-sleeping" : ""}`}
-          style={{ left: position.x, top: position.y }}
+          style={{ left: 0, top: 0, transform: `translate3d(${displayedPosition.x}px, ${displayedPosition.y}px, 0)` }}
           aria-label={ui("MIRA, guida del sito")}
         >
           {(expanded || showNudge) && !isDragging && (
@@ -1082,9 +1057,8 @@ export function MiraGuide() {
               className={`mira-neon-bubble ${expanded ? "mira-bubble-expanded" : "mira-bubble-compact"} ${
                 bubbleOnLeft ? "mira-bubble-left" : "mira-bubble-right"
               }`}
-              style={{ left: bubbleLeft, top: bubbleTop, width: bubbleWidth }}
+              style={{ left: bubbleLeft - displayedPosition.x, top: bubbleTop - displayedPosition.y, width: bubbleWidth, maxHeight: expanded ? estimatedBubbleHeight : undefined }}
               aria-label={expanded ? "Parla con MIRΛ" : "Suggerimento di MIRΛ"}
-              aria-live="polite"
             >
               {expanded ? (
                 <>
@@ -1092,12 +1066,28 @@ export function MiraGuide() {
                     <div>
                       <div className="flex items-center gap-2">
                         <p className="text-[9px] font-semibold uppercase tracking-[0.22em] text-primary">MIRΛ</p>
-                        <span className="h-1.5 w-1.5 rounded-full bg-emerald-300 shadow-[0_0_8px_rgba(110,231,183,0.9)]" />
+                        <span className={`h-1.5 w-1.5 rounded-full ${limitedReply ? "bg-amber-300" : "bg-emerald-300"}`} />
                       </div>
                       <p className="mt-0.5 text-[8px] uppercase tracking-[0.13em] text-white/35">
-                        {isListening ? "Ti ascolto" : isThinking ? "Ci sto pensando" : isSpeaking ? "Ti rispondo" : "Guida MIRΛI"}
+                        {isListening ? copy.listening : isThinking ? copy.thinking : isSpeaking ? copy.speaking : copy.ready}
                       </p>
                     </div>
+                    <div className="flex items-center gap-1">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        stopActivity()
+                        conversationRef.current = []
+                        lastLocalIntentRef.current = null
+                        lastLocalProductRef.current = null
+                        setConversation([])
+                        setLimitedReply(false)
+                        setReply({ text: contextualPrompt })
+                      }}
+                      className="flex h-8 w-8 items-center justify-center rounded-full text-white/50 hover:bg-white/10 hover:text-white"
+                      aria-label={copy.clear}
+                      title={copy.clear}
+                    ><RotateCcw className="h-3.5 w-3.5" /></button>
                     <button
                       type="button"
                       onClick={closeBubble}
@@ -1106,14 +1096,27 @@ export function MiraGuide() {
                     >
                       <X className="h-3.5 w-3.5" />
                     </button>
+                    </div>
                   </div>
 
-                  <div className="px-4 pb-3 pt-3.5">
-                    <div className="min-h-16 rounded-2xl border border-white/[0.08] bg-white/[0.035] px-3.5 py-3 text-[12px] leading-5 text-white/78">
-                      <p>{stylizeBrandText(reply.text)}</p>
+                  <div className="mira-chat-content px-4 pb-3 pt-3.5">
+                    <div ref={transcriptRef} className="mira-transcript" aria-label={copy.ready}
+                      onScroll={(event) => {
+                        const target = event.currentTarget
+                        followTranscriptRef.current = target.scrollHeight - target.scrollTop - target.clientHeight < 48
+                      }}>
+                    {conversation.slice(0, -1).map((turn, index) => (
+                      <div key={index} className={`mira-message ${turn.role === "user" ? "mira-message-user" : "mira-message-assistant"}`}>
+                        <span className="sr-only">{turn.role === "user" ? "Tu: " : "MIRA: "}</span>
+                        <p className="whitespace-pre-wrap">{stylizeBrandText(turn.content)}</p>
+                      </div>
+                    ))}
+                    <div className="mira-message mira-message-assistant" aria-busy={isThinking}>
+                      <p className="whitespace-pre-wrap">{stylizeBrandText(reply.text)}{isThinking && <span className="mira-stream-caret" aria-hidden="true" />}</p>
+                      {limitedReply && <p className="mt-2 text-[10px] text-amber-200/80">{copy.limited}</p>}
                       {reply.href && reply.label && (
                         <Link
-                          href={reply.href}
+                          href={localizedOrganicPath(reply.href, locale)}
                           onClick={() => setExpanded(false)}
                           className="mt-2.5 inline-flex items-center gap-1.5 text-[9px] font-semibold uppercase tracking-[0.14em] text-primary transition-colors hover:text-white"
                         >
@@ -1121,6 +1124,17 @@ export function MiraGuide() {
                         </Link>
                       )}
                     </div>
+                    </div>
+                    <span className="sr-only" role="status" aria-live="polite" aria-atomic="true">{isThinking ? copy.thinking : reply.text}</span>
+
+                    {(isThinking || isSpeaking || voiceSupported) && conversation.length > 0 && (
+                      <button type="button" onClick={() => isThinking || isSpeaking ? stopActivity() : speakReply(reply.text)}
+                        className="mt-2 inline-flex min-h-8 items-center gap-1.5 text-[10px] text-white/60 hover:text-primary"
+                        aria-label={isThinking || isSpeaking ? copy.stop : copy.read}>
+                        {isThinking || isSpeaking ? <Square className="h-3 w-3" /> : <Volume2 className="h-3 w-3" />}
+                        {isThinking || isSpeaking ? copy.stop : copy.read}
+                      </button>
+                    )}
 
                     {isListening && (
                       <div className="mira-voice-wave my-2.5 flex h-5 items-center justify-center gap-1" aria-hidden="true">
@@ -1133,7 +1147,7 @@ export function MiraGuide() {
                         value={input}
                         onChange={(event) => setInput(event.target.value)}
                         placeholder={isListening ? ui("Ti ascolto…") : ui("Chiedi qualcosa a MIRA…")}
-                        maxLength={240}
+                        maxLength={1500}
                         className="h-9 min-w-0 flex-1 bg-transparent px-2 text-xs text-white outline-none placeholder:text-white/30"
                         aria-label={ui("Richiesta per MIRA")}
                       />
@@ -1153,7 +1167,7 @@ export function MiraGuide() {
                       </button>
                       <button
                         type="submit"
-                        disabled={!input.trim() || isThinking}
+                        disabled={!input.trim() || isThinking || isListening}
                         className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground transition-all hover:brightness-110 disabled:cursor-not-allowed disabled:bg-white/[0.08] disabled:text-white/25"
                         aria-label={ui("Invia richiesta a MIRA")}
                       >
