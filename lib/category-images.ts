@@ -88,11 +88,12 @@ const CONTAINED_CATEGORY_SLUGS = new Set([
 ])
 
 export function getCategoryImage(slug: string, databaseImage: string | null) {
-  return CATEGORY_IMAGES[slug.toLowerCase()] || databaseImage || DEFAULT_CATEGORY_IMAGE
+  // The admin-managed image is authoritative; bundled images are fallbacks only.
+  return databaseImage || CATEGORY_IMAGES[slug.toLowerCase()] || DEFAULT_CATEGORY_IMAGE
 }
 
 export function getCategoryCardImage(slug: string, databaseImage: string | null) {
-  return CATEGORY_CARD_IMAGES[slug.toLowerCase()] || getCategoryImage(slug, databaseImage)
+  return databaseImage || CATEGORY_CARD_IMAGES[slug.toLowerCase()] || getCategoryImage(slug, databaseImage)
 }
 
 export function shouldContainCategoryImage(slug: string) {

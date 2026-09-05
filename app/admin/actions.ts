@@ -602,6 +602,16 @@ export async function sendDiscountCodeToCommunity(formData: FormData) {
 
 // --- Categories ---
 
+function revalidateCategoryPages() {
+  revalidatePath("/admin")
+  revalidatePath("/")
+  revalidatePath("/collezioni")
+  revalidatePath("/collezione/[slug]", "page")
+  revalidatePath("/[locale]", "page")
+  revalidatePath("/[locale]/collezioni", "page")
+  revalidatePath("/[locale]/collezione/[slug]", "page")
+}
+
 export async function createCategory(formData: FormData) {
   const { supabase } = await assertAdmin()
 
@@ -615,10 +625,7 @@ export async function createCategory(formData: FormData) {
 
   if (error) throw new Error(error.message)
 
-  revalidatePath("/admin")
-  revalidatePath("/")
-  revalidatePath("/collezioni")
-  revalidatePath("/collezione/[slug]", "page")
+  revalidateCategoryPages()
 }
 
 export async function updateCategory(formData: FormData) {
@@ -635,10 +642,7 @@ export async function updateCategory(formData: FormData) {
 
   if (error) throw new Error(error.message)
 
-  revalidatePath("/admin")
-  revalidatePath("/")
-  revalidatePath("/collezioni")
-  revalidatePath("/collezione/[slug]", "page")
+  revalidateCategoryPages()
 }
 
 export async function deleteCategory(formData: FormData) {
@@ -650,10 +654,7 @@ export async function deleteCategory(formData: FormData) {
 
   if (error) throw new Error(error.message)
 
-  revalidatePath("/admin")
-  revalidatePath("/")
-  revalidatePath("/collezioni")
-  revalidatePath("/collezione/[slug]", "page")
+  revalidateCategoryPages()
 }
 
 // --- Users ---
