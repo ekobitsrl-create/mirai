@@ -84,6 +84,7 @@ export async function POST(request: NextRequest) {
     const { data, error } = await supabase.auth.admin.generateLink({
       type: "recovery",
       email,
+      options: { redirectTo: getAbsoluteUrl("/auth/confirm") },
     })
 
     const tokenHash = data.properties?.hashed_token
