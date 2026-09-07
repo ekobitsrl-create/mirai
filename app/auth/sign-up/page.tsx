@@ -1,5 +1,6 @@
 "use client"
 
+import { safeNextPath } from "@/lib/auth-redirect"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
@@ -8,10 +9,6 @@ import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
 import { Suspense, useState } from "react"
 import { BrandMark } from "@/components/brand-mark"
-
-function safeNextPath(value: string | null) {
-  return value && value.startsWith("/") && !value.startsWith("//") ? value : "/community/hub"
-}
 
 function SignUpForm() {
   const router = useRouter()

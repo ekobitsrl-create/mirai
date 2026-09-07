@@ -1,3 +1,4 @@
+import { safeNextPath } from "@/lib/auth-redirect"
 import { NextResponse } from "next/server"
 import { randomUUID } from "node:crypto"
 import { accountConfirmationTemplate } from "@/lib/email/templates"
@@ -28,12 +29,6 @@ type SignUpPayload = {
 
 function textField(value: unknown, maximumLength: number) {
   return typeof value === "string" ? value.trim().slice(0, maximumLength) : ""
-}
-
-function safeNextPath(value: unknown) {
-  return typeof value === "string" && value.startsWith("/") && !value.startsWith("//")
-    ? value.slice(0, 500)
-    : "/community/hub"
 }
 
 function publicError(message: string, status: number) {

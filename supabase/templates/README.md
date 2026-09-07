@@ -14,6 +14,13 @@ Il Site URL non deve restare su `localhost`: Supabase lo usa anche quando un lin
 
 - Oggetto: `Attiva il tuo MIRΛI PASS`
 - Template: copiare il contenuto di `confirmation.html` dentro **Authentication > Email Templates > Confirm signup**.
+- Il link verifica `{{ .TokenHash }}` con `type=signup` su `/auth/confirm`, anche per gli invii standard Supabase.
+
+## Accesso tramite link
+
+- Oggetto: `Accedi al tuo MIRΛI PASS`
+- Template: copiare `../../emails/supabase/magic-link.html` dentro **Authentication > Email Templates > Magic Link**.
+- Il link punta a `/auth/confirm` con `{{ .TokenHash }}` e `type=magiclink`.
 
 ## Recupero password
 

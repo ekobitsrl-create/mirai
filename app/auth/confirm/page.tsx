@@ -1,108 +1,62 @@
 "use client"
 
+import { safeNextPath } from "@/lib/auth-redirect"
 import Link from "next/link"
 import { CheckCircle2, LoaderCircle } from "lucide-react"
 import { useEffect, useRef, useState } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { BrandMark } from "@/components/brand-mark"
 
-function safeNextPath(value: string | null) {
-  return value && value.startsWith("/") && !value.startsWith("//") ? value : "/community/hub"
-}
-
-type SupportedOtpType = "signup" | "magiclink"
-
-function supportedOtpType(value: string | null): SupportedOtpType | null {
-  return value === "signup" || value === "magiclink" ? value : null
-}
+import { verifyEmailLink } from "@/lib/supabase/verify-email-link"
 
 export default function ConfirmAccountPage() {
   const [status, setStatus] = useState<"loading" | "success" | "error">("loading")
   const [nextPath, setNextPath] = useState("/community/hub")
   const [isRecovery, setIsRecovery] = useState(false)
-  const completed = useRef(false)
+  const verification = useRef<ReturnType<typeof verifyEmailLink> | null>(null)
+  const callbackUrl = useRef<URL | null>(null)
 
   useEffect(() => {
-    const searchParams = new URLSearchParams(window.location.search)
-    const tokenHash = searchParams.get("token_hash")
-    const otpType = supportedOtpType(searchParams.get("type"))
-    const recoveryFromQuery = Boolean(tokenHash && searchParams.get("type") === "recovery")
-    const recoveryFromHash = new URLSearchParams(window.location.hash.slice(1)).get("type") === "recovery"
-    const recoveryFromUrl = recoveryFromQuery || recoveryFromHash
-    const requestedDestination = safeNextPath(searchParams.get("next"))
-    const destination = recoveryFromUrl ? "/auth/update-password" : requestedDestination
-    setIsRecovery(recoveryFromUrl)
+    let active = true
+    let redirectTimer: number | undefined
+    const url = callbackUrl.current ?? new URL(window.location.href)
+    callbackUrl.current = url
+    const recovery = url.searchParams.get("type") === "recovery"
+      || new URLSearchParams(url.hash.slice(1)).get("type") === "recovery"
+    const destination = recovery ? "/auth/update-password" : safeNextPath(url.searchParams.get("next"))
+    setIsRecovery(recovery)
     setNextPath(destination)
-    const supabase = createClient()
 
-    async function completeSession(accessToken: string, refreshToken: string, recovery = false) {
-      if (completed.current) return
-      completed.current = true
-
-      const finalDestination = recovery ? "/auth/update-password" : destination
-      if (recovery) {
-        setIsRecovery(true)
-        setNextPath(finalDestination)
-      }
-
+    // Reuse the verification during React's effect replay: OTPs are single use.
+    verification.current ??= verifyEmailLink(createClient().auth, url)
+    void verification.current.then(async (session) => {
+      if (!active) return
       const response = await fetch("/api/auth/set-session", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({ access_token: accessToken, refresh_token: refreshToken }),
+        body: JSON.stringify({ access_token: session.access_token, refresh_token: session.refresh_token }),
       })
-
-      if (!response.ok) {
-        completed.current = false
-        setStatus("error")
-        return
-      }
-
+      if (!response.ok) throw new Error("Impossibile salvare la sessione")
+      if (!active) return
       setStatus("success")
-      window.setTimeout(() => {
-        window.location.href = finalDestination
+      redirectTimer = window.setTimeout(() => {
+        window.location.href = destination
       }, 900)
-    }
-
-    const { data: listener } = supabase.auth.onAuthStateChange((event, session) => {
-      if (recoveryFromQuery) return
-      if (session) void completeSession(session.access_token, session.refresh_token, event === "PASSWORD_RECOVERY")
+    }).catch(() => {
+      if (active) setStatus("error")
+    }).finally(() => {
+      if (!active) return
+      const cleanUrl = new URL("/auth/confirm", url.origin)
+      if (recovery) cleanUrl.searchParams.set("type", "recovery")
+      else cleanUrl.searchParams.set("next", destination)
+      window.history.replaceState({}, "", cleanUrl)
     })
 
-    async function verifyOrRecoverSession() {
-      if (tokenHash && (otpType || recoveryFromQuery)) {
-        const { data, error } = await supabase.auth.verifyOtp({
-          token_hash: tokenHash,
-          type: recoveryFromQuery ? "recovery" : otpType!,
-        })
-
-        const cleanUrl = new URL("/auth/confirm", window.location.origin)
-        if (!recoveryFromQuery) cleanUrl.searchParams.set("next", destination)
-        window.history.replaceState({}, "", cleanUrl)
-
-        if (error || !data.session) {
-          setStatus("error")
-          return
-        }
-
-        await completeSession(data.session.access_token, data.session.refresh_token, recoveryFromQuery)
-        return
-      }
-
-      const { data } = await supabase.auth.getSession()
-      if (data.session) {
-        await completeSession(data.session.access_token, data.session.refresh_token, recoveryFromUrl)
-        return
-      }
-
-      window.setTimeout(() => {
-        if (!completed.current) setStatus("error")
-      }, 4500)
+    return () => {
+      active = false
+      window.clearTimeout(redirectTimer)
     }
-
-    void verifyOrRecoverSession()
-
-    return () => listener.subscription.unsubscribe()
   }, [])
 
   return (

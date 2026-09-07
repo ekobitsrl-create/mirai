@@ -1,5 +1,6 @@
 "use client"
 
+import { safeNextPath } from "@/lib/auth-redirect"
 import { createClient } from "@/lib/supabase/client"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -57,11 +58,8 @@ function LoginForm() {
 
       const isAdmin = (profile as { role?: string } | null)?.role === 'admin' || isAdminEmail(data.user.email)
       // Respect safe internal redirects. Only the admin area requires an admin role.
-      let redirectUrl = isAdmin ? '/admin' : '/account'
-      const safeRedirect = typeof redirectTo === 'string' && redirectTo.startsWith('/') && !redirectTo.startsWith('//')
-      if (safeRedirect && redirectTo) {
-        redirectUrl = redirectTo.startsWith('/admin') && !isAdmin ? '/account' : redirectTo
-      }
+      const requestedPath = safeNextPath(redirectTo, isAdmin ? "/admin" : "/account")
+      const redirectUrl = requestedPath.startsWith("/admin") && !isAdmin ? "/account" : requestedPath
 
       // Small delay to ensure cookies are properly saved by the browser
       await new Promise(resolve => setTimeout(resolve, 100))

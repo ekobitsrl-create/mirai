@@ -6,6 +6,7 @@ import {
   readJsonBody,
   RequestBodyTooLargeError,
 } from "@/lib/request-security"
+import { setSessionCookies } from "@/lib/supabase/session-cookies"
 import { createPublicClient } from "@/lib/supabase/server"
 
 export async function POST(request: NextRequest) {
@@ -42,21 +43,7 @@ export async function POST(request: NextRequest) {
   }
 
   const response = NextResponse.json({ ok: true })
-  const secure = process.env.NODE_ENV === "production"
-  response.cookies.set("sb-access-token", accessToken, {
-    path: "/",
-    httpOnly: true,
-    secure,
-    sameSite: "lax",
-    maxAge: 60 * 60,
-  })
-  response.cookies.set("sb-refresh-token", refreshToken, {
-    path: "/",
-    httpOnly: true,
-    secure,
-    sameSite: "lax",
-    maxAge: 60 * 60 * 24 * 30,
-  })
+  setSessionCookies(response, accessToken, refreshToken)
 
   return response
 }

@@ -35,5 +35,17 @@ export function createClient(): SupabaseClient<LooseDatabase> {
       },
     },
   )
+  // Keep server-rendered member pages in sync even when Account is not mounted.
+  client.auth.onAuthStateChange((event, session) => {
+    if (event !== "TOKEN_REFRESHED" || !session) return
+    void fetch("/api/auth/set-session", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({ access_token: session.access_token, refresh_token: session.refresh_token }),
+    }).catch(() => {
+      // Server-side renewal remains available when a network request fails.
+    })
+  })
   return client
 }
